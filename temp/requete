@@ -1,0 +1,1 @@
+SELECT gc.id id_champ, IFNULL(gcpv.id_champ , gcp.default_value) FROM `gab_champ` gc INNER JOIN gab_champ_type gct ON gc.type = gct.code  LEFT JOIN gab_champ_param  gcp ON gcp.code_champ_type = gct.code LEFT JOIN gab_champ_param_value gcpv ON gcpv.code_champ_param = gcp.code AND gc.id = gcpv.id_champ

@@ -1,0 +1,7 @@
+<h1>Gestion des pages</h1>
+
+<h2><?php echo ($this->page->getMeta() ? 'Modification de ' : 'création de ') . $this->page->getGabarit()->getLabel(); ?></h2>
+
+<h3><span id="version_courante">version web</span></h3>
+
+<?php echo $this->form; ?>

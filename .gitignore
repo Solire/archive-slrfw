@@ -1,0 +1,6 @@
+# On ignore le dossier netbeans
+/nbproject/
+
+# dossiers de documentations
+~files/
+~export/

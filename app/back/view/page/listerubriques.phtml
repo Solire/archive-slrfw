@@ -1,0 +1,56 @@
+<h1>Liste des rubriques et sous-rubriques</h1>
+
+
+<div style="float:left;margin-right:10px;">
+	<a href="page/display.html?id_gabarit=2" class="button vert">
+		<span class="vert">Sous-rubrique</span>
+	</a>
+</div>
+
+<div class="clearin"></div>
+
+<div class="sort-box">
+    
+<?php foreach ($this->rubriques as $rubrique) {?>
+
+    <fieldset class="sort-elmt" id="gab_page_<?php echo $rubrique->getMeta('id'); ?>">
+
+        <legend><?php echo $rubrique->getMeta('titre'); ?> - <i><?php echo $rubrique->getMeta('nbre_enfants'); ?> sous-rubrique<?php echo $rubrique->getMeta('nbre_enfants') > 1 ? 's' : ''; ?></i></legend>
+
+        <div class="sort-box" style="display:none;"></div>        
+
+        <div class="line cat-modif">
+            
+			<div style="float:left;">
+                
+<?php if ($this->utilisateur->get("niveau") == "solire") { ?>
+                
+				<a title="Déplacer '<?php echo $rubrique->getMeta('titre'); ?>'" class="button bleu sort-move" href="#"><span class="bleu"><img alt="Déplacer" src="img/back/deplacer.png" /></span></a>
+                
+                <a title="Modifier '<?php echo $rubrique->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $rubrique->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
+                
+                <a title="Rendre visible '<?php echo $rubrique->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $rubrique->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+
+<?php } ?>
+                
+			</div>
+			
+			<div style="float:right;">
+				<a title="Supprimer '<?php echo $rubrique->getMeta('titre'); ?>'" style="float: right;display:none;" class="button bleu supprimer" href="#"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
+			</div>
+            
+		</div>
+        
+    </fieldset>
+
+<?php } ?>
+
+</div>
+
+<div class="clearin"></div>
+
+<div class="buttonfixed">
+	<a href="#" class="button vert enregistrerordre">
+		<span class="vert ">Enregistrer Ordre</span>
+	</a>
+</div>

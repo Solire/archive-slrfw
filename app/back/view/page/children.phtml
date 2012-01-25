@@ -1,0 +1,19 @@
+<?php if (count($this->pages) > 0) { foreach ($this->pages as $page) { ?>
+
+        <div id="gab_page_<?php echo $page->getMeta('id') ?>" class="sort-elmt ligne">
+            
+            <a href="#" class="button bleu supprimer" style="float: right;"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
+            
+            <a href="#" class="button bleu sort-move"><span class="bleu"><img alt="déplacer" src="img/back/deplacer.png"></span></a>
+            
+            <a class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+            
+            <a href="page/display.html?id_gab_page=<?php echo $page->getMeta('id') ?>" style="margin-left:20px;" title="<?php echo $page->getMeta('rewriting') ?>"><b><?php echo $page->getMeta('titre') ?></b></a>
+            
+        </div>
+
+<?php }} else { ?>
+
+        <div>Aucune page dans ce dossier</div>
+        
+<?php } ?>

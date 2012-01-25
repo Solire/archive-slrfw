@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+    <head>
+        <title><?php echo $this->seo->getTitle(); ?></title>
+        <meta name="description" content="<?php echo $this->seo->getDescription(); ?>" />
+        <meta name="keywords" lang="fr" content="<?php echo $this->seo->showKeywords(); ?>" />
+
+
+        <meta charset="UTF-8" />
+        <meta name="language" content="fr" />
+        <meta name="robots" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
+        <meta name="googlebot" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
+
+        <meta name="msvalidate.01" content="" />
+        <meta name="y_key" content="" />
+        <meta name="google-site-verification" content="" />
+        <meta name="author" content="Solire" />
+        <base href="<?php echo $this->Url; ?>" />
+
+
+
+        <?php echo $this->cssComponents; ?>
+
+        <?php echo $this->jsComponents; ?>
+
+
+    </head>
+    <body role="document">
+
+        <div id="global">
+
+            <header role="banner">
+
+
+
+            </header>
+
+            <nav role="navigation" >
+                <ul>
+                    <li><a href="page/mypage.html"><?php echo $this->_("REALISATEURS") ?></a></li>
+                </ul>
+
+            </nav>
+
+
+            <?php $this->content(); ?>
+
+
+            <footer role="contentinfo">
+
+
+
+            </footer>
+
+        </div>
+
+
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', '']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+    </body>
+</html>

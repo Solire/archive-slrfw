@@ -1,0 +1,57 @@
+				<div id="mmenu">
+                    <div id="currentruntime" style="font-size:10px; color:#a1a1a1; font-style:italic; padding: 3px;"></div>
+                    
+					<div style="float:left; margin-right:10px; width:200px; height:40px;">
+                        
+                        <!--<a href="#" class="button vert" id="add_folder">
+							<span class="vert">ajouter un dossier</span>
+						</a>-->
+
+						<a href="#" class="button vert" id="pickfiles">
+							<span class="vert">ajouter un fichier</span>
+						</a>
+                        
+					</div>
+                    
+                    <div style="float: left">
+                        <form action="index.php" style="margin:0;">
+                            <div>
+                                <label style="width:100px;" for="search">Recherche</label>
+                                <input type="text" id="search" />
+                            </div>
+<!--
+                            <div>
+                                <label style="width:100px;" for="catid">Dans</label>
+                                <select id="catid">{OPTIONS}</select>
+                            </div>-->
+                        </form>
+                    </div>
+					
+					<!--<div style="float: left; margin-right: 10px;">
+						<a href="#" class="button vert" id="uploadfiles">
+							<span class="vert">charger les fichiers</span>
+						</a>
+					</div>-->
+				</div>
+				<div class="clear"></div>
+                
+				<div id="folders" style="width: 200px; overflow: hidden; float: left"></div>
+                
+				<div id="colright" style="min-height: 400px; float: left; width: 660px; margin-left: 20px;">
+					<table id="tableau" style="width:100%;">
+						<thead>
+							<tr>
+								<th style="width: 200px; text-align: center;">&nbsp;<a id="rewriting" class="css_right ui-icon ui-icon-carat-2-n-s"></a></th>
+								<th>Taille<a id="taille" class="css_right ui-icon ui-icon-carat-2-n-s"></a></th>
+								<th>Largeur<a id="width" class="css_right ui-icon ui-icon-carat-2-n-s"></a></th>
+								<th>Hauteur<a id="height" class="css_right ui-icon ui-icon-carat-2-n-s"></a></th>
+								<th>Date / Heure<a id="date_crea" class="css_right ui-icon ui-icon-carat-1-s"></a></th>
+								<th style="width: 50px;">&nbsp;</th>
+							</tr>
+						</thead>
+
+						<tbody id="foldercontent">
+							<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+						</tbody>
+					</table>
+				</div>

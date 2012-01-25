@@ -1,0 +1,326 @@
+<style type="text/css">
+    @import "css/jquery/plugins/datatables-1.8.2/demopage.css";
+    @import "css/jquery/plugins/datatables-1.8.2/demotablejui.css";
+</style>
+
+
+<script class="jsbin" src="http://datatables.net/download/build/jquery.dataTables.nightly.js"></script> 
+
+<script type="text/javascript" charset="utf-8"> 
+
+    $(document).ready(function() {
+        /*
+         * Object ui 
+         * Permet d'ajouter des éléments graphiques
+         */
+        
+        var ui = {
+            appendEffect : "<?php echo $this->appConfig->get('ui-appendeffect', 'version'); ?>",
+            appendDelay : <?php echo $this->appConfig->get('ui-appenddelay', 'version'); ?>,
+            
+            init : function () {
+                this._initDialog();
+                this._initEvent();
+                this._initFormToTable();
+                this._initDataTable();
+                this._initGui();
+                this._initData();
+                this._initAutoComplete();
+                
+            },
+            
+            _initDialog : function () {
+                var $formTemplate = $('#template-version-form').tmpl({add : true})
+                .appendTo("#dialog-version")
+                $formTemplate.form();
+                
+                $('.dialog-form').dialog({
+                    resizable: false,
+                    autoOpen: false,
+                    height: "auto",
+                    width: 450,
+                    modal: false,
+                    show: "explode",
+                    hide: "explode",
+                    buttons: {
+                        "Ajouter": function() {
+                            var myDialog = $( this ).attr('id').split('-')
+                            
+                            switch($( this ).attr('id')) {
+                                case 'dialog-version':
+                                    $('#version-form').formToTable('send');
+                                    break;
+                                
+                            }
+                        },
+                        "Ajouter et fermer": function() {
+                            var myDialog = $( this ).attr('id').split('-')
+                            
+                            switch($( this ).attr('id')) {
+                                case 'dialog-version':
+                                    $('#version-form').formToTable('send');
+                                    break;
+                            }
+                    
+                            $( this ).dialog( "close" );
+                        },
+                        "Fermer" : function() {
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    open: function() {
+                        switch($( this ).attr('id')) {
+                            case 'dialog-version':
+                                    
+                                break;
+                        }
+                    },
+                    close: function() {
+                
+                    }
+                });
+                
+            },
+            
+            _initEvent : function () {
+            
+                $('.open-dialog').click(function () {
+                    var myDialog = $(this).attr('id').split('-')
+                    var type = myDialog[1];
+                    $('.dialog-form#dialog-' + type).dialog('open');
+                })
+            },
+            
+            _initFormToTable : function () {
+                $('#version-form').formToTable({
+                    callback : function(data) {
+                        ui.addVersion( 'flags/png/' + data['suf'].toLowerCase() + '.png', data['suf'], data['nom'], data['domaine'], data['analytics'], data['sitemap-google'], data['sitemap-yahoo'], data['sitemap-bing'], data['id'])
+                    }
+                });
+            },
+            
+            _initDataTable : function () {
+                $('.ui-table').dataTable({
+                    "bJQueryUI": true,
+                    "sPaginationType": "full_numbers"
+                });
+            },
+            
+            _initAutoComplete : function () {
+                $( ".ui-form-autocomplete" ).autocomplete({
+                    source: function( request, response ) {
+                        var params = this.element.attr("id").split('-');
+                        $.getJSON( "version/auto-complete.html?type=" + params[0], request, function( data, status, xhr ) {
+                            response( data.items );
+                            
+                        });
+                    },
+                    select: function(e, ui) {
+                        $(this).parents('form:first').find('input[name="suf"]').val(ui.item.code_pays)
+                        
+                
+                    },
+                    minLength: 0
+                }).data("autocomplete")._renderItem = function (ul, item) {
+                    return $("<li />")
+                    .data("item.autocomplete", item)
+                    .append("<a><img src='img/" + item.icon + "' /> " + item.label + "</a>")
+                    .appendTo(ul);
+                };
+            },
+            
+            _initGui : function () {
+                //SELECT UI
+                $('.dialog-form .ui-select:not(.ui-select-load)' ).selectmenu({
+                    width : 250,
+                    style : "dropdown",
+                    maxHeight: 200
+                });
+                
+                $(".dialog-form form").form();
+                
+                
+                
+                //all hover and click logic for buttons
+                $(".dialog-form .fg-button-custom:not(.ui-state-disabled)")
+                .hover(
+                function(){ 
+                    $(this).addClass("ui-state-hover"); 
+                },
+                function(){ 
+                    $(this).removeClass("ui-state-hover"); 
+                })
+                .mousedown(function(event){
+                    $(this).parents('.fg-buttonset-single:first').find(".fg-button-custom.ui-state-active").removeClass("ui-state-active");
+                    if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
+                    else { $(this).addClass("ui-state-active"); }	
+                })
+                .mouseup(function(event){
+                    if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button-custom,  .fg-buttonset-multi .fg-button-custom') ){
+                        $(this).removeClass("ui-state-active");
+                    }
+                }).click(function(event){
+                    event.preventDefault();
+                });
+            },
+            
+            _initData : function () {
+                
+            },
+            
+            addVersion : function (icone, suf, nom, domaine, analytics, sitemapgoogle, sitemapyahoo, sitemapbing, id) {
+                $('#table-version table').dataTable().fnAddData( [
+                    "&nbsp;<img src='img/" + icone + "' />&nbsp;", 
+                    suf, 
+                    nom,
+                    domaine, 
+                    analytics, 
+                    sitemapgoogle, 
+                    sitemapyahoo, 
+                    sitemapbing
+                ] );
+
+            }
+            
+            
+            
+        }
+        
+        ui.init();
+        
+        /*
+         * Object loader
+         * Permet de charger l'interface
+         */
+        var loader = {
+            
+            version: function(p) {
+                
+                for(i in p.data) {
+                    ui.addVersion(p.data[i]['icon'], p.data[i]['suf'], p.data[i]['nom'], p.data[i]['domaine'], p.data[i]['analytics'], p.data[i]['sitemap-google'], p.data[i]['sitemap-yahoo'], p.data[i]['sitemap-bing'], p.data[i]['id'])
+                }
+                
+            }
+        }
+        
+        
+        document.body.style.cursor='wait';
+        $.getJSON("version/load.html", function(data){
+            
+            for(i in data) {
+                if (data[i]) {
+                    loader[i].call(this, data[i]);
+                }
+            }
+            document.body.style.cursor='auto';
+        });
+    }); 
+        
+        
+  
+ 
+</script> 
+
+
+<div id="table-version">
+    <table cellpadding="0" cellspacing="0" border="0" style="width: 100% !Important;" class="ui-table" id="">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Suffixe</th>
+                <th>Nom</th>
+                <th>Domaine</th>
+                <th>Analytics</th>
+                <th>sitemap-google</th>
+                <th>sitemap-yahoo</th>
+                <th>sitemap-bing</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Suffixe</th>
+                <th>Nom</th>
+                <th>Domaine</th>
+                <th>Analytics</th>
+                <th>sitemap-google</th>
+                <th>sitemap-yahoo</th>
+                <th>sitemap-bing</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<div id="dialog-version" class="dialog-form" title="Créer une version">
+
+
+</div>
+
+
+<!-- TEMPLATE JQUERY -->
+
+<script id="template-version-form" type="text/x-jquery-tmpl">
+
+
+    <form id="version-form" method="post" class="ui-form ui-widget">
+
+        {{if data}}
+        <input name="id" type="hidden" value="${data.id}" />
+        {{/if}}
+
+        <div class="ui-form-elem">
+            <label for="">Nom</label>
+            <input type="text" value="" class="ui-form-autocomplete" id="pays-autocomplete" name="nom" />
+        </div>
+
+        <div class="ui-form-elem">
+            <label for="">Suffixe</label>
+            <input type="text" value="" name="suf" />
+        </div>
+
+        <div class="ui-form-elem">
+            <label for="">Domaine</label>
+            <input type="text" value="" name="domaine" />
+        </div>
+
+        <div class="ui-form-elem">
+            <label for="">Code analytics</label>
+            <input type="text" value="" name="analytics" />
+        </div>
+
+        <div class="ui-form-elem">
+            <label for="">Site map Google</label>
+            <input type="text" value="" name="sitemap-google" />
+        </div>
+        <div class="ui-form-elem">
+            <label for="">Site map Yahoo</label>
+            <input type="text" value="" name="sitemap-yahoo" />
+        </div>
+
+        <div class="ui-form-elem">
+            <label for="">Site map Bing</label>
+            <input type="text" value="" name="sitemap-bing" />
+        </div>
+        {{if add}}
+        {{else}}
+        <div class="ui-form-elem">
+            <label for=""></label>
+            <button type="submit" class="fg-button fg-button-custom ui-state-default ui-corner-all">Enregistrer</button>
+        </div>
+        {{/if}}
+
+    </form>
+
+
+
+</script>
+
+<script id="template-menu-param" type="text/x-jquery-tmpl">
+    <div class="fg-buttonset fg-buttonset-custom ui-helper-clearfix">
+        <button class="fg-button fg-button-custom ui-state-default ui-corner-all open-dialog" id="add-version">Créer une version</button>
+    </div>
+</script>
+
+<!-- END TEMPLATE JQUERY -->

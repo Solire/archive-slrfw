@@ -1,0 +1,195 @@
+/***************************************
+* reset.
+***************************************/
+/* http://meyerweb.com/eric/thoughts/2007/05/01/reset-reloaded/ */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+    /*border: 0;*/
+    font-family: inherit;
+    font-size: 100%;
+    font-style: inherit;
+    font-weight: inherit;
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    vertical-align: baseline;
+}
+
+form.ui-form label {
+    width: 150px;
+    margin-bottom: 3px;
+    display: block;
+    float: left;
+    font-size: 1em;
+    height: 20px;
+    margin-right: 4px;
+    text-align: right;
+    line-height: 2em;
+    font-weight: bold;
+}
+
+/*form.ui-form input, form.ui-form select, form.ui-form .fg-buttonset, form.ui-form .ui-form-button {
+    width: 250px;
+}*/
+
+form.ui-form .fg-button-double {
+    width: 126px;
+}
+
+
+
+form.ui-form fieldset legend { width: 100%;text-align: center; }
+
+form.ui-form fieldset, form.ui-form .ini-bloc {
+    width: 425px;
+    float: left;
+    margin: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+form.ui-form .ini-bloc {
+    margin: 10px;
+    padding-bottom: 10px;
+    padding-top: 2px;
+}
+
+form.ui-form .ui-form-elem {
+    height: 35px;
+}
+
+
+
+.clear {
+    clear: both;
+}
+
+body {
+    font-size: 0.8em
+        
+}
+
+#main-layout {
+    padding: 10px;
+}
+
+
+.main-toolbar {
+    position: fixed;
+    top :0;
+    width: 100%;
+    z-index: 1000
+}
+
+.buttonset-add {
+    top :5px;
+    left : 15px;
+    position: absolute;
+}
+
+.main-toolbar .fg-toolbar {
+    position: relative;
+    width: 100%;
+}
+
+.main-toolbar .buttonset-add {
+    position: relative;
+}
+
+.main-toolbar .fg-toolbar {
+    position: fixed;
+}
+
+.main-toolbar .ui-selectmenu {
+    float:left;
+    margin-right: 4px;
+    padding: 2px;
+    padding-bottom: 1px;
+}
+
+.fg-button-custom { clear:none;outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+    .fg-button-custom .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
+
+    a.fg-button-custom { float:left; }
+
+    /* remove extra button width in IE */
+    button.fg-button-custom { width:auto; overflow:visible; }
+
+    .fg-button-icon-left { padding-left: 2.1em; }
+    .fg-button-icon-right { padding-right: 2.1em; }
+    .fg-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }
+    .fg-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
+
+    .fg-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+
+    .fg-buttonset-custom { float:left; }
+    .fg-buttonset-custom .fg-button-custom { float: left; }
+    .fg-buttonset-single .fg-button-custom, 
+    .fg-buttonset-multi .fg-button-custom { margin-right: -1px;}
+
+    .fg-toolbar { height: 30px;padding: .5em; margin: 0;  }
+    .fg-toolbar .fg-buttonset-custom { margin-right:1.5em; padding-left: 1px; }
+    .fg-toolbar .fg-button-custom { font-size: 1em;  }
+
+    
+        .mysortable { min-height: 60px;list-style-type: none; margin: 0; padding: 0; float: left; margin-right: 10px;width: 100%; }
+    .mysortable li { margin: 0 5px 5px 5px; padding: 5px; font-size: 1.2em;  }
+    .ui-state-highlight { height: 4em; line-height: 1.2em;  }
+    .groups .mysortable .ui-state-highlight { height: 1.5em; line-height: 1.2em;  }
+    
+    
+    .template {display: none;}
+
+    
+    .ui-effects-transfer { border: 2px dotted gray; } 
+    
+    
+    .field-tools, .group-tools {
+        float:right;    
+        height: 24px;
+    }
+    
+     .field-tools span, .group-tools span{
+        float:left;  
+        display: block;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+    
+    input.ui-state-default {
+        height: 20px;
+        width: 222px;
+        padding-left: 14px;
+        padding-right: 14px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+    
+    .fg-menu-container {
+        z-index : 2000000
+    }
+    
+    
+    
+    .dialogs {
+        display: none;
+    }
+    
+    .tabs-layout {
+        width: 100%;
+    }
+    
+    #tabs-layout-0 {
+        width: 65%
+    }
+    
+    #table-version {
+    }

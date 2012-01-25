@@ -1,0 +1,45 @@
+<!doctype html public "-//W3C//DTD HTML 4.0//EN">
+<html>
+	<head>
+		<title>Connexion</title>
+		<meta name="ROBOTS" content="noindex, nofollow" />
+		<meta name="GOOGLEBOT" content="noindex, nofollow" />
+
+		<base href="<?php echo $this->Url; ?>" />
+
+		<link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/admin/style.css" />
+
+		<script type="text/javascript" src="js/back/jquery/jquery-1.4.4.min.js"></script>
+		<script type="text/javascript" src="js/back/form.js"></script>
+		<script type="text/javascript">
+			var keypressaction = function(event){
+				if(event.keyCode == 13) $('.formsubmit').trigger('click');
+			}
+
+			$(document).bind('keypress', keypressaction);
+		</script>
+	</head>
+	<body style="background:#efefef;">
+		<div style="margin-top:15%; margin-right:auto; margin-left:auto; width:488px; background-color:#fff; padding:20px;">
+            <form method="post" action="<?php echo $this->action; ?>">
+				<fieldset>
+					<legend><b>Module d'administration</b></legend>
+
+					<div class="line">
+						<label for="log">Identifiant</label>
+						<input type="text" name="log" id="log" class="form-controle form-oblig form-mix mini" size="50" maxlength="100" />
+					</div>
+
+					<div class="line">
+						<label for="pwd">Mot de passe</label>
+						<input type="password" name="pwd" id="pwd" class="form-controle form-oblig form-mix mini" size="50" maxlength="100" />
+					</div>
+
+					<div class="buttonright">
+						<a href="#" class="button vert formsubmit" id="intro" style="float:right;"><span class="vert">Connexion</span></a>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</body>
+</html>

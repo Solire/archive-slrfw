@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+    <head>
+        <title><?php echo $this->seo->getTitle(); ?></title>
+        <meta name="description" content="<?php echo $this->seo->getDescription(); ?>" />
+        <meta name="keywords" lang="fr" content="<?php echo $this->seo->showKeywords(); ?>" />
+
+
+        <meta charset="UTF-8" />
+        <meta name="language" content="fr" />
+        <meta name="robots" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
+        <meta name="googlebot" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
+
+        <meta name="msvalidate.01" content="" />
+        <meta name="y_key" content="" />
+        <meta name="google-site-verification" content="" />
+        <meta name="author" content="Solire" />
+        <base href="<?php echo $this->Url; ?>" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+
+        <link rel="apple-touch-icon" href="http://www.solire.fr/apple-touch-icon.png" />
+
+        <?php echo $this->cssComponents; ?>
+
+        <?php echo $this->jsComponents; ?>
+
+
+    </head>
+    <body role="document">
+
+
+        <div data-role="page" data-theme="a" data-back-btn-text="Retour">
+
+            <div data-role="header">
+                <div class="fildefer">
+                    {FILDEFER}
+                </div>
+                <h1><?php echo $this->seo->getTitle(); ?></h1>
+            </div><!-- /header -->
+
+            <div data-role="content">	
+                <?php $this->content(); ?>		
+            </div><!-- /content -->
+
+            <div data-role="footer">
+                <h4>Page Footer</h4>
+            </div><!-- /footer -->
+        </div><!-- /page -->
+
+
+
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', '']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+        <script type="text/javascript">
+            $( '[data-role=page]' ).live( 'pageshow', function (event, ui) {
+                try
+                {
+                    if ( location.hash )
+                    {
+                        url = location.hash;
+                    }
+                    else
+                    {
+                        url = defaulturl;
+                    }
+                    _gaq.push( ['_trackPageview', url] );
+                }
+                catch( error )
+                {
+                    // Oh no! Call the catch logger
+                }
+            });
+        </script>
+
+    </body>
+</html>

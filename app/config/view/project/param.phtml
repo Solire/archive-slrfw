@@ -1,0 +1,338 @@
+
+
+
+
+
+
+
+<script type="text/javascript" charset="utf-8"> 
+    $(document).ready(function() {
+        
+        
+
+        
+        /*
+         * Object ui 
+         * Permet d'ajouter des éléments graphiques
+         */
+        
+        var ui = {
+            appendEffect : "<?php echo $this->appConfig->get('ui-appendeffect', 'param'); ?>",
+            appendDelay : <?php echo $this->appConfig->get('ui-appenddelay', 'param'); ?>,
+            
+            init : function () {
+                this._initDialog();
+                this._initForm();
+                this._initEvent();
+                this._initFormToTable();
+                
+                
+            },
+            
+            _initDialog : function () {
+                
+                var $formTemplate = $('#template-param-form-serveur').tmpl({add : true})
+                .appendTo("#dialog-serveur")
+                $formTemplate.form();
+                $('.ui-select:not(.ui-select-load)', $formTemplate).selectmenu({
+                    width : 250,
+                    style : "dropdown",
+                    maxHeight: 200
+                });
+                
+                
+                $.fx.speeds._default = 1000;
+                
+                
+                $('.dialog-form').dialog({
+                    resizable: false,
+                    autoOpen: false,
+                    height: "auto",
+                    width: 450,
+                    modal: false,
+                    show: "explode",
+                    hide: "explode",
+                    buttons: {
+                        "Ajouter": function() {
+                            var myDialog = $( this ).attr('id').split('-')
+                            
+                            switch($( this ).attr('id')) {
+                                case 'dialog-serveur':
+                                    $('#serveur-form').formToTable('send');
+                                    break;
+                                
+                            }
+                        },
+                        "Ajouter et fermer": function() {
+                            var myDialog = $( this ).attr('id').split('-')
+                            
+                            switch($( this ).attr('id')) {
+                                case 'dialog-serveur':
+                                    $('#serveur-form').formToTable('send');
+                                    break;
+                                
+                            }
+                    
+                            $( this ).dialog( "close" );
+                        },
+                        "Fermer" : function() {
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    open: function() {
+                        switch($( this ).attr('id')) {
+                            case 'dialog-serveur':
+                                break;
+                                
+                        }
+                    },
+                    close: function() {
+                
+                    }
+                });
+            },
+            
+            _initEvent : function () {
+            
+                $('.open-dialog').click(function () {
+                    var myDialog = $(this).attr('id').split('-')
+                    var type = myDialog[1];
+                    $('.dialog-form#dialog-' + type).dialog('open');
+                })
+            },
+            
+            _initFormToTable : function () {
+                $(' #serveur-form').formToTable({
+                    callback : function(data) {
+                        ui.addServer(data['nom'], data['hote'], data['utilisateur'], data['mot_de_passe'], data['repertoire'], data['type'], data['id'], data['id_projet'])
+                    }
+                });
+        
+                
+            },
+            
+            _initForm : function () {
+                $('#form-project').form();
+                
+                $('#form-project .ui-select:not(.ui-select-load)').selectmenu({
+                    width : 250,
+                    style : "dropdown",
+                    maxHeight: 200
+                });
+                
+            },
+            
+            addServer : function (nom, hote, utilisateur, motDePasse, repertoire, type, id, id_projet) {
+                var data = {
+                    nom : nom,
+                    hote : hote,
+                    utilisateur : utilisateur,
+                    motDePasse : motDePasse,
+                    repertoire : repertoire,
+                    type : type,
+                    id : id,
+                    id_projet : id_projet
+                }; 
+                var $serveur = $('#template-param-form-serveur').tmpl( {data : data} )
+                .appendTo( '#form-project' )
+                .hide()
+                .show(ui.appendEffect, ui.appendDelay, function () {
+                    
+                });
+                
+                
+                $serveur.form();
+                
+                $('.ui-select:not(.ui-select-load)', $serveur).selectmenu({
+                    width : 250,
+                    style : "dropdown",
+                    maxHeight: 200
+                });
+                
+                //Bind event test connexion 
+                $('.ftp-test', $serveur).bind('click', function(e) {
+                    e.preventDefault();
+                    var hote = $serveur.find('input[name="hote"]').val();
+                    var utilisateur = $serveur.find('input[name="utilisateur"]').val();
+                    var motDePasse = $serveur.find('input[name="mot_de_passe"]').val();
+                    var repertoire = $serveur.find('input[name="repertoire"]').val();
+                    process.ftpTest(hote, utilisateur, motDePasse, repertoire);
+                })
+                
+                $serveur.formToTable({
+                    callback : function (data) {
+                                                $serveur.find('.ini-bloc .ui-dialog-titlebar span:first .serveur-name').html(data.nom)
+                        //                        $($serveur).find('.gab_champ-form-edit:first').hide(ui.appendEffect, ui.appendDelay);
+                    }
+                })
+            }
+            
+            
+        }
+        
+        ui.init()
+        /*
+         * Object loader
+         * Permet de charger l'interface
+         */
+        var loader = {
+            
+            serveur: function(p) {
+                
+                for(i in p.data) {
+                    ui.addServer(p.data[i]['nom'], p.data[i]['hote'], p.data[i]['utilisateur'], p.data[i]['mot_de_passe'], p.data[i]['repertoire'], p.data[i]['type'], p.data[i]['id'], p.data[i]['id_projet'])
+                }
+                
+            }
+        }
+        
+        var process = {
+            ftpTest : function (hote, utilisateur, motDePasse, repertoire) {
+                document.body.style.cursor='wait';
+                $.getJSON("project/ftp-test.html",{hote : hote, utilisateur : utilisateur, mot_de_passe : motDePasse, repertoire : repertoire},  function(data){
+                    if(data.files.length > 0)
+                        console.log('ok')
+                    else 
+                        console.log('Pas ok')
+                    document.body.style.cursor='auto';
+                });
+            }
+        }
+        
+        
+        document.body.style.cursor='wait';
+        $.getJSON("project/load.html",{project : <?php echo $_SESSION['project']['id'] ?>},  function(data){
+            for(i in data) {
+                if (data[i]) {
+                    loader[i].call(this, data[i]);
+                }
+            }
+            document.body.style.cursor='auto';
+        });
+        
+       
+    }); 
+        
+        
+  
+ 
+</script> 
+
+
+
+<div id="dialog-serveur" class="dialog-form" title="Ajouter un serveur">
+</div>
+
+
+<div id="form-project">
+    <form method="post" id="projet-form" class="ui-form ui-widget">
+        <div id="" style="outline: 0px none; width: 425px;position: relative;overflow: visible;" class="ini-bloc ui-dialog ui-widget ui-widget-content ui-corner-all">
+
+            <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix" style="margin-bottom: 5px;">
+                <span class="ui-dialog-title"><?php echo $this->_("Paramètres Général"); ?></span>
+                <div class="group-tools">
+                    <span class="ui-icon ui-icon-trash"></span>
+                </div>
+
+            </div>
+
+
+
+            <div class="ui-form-elem">
+
+                <label for=""><?php echo $this->_("Nom"); ?></label>
+                <input type="text" value="" name="" />
+            </div>
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Chemin"); ?></label>
+                <input type="text" value="<?php echo $_SESSION['project'] ?>" name="" />
+            </div>
+
+
+
+        </div>
+    </form>
+
+</div>
+
+
+<!-- TEMPLATE JQUERY -->
+
+<script id="template-param-form-serveur" type="text/x-jquery-tmpl">
+
+
+    <form method="post" id="{{if add}}serveur-form{{else}}serveur-form-${data.id}{{/if}}" class="ui-form ui-widget">
+
+
+        {{if data}}
+        <input name="id" type="hidden" value="${data.id}" />
+        <div id="" style="outline: 0px none; width: 425px;position: relative;overflow: visible;" class="ini-bloc ui-dialog ui-widget ui-widget-content ui-corner-all">
+
+            <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix" style="margin-bottom: 5px;">
+                <span class="ui-dialog-title"><?php echo $this->_("Paramètres serveur"); ?> <span class="serveur-name">${data.nom}</span></span>
+                <div class="group-tools">
+                    <span class="ui-icon ui-icon-trash"></span>
+                </div>
+
+            </div>
+            {{/if}}
+
+
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Nom du serveur"); ?></label>
+                <input type="text" value="{{if data}}${data.nom}{{/if}}" name="nom" />
+            </div>
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Type de serveur"); ?></label>
+                <select name="type" id="" class="ui-select">
+                    <option {{if data}}{{if data.type == "Développement"}}selected="selected"{{/if}}{{/if}} value="Développement">Développement</option>
+                    <option {{if data}}{{if data.type == "Recette"}}selected="selected"{{/if}}{{/if}} value="Recette">Recette</option>
+                    <option {{if data}}{{if data.type == "Pré production"}}selected="selected"{{/if}}{{/if}} value="Pré production">Pré production</option>
+                    <option {{if data}}{{if data.type == "Production"}}selected="selected"{{/if}}{{/if}} value="Production">Production</option>
+                </select>
+            </div>
+
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Hote"); ?></label>
+                <input type="text" value="{{if data}}${data.hote}{{/if}}" name="hote" />
+            </div>
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Nom d'utilisateur"); ?></label>
+                <input type="text" value="{{if data}}${data.utilisateur}{{/if}}" name="utilisateur" />
+            </div>
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Mot de passe"); ?></label>
+                <input type="text" value="{{if data}}${data.motDePasse}{{/if}}" name="mot_de_passe" />
+            </div>
+            <div class="ui-form-elem">
+                <label for=""><?php echo $this->_("Répertoire web"); ?></label>
+                <input type="text" value="{{if data}}${data.repertoire}{{/if}}" name="repertoire" />
+            </div>
+            <input type="hidden" value="{{if data}}${data.id_projet}{{else}}<?php echo $_SESSION['project']['id'] ?>{{/if}}" name="id_projet" />
+
+
+            {{if add}}
+            {{else}}
+            <div class="ui-form-elem">
+                <label for=""></label>
+                <button type="submit" class="fg-button fg-button-custom ui-state-default ui-corner-all">Enregistrer</button>
+                <button type="" class="ftp-test fg-button fg-button-custom ui-state-default ui-corner-all">Tester</button>
+            </div>
+        </div>
+        {{/if}}
+
+
+    </form>
+
+
+</script>
+
+
+<script id="template-menu-project" type="text/x-jquery-tmpl">
+    <div class="fg-buttonset fg-buttonset-custom ui-helper-clearfix">
+        <button class="fg-button fg-button-custom ui-state-default ui-corner-all open-dialog" id="add-serveur">Ajouter un nouveau serveur</button>
+    </div>
+</script>
+
+
+<!-- END TEMPLATE JQUERY -->
