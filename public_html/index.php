@@ -1,5 +1,4 @@
 <?php
-
 // Start session !
 session_name();
 session_start();
@@ -57,11 +56,12 @@ $log      = Log::newLog($db);
 //On configure le registre
 Registry::set("mainconfig", $mainConfig);
 Registry::set("appconfig", $appConfig);
+Registry::set("envconfig", $envConfig);
 Registry::set("db", $db);
+Registry::set("base", $baseHref);
 Registry::set("basehref", $baseHref . $baseHrefSuffix);
 Registry::set("baseroot", $baseRoot);
 Registry::set("log", $log);
-
 
 Registry::set("site", $mainConfig->get("name", "project"));
 

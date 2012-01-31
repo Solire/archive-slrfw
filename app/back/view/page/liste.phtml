@@ -1,0 +1,57 @@
+        <h1>Liste des pages</h1>
+        
+        <h2 style="color: red;">Attention de créer les Rubriques avant de créer les pages (Institutionnel, Actualité, Publication)</h2>
+</h2>
+        
+<?php foreach ($this->gabarits as $gabarit) { ?>        
+        <div style="float:left;margin-right:10px;">
+            <a href="page/display.html?id_gabarit=<?php echo $gabarit['id'] ?>" class="button vert">
+                <span class="vert"><?php echo $gabarit['label'] ?></span>
+            </a>
+        </div>
+<?php } ?>
+
+        <div class="clear"></div>
+
+        <div class="sort-box">
+    
+<?php if (count($this->pages) > 0) { foreach ($this->pages as $page) { ?>
+
+            <fieldset class="<?php echo $page->getMeta("id_gabarit") == 1 ? '' : 'sort-elmt' ?>" id="gab_page_<?php echo $page->getMeta('id'); ?>">
+
+                <legend title="<?php echo $page->getMeta('rewriting') ?>">
+                    <?php echo $page->getMeta('titre'); ?><?php if ($page->getMeta('nbre_enfants') > 0) { ?> - <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i><?php } ?>
+                </legend>
+                <div class="sort-box" style="display:none;"></div>
+
+                <div class="line cat-modif">
+
+<?php if ($page->getMeta("id_gabarit") == 1) { ?>
+                    <div style="float:left;">
+                        <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
+                    </div>
+<?php } else { ?>
+                    <div style="float:left;">
+                        <a title="Déplacer '<?php echo $page->getMeta('titre'); ?>'" class="button bleu sort-move" href="#"><span class="bleu"><img alt="Déplacer" src="img/back/deplacer.png" /></span></a>
+                        <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
+                        <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+                    </div>
+                    
+                    <div style="float:right;">
+                        <a title="Supprimer '<?php echo $page->getMeta('titre'); ?>'" style="float:right; display:<?php echo $page->getMeta('nbre_enfants') > 0 ? 'none' : 'block'; ?>;" class="button bleu supprimer" href="#"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
+                    </div>
+<?php } ?>
+                </div>
+
+            </fieldset>
+
+<?php }} else { ?>
+
+            <p>Aucune page</p>
+        
+<?php } ?>
+            
+        </div>
+
+
+        <div class="buttonfixed"><a href="#" class="button vert enregistrerordre"><span class="vert ">Enregistrer Ordre</span></a></div>

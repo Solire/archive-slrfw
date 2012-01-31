@@ -31,6 +31,12 @@ class ActionController
 
     /**
      *
+     * @var Config 
+     */
+    protected $_envConfig = null;
+    
+    /**
+     *
      * @var View
      */
     protected $_view = null;
@@ -127,9 +133,11 @@ class ActionController
 
     public function __construct()
     {
+               
         $this->_mainConfig = Registry::get('mainconfig');
         $this->_appConfig = Registry::get('appconfig');
-
+        $this->_envConfig = Registry::get('envconfig');
+        
         $this->_request = $_REQUEST;
         $this->_url = Registry::get('basehref');
         $this->_root = Registry::get('baseroot');
@@ -143,6 +151,7 @@ class ActionController
         $this->_view = new View($this->_translate);
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
+        $this->_view->envConfig = Registry::get('envconfig');
         
         $this->_view->seo = $this->_seo;
 
@@ -217,5 +226,10 @@ class ActionController
 
         return true;
     }
+    
+    public function _($string) {
+        return $this->_translate->_($string);
+    }
+
 
 }

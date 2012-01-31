@@ -6,44 +6,32 @@
  */
 class gabaritManager extends manager {    
     /**
-     * Donne l'identifiant d'une page d'après son rewriting et l'identifiant
+     * <p>Donne l'identifiant d'une page d'après son rewriting et l'identifiant.</p>
      * @param string $rewriting
-     * @param type $id_parent
-     * @param type $id_version
-     * @return type 
+     * @param int $id_parent
+     * @param int $id_version
+     * @return int 
      */
-    public function getIdByRewriting($rewriting, $id_parent = 0, $id_version = ID_VERSION) {
+    public function getIdByRewriting($id_version, $rewriting, $id_parent = 0) {
 		$query = "SELECT `id` FROM `gab_page`"
                . " WHERE `suppr` = 0 AND `visible` = 1 AND `id_parent` = $id_parent"
                . " AND `id_version` = $id_version AND `rewriting` = " . $this->_db->quote($rewriting);
+        
         return $this->_db->query($query)->fetchColumn();
     }
-    
-//    /**
-//     *
-//     * @param type $id
-//     * @param type $id_version
-//     * @return type 
-//     */
-//    public function getMeta($id, $id_version = ID_VERSION) {
-//        $query = "SELECT * FROM `gab_page` WHERE `id_version` = $version AND `id` = $id AND `suppr` = 0";
-//        $meta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
-//        
-//        return $meta;
-//    }
     
     /**
      * <p>Retourne un objet page à partir de l'identifiant de la page <br />
      * ou un objet page vide à partir de l'idenfiant du gabarit</p>
-     * @param type $id
-     * @param type $id_gabarit
-     * @param type $version 
+     * @param int $id_gab_page
+     * @param int $id_gabarit
+     * @param int $version 
      */
-    public function getPage($id, $id_gabarit = 0, $id_version = ID_VERSION) {   
-        $page = new page();
+    public function getPage($id_version, $id_gab_page, $id_gabarit = 0) {   
+        $page = new gabaritPage();
                 
-        if ($id) {
-            $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id` = $id AND `suppr` = 0";
+        if ($id_gab_page) {
+            $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id` = $id_gab_page AND `suppr` = 0";
             $meta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
             
             if (!$meta)
@@ -54,12 +42,33 @@ class gabaritManager extends manager {
         }
         
         $gabarit = $this->getGabarit($id_gabarit);
+        
+        $query = "SELECT * FROM `gab_gabarit` WHERE `id` = " . $gabarit->getIdParent();
+        $parentData = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $gabarit->setGabaritParent($parentData);
+        
+        if (!$id_gab_page && $gabarit->getIdParent() > 0) {
+            $query = "SELECT `p`.`id`, `p`.`titre`, `p`.`rewriting`,"
+                . " `q`.`id` `p_id`, `q`.`titre` `p_titre`, `q`.`rewriting` `p_rewriting`,"
+                . " `r`.`id` `pp_id`, `r`.`titre` `pp_titre`, `r`.`rewriting` `pp_rewriting`"
+                . " FROM `gab_page` `p`"
+                . " LEFT JOIN `gab_page` `q` ON `q`.`id` = `p`.`id_parent` AND `q`.`suppr` = 0 AND `q`.`id_version` = $id_version"
+                . " LEFT JOIN `gab_page` `r` ON `r`.`id` = `q`.`id_parent` AND `r`.`suppr` = 0 AND `r`.`id_version` = $id_version"
+                . " WHERE `p`.`id_gabarit` = " . $gabarit->getIdParent() . " AND `p`.`suppr` = 0 AND `p`.`id_version` = $id_version";
+            
+            $parents = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+            $gabarit->setParents($parents);
+        }
+        
         $page->setGabarit($gabarit);
         
-        $blocs = $this->getBlocs($gabarit, $id);
+        $blocs = $this->getBlocs($gabarit, $id_gab_page);
         $page->setBlocs($blocs);
         
-        if ($id) {
+        if ($id_gab_page) {
+            $parents = $this->getParents($meta['id_parent'], $id_version);
+            $page->setParents($parents);
+            
             $values = $this->getValues($page);
             
             if ($values) {
@@ -67,7 +76,7 @@ class gabaritManager extends manager {
                 
                 $blocs = $page->getBlocs();
                 foreach ($blocs as $bloc) {                    
-                    $valuesBloc = $this->getBlocValues($bloc, $values['id'], $id_version);
+                    $valuesBloc = $this->getBlocValues($bloc, $id_gab_page, $id_version);
                     if ($valuesBloc)
                         $bloc->setValues($valuesBloc);
                 }
@@ -76,6 +85,10 @@ class gabaritManager extends manager {
         
         return $page;
     }
+    
+    
+    
+    
     
 	/**
 	 * <p>Retourne un objet gabarit à partir de l'identifiant du gabarit</p>
@@ -97,8 +110,12 @@ class gabaritManager extends manager {
         }
         $gabarit->setTable($table);
 		        
-		$query = "SELECT * FROM `gab_champ` WHERE `id_parent` = $id_gabarit AND `type_parent` = 'gabarit'";
-        $champs = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+		$query = "SELECT IF (`g`.`label` IS NULL, 'general', `g`.`label`), `c`.*"
+               . " FROM `gab_champ` `c`"
+               . " LEFT JOIN `gab_champ_group` `g` ON `g`.`id` = `c`.`id_group`"
+               . " WHERE `id_parent` = $id_gabarit AND `type_parent` = 'gabarit'"
+               . " ORDER BY `g`.`ordre`, `c`.`ordre`";
+        $champs = $this->_db->query($query)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
 		$gabarit->setChamps($champs);
         
 		return $gabarit;
@@ -130,9 +147,7 @@ class gabaritManager extends manager {
             
             $gabarit_bloc->setChamps($champs);
             
-            $bloc = new bloc();
-            if ($id_gab_page > 0)
-                $bloc->setId ($id_gab_page);
+            $bloc = new gabaritBloc();
                 
             $bloc->setGabarit($gabarit_bloc);
             
@@ -144,12 +159,12 @@ class gabaritManager extends manager {
     
     /**
      * Retourne la ligne des infos de la table générée à partir d'une page.
-     * @param page $page 
+     * @param gabaritPage $page 
      * @return array
      */
     public function getValues($page) {
-        $query = "SELECT * FROM `" . $page->getGabarit()->getTable()
-               . "` WHERE `id_parent` = " . $page->getMeta("id")
+        $query = "SELECT * FROM `" . $page->getGabarit()->getTable() . "`"
+               . " WHERE `id_gab_page` = " . $page->getMeta("id")
                . " AND `id_version` = " . $page->getMeta("id_version");
         
         return $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
@@ -159,18 +174,19 @@ class gabaritManager extends manager {
      * <p>Retourne les lignes des infos de la table générée à partir d'un bloc<br />
      * et de la page parente.</p>
      * @param gabarit $bloc
-     * @param int $id_parent identifiant de la page parente.
+     * @param int $id_gab_page identifiant de la page parente.
      * @param int $id_version identifiant de la version.
      * @param bool $visible <p>si faux on récupère les blocs visibles ou non,<br />
      * si vrai on récupère uniquement les blocs visibles.</p>
      * @return type 
      */
-    public function getBlocValues($bloc, $id_parent, $id_version = ID_VERSION, $visible = FALSE) {
-        $query = "SELECT * FROM `" . $bloc->getGabarit()->getTable() . "` WHERE `id_parent` = " . $id_parent . " AND `suppr` = 0"
+    public function getBlocValues($bloc, $id_gab_page, $id_version, $visible = FALSE) {
+        $query = "SELECT * FROM `" . $bloc->getGabarit()->getTable() . "`"
+               . " WHERE `id_gab_page` = " . $id_gab_page . " AND `suppr` = 0"
                . " AND `id_version` = $id_version"
                . ($visible ? " AND `visible` = 1" : "")
                . " ORDER BY `ordre`";
-//        echo $query;
+        
         return $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
         
@@ -181,22 +197,27 @@ class gabaritManager extends manager {
      * @param int $id_version
      * @return array 
      */
-    public function getParents($id_gab_page_parent, $id_version = ID_VERSION) {
+    public function getParents($id_gab_page_parent, $id_version) {
         $parents = array();
         
-        while ($id_gab_page_parent) {
-            $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id` = $id_gab_page_parent AND `suppr` = 0";
+        while ($id_gab_page_parent > 0) {
+            $query = "SELECT * FROM `gab_page`"
+                   . " WHERE `id_version` = $id_version AND `id` = $id_gab_page_parent AND `suppr` = 0";
             $parentMeta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
 
-            $parentPage = new page($parentMeta);
+            $parentPage = new gabaritPage();
+            $parentPage->setMeta($parentMeta);
             $gabarit = $this->getGabarit($parentMeta['id_gabarit']);
-            $parents[$gabarit->getName()] = $parentPage;        
+            $parents[] = $parentPage;        
 
             $id_gab_page_parent = $parentMeta['id_parent'];
         }
         
         return $parents;
     }
+    
+    
+    
     
     /**
      * <p>Retourne un tableau de page a partir de l'identifiant d'un parent.</p>
@@ -207,14 +228,14 @@ class gabaritManager extends manager {
      * @param int $id_version
      * @return array 
      */
-	public function getList($id_parent = 0, $id_gabarit = 0, $visible = FALSE, $orderby = "ordre", $sens = "ASC",$debut = 0, $nbre = 0, $id_version = ID_VERSION) {
+	public function getList($id_version, $id_parent = FALSE, $id_gabarit = 0, $visible = FALSE, $orderby = "ordre", $sens = "ASC",$debut = 0, $nbre = 0) {
 		$query = "SELECT `p`.*, COUNT(`e`.`id`) `nbre_enfants`"
                . " FROM `gab_page` `p` LEFT JOIN `gab_page` `e` ON `e`.`id_parent` = `p`.`id` AND `e`.`suppr` = 0 AND `e`.`id_version` = $id_version"
                . ($visible ? " AND `e`.`visible` = 1" : "")
                . " WHERE `p`.`suppr` = 0 AND `p`.`id_version` = $id_version"
                . ($visible ? " AND `p`.`visible` = 1" : "");
         
-        if ($id_parent) $query .= " AND `p`.`id_parent` = $id_parent";//`p`.`id_parent` = $id_parent AND 
+        if ($id_parent !== FALSE) $query .= " AND `p`.`id_parent` = $id_parent";//`p`.`id_parent` = $id_parent AND 
         if ($id_gabarit) $query .= " AND `p`.`id_gabarit` = $id_gabarit";
         
         $query .= " GROUP BY `p`.`id`";
@@ -222,12 +243,15 @@ class gabaritManager extends manager {
         $query .= " ORDER BY `p`.`$orderby` $sens";
         
         if ($nbre) $query .= " LIMIT $debut, $nbre";
-
+        
         $metas = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         
         $pages = array();
-        foreach ($metas as $meta)
-            $pages[] = new page($meta);
+        foreach ($metas as $meta) {
+            $page = new gabaritPage();
+            $page->setMeta($meta);
+            $pages[] = $page;
+        }
         
         return $pages;
 	}
@@ -242,7 +266,7 @@ class gabaritManager extends manager {
      * @return array
      * @see gabaritManager::getList
      */
-    public function getSearch($term, $id_gabarit = 0, $id_parent = FALSE, $visible = FALSE, $id_version = ID_VERSION) {
+    public function getSearch($id_version, $term, $id_gabarit = 0, $id_parent = FALSE, $visible = FALSE) {
 		$query = "SELECT * FROM `gab_page` WHERE `suppr` = 0 AND `id_version` = "
                . $id_version . " AND `titre` LIKE " . $this->_db->quote("%$term%");
         
@@ -258,8 +282,11 @@ class gabaritManager extends manager {
 		$metas = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         
         $pages = array();
-        foreach ($metas as $meta)
-            $pages[] = new page($meta);
+        foreach ($metas as $meta) {
+            $page = new gabaritPage();
+            $page->setMeta($meta);
+            $pages[] = $page;
+        }
         
         return $pages;
     }	
@@ -271,7 +298,7 @@ class gabaritManager extends manager {
      * @param int $id_version
      * @return array 
      */
-	public function getFirstChild($id_parent = 0, $id_version = ID_VERSION) {
+	public function getFirstChild($id_version, $id_parent = 0) {
 		$query = "SELECT *"
                . " FROM `gab_page`"
                . " WHERE `id_parent` = $id_parent AND `suppr` = 0 AND `id_version` = $id_version"
@@ -280,7 +307,8 @@ class gabaritManager extends manager {
                . " LIMIT 0, 1";
 		$meta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
         if ($meta) {
-            $page = new page($meta);
+            $page = new gabaritPage();
+            $page->setMeta($meta);
             return $page;
         }
         
@@ -291,59 +319,62 @@ class gabaritManager extends manager {
     
     
     
-	/**
-	 *
-	 * @param type $id_gabarit 
-	 */
-	public function	save($post) { 
-		$this->_post = $post;
+    /**
+     * <p>Sauve une page et ses blocs dynamique.</p>
+     * @param array $donnees
+     * @return gabaritPage 
+     */
+	public function	save($donnees) { 
 		$this->_versions = $this->_db->query("SELECT `id` FROM `version`")->fetchAll(PDO::FETCH_COLUMN);
 		
-		$this->_upd = ($this->_post['id_gab_page'] > 0);
+		$updating = ($donnees['id_gab_page'] > 0);
 
-        if ($this->_upd)
-			$page = $this->getPage($this->_post['id_gab_page'], 0, $this->_post['id_version']);
+        if ($updating)
+			$page = $this->getPage($donnees['id_version'], $donnees['id_gab_page'], 0);
 		else
-			$page = $this->getPage(0, $this->_post['id_gabarit'], 1);
+			$page = $this->getPage(1, 0, $donnees['id_gabarit']);
 		    
-        $id_gab_page = $this->_saveMeta($page);
+        $id_gab_page = $this->_saveMeta($page, $donnees);
         
-        $page = $this->getPage($id_gab_page, 0, 1);
+        if (!$id_gab_page)
+            return NULL;
         
-        $id_parent = $this->_savePage($page);
+        $page = $this->getPage(1, $id_gab_page, 0);
+        
+        $id_parent = $this->_savePage($page, $donnees);
         
         $blocs = $page->getBlocs();
         foreach ($blocs as $bloc) {
-            $this->_saveBloc($bloc, $id_parent);
+            $this->_saveBloc($bloc, $id_gab_page, $page->getMeta("id_version"), $donnees);
         }
         
-		$page = $this->getPage($page->getMeta("id"), 0, $this->_post['id_version'] ? $this->_post['id_version'] : 1);
+		$page = $this->getPage($donnees['id_version'] ? $donnees['id_version'] : 1, $page->getMeta("id"), 0);
         return $page;
-        
-//        return TRUE;
 	}
 
     /**
 	 *
-	 * @param page $page
-	 * @param type $id_page
+	 * @param gabaritPage $page
+     * @param array $donnees
 	 * @return type 
 	 */
-	private function _saveMeta($page) {        
+	private function _saveMeta($page, $donnees) {
+        $updating = $donnees['id_gab_page'] > 0;
+        
 		// Insertion dans la table `gab_page`.
-		if ($this->_upd) {
-            $rewriting = $this->_db->rewrit($this->_post['titre'], 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
-//            if ($page->getMeta("rewriting") == "") $rewriting = "accueil";
+		if ($updating) {
+            $rewriting = $this->_db->rewrit($donnees['titre'], 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
             
             $query = "UPDATE `gab_page` SET"
-                   . " `titre`			= " . $this->_db->quote($this->_post['titre']) . ","
-                   . " `bal_title`		= " . $this->_db->quote($this->_post['bal_title'] ? $this->_post['bal_title'] : $this->_post['titre']) . ","
-                   . " `bal_key`		= " . $this->_db->quote($this->_post['bal_key']) . ","
-                   . " `bal_descr`		= " . $this->_db->quote($this->_post['bal_descr']) . ","
-                   . " `importance`	= " . $this->_post['importance'] . ","
+                   . " `titre`      = " . $this->_db->quote($donnees['titre']) . ","
+                   . " `bal_title`  = " . $this->_db->quote($donnees['bal_title'] ? $donnees['bal_title'] : $donnees['titre']) . ","
+                   . " `bal_key`    = " . $this->_db->quote($donnees['bal_key']) . ","
+                   . " `bal_descr`	= " . $this->_db->quote($donnees['bal_descr']) . ","
+                   . " `importance`	= " . $donnees['importance'] . ","
                    . " `date_modif`	= NOW(),"
-                   . " `no_index`		= " . (isset($this->_post['no_index']) && $page->getMeta("id") != 1 ? $this->_post['no_index'] : 0)
-                   . ($page->getMeta("rewriting") == "" ? ", `rewriting`		= " . $this->_db->quote($rewriting) : "")
+                   . " `no_index`   = " . (isset($donnees['no_index']) && $page->getMeta("id") != 1 ? $donnees['no_index'] : 0)
+                   . ", `rewriting`		= " . $this->_db->quote($rewriting)
+//                   . ($page->getMeta("rewriting") == "" ? ", `rewriting`		= " . $this->_db->quote($rewriting) : "")
                    . " WHERE `id` = " .  $page->getMeta("id")
                    . " AND `id_version` = " .  $page->getMeta("id_version");
                         
@@ -353,52 +384,35 @@ class gabaritManager extends manager {
             return $page->getMeta("id");
 		}			
 		else {
-			$id_parent = isset($this->_post['id_parent']) ? $this->_post['id_parent'] : 0;
+			$id_parent = isset($donnees['id_parent']) && $donnees['id_parent'] ? $donnees['id_parent'] : 0;
 			
-			$rewriting = $this->_db->rewrit($this->_post['titre'], 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
+			$rewriting = $this->_db->rewrit($donnees['titre'], 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
 			
 			$ordre = $this->_db->query("SELECT MAX(`ordre`) FROM `gab_page` WHERE id_parent = $id_parent")->fetchColumn();
 			$ordre = $ordre ? $ordre + 1 : 1;
 			
 			$id_gab_page = 0;
 			foreach ($this->_versions as $version) {
-				$query = "INSERT INTO `gab_page` ("
-                       . "`id`,"
-                       . "`id_gabarit`,"
-                       . "`titre`,"
-                       . "`rewriting`,"
-                       . "`bal_title`,"
-                       . "`bal_key`,"
-                       . "`bal_descr`,"
-                       . "`no_index`,"
-                       . "`importance`,"
-                       . "`id_parent`,"
-                       . "`ordre`,"
-                       . "`date_crea`,"
-                       . "`date_modif`,"
-                       . "`visible`,"
-                       . "`id_version`"
-                       . ") VALUES ("
-                       . ($id_gab_page > 0 ? $id_gab_page : "NULL") . ","
-                       . $page->getGabarit()->getId() . ","
-                       . $this->_db->quote($this->_post['titre']) . ","
-					   . ($id_gab_page > 0 || $version['id'] > 1 ? "''" : $this->_db->quote($rewriting)) . ","
-					   . $this->_db->quote($this->_post['bal_title'] ? $this->_post['bal_title'] : $this->_post['titre']) . ","
-					   . $this->_db->quote($this->_post['bal_key']) . ","
-					   . $this->_db->quote($this->_post['bal_descr']) . ","
-                       . (isset($this->_post['no_index']) ? $this->_post['no_index'] : 0) . ","
-                       . $this->_post['importance'] . ","
-                       . $id_parent . ", "
-                       . $ordre . ","
-                       . "NOW(),"
-                       . "NOW(),"
-                       . " 0,"
-                       . $version['id']
-					   . ")";
+				$query = "INSERT INTO `gab_page` SET "
+                       . "`id` = "          . ($id_gab_page > 0 ? $id_gab_page : "NULL") . ","
+                       . "`id_gabarit` = "  . $page->getGabarit()->getId() . ","
+                       . "`titre` = "       . $this->_db->quote($donnees['titre']) . ","
+                       . "`rewriting` = "   . ($id_gab_page > 0 || $version['id'] > 1 ? "''" : $this->_db->quote($rewriting)) . ","
+                       . "`bal_title` = "   . $this->_db->quote($donnees['bal_title'] ? $donnees['bal_title'] : $donnees['titre']) . ","
+                       . "`bal_key` = "     . $this->_db->quote($donnees['bal_key']) . ","
+                       . "`bal_descr` = "   . $this->_db->quote($donnees['bal_descr']) . ","
+                       . "`no_index` = "    . (isset($donnees['no_index']) ? $donnees['no_index'] : 0) . ","
+                       . "`importance` = "  . $donnees['importance'] . ","
+                       . "`id_parent` = "   . $id_parent . ", "
+                       . "`ordre` = "       . $ordre . ","
+                       . "`date_crea` = NOW(),"
+                       . "`date_modif` = NOW(),"
+                       . "`visible` = 0,"
+                       . "`id_version` = "  . $version['id'];
                 
 //                echo "$query<br />";
                 
-				if (!$this->_db->query($query))
+				if (!$this->_db->exec($query))
 					return FALSE;
 
 				if ($id_gab_page == 0)
@@ -406,168 +420,124 @@ class gabaritManager extends manager {
 			}
 			
             return $id_gab_page;
-		}		
+		}
 	}
 	
 	/**
 	 *
-	 * @param page $page
+	 * @param gabaritPage $page
+     * @param array $donnees
 	 * @return type 
 	 */
-	private function _savePage($page) {        
+	private function _savePage($page, $donnees) {
+        $updating = $donnees['id_gab_page'] > 0;
+        
         $gabarit = $page->getGabarit();
-        $id_parent = $page->getMeta("id");
+        $id_gab_page = $page->getMeta("id");
+        $id_version = $page->getMeta("id_version");
         $table = $gabarit->getTable();
         
-		$champs = $gabarit->getChamps();
-		$champsExiste = count($champs);
-
-        if (!isset($this->_post['id_' . $gabarit->getTable()]))
-            return FALSE;
-
-        $id_bloc = $this->_post['id_' . $gabarit->getTable()];
-        $upd = ($id_bloc > 0);
+		$allchamps = $gabarit->getChamps();
+		$champsExiste = count($allchamps);
                 
-        if ($upd) { 
-            $sql1 = "UPDATE `$table` SET ";
-            $sql2 = "WHERE `id_version` = " . $this->_post['id_version'] . " AND `id` = " . $id_bloc;
+        if ($updating) { 
+            $query = "UPDATE `$table` SET ";
+            $where = "WHERE `id_version` = $id_version AND `id_gab_page` = $id_gab_page";
         }
         else {
-            $sql1 = "INSERT INTO `$table` (`id_parent`,";
-            $sql2 = ") VALUES ($id_parent,";
+            $query = "INSERT INTO `$table` SET `id_gab_page` = $id_gab_page,";
         }
 
-        if ($champsExiste) {
-            foreach ($champs as $champ) {
-                $value = $this->_post['champ' . $champ['id']][0];
+        foreach ($allchamps as $name_group => $champs) {
+            foreach ($champs as $champ) {                
+                $value = $donnees['champ' . $champ['id']][0];
 
                 if ($champ['typedonnee']=='date')
                     $value = dateFRtoUS($value);
 
-                if ($upd)
-                    $sql1 .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
-                else {
-                    $sql1 .= "`" . $champ['name'] . "`,";
-                    $sql2 .= $this->_db->quote($value) . ",";
-                }
+                $query .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
             }
         }
 
-        if ($upd) {
+        if ($updating) {
             if ($champsExiste) {
-                $sql = substr($sql1, 0, -1) . " " . $sql2;
+                $queryTmp = substr($query, 0, -1) . " " . $where;
                 
-//                echo $sql;
-                
-                if (!$this->_db->query($sql)) {
-                    echo "echec de l'update d'un " . $gabarit->getLabel() . "<br />$sql";   
+                if (!$this->_db->query($queryTmp)) {
+                    echo "echec de l'update d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
                     return FALSE;
                 }
             }
         }
         else {
-            $id_bloc = 0;
-
             foreach ($this->_versions as $id_version) {
-                if ($champsExiste) {
-                    $sqltmp1 = $sql1;
-                    $sqltmp2 = $sql2;
-
-                    if ($id_bloc) {
-                        $sqltmp1 .= "`id`,";
-                        $sqltmp2 .= "$id_bloc,";
-                    }
-
-                    $sqltmp1 .= "`id_version`";
-                    $sqltmp2 .= "$id_version";
-
-                    $sql = $sqltmp1 . $sqltmp2 . ")";
-                }
-                else
-                    $sql = "INSERT INTO `$table` (`id`, `id_parent`, `id_version`) VALUES (NULL, $id_parent, $id_version)";
+                $queryTmp = $query . "`id_version` = $id_version";
                 
-                if (!$this->_db->query($sql)) {
-                    echo "echec de l'insertion d'un " . $gabarit->getLabel() . "<br />$sql";
+                if (!$this->_db->exec($queryTmp)) {
+                    echo "echec de l'insertion d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
                     return FALSE;
                 }
-
-                if (!$id_bloc) $id_bloc = $this->_db->lastInsertId();
             }
         }
         
-		return $id_bloc;		
+        return TRUE;
 	}
     
     /**
      *
-     * @param bloc $bloc
-     * @param int $id_parent
-     * @return bool 
+     * @param gabaritBloc $bloc
+     * @param int $id_gab_page
+     * @param int $id_version
+     * @param array $donnees
+     * @return boolean 
      */
-    private function _saveBloc($bloc, $id_parent) {
+    private function _saveBloc($bloc, $id_gab_page, $id_version, $donnees) {     
         $gabarit = $bloc->getGabarit();
         $table = $gabarit->getTable();
-        
-        if (!count($this->_post['id_' . $gabarit->getTable()]))
-            return FALSE;
-        
         $champs = $gabarit->getChamps();
         
-        if (count($champs) == 0)
-            return FALSE;
-        
         $ordre = 1;
-        foreach ($this->_post['id_' . $gabarit->getTable()] as $id_bloc) {
-            $upd = ($id_bloc > 0);
+        foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
+            $updating = ($id_bloc > 0);
             
-            $visible = array_shift($this->_post['visible']);
+            $visible = array_shift($donnees['visible']);
             
-            if ($upd) { 
-                $sql1 = "UPDATE `$table` SET `ordre` = $ordre, `visible` = $visible,";
-                $sql2 = "WHERE `id_version` = " . $this->_post['id_version'] . " AND `id` = $id_bloc";
+            if ($updating) { 
+                $query = "UPDATE `$table` SET"
+                       . " `ordre` = $ordre,"
+                       . " `visible` = $visible,";
             }
             else {
-                $sql1 = "INSERT INTO `$table` (`id_parent`, `id_version`, `ordre`, `visible`,";
-                $sql2 = ") VALUES ($id_parent, " . $this->_post['id_version'] . ", $ordre, $visible,";
+                $query = "INSERT INTO `$table` SET"
+                      . " `id_gab_page` = $id_gab_page,"
+                      . " `id_version`  = $id_version,"
+                      . " `ordre`       = $ordre,"
+                      . " `visible`     = $visible,";
             }
 
             foreach ($champs as $champ) {
-                $value = array_shift($this->_post['champ' . $champ['id']]);
+                $value = array_shift($donnees['champ' . $champ['id']]);
 
                 if ($champ['typedonnee']=='date')
                     $value = dateFRtoUS($value);
 
-                if ($upd)
-                    $sql1 .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
-                else {
-                    $sql1 .= "`" . $champ['name'] . "`,";
-                    $sql2 .= $this->_db->quote($value) . ",";
-                }
+                $query .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
             }
 
             
-            if ($upd) {
-                $sql = substr($sql1, 0, -1) . " " . $sql2;
+            if ($updating) {
+                $queryTmp = substr($query, 0, -1) . " WHERE `id_version` = $id_version AND `id` = $id_bloc";
                                 
-                if (!$this->_db->query($sql)) {
-                    echo "Echec de l'update d'un " . $gabarit->getLabel() . "<br />$sql";   
+                if (!$this->_db->query($queryTmp)) {
+                    echo "Echec de l'update d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
                     return FALSE;
                 }
             }
             else {
-                $sqltmp1 = $sql1;
-                $sqltmp2 = $sql2;
-
-                $sqltmp1 .= "`id`";
-                $sqltmp2 .= $id_bloc ? $id_bloc : "NULL";
-
-//                $sqltmp1 .= "`id_version`";
-//                $sqltmp2 .= "1";
-
-                $sql = $sqltmp1 . $sqltmp2 . ")";
-
-                if (!$this->_db->query($sql)) {
-                    echo "Echec de l'insertion d'un " . $gabarit->getLabel() . "<br />$sql";
+                $queryTmp = substr($query, 0, -1);
+                
+                if (!$this->_db->exec($queryTmp)) {
+                    echo "Echec de l'insertion d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
                     return FALSE;
                 }
 
@@ -578,76 +548,11 @@ class gabaritManager extends manager {
             $ordre++;
         }
         
-        if ($this->_upd) {
-            $query = "UPDATE `$table` SET `suppr` = NOW() WHERE `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = " . $this->_post['id_version'] . " AND `id` NOT IN (" . implode(",", $ids_blocs) . ")";
-            $this->_db->query($query);
-        }
-        
-        
-        
-        return TRUE;
-    }
-    
-    
-    
-	/**
-	 *
-	 * @param int $gabarit_id
-	 * @param string $prefixe 
-	 */
-	public function createTables($id_gabarit) {
-        $gabarit = $this->getGabarit($id_gabarit);
-		$this->_createTable($gabarit);
-		
-        $blocs = $this->getBlocs($gabarit);
-        foreach ($blocs as $bloc)
-            $this->_createBlocTable ($bloc->getGabarit());
-	}
-	
-	/**
-	 *
-	 * @param gabarit $gabarit
-	 * @param string $prefixe
-	 * @return bool 
-	 */
-	private function _createTable($gabarit) {
-        $champs = $gabarit->getChamps();
-        
-		$createSql = "CREATE TABLE IF NOT EXISTS `" . $gabarit->getTable() . "` ("
-			       . "`id` int(11) NOT NULL auto_increment,"
-			       . "`id_version` tinyint(1) NOT NULL,"
-			       . "`id_parent` int(11) NOT NULL,";
-        
-		foreach ($champs as $champ)
-			$createSql .= "`" . $champ['name'] . "` " . $champ['typesql'] . ",";
+        $query = "UPDATE `$table` SET `suppr` = 1, `date_modif` = NOW()"
+                . " WHERE `suppr` = 0 AND `id_gab_page` = $id_gab_page AND `id_version` = $id_version"
+                . " AND `id` NOT IN (" . implode(",", $ids_blocs) . ")";
+        $this->_db->query($query);
 
-		$createSql .= "PRIMARY KEY (`id`, `id_version`)"
-		            . ") ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1";
-        
-		return $this->_db->query($createSql);
-	}
-    
-    /**
-     *
-     * @param gabarit $bloc 
-     */
-    private function _createBlocTable($bloc) {
-        $champs = $bloc->getChamps();
-        
-		$createSql = "CREATE TABLE IF NOT EXISTS `" . $bloc->getTable() . "` ("
-			       . "`id` int(11) NOT NULL auto_increment,"
-			       . "`id_version` tinyint(1) NOT NULL,"
-			       . "`id_parent` int(11) NOT NULL,"
-			       . "`ordre` int(11) NOT NULL,"
-			       . "`visible` int(11) NOT NULL,"
-			       . "`suppr` datetime NOT NULL,";
-        
-		foreach ($champs as $champ)
-			$createSql .= "`" . $champ['name'] . "` " . $champ['typesql'] . ",";
-        
-		$createSql .= "PRIMARY KEY (`id`, `id_version`)"
-		            . ") ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1";
-		
-        return $this->_db->query($createSql);
+        return TRUE;
     }
 }

@@ -31,7 +31,7 @@ var initTinyMCE = function () {
         theme_advanced_toolbar_align : "left",
         theme_advanced_resizing : true,
 
-        theme_advanced_blockformats : "h4",
+        theme_advanced_blockformats : "h3,h4",
 
         external_image_list_url : "../media/autocomplete.html?tinyMCE"
     });    
@@ -209,7 +209,7 @@ $(function(){
 		clone.insertBefore($this);
 		$this.parents('.sort-box').sortable('refresh');
 		$this.siblings('.sort-elmt').find('.delBloc').removeClass('translucide');
-		$this.find('.date').datepicker($.datepicker.regional['fr']);
+		$this.find('.form-date').datepicker($.datepicker.regional['fr']);
 
 		initAutocompletePat();
 
@@ -291,7 +291,7 @@ $(function(){
 		return false;
 	});
 
-	$('.date').datepicker($.datepicker.regional['fr']);
+	$('.form-date').datepicker($.datepicker.regional['fr']);
 
 	var version = 'version web';
 

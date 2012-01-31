@@ -11,6 +11,12 @@ class MediaController extends MainController {
     
     public function start() {
         parent::start();
+        
+        $upload                 = $this->_mainConfig->get("upload");
+        $this->_upload_path     = $upload['path'];
+        $this->_upload_temp     = $upload['temp'];
+        $this->_upload_vignette = $upload['vignette'];
+        $this->_upload_apercu   = $upload['apercu'];
     }
     
     public function startAction() {
@@ -35,29 +41,29 @@ class MediaController extends MainController {
             $orderby = isset($_REQUEST['orderby']['champ']) ? $_REQUEST['orderby']['champ'] : '';
             $sens    = isset($_REQUEST['orderby']['sens'])  ? $_REQUEST['orderby']['sens']  : '';
             
-            $this->_page = $this->_managers->getManagerOf("gabarit")->getPage($id_gab_page);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
 //            $sous_rubrique = $this->_page->getParent(2);
 //            if ($sous_rubrique)
-                $this->_files = $this->_managers->getManagerOf("file")->getList($this->_page->getMeta("id"), $search, $orderby, $sens);
+                $this->_files = $this->_fileManager->getList($this->_page->getMeta("id"), $search, $orderby, $sens);
         }
         
         foreach ($this->_files as &$file) {
             $ext = strtolower(array_pop(explode(".", $file['rewriting'])));
             
-            $file['path'] = Registry::get("base") . Registry::get("upload-path") . DIRECTORY_SEPARATOR
+            $file['path'] = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
                           . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                           . $file['rewriting'];
             
-            $serverpath = ".." . DIRECTORY_SEPARATOR . Registry::get("upload-path") . DIRECTORY_SEPARATOR
+            $serverpath = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
                   . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                   . $file['rewriting'];
             
             $file['class'] = 'hoverprevisu vignette';
             
             if (array_key_exists($ext, fileManager::$_extensions['image'])) {
-                $file['path_mini'] = Registry::get("base") . Registry::get("upload-path") . DIRECTORY_SEPARATOR
+                $file['path_mini'] = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
                                    . $file['id_gab_page'] . DIRECTORY_SEPARATOR
-                                   . Registry::get("upload-vignette") . DIRECTORY_SEPARATOR
+                                   . $this->_upload_vignette . DIRECTORY_SEPARATOR
                                    . $file['rewriting'];
             
                 $sizes = getimagesize($serverpath);
@@ -98,7 +104,7 @@ class MediaController extends MainController {
             );
         }
         elseif ($_REQUEST['id'] === "0") {
-            $rubriques = $this->_managers->getManagerOf("gabarit")->getList(0);
+            $rubriques = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
             foreach ($rubriques as $rubrique)
                 $res[] = array(
                     "attr"	=> array(
@@ -112,7 +118,7 @@ class MediaController extends MainController {
                 );
         }
         else {
-            $sous_rubriques = $this->_managers->getManagerOf("gabarit")->getList($_REQUEST['id']);
+            $sous_rubriques = $this->_gabaritManager->getList(BACK_ID_VERSION, $_REQUEST['id']);
             
             foreach ($sous_rubriques as $sous_rubrique) {
                 $nbre = $this->_db->query("SELECT COUNT(*) FROM `media_fichier` WHERE `suppr` = 0 AND `id_gab_page` = " . $sous_rubrique->getMeta('id'))->fetchColumn();
@@ -143,15 +149,15 @@ class MediaController extends MainController {
         $id_gab_page = isset($_REQUEST['id_gab_page']) && $_REQUEST['id_gab_page'] ? $_REQUEST['id_gab_page'] : 0;
         
         if ($id_gab_page) {
-            $this->_page = $this->_managers->getManagerOf("gabarit")->getPage($id_gab_page);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
             
             if ($this->_page) {
-                $targetTmp   = "../" . Registry::get("upload-path") . DIRECTORY_SEPARATOR . Registry::get("upload-temp");
-                $targetDir   = "../" . Registry::get("upload-path") . DIRECTORY_SEPARATOR . $this->_page->getMeta("id");
-                $vignetteDir = "../" . Registry::get("upload-path") . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . Registry::get("upload-vignette");
-                $apercuDir   = "../" . Registry::get("upload-path") . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . Registry::get("upload-apercu");
+                $targetTmp   = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
+                $targetDir   = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id");
+                $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+                $apercuDir   = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
-                $json = $this->_managers->getManagerOf("file")-> upload($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
+                $json = $this->_fileManager-> upload($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
             }
             else {
                 $json =  array(
@@ -206,24 +212,24 @@ class MediaController extends MainController {
         $tinyMCE = isset($_GET['tinyMCE']);
                
         if ($id_gab_page) {
-            $this->_page = $this->_managers->getManagerOf("gabarit")->getPage($id_gab_page, 0);            
-            $files = $this->_managers->getManagerOf("file")->getSearch($term, $this->_page->getMeta("id"));
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page, 0);            
+            $files = $this->_fileManager->getSearch($term, $this->_page->getMeta("id"));
 
             foreach ($files as $file) {
                 if (!$tinyMCE || fileManager::isImage($file['rewriting'])) {
-                    $path = Registry::get("base") . Registry::get("upload-path") . DIRECTORY_SEPARATOR
+                    $path = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
                           . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                           . $file['rewriting'];
-                    $vignette = Registry::get("base") . Registry::get("upload-path") . DIRECTORY_SEPARATOR
+                    $vignette = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
                               . $file['id_gab_page'] . DIRECTORY_SEPARATOR
-                              . Registry::get("upload-vignette") . DIRECTORY_SEPARATOR
+                              . $this->_upload_vignette . DIRECTORY_SEPARATOR
                               . $file['rewriting'];
-                    $serverpath = ".." . DIRECTORY_SEPARATOR . Registry::get("upload-path") . DIRECTORY_SEPARATOR
+                    $serverpath = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
                           . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                           . $file['rewriting'];
                     
-                    $this->_page = $this->_managers->getManagerOf("gabarit")->getPage($file['id_gab_page']);
-                    $realpath = Registry::get("base") . $this->_page->getMeta("rewriting") . '/'. $file['rewriting'];
+//                    $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $file['id_gab_page']);
+                    $realpath = Registry::get("base") . $file['id_gab_page'] . '/'. $file['rewriting'];
 
                     $ext = array_pop(explode(".", $file['rewriting']));
                     if (in_array($ext, $extensionsImage)) {

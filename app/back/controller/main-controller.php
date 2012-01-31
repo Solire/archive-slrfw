@@ -13,6 +13,13 @@ require "action-controller.php";
 class MainController extends ActionController
 {
     /**
+     *
+     * @var utilisateur
+     */
+    protected $_utilisateur;
+
+
+    /**
      * Always execute before other method in controller
      *
      * @return void
@@ -24,8 +31,11 @@ class MainController extends ActionController
         $this->_javascript->addLibrary("back/jquery/jquery.cookie.js");
         
         $this->_view->site = Registry::get("site");
+        $this->_view->action = "liste";
         
-        $this->_managers = new managers();
+        $this->_utilisateurManager = new utilisateurManager();
+        $this->_gabaritManager     = new gabaritManager();
+        $this->_fileManager        = new fileManager();
         
 		if ($_POST) {
 			$this->_post = $_POST;
@@ -41,10 +51,10 @@ class MainController extends ActionController
         else
             define("BACK_ID_VERSION", 1);
         
-        $this->_utilisateur = $this->_managers->getManagerOf("utilisateur")->get();
+        $this->_utilisateur = $this->_utilisateurManager->get();
         
         if (isset($this->_post['log']) && isset($this->_post['pwd']) && $this->_post['log'] && $this->_post['pwd'])
-            $this->_managers->getManagerOf("utilisateur")->connect($this->_utilisateur, $this->_post['log'], $this->_post['pwd']);
+            $this->_utilisateurManager->connect($this->_utilisateur, $this->_post['log'], $this->_post['pwd']);
         
         if (!$this->_utilisateur->isconnected() && isset($_GET['action']) && $_GET['action'] != "start")
             $this->simpleRedirect ("sign/start.html", TRUE);

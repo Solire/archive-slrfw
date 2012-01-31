@@ -29,7 +29,7 @@
 		<!--[if lte IE 6]>
 		   <link rel="stylesheet" href="ie6.css" type="text/css" />
 		<![endif]-->
-
+        
         <?php echo $this->css; ?>
         
         <style type="text/css">
@@ -51,18 +51,12 @@
 
 					<ul id="menu">
 						<li class="gen">Module d'admin :<br /><br /><b><?php echo $this->site; ?></b><br /><i><?php echo $this->utilisateur->get("nom"); ?></i></li>
-
-						<li><a href="page/display.html?id_gab_page=1" class="bouton<?php if ($this->action == "biographie") echo ' active' ?>">Biographie<span>Biographie</span></a></li>
-						
-                        <li><a href="page/display.html?id_gab_page=2" class="bouton<?php if ($this->action == "contact") echo ' active' ?>">Contact<span>Contact</span></a></li>
                         
-						<li><a href="page/listeprojets.html" class="bouton<?php if ($this->action == "projet") echo ' active' ?>">Projets<span>Projets</span></a></li>
+						<li><a href="page/liste.html" class="bouton<?php if ($this->action == "liste") echo ' active' ?>">Pages<span>Pages</span></a></li>
 						
                         <li><a href="media/start.html" class="bouton<?php if ($this->action == "fichier") echo ' active' ?>">Fichiers<span>Fichiers</span></a></li>
                        
-						<li class="bis" style="border-left:1px solid #a1a1a1;">
-							<a href="sign/signout.html" class="bis"><b>Déconnexion</b></a>
-						</li>
+						<li class="bis" style="border-left:1px solid #a1a1a1;"><a href="sign/signout.html" class="bis"><b>Déconnexion</b></a></li>
 					</ul>
                 </div>
 			</div>

@@ -8,10 +8,9 @@
 		<base href="<?php echo $this->Url; ?>" />
 
 		<link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/admin/style.css" />
-
-		<script type="text/javascript" src="js/back/jquery/jquery-1.4.4.min.js"></script>
-		<script type="text/javascript" src="js/back/form.js"></script>
-		<script type="text/javascript">
+        
+        <?php echo $this->javascript; ?>
+        <script type="text/javascript">
 			var keypressaction = function(event){
 				if(event.keyCode == 13) $('.formsubmit').trigger('click');
 			}

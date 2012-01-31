@@ -7,18 +7,20 @@ class SignController extends MainController {
     }
     
     public function startAction() {
+        $this->_javascript->addLibrary("back/form.js");
+        
         $this->_view->main(false);
         
-        $this->_view->action = 'page/listeprojets.html';
+        $this->_view->action = 'page/liste.html';
         
         if ($this->_utilisateur->isconnected())
-            $this->simpleRedirect ("page/listeprojets.html", TRUE);
+            $this->simpleRedirect ("page/liste.html", TRUE);
     }
 
     public function signoutAction() {
         $this->_view->enable(false);
         
-        $this->_managers->getManagerOf("utilisateur")->disconnect();
+        $this->_utilisateurManager->disconnect();
         $this->simpleRedirect ("sign/start.html", TRUE);
     }
 }

@@ -1,34 +1,46 @@
-var sort_elmt = $(null);
-var sort_box = $(null);
+//var sort_elmt = $(null);
+//var sort_box = $(null);
 var positions = {};
 
 $(function(){
 //// SUPPRIMER UNE PAGE.
-	var confirm = $('<div>', {id : "confirm"}).dialog({
-		autoOpen : false,
-		title : "Attention",
-		buttons: {
-			"Ok" : function(){
-				$.post('page/delete.html', {id_gab_page : parseInt(sort_elmt.attr('id').split('_').pop())}, function(data){
-					if(data.status == 'success')
-						sort_elmt.slideUp('fast', function(){
-							$(this).remove();
-							sort_box.sortable('refresh');
-							$('#confirm').dialog("close")
-						})
-				}, 'json')
-			},
-			"Annuler" : function(){$(this).dialog("close");bloc.removeClass('red')}
-		},
-		close: function(){if(bloc.length>0){bloc.removeClass('red');bloc = $(null)}}
-	});
+	confirm = $('<div>')
+        .html("Etes-vous sur de vouloir supprimer cette page?")
+        .dialog({
+            autoOpen : false,
+            title : "Attention",
+            buttons: {
+                "Ok" : function(){$(this).dialog("close");},
+                "Annuler" : function(){$(this).dialog("close");}
+            }
+    });
+    
+    var confirmOpen = function(sort_elmt) {
+        var sort_box = sort_elmt.parent();
+        var id_gab_page = parseInt(sort_elmt.attr('id').split('_').pop());
+        
+        confirm.dialog('option', 'buttons', {
+            "Ok" : function(){
+                $.post(
+                    'page/delete.html',
+                    {id_gab_page : id_gab_page},
+                    function(data){
+                        if(data.status == 'success')
+                            sort_elmt.slideUp('fast', function(){
+                                $(this).remove();
+                                sort_box.sortable('refresh');
+                                confirm.dialog("close")
+                            })
+                    },
+                    'json'
+                );
+            },
+            "Annuler" : function(){$(this).dialog("close");}            
+        }).dialog('open');
+    }
 	
 	$('.supprimer').live('click', function(){
-		sort_elmt = $(this).parents('.sort-elmt').first();
-		sort_box = sort_elmt.parent();
-
-		confirm.html("Etes-vous sur de vouloir supprimer cette page?");
-		confirm.dialog('open');
+        confirmOpen($(this).parents('.sort-elmt').first());
 
 		return false
 	});
@@ -45,9 +57,7 @@ $(function(){
 				id_gab_page : id_gab_page,
 				visible     : checked ? 1 : 0
 			},
-			function(data){
-//                console.log(data);
-                
+			function(data){                
 				if(data.status != 'success')
 					$this.attr('checked', !checked);
 			},
@@ -97,18 +107,24 @@ $(function(){
 //// OUVERTURE / FERMETURE DES PAGES PARENTES.
 	$('legend').live('click', function(){
 		if ($(this).next('div').is(':hidden') && $(this).next('div').html()=='') {
-			var id = $(this).parent().attr('id').split('_').pop();
-			$(this).next('div').load('page/children.html', {id_parent : id}, function(data){
-				if (data != '') {
-					initTri();
-					$(this).slideToggle(500);
-					$(this).siblings('.cat-modif').slideToggle(500);
-				}
-			});
+            
+            if (!$(this).next('div').hasClass('children-loaded')) {            
+                var id = $(this).parent().attr('id').split('_').pop();
+                $(this).next('div').load('page/children.html', {id_parent : id}, function(data){
+                    $(this).addClass('children-loaded');
+                    if (data != '') {
+                        initTri();
+                        $(this).slideToggle(500);
+                        $(this).siblings('.cat-modif').slideToggle(500);
+                    }
+                });
+            }
 		}
 		else {
 			$(this).next('div').slideToggle(500);
 			$(this).siblings('.cat-modif').slideToggle(500);
 		}
+        
+        return false;
 	});
 });

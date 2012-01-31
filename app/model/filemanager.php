@@ -33,7 +33,6 @@ class fileManager extends manager {
         return FALSE;
     }
     
-    
     public function addFolder($id, $nom, $id_parent) {
         $json = array('status' => "error");
 

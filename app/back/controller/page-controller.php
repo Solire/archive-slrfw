@@ -8,7 +8,7 @@ class PageController extends MainController
     
     /**
      *
-     * @var page
+     * @var gabarit_page
      */
     private $_page = null;
     
@@ -25,11 +25,16 @@ class PageController extends MainController
      * 
      * @return void
      */
-    public function listeprojetsAction() {
+    public function listeAction() {
 		$this->_javascript->addLibrary("back/liste.js");
         
-        $this->_view->action = "projet";
-        $this->_pages = $this->_managers->getManagerOf("gabarit")->getList(0, 2);
+        if ($this->_utilisateur->get("niveau") == "solire")
+            $query = "SELECT * FROM `gab_gabarit`";
+        else
+            $query = "SELECT * FROM `gab_gabarit` WHERE `id` > 1";
+        $this->_view->gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        
+        $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
         $this->_view->pages = $this->_pages;
     }
     
@@ -39,7 +44,7 @@ class PageController extends MainController
      */
     public function childrenAction() {
         $this->_view->main(FALSE);
-        $this->_pages = $this->_managers->getManagerOf("gabarit")->getList($_REQUEST['id_parent']);
+        $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $_REQUEST['id_parent']);
         if (count($this->_pages) == 0)
             exit();
         $this->_view->pages = $this->_pages;
@@ -50,22 +55,12 @@ class PageController extends MainController
      * @return void
      */
     public function displayAction() {
-//        header('Content-type: text/html; charset=UTF-8');
-//        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-//        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-//        header("Cache-Control: no-store, no-cache, must-revalidate");
-//        header("Cache-Control: post-check=0, pre-check=0", false);
-//        header("Pragma: no-cache");
+        $upload_path = $this->_mainConfig->get("path", "upload");
         
         $id_gab_page = isset($_GET['id_gab_page']) ? $_GET['id_gab_page'] : 0;
-        $id_gabarit = isset($_GET['id_gabarit']) ? $_GET['id_gabarit'] : 1;
+        $id_gabarit  = isset($_GET['id_gabarit']) ? $_GET['id_gabarit'] : 1;
 
-        if ($id_gab_page == 1)
-            $this->_view->action = "biographie";
-        elseif ($id_gab_page == 2)
-            $this->_view->action = "contact";
-        else
-            $this->_view->action = "projet";
+        $this->_view->action = "liste";
             
         $this->_javascript->addLibrary("back/tiny_mce/tiny_mce.js");
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
@@ -79,63 +74,32 @@ class PageController extends MainController
             $form = '';
             $devant = '';
             foreach ($versions as $version) {
-                $page = $this->_managers->getManagerOf("gabarit")->getPage($id_gab_page, 0, $version['id']);
+                $page = $this->_gabaritManager->getPage($version['id'], $id_gab_page);
                 
-//                $devant .= '<!--' . print_r($page, true) . '-->';
                 $devant .= '<a href="#" class="button bleu openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide')
                          . '"><span class="bleu">Langue : <img src="img/back/flag-' . $version['suf'] . '.gif" alt="'
                          . $version['nom'] . '" /></span></a>';
                 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                        . '"><div class="clearin"></div>'
-                       . $page->getForm($this->_getFormRetour($page->getGabarit()->getName()))
+                       . $page->getForm("page/save.html", "page/liste.html", $upload_path)
                        . '</div>';
             }
             
-            $this->_page = $this->_managers->getManagerOf("gabarit")->getPage($id_gab_page, 0);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
             
             $this->_form .= '<div>' . $devant . '</div>' . $form;
         }
         else {        
-            $this->_managers->getManagerOf("gabarit")->createTables($id_gabarit);
-            $this->_page = $this->_managers->getManagerOf("gabarit")->getPage(0, $id_gabarit);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, 0, $id_gabarit);
             
-//            $parents = $this->_managers->getManagerOf("gabarit")->getList($this->_page->getGabarit()->getIdParent());
-//            echo '<pre>' . print_r($parents, true) . '</pre>';
-            
-            $form = $this->_page->getForm($this->_getFormRetour($this->_page->getGabarit()->getName()));
+            $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path);
             $this->_form = $form;        
         }
         
-        $gab_name = $this->_page->getGabarit()->getName();
         $this->_view->page = $this->_page;
         $this->_view->form = $this->_form;
     }
-    
-    /**
-     *
-     * @param string $gab_name
-     * @return string 
-     */
-    private function _getFormRetour($gab_name) {
-        switch($gab_name) {
-            case "dossier" :
-            case "page" :
-                $retour = "page/listedossiers.html";
-                break;
-            
-            case "rubrique" :
-            case "sous_rubrique" :
-                $retour = "page/listerubriques.html";
-                break;
-            
-            default :
-                $retour = "page/display.html";
-        }
-        
-        return $retour;
-    }
-    
     
     /**
      * 
@@ -145,26 +109,27 @@ class PageController extends MainController
         $this->_view->main(FALSE);
         $this->_view->enable(FALSE);
 
-        $this->_page = $this->_managers->getManagerOf("gabarit")->save($_POST);
-
-//        if ($this->_page->getGabarit()->getName() == 'rubrique' || $this->_page->getGabarit()->getName() == 'sous_rubrique')
-//            $this->_managers->getManagerOf("file")->createFolder($this->_page->getMeta("id"), self::$_dirs['media']); // addFolder($this->_page->getMeta("id"));
+        $this->_page = $this->_gabaritManager->save($_POST);
+        
+        $contenu = '<a href="' . Registry::get("basehref") . 'page/display.html?id_gab_page='
+                 . $this->_page->getMeta("id") . '">'
+                 . $this->_page->getMeta("titre") . '</a>';
+        
+        $headers = "From: ". Registry::get("mail-contact") . "\r\n"
+                 . "Reply-To: ". Registry::get("mail-contact") . "\r\n"
+                 . "Bcc: contact@solire.fr \r\n"
+                 . "X-Mailer: PHP/" . phpversion();
+        
+        Tools::mail_utf8("Modif site <modif@solire.fr>", "Modification de contenu sur " . Registry::get("site"), $contenu, $headers);
         
         $json = array(
             "status" => $this->_page ? "success" : "error",
             "search" => "?id_gab_page=" . $this->_page->getMeta("id"),
             "id_gab_page" => $this->_page->getMeta("id"),
-//            "debug"     => $this->_page->getValues(),
-//            "request" => $_REQUEST,
-//            "post" => $_POST,
-//            "get" => $_GET,
-//            "cookie" => $_COOKIE,
-//            "id_version" => ID_VERSION,
         );
         
         exit(json_encode($json));
     }
-    
     
     /**
      * 
@@ -180,7 +145,7 @@ class PageController extends MainController
         if (!isset ($_REQUEST['id_gabarit']) || !is_numeric($_REQUEST['id_gabarit']))
             exit(json_encode ($json));
         
-        $pages = $this->_managers->getManagerOf("gabarit")->getSearch($_GET['term'], $_REQUEST['id_gabarit']);
+        $pages = $this->_gabaritManager->getSearch(BACK_ID_VERSION, $_GET['term'], $_REQUEST['id_gabarit']);
         foreach ($pages as $page) {
             if (!in_array($page->getMeta('id'), $dejaLiees))
                 $json[] = array("value" => $page->getMeta('id'), "label" => $page->getMeta('titre'), "visible" => $page->getMeta('titre'));
@@ -215,35 +180,15 @@ class PageController extends MainController
      * 
      * @return void
      */
-    public function enavantAction() {
-        $this->_view->enable(FALSE);
-
-        $json = array('status' => "error");
-        
-        if (is_numeric($_POST['id_gab_page']) && is_numeric($_POST['en_avant'])) {
-            $query = "UPDATE `gab_page` SET `en_avant` = " . $_POST['en_avant'] . " WHERE `id` = " . $_POST['id_gab_page'];
-            if ($this->_db->query($query)) {
-                $json['status'] = "success";
-                $json['debug'] = $query;
-            }
-        }
-        
-        exit (json_encode($json));
-    }
-
-    /**
-     * 
-     * @return void
-     */
     public function deleteAction() {
         $this->_view->enable(FALSE);
 
         $json = array('status' => "error");
 
-        if (is_numeric($_REQUEST['id_gab_page'])) {
-            $prepStmt = $this->_db->prepare("UPDATE `gab_page` SET `suppr` = 1 AND `date_suppr` = NOW() WHERE `id` = :id");
-            $prepStmt->bindValue(":id", $_REQUEST['id_gab_page'], PDO::PARAM_INT);
-            if ($prepStmt->execute()) {
+        if (is_numeric($_POST['id_gab_page'])) {
+            $query = "UPDATE `gab_page` SET `suppr` = 1, `date_modif` = NOW() WHERE `id` = " . $_POST['id_gab_page'];
+            $json['query'] = $query;
+            if ($this->_db->exec($query)) {
                 $json['status'] = "success";
             }
         }
