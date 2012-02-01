@@ -142,7 +142,7 @@ class gabaritPage extends gabaritBloc {
      */
     public function getParent($i) {
         if (array_key_exists($i, $this->_parents))
-            return $this->_parents[$id_gabarit];
+            return $this->_parents[$i];
         
         return FALSE;
     }

@@ -33,7 +33,15 @@ var initTinyMCE = function () {
 
         theme_advanced_blockformats : "h3,h4",
 
-        external_image_list_url : "../media/autocomplete.html?tinyMCE"
+//        external_image_list_url : "../media/autocomplete.html?tinyMCE"
+        
+        
+        relative_urls : true,
+//        remove_script_host : false,
+        convert_urls : true,
+        document_base_url : "../../../../",
+//        content_css : "css/back/style-tinymce.css",
+        external_image_list_url : "back/media/autocomplete.html?tinyMCE"
     });    
 }
 
