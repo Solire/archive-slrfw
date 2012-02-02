@@ -130,7 +130,7 @@ class gabaritManager extends manager {
         $query = "SELECT * FROM `gab_bloc` WHERE `id_gabarit` = " . $gabarit->getId();
         $rows = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         
-		$query = "SELECT * FROM `gab_champ` WHERE `id_parent` = :id_bloc AND `type_parent` = 'bloc'";
+		$query = "SELECT * FROM `gab_champ` WHERE `id_parent` = :id_bloc AND `type_parent` = 'bloc' ORDER BY `gab_champ`.`ordre`";
         $stmt = $this->_db->prepare($query);
                 
         $blocs = array();
