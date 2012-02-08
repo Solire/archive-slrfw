@@ -1,0 +1,6 @@
+<div class="line<?php echo $this->champ['media']; ?>">
+    <label for="<?php echo $this->id; ?>">
+        <span><?php echo $this->label; ?></span>
+    </label>
+    <input type="checkbox" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>"<?php echo ($value > 0 ? ' checked="checked"' : '') ?> />
+</div>
