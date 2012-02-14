@@ -14,14 +14,16 @@ abstract class GabaritField
     protected $value;
     protected $id;
     protected $classes;
+    protected $db;
 
-    public function __construct($champ, $label, $value, $id, $classes)
+    public function __construct($champ, $label, $value, $id, $classes, $db = null)
     {
         if (isset($champ["params"])) {
             $this->params = $champ["params"];
             unset($champ["params"]);
         }
-
+        if ($db)	$this->db = $db;
+        else		$this->db = Registry::get("db");
         $this->champ = $champ;
         $this->label = $label;
         $this->value = $value;

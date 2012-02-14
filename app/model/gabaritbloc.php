@@ -134,8 +134,10 @@ class gabaritBloc
      */
     protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page)
     {
+        
         $form = '';
-
+        if($champ["visible"] == 0)
+            return $form;
         $label = $champ['label'];
         $classes = 'form-controle form-' . $champ['oblig'] . ' form-' . strtolower($champ['typedonnee']);
         $id = 'champ' . $champ['id'] . '_' . $idpage;

@@ -551,11 +551,13 @@ class gabaritManager extends manager
 
         foreach ($allchamps as $name_group => $champs) {
             foreach ($champs as $champ) {
+                if($champ["visible"] == 0)
+                    continue;
                 $value = $donnees['champ' . $champ['id']][0];
 
                 if ($champ['typedonnee'] == 'date')
                     $value = dateFRtoUS($value);
-
+                
                 $query .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
             }
         }
@@ -616,6 +618,8 @@ class gabaritManager extends manager
             }
 
             foreach ($champs as $champ) {
+                if($champ["visible"] == 0)
+                    continue;
                 $value = array_shift($donnees['champ' . $champ['id']]);
 
                 if ($champ['typedonnee'] == 'date')
