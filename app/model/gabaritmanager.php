@@ -80,10 +80,13 @@ class gabaritManager extends manager
                 $page->setValues($values);
 
                 $blocs = $page->getBlocs();
-                foreach ($blocs as $bloc) {
+                foreach ($blocs as $blocName => $bloc) {
                     $valuesBloc = $this->getBlocValues($bloc, $id_gab_page, $id_version);
-                    if ($valuesBloc)
+                    if ($valuesBloc) {
                         $bloc->setValues($valuesBloc);
+                        //TODO ADMIN
+                        $this->getBlocJoinsValues($page, $blocName, $id_gab_page, $id_version);
+                    }
                 }
             }
         }
@@ -117,7 +120,6 @@ class gabaritManager extends manager
                 . " WHERE `id_parent` = $id_gabarit AND `type_parent` = 'gabarit'"
                 . " ORDER BY `g`.`ordre`, `c`.`ordre`";
         $champs = $this->_db->query($query)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
-
         //Parametre
         //TODO a optimiser (1 requete pour champ dyn et champ normaux, filtrer par id champ + type, voir faire des jointure sur gab_champ)
         $gabChampTypeParams = $this->_db->query('
@@ -196,7 +198,7 @@ class gabaritManager extends manager
             INNER JOIN gab_champ_param gcp 
                 ON gct.code = gcp.code_champ_type
             ORDER BY  gct.ordre, gct.code')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
-        
+
         foreach ($gabChampTypeParamsDefault as $type => $params) {
             $paramsDefault[$type] = array();
             foreach ($params as $param) {
@@ -208,6 +210,7 @@ class gabaritManager extends manager
 
 
         $blocs = array();
+        $joins = array();
         foreach ($rows as $row) {
             $gabarit_bloc = new gabarit($row['id'], 0, $row['name'], $row['label']);
 
@@ -217,7 +220,6 @@ class gabaritManager extends manager
             $stmt->bindValue(":id_bloc", $row['id'], PDO::PARAM_INT);
             $stmt->execute();
             $champs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             //Parametre
             foreach ($gabChampTypeParams as $idField => $params) {
                 $params2 = array();
@@ -235,6 +237,10 @@ class gabaritManager extends manager
                         $champ["params"] = array_merge($champ["params"], $params2);
 //                        break;
                     }
+                    if ($champ["type"] == "JOIN") {
+                        $joins[] = $champ;
+                        unset($champ);
+                    }
                 }
             }
 
@@ -243,6 +249,7 @@ class gabaritManager extends manager
             $stmt->closeCursor();
 
             $gabarit_bloc->setChamps($champs);
+            $gabarit_bloc->setJoins($joins);
 
             $bloc = new gabaritBloc();
 
@@ -285,6 +292,59 @@ class gabaritManager extends manager
                 . " AND `id_version` = $id_version"
                 . ($visible ? " AND `visible` = 1" : "")
                 . " ORDER BY `ordre`";
+
+        return $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     *
+     * @param gabaritPage $page
+     * @param type $id_gab_page
+     * @param type $id_version
+     * @param type $visible
+     * @return type 
+     */
+    public function getBlocJoinsValues($page, $name_bloc, $id_gab_page, $id_version, $visible = FALSE)
+    {
+        $joinFields = array();
+        foreach ($page->getBlocs($name_bloc)->getGabarit()->getJoins() as $joinField) {
+            $joinFields[$joinField["name"]] = array(
+                "values" => array(),
+                "table" => $joinField["params"]["TABLE.NAME"],
+                "fieldId" => $joinField["params"]["TABLE.FIELD.ID"],
+            );
+            foreach ($page->getBlocs($name_bloc)->getValues() as $value) {
+                $joinFields[$joinField["name"]]["values"][] = $value[$joinField["name"]];
+            }
+        }
+        
+        if(count($joinFields) == 0)
+            return null;
+
+        foreach ($joinFields as $joinName =>  $joinField) {
+            
+            $query = "SELECT `gab_page`.`id`, `gab_page`.* FROM `gab_page` WHERE `id_version` = $id_version AND `id`  IN (" . implode(",", $joinField['values']) . ") AND `suppr` = 0";
+            $meta = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+            if (!$meta)
+                continue;
+
+            $query = "SELECT `" . $joinField["table"] . "`.`id_gab_page`, `" . $joinField["table"] . "`.*"
+                    . " FROM `" . $joinField["table"] . "`"
+                    . " WHERE `id_gab_page` IN (" . implode(",", array_keys($meta)) . ")"
+                    . " AND `" . $joinField["table"] . "`.`id_version` = $id_version";
+            
+            $values = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+            
+            foreach ($page->getBlocs($name_bloc)->getValues() as $keyValue => $value) {
+                $pageJoin = new gabaritPage();
+                $pageJoin->setMeta($meta[$value[$joinName]]);
+                $pageJoin->setValues($values[$value[$joinName]]);
+                $page->getBlocs($name_bloc)->setValue($keyValue, $pageJoin, $joinName);
+            }
+            
+        }
+
+
 
         return $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -551,13 +611,13 @@ class gabaritManager extends manager
 
         foreach ($allchamps as $name_group => $champs) {
             foreach ($champs as $champ) {
-                if($champ["visible"] == 0)
+                if ($champ["visible"] == 0)
                     continue;
                 $value = $donnees['champ' . $champ['id']][0];
 
                 if ($champ['typedonnee'] == 'date')
                     $value = dateFRtoUS($value);
-                
+
                 $query .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
             }
         }
@@ -618,7 +678,7 @@ class gabaritManager extends manager
             }
 
             foreach ($champs as $champ) {
-                if($champ["visible"] == 0)
+                if ($champ["visible"] == 0)
                     continue;
                 $value = array_shift($donnees['champ' . $champ['id']]);
 

@@ -16,7 +16,9 @@ class gabarit
     
     private $_label;
 
-	private $_champs = array();
+    private $_champs = array();
+    
+    private $_joins = array();
     
     
     /**
@@ -54,6 +56,10 @@ class gabarit
         $this->_champs = $champs;
     }
     
+    public function setJoins($joins) {
+        $this->_joins = $joins;
+    }
+    
     public function setGabaritParent($dbRow) {
         $this->_gabaritParent = $dbRow;
     }
@@ -88,6 +94,10 @@ class gabarit
     
     public function getChamps() {
         return $this->_champs;
+    }
+    
+    public function getJoins() {
+        return $this->_joins;
     }
     
     public function getGabaritParent($key = NULL) {

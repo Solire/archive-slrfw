@@ -73,7 +73,7 @@ $(function(){
 	$.fn.clearForm = function(){
 		var idnew;
 		
-		this.find('input, textarea, select').not('[name="visible[]"]').each(function(){
+		this.find('input, textarea, select').not('[name="visible[]"]').not(".join-param").each(function(){
 			idnew = $(this).attr('id')+'a';
 			$(this).attr('id', idnew);
 			$(this).prev('label').attr('for', idnew);

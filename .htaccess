@@ -41,7 +41,13 @@ RewriteRule ^mobile/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      pub
 RewriteRule ^mobile/$                                                       public_html/index.php?application=mobile&%{QUERY_STRING} [L]
 RewriteRule ^back/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=back&%{QUERY_STRING} [L]
 RewriteRule ^back/$                                                       public_html/index.php?application=back&%{QUERY_STRING} [L]
-RewriteRule ^([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=$1&action=$3&%{QUERY_STRING} [L]
+#RewriteRule ^([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=$1&action=$3&%{QUERY_STRING} [L]
+
+RewriteRule ^$                                                public_html/index.php?controller=page&action=start&rew=accueil&%{QUERY_STRING} [L]
+RewriteRule ^(([a-z0-9\-]+).html)$                            public_html/index.php?controller=page&action=start&rub=$2&%{QUERY_STRING} [L]
+RewriteRule ^([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=page&action=start&prub=$1&rub=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z0-9\-]+)/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$       public_html/index.php?controller=page&action=start&prub=$1&rub=$2&rew=$4&%{QUERY_STRING} [L]
+
 
 #   Toutes les URL qui ne correspondent pas à ces masques sont réécrites.
 RewriteCond $1 !^(public_html/)

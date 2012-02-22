@@ -63,6 +63,8 @@ class PageController extends MainController
         $this->_view->action = "liste";
             
         $this->_javascript->addLibrary("back/tiny_mce/tiny_mce.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.livequery.min.js");
+        $this->_javascript->addLibrary("back/autocomplete.js");
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
         $this->_javascript->addLibrary("back/formgabarit.js");
         $this->_javascript->addLibrary("back/affichegabarit.js");
@@ -77,7 +79,7 @@ class PageController extends MainController
                 $page = $this->_gabaritManager->getPage($version['id'], $id_gab_page);
                 
                 $devant .= '<a href="#" class="button bleu openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide')
-                         . '"><span class="bleu">Langue : <img src="img/back/flag-' . $version['suf'] . '.gif" alt="'
+                         . '"><span class="bleu">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
                          . $version['nom'] . '" /></span></a>';
                 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
@@ -152,6 +154,33 @@ class PageController extends MainController
         }
         
         exit(json_encode ($json));
+    }
+    
+    /**
+     * 
+     * @return void
+     */
+    public function autocompleteJoinAction()
+    {
+        $this->_view->enable(FALSE);
+        $this->_view->main(FALSE);
+
+        $json = array();
+        $term = $_REQUEST["term"];
+        $idField = $_REQUEST["id_field"];
+        $labelField = $_REQUEST["label_field"];
+        $idGabPage = $_REQUEST["id_gab_page"];
+        $queryFilter = str_replace("[ID]", $idGabPage, $_REQUEST["query_filter"]);
+        $table = $_REQUEST["table"];
+        $lang = BACK_ID_VERSION;
+
+        $sql = "SELECT `$table`.$idField id, `$table`.$labelField label
+                    FROM `$table` 
+                    WHERE id_version = $lang " . ($queryFilter != "" ? "AND (" . $queryFilter . ")" : "") . " AND `$table`.`$labelField`  LIKE '%$term%'";
+        
+        $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        
+        exit(json_encode($json));
     }
 
     

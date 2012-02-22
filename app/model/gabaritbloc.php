@@ -42,6 +42,27 @@ class gabaritBloc
     {
         $this->_values = $values;
     }
+    
+    /**
+     *
+     * @param string $key
+     * @return mixed 
+     */
+    public function setValue($i, $value, $key = NULL)
+    {
+        if ($i < 0 || $i >= count($this->_values))
+            return false;
+
+        $row = $this->_values[$i];
+
+        if ($key == NULL)
+            return $this->_values = $value;
+
+        if (!isset($row[$key]))
+            return false;
+
+        return $this->_values[$i][$key] = $value;
+    }
 
     /**
      *
