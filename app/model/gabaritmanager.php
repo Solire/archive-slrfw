@@ -317,12 +317,12 @@ class gabaritManager extends manager
                 $joinFields[$joinField["name"]]["values"][] = $value[$joinField["name"]];
             }
         }
-        
-        if(count($joinFields) == 0)
+
+        if (count($joinFields) == 0)
             return null;
 
-        foreach ($joinFields as $joinName =>  $joinField) {
-            
+        foreach ($joinFields as $joinName => $joinField) {
+
             $query = "SELECT `gab_page`.`id`, `gab_page`.* FROM `gab_page` WHERE `id_version` = $id_version AND `id`  IN (" . implode(",", $joinField['values']) . ") AND `suppr` = 0";
             $meta = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
             if (!$meta)
@@ -332,21 +332,64 @@ class gabaritManager extends manager
                     . " FROM `" . $joinField["table"] . "`"
                     . " WHERE `id_gab_page` IN (" . implode(",", array_keys($meta)) . ")"
                     . " AND `" . $joinField["table"] . "`.`id_version` = $id_version";
-            
+
             $values = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
             
+            //On recupere les pages jointes
             foreach ($page->getBlocs($name_bloc)->getValues() as $keyValue => $value) {
+                if ($meta[$value[$joinName]]["id_parent"] != 0)
+                    $parents[] = $meta[$value[$joinName]]["id_parent"];
                 $pageJoin = new gabaritPage();
                 $pageJoin->setMeta($meta[$value[$joinName]]);
                 $pageJoin->setValues($values[$value[$joinName]]);
                 $page->getBlocs($name_bloc)->setValue($keyValue, $pageJoin, $joinName);
             }
-            
+
+            //Si on a des parents pour une des valeurs d'un bloc
+            if (count($parents) > 0) {
+                $parentsUnique = array_unique($parents);
+                unset($parents);
+                $query = "SELECT * FROM `gab_page`"
+                        . " WHERE `id_version` = $id_version AND `id` IN (" . implode(", ", $parentsUnique) . ") AND `suppr` = 0";
+                $parentsMeta = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($parentsMeta as $parentMeta) {
+                    if ($meta[$value[$joinName]]["id_parent"] != 0)
+                        $parents[] = $parentMeta["id_parent"];
+                    $parentsPage[$parentMeta["id"]] = new gabaritPage();
+                    $parentsPage[$parentMeta["id"]]->setMeta($parentMeta);
+                }
+
+                //Si on a des grands parents
+                $parentsUnique2 = array_unique(array_merge($parentsUnique, $parents));
+                //Si on a des grandparents qu'on avait pas recuperer
+                if (count($parentsUnique2) > count($parentsUnique)) {
+                    $query = "SELECT * FROM `gab_page`"
+                            . " WHERE `id_version` = $id_version AND `id` IN (" . implode(", ", $parentsUnique2) . ") AND `suppr` = 0";
+                    $parentsMeta2 = array_merge($parentsMeta, $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC));
+                    foreach ($parentsMeta2 as $parentMeta2) {
+                        $parentsPage[$parentMeta2["id"]] = new gabaritPage();
+                        $parentsPage[$parentMeta2["id"]]->setMeta($parentMeta2);
+                    }
+                }
+
+
+                //On remplit les parents et grands parents des pages joins
+                foreach ($page->getBlocs($name_bloc)->getValues() as $keyValue => $value) {
+                    $pageJoin = $page->getBlocs($name_bloc)->getValue($keyValue, $joinName);
+                    $parents = array();
+                    //Si on a un parent
+                    if ($pageJoin->getMeta("id_parent") > 0) {
+                        $parents[] = $parentsPage[$pageJoin->getMeta("id_parent")];
+                        //Si on a un grand parent
+                        if ($parentsPage[$pageJoin->getMeta("id_parent")]->getMeta("id_parent") > 0) {
+                            $parents[] = $parentsPage[$parentsPage[$pageJoin->getMeta("id_parent")]->getMeta("id_parent")];
+                        }
+                    }
+
+                    $pageJoin->setParents($parents);
+                }
+            }
         }
-
-
-
-        return $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
