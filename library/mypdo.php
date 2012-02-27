@@ -2,9 +2,7 @@
 
 /**
  * Extention de PDO
- * @author Sanath <admin@sanathlabs.fr>
  * @version 1
- * @package Helion
  */
 class MyPDO extends PDO
 {

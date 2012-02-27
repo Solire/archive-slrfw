@@ -3,7 +3,6 @@
 /**
  * Gestionnaire de connexion à la base de données
  *
- * @author Adrien
  * @version 1.3
  */
 require_once 'mypdo.php';
