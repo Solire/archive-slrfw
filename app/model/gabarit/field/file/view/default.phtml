@@ -4,7 +4,7 @@
     </label>
     <input type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" />
     
-    <a href="<?php echo ($value ? Registry::get("base") . $upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $value : '') ?>" class="previsu">
+    <a href="<?php echo ($this->value ? Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" class="previsu">
         <?php echo $this->value; ?>
     </a>
 </div>

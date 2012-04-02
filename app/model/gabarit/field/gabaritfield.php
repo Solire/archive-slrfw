@@ -8,15 +8,19 @@
 abstract class GabaritField
 {
 
+    protected $view = "default";
     protected $champ;
+    
     protected $params;
     protected $label;
     protected $value;
+    protected $idGabPage;
+    protected $uploadPath;
     protected $id;
     protected $classes;
     protected $db;
 
-    public function __construct($champ, $label, $value, $id, $classes, $db = null)
+    public function __construct($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, $db = null)
     {
         if (isset($champ["params"])) {
             $this->params = $champ["params"];
@@ -24,6 +28,11 @@ abstract class GabaritField
         }
         if ($db)	$this->db = $db;
         else		$this->db = Registry::get("db");
+        
+        ;
+        ;
+        $this->idGabPage = $id_gab_page;
+        $this->uploadPath = $upload_path;
         $this->champ = $champ;
         $this->label = $label;
         $this->value = $value;
@@ -39,7 +48,8 @@ abstract class GabaritField
     public function __toString()
     {
         $rc = new ReflectionClass(get_class($this));
-        return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . "view/default.phtml");
+        $view = $this->view;
+        return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . "view/$view.phtml");
     }
 
     /**

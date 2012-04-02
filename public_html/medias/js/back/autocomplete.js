@@ -1,3 +1,5 @@
+var timer = null;
+
 $(function(){
     $(".autocomplete-join").livequery(function(){ 
         var $input = $(this); 
@@ -20,14 +22,27 @@ $(function(){
                         term : request.term
                     }, function( data, status, xhr ) {
                         response( data );
-                    });
+                    })
             },
             minLength: 0,
             select: function(e, ui) {
                 $(this).parent().find(".join").val(ui.item.id)
             }
                 
-        }); 
+        }).focus( function() {
+            
+            if (this.value == "")
+            {
+                clearTimeout(timer);
+                timer = setTimeout(function(){
+                    if ($input.val() == "")
+                    {
+                        $input.autocomplete('search', '');
+                    }
+                },220);
+                
+            }
+        });; 
     });
 
     

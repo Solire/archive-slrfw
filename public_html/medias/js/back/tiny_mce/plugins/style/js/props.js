@@ -10,9 +10,9 @@ var defaultFonts = "" +
 	"Geneva, Arial, Helvetica, sans-serif=Geneva, Arial, Helvetica, sans-serif";
 
 var defaultSizes = "9;10;12;14;16;18;24;xx-small;x-small;small;medium;large;x-large;xx-large;smaller;larger";
-var defaultMeasurement = "+pixels=px;points=pt;em;in;cm;mm;picas;ems;exs;%";
-var defaultSpacingMeasurement = "pixels=px;points=pt;in;cm;mm;picas;+ems;exs;%";
-var defaultIndentMeasurement = "pixels=px;+points=pt;in;cm;mm;picas;ems;exs;%";
+var defaultMeasurement = "+pixels=px;points=pt;inches=in;centimetres=cm;millimetres=mm;picas=pc;ems=em;exs=ex;%";
+var defaultSpacingMeasurement = "pixels=px;points=pt;inches=in;centimetres=cm;millimetres=mm;picas=pc;+ems=em;exs=ex;%";
+var defaultIndentMeasurement = "pixels=px;+points=pt;inches=in;centimetres=cm;millimetres=mm;picas=pc;ems=em;exs=ex;%";
 var defaultWeight = "normal;bold;bolder;lighter;100;200;300;400;500;600;700;800;900";
 var defaultTextStyle = "normal;italic;oblique";
 var defaultVariant = "normal;small-caps";
@@ -144,6 +144,8 @@ function setupFormData() {
 	f.text_overline.checked = inStr(ce.style.textDecoration, 'overline');
 	f.text_linethrough.checked = inStr(ce.style.textDecoration, 'line-through');
 	f.text_blink.checked = inStr(ce.style.textDecoration, 'blink');
+	f.text_none.checked = inStr(ce.style.textDecoration, 'none');
+	updateTextDecorations();
 
 	// Setup background fields
 
@@ -177,11 +179,7 @@ function setupFormData() {
 
 	f.box_height.value = getNum(ce.style.height);
 	selectByValue(f, 'box_height_measurement', getMeasurement(ce.style.height));
-
-	if (tinymce.isGecko)
-		selectByValue(f, 'box_float', ce.style.cssFloat, true, true);
-	else
-		selectByValue(f, 'box_float', ce.style.styleFloat, true, true);
+	selectByValue(f, 'box_float', ce.style.cssFloat || ce.style.styleFloat, true, true);
 
 	selectByValue(f, 'box_clear', ce.style.clear, true, true);
 
@@ -247,12 +245,12 @@ function setupFormData() {
 }
 
 function getMeasurement(s) {
-	return s.replace(/^([0-9]+)(.*)$/, "$2");
+	return s.replace(/^([0-9.]+)(.*)$/, "$2");
 }
 
 function getNum(s) {
-	if (new RegExp('^[0-9]+[a-z%]+$', 'gi').test(s))
-		return s.replace(/[^0-9]/g, '');
+	if (new RegExp('^(?:[0-9.]+)(?:[a-z%]+)$', 'gi').test(s))
+		return s.replace(/[^0-9.]/g, '');
 
 	return s;
 }
@@ -376,7 +374,7 @@ function applyAction() {
 	generateCSS();
 
 	tinyMCEPopup.restoreSelection();
-	ed.dom.setAttrib(ed.selection.getNode(), 'style', tinyMCEPopup.editor.dom.serializeStyle(tinyMCEPopup.editor.dom.parseStyle(ce.style.cssText)));
+	ed.dom.setAttrib(ed.selection.getSelectedBlocks(), 'style', tinyMCEPopup.editor.dom.serializeStyle(tinyMCEPopup.editor.dom.parseStyle(ce.style.cssText)));
 }
 
 function updateAction() {
@@ -440,9 +438,7 @@ function generateCSS() {
 	ce.style.width = f.box_width.value + (isNum(f.box_width.value) ? f.box_width_measurement.value : "");
 	ce.style.height = f.box_height.value + (isNum(f.box_height.value) ? f.box_height_measurement.value : "");
 	ce.style.styleFloat = f.box_float.value;
-
-	if (tinymce.isGecko)
-		ce.style.cssFloat = f.box_float.value;
+	ce.style.cssFloat = f.box_float.value;
 
 	ce.style.clear = f.box_clear.value;
 
@@ -478,7 +474,7 @@ function generateCSS() {
 		ce.style.borderBottomWidth = f.border_width_bottom.value + (isNum(f.border_width_bottom.value) ? f.border_width_bottom_measurement.value : "");
 		ce.style.borderLeftWidth = f.border_width_left.value + (isNum(f.border_width_left.value) ? f.border_width_left_measurement.value : "");
 	} else
-		ce.style.borderWidth = f.border_width_top.value;
+		ce.style.borderWidth = f.border_width_top.value + (isNum(f.border_width_top.value) ? f.border_width_top_measurement.value : "");
 
 	if (!f.border_color_same.checked) {
 		ce.style.borderTopColor = f.border_color_top.value;
@@ -636,6 +632,19 @@ function synch(fr, to) {
 
 	if (f.elements[fr + "_measurement"])
 		selectByValue(f, to + "_measurement", f.elements[fr + "_measurement"].value);
+}
+
+function updateTextDecorations(){
+	var el = document.forms[0].elements;
+
+	var textDecorations = ["text_underline", "text_overline", "text_linethrough", "text_blink"];
+	var noneChecked = el["text_none"].checked;
+	tinymce.each(textDecorations, function(id) {
+		el[id].disabled = noneChecked;
+		if (noneChecked) {
+			el[id].checked = false;
+		}
+	});
 }
 
 tinyMCEPopup.onInit.add(init);

@@ -137,7 +137,11 @@ class MyPDO extends PDO
                 $p = $this->quote($p);
         }
         unset($p);
-        return parent::exec(vsprintf($query, $params));
+        if ($params == NULL) {
+            return parent::exec($query);
+        } else {
+            return parent::exec(vsprintf($query, $params));
+        }
     }
     
     // insertion de données dans MySQL
