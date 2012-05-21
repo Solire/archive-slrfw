@@ -2,7 +2,5 @@
     <label for="<?php echo $this->id; ?>">
         <span><?php echo $this->label; ?></span>
     </label>
-    <textarea name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" rows="5" cols="20">
-        <?php echo $this->value; ?>
-    </textarea>
+    <textarea name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" rows="5" cols="20"><?php echo $this->value; ?></textarea>
 </div>

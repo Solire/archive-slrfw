@@ -65,45 +65,7 @@ $(function(){
 		verifieForm($(this));
 	});
 
-	//envoi normal.
-	$('.formsubmit').live('click', function(){
-		var formu = $(this).parents('form').first();
-		var ok = true;
-		formu.attr('target', '');
-		
-		if(typeof tinyMCE=="object")
-			tinyMCE.triggerSave(true, true);
-		
-		$('.controle', formu).each(function(){
-			if(!verifieForm($(this))){
-				var $this = $(this);
-				if ($(this).is('textarea')) $this = $(this).next();
-				
-				if(ok){
-					ok = false;
-					var haut = $(this).parent().position().top-10;
-					$('html').animate(
-						{scrollTop : haut},
-						'fast',
-						function(){
-							if($this.is(':hidden')){
-								var parent = $this.parents('fieldset').first();
-								parent.children('legend').click();
-								if(parent.is(':hidden'))
-									$this.parents('fieldset').first().children('legend').click();
-							}
-							$this.focus();
-						}
-					);
-				}
-			}
-		});
-		
-		if(ok)
-			formu.submit();
-		
-		return false;
-	});
+	
 
     var enregistrement = $('<div>', {id : 'enregistrement'}).dialog({
         autoOpen : false,
@@ -124,6 +86,7 @@ $(function(){
     }
 
 	$('.formajaxsubmit:visible').live('click', function(){
+                
 		json = {};
 		var tthis = $(this);
 		var ok = true;
@@ -161,6 +124,7 @@ $(function(){
 		});
 		
 		if (ok) {
+                        $('.formajaxsubmit:visible').unbind("click");
 			json = formu.serialize();
 			
             enregistrement_open('<p>...</p>');
@@ -174,8 +138,11 @@ $(function(){
 					
 					if (data.status == "success") {
                         
-                        if (typeof data.id_gab_page != "undefined")
+                        if (typeof data.id_gab_page != "undefined") {
                             $.cookie("id_gab_page", data.id_gab_page, {path : '/'});
+                            $('[name=id_gab_page]').val(data.id_gab_page);
+                            
+                        }
                         
                         if (typeof uploader == "object" && uploader.files.length > 0) {
                             uploader.start();

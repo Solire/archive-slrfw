@@ -13,6 +13,13 @@ class gabaritPage extends gabaritBloc {
     
     /**
      *
+     * @var array 
+     */
+    private $_version = array();
+
+
+    /**
+     *
      * @var array
      */
     private $_blocs = array();
@@ -43,12 +50,24 @@ class gabaritPage extends gabaritBloc {
         $this->_id = $meta['id'];
     }
     
+    public function setVersion($data) {
+        $this->_version = $data;
+    }
+    
     /**
      *
      * @param array $values 
      */
     public function setValues($values) {
         $this->_values = $values;
+    }
+    
+    /**
+     *
+     * @param array $values 
+     */
+    public function setValue($key, $value) {
+        $this->_values[$key] = $value;
     }
     
     /**
@@ -114,12 +133,28 @@ class gabaritPage extends gabaritBloc {
      * @param string $key
      * @return mixed 
      */
-    public function getValues($key = NULL) {
-        if (is_array($this->_values) && array_key_exists($key, $this->_values))
-            return $this->_values[$key];
+    public function getVersion($key = NULL) {
+        if ($key != NULL) {
+            if (is_array($this->_version) && array_key_exists($key, $this->_version))
+                return $this->_version[$key];
+            
+            return NULL;
+        }
         
+        return $this->_version;
+    }
+    
+    /**
+     *
+     * @param string $key
+     * @return mixed 
+     */
+    public function getValues($key = NULL) {
         if ($key == NULL)
             return $this->_values;
+        
+        if (is_array($this->_values) && array_key_exists($key, $this->_values))
+            return $this->_values[$key];
         
         return '';
     }
@@ -194,9 +229,16 @@ class gabaritPage extends gabaritBloc {
               . '<div class="line">'
               . '<label for="titre-' . $metaLang . '">Titre</label>'
               . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="form-controle form-oblig form-mix" />'
-              . '</div>'
+              . '</div>';
+        
+        if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
+            $form .= '<div class="line">'
+                   . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting</label>'
+                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="form-controle form-oblig form-mix" />'
+                   . '</div>';
+        }
 
-              . '<fieldset><legend>Balise Meta</legend><div style="display:none;">'
+        $form .= '<fieldset><legend>Balise Meta</legend><div style="display:none;">'
 
               . '<div class="line">'
               . '<label for="rewriting-' . $metaLang . '">Rewriting</label>'
@@ -264,7 +306,7 @@ class gabaritPage extends gabaritBloc {
         $id_gab_page = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
         
         foreach ($allchamps as $name_group => $champs) {
-            $form .= '<fieldset><legend>' . $name_group . '</legend><div>';
+            $form .= '<fieldset><legend>' . $name_group . '</legend><div ' . ($id_gab_page ? 'style="display:none;"' : '') . '>';
             foreach ($champs as $champ) {
                 $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
                 $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';

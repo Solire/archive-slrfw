@@ -1,0 +1,29 @@
+
+<fieldset><legend><?php echo $this->gabarit->getLabel(); ?></legend><div style="display:none;" class="sort-box">
+
+        <?php
+        foreach ($this->values as $value) {
+            $this->_buildChamps($value);
+            ?>
+            <fieldset class="sort-elmt" style="margin-left:30px;"><legend><?php echo $this->valueLabel; ?></legend>
+                <div>
+                    <div class="line">
+                        <label for="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>">Visible</label>
+                        <input type="checkbox" id="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>" class="changevisible"<?php echo (isset($value['visible']) && $value['visible'] ? ' checked="checked"' : '') ?> />
+                        <input type="hidden" value="<?php echo (isset($value['visible']) && $value['visible'] ? 1 : 0) ?>" name="visible[]" />
+                    </div><div<?php echo (isset($value['visible']) && $value['visible'] ? '' : ' class="translucide"') ?>>
+                        <input type="hidden" name="id_<?php echo $this->gabarit->getTable() . '[]" value="' . (isset($value['id']) ? $value['id'] : '') ?>" />
+
+                        <?php echo $this->champsHTML; ?>
+                    </div></div>
+                <div>
+                    <a href="#" class="button bleu delBloc<?php echo ( count($value) > 1 ? '' : ' translucide' ) ?>" style="float:right;">
+                        <span class="bleu"><img src="img/back/supprimer.png" border="0" alt="supprimer"/></span></a>
+                    <a href="#" class="button bleu sort-move"><span class="bleu"><img src="img/back/deplacer.png" alt="Déplacer" /></span></a>
+                </div>
+            </fieldset>
+            <?php
+        }
+        ?>
+        <div class="buttonright"><a class="button bleu addBloc" href="#"><span class="bleu">Ajouter un bloc</span></a></div>
+    </div></fieldset>

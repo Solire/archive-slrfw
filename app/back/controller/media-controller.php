@@ -129,7 +129,7 @@ class MediaController extends MainController {
                         "rel"	=> "page"
                     ),
                     "data"	=> array(
-                        "title"	=> ( strlen($sous_rubrique->getMeta('titre')) > 16 ? substr($sous_rubrique->getMeta('titre'), 0, 16) . "&hellip;" : $sous_rubrique->getMeta('titre') ) . " (<i>$nbre</i>)",
+                        "title"	=> ( strlen($sous_rubrique->getMeta('titre')) > 16 ? mb_substr($sous_rubrique->getMeta('titre'), 0, 16, "utf-8") . "&hellip;" : $sous_rubrique->getMeta('titre') ) . " (<i>$nbre</i>)",
                         "attr"	=> array(
                             "title"	=> $sous_rubrique->getMeta('titre')
                         )
@@ -146,7 +146,7 @@ class MediaController extends MainController {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
         
-        $id_gab_page = isset($_REQUEST['id_gab_page']) && $_REQUEST['id_gab_page'] ? $_REQUEST['id_gab_page'] : 0;
+        $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
         
         if ($id_gab_page) {
             $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);

@@ -20,22 +20,25 @@ class PageController extends MainController
     public function start() {
         parent::start();
     }//end start()
-
+    
     /**
      * 
      * @return void
      */
     public function listeAction() {
-		$this->_javascript->addLibrary("back/liste.js");
+        $this->_javascript->addLibrary("back/liste.js");
         
         if ($this->_utilisateur->get("niveau") == "solire")
-            $query = "SELECT * FROM `gab_gabarit`";
+            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
         else
-            $query = "SELECT * FROM `gab_gabarit` WHERE `id` > 1";
-        $this->_view->gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+        $this->_view->gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
         
         $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
         $this->_view->pages = $this->_pages;
+        
+        $this->_view->versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
+
     }
     
     /**
@@ -67,7 +70,15 @@ class PageController extends MainController
         $this->_javascript->addLibrary("back/autocomplete.js");
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
         $this->_javascript->addLibrary("back/formgabarit.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.tipsy.js");
         $this->_javascript->addLibrary("back/affichegabarit.js");
+        
+        $this->_javascript->addLibrary("back/autocomplete_multi/jquery.tokeninput.js");
+        $this->_javascript->addLibrary("back/autocomplete_multi.js");
+        
+        $this->_css->addLibrary("back/tipsy.css");
+        $this->_css->addLibrary("back/autocomplete_multi/token-input.css");
+        $this->_css->addLibrary("back/autocomplete_multi/token-input-facebook.css");
         
         $this->_form = '';
         
@@ -168,16 +179,36 @@ class PageController extends MainController
         $json = array();
         $term = $_REQUEST["term"];
         $idField = $_REQUEST["id_field"];
-        $labelField = $_REQUEST["label_field"];
         $idGabPage = $_REQUEST["id_gab_page"];
         $queryFilter = str_replace("[ID]", $idGabPage, $_REQUEST["query_filter"]);
         $table = $_REQUEST["table"];
+        $labelField = "";
         $lang = BACK_ID_VERSION;
-
-        $sql = "SELECT `$table`.$idField id, `$table`.$labelField label
-                    FROM `$table` 
-                    WHERE id_version = $lang " . ($queryFilter != "" ? "AND (" . $queryFilter . ")" : "") . " AND `$table`.`$labelField`  LIKE '%$term%'";
+        $gabPageJoin= "";
         
+        
+        $filterVersion = "`$table`.id_version = $lang";
+        if(isset($_REQUEST["no_version"]) && $_REQUEST["no_version"] == 1) {
+            $filterVersion = 1;
+
+        } else {
+            $gabPageJoin = "INNER JOIN gab_page ON visible = 1 AND suppr = 0 AND gab_page.id = `$table`.$idField " . ($filterVersion != 1 ? "AND gab_page.id_version = $lang" : "");
+
+        }
+        
+        
+        
+        if(substr($_REQUEST["label_field"], 0, 9) == "gab_page.") {
+                $labelField =  $_REQUEST["label_field"];
+        } else {
+            $labelField = "`$table`.`" . $_REQUEST["label_field"] . "`";
+        }
+
+        $sql = "SELECT `$table`.$idField id, $labelField label
+                    FROM `$table` 
+                    $gabPageJoin
+                    WHERE $filterVersion " . ($queryFilter != "" ? "AND (" . $queryFilter . ")" : "") . " AND $labelField  LIKE '%$term%'";
+
         $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         
         exit(json_encode($json));
@@ -194,7 +225,7 @@ class PageController extends MainController
         $json = array('status' => "error");
         
         if (is_numeric($_POST['id_gab_page']) && is_numeric($_POST['visible'])) {
-            $query = "UPDATE `gab_page` SET `visible` = " . $_POST['visible'] . " WHERE `id` = " . $_POST['id_gab_page'];
+            $query = "UPDATE `gab_page` SET `visible` = " . $_POST['visible'] . " WHERE id_version =  " . BACK_ID_VERSION . " AND `id` = " . $_POST['id_gab_page'];
             if ($this->_db->query($query)) {
                 $json['status'] = "success";
                 $json['debug'] = $query;

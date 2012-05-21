@@ -1,7 +1,7 @@
 <?php
 
 require_once 'view.php';
-require_once 'translate.php';
+require_once 'translate-mysql.php';
 require_once 'log.php';
 require_once 'auth.php';
 require_once 'seo.php';
@@ -98,12 +98,7 @@ class ActionController
 
     public function shutdown()
     {
-        if (count($this->_translate->getTranslationJs()) > 0) {
-            $this->_javascript->addLibrary('js/jquery/plugins/jquery.translate');
-            foreach ($this->_translate->getTranslationJs() as $path) {
-                $this->_javascript->addLibrary($path);
-            }
-        }
+        
 
         $this->_view->Url = $this->_url;
 
@@ -145,7 +140,7 @@ class ActionController
         $this->_log = Registry::get('log');
         $this->_css = new Css();
         $this->_javascript = new Javascript();
-        $this->_translate = new Translate(SUF_VERSION, '../' . $this->_mainConfig->get('i18n', 'dirs'));
+        $this->_translate = new TranslateMysql(ID_VERSION, $this->_db);
         $this->_seo = new Seo();
         $this->_project = new Project($this->_mainConfig->get('name', 'project'));
         $this->_view = new View($this->_translate);

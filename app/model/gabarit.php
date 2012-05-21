@@ -130,8 +130,13 @@ class gabarit
                 $idpar = $parent['p_id'];
                 $form .= '<option disabled="disabled" class="option2">' . $parent['p_titre'] . '</option>';
             }
+            
+            $selected = '';
+            
+            if(count($this->_parents) == 1)
+                $selected = 'selected="selected"';
 
-            $form .= '<option value="' . $parent['id'] . '"' . (isset($this->_meta['id_parent']) && $this->_meta['id_parent'] == $parent['id'] ? ' selected="selected"' : '') . ' class="option3">' . $parent['titre'] . '</option>';
+            $form .= '<option ' . $selected . ' value="' . $parent['id'] . '"' . (isset($this->_meta['id_parent']) && $this->_meta['id_parent'] == $parent['id'] ? ' selected="selected"' : '') . ' class="option3">' . $parent['titre'] . '</option>';
         }
 
         $form .= '</select>';
