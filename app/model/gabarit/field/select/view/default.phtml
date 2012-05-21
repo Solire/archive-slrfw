@@ -1,0 +1,16 @@
+<div class="line<?php echo $this->champ['media']; ?>">
+    <label for="<?php echo $this->id; ?>">
+        <span><?php echo $this->label; ?></span>
+    </label>
+    <select name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>">
+        <option value="0">---</option>
+        <?php
+        foreach ($this->values as $value) {
+            ?>
+            <option <?php echo $this->value == $value ? 'selected="selected"' : ''; ?> value="<?php echo $value; ?>"><?php echo $value; ?></option>
+            <?php
+        }
+        ?>
+        
+    </select>
+</div>
