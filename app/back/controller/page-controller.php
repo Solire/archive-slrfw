@@ -156,7 +156,7 @@ class PageController extends MainController
                 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                        . '"><div class="clearin"></div>'
-                       . $page->getForm("page/save.html", "page/liste.html", $upload_path)
+                       . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta())
                        . '</div>';
             }
             
@@ -167,7 +167,7 @@ class PageController extends MainController
         else {        
             $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, 0, $id_gabarit);
             
-            $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path);
+            $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $this->_page->getGabarit()->getMeta());
             $this->_form = $form;        
         }
         
