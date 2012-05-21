@@ -200,9 +200,11 @@ class gabaritPage extends gabaritBloc {
      * @param type $mobile
      * @return string 
      */
-    public function getForm($action, $retour, $upload_path, $mobile = FALSE) {        
+    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE) {        
         $metaId = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
         $metaLang = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : 1;
+        
+        $noMeta = !$meta ? ' style="display: none;" ' : '';
         
         $parentSelect = '';
         
@@ -226,19 +228,19 @@ class gabaritPage extends gabaritBloc {
 			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
               
               . $parentSelect
-              . '<div class="line">'
+              . '<div ' . $noMeta . ' class="line">'
               . '<label for="titre-' . $metaLang . '">Titre</label>'
-              . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="form-controle form-oblig form-mix" />'
+              . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="' . ($meta ? 'form-controle form-oblig form-mix' : '') . '" />'
               . '</div>';
         
         if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
-            $form .= '<div class="line">'
+            $form .= '<div ' . $noMeta . ' class="line">'
                    . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting</label>'
                    . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="form-controle form-oblig form-mix" />'
                    . '</div>';
         }
 
-        $form .= '<fieldset><legend>Balise Meta</legend><div style="display:none;">'
+        $form .= '<fieldset ' . $noMeta . '><legend>Balise Meta</legend><div style="display:none;">'
 
               . '<div class="line">'
               . '<label for="rewriting-' . $metaLang . '">Rewriting</label>'
