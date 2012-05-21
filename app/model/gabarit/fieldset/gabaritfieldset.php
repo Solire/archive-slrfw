@@ -23,6 +23,8 @@ abstract class GabaritFieldSet
     public function __construct($gabarit,  $champs, $values, $upload_path, $id_gab_page, $meta,  $db = null)
     {
         $this->gabarit = $gabarit;
+        if(count($values) == 0)
+            $values[0] = array();
         $this->values = $values;
         $this->champs = $champs;
         $this->idGabPage = $id_gab_page;
