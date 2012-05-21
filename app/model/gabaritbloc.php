@@ -110,38 +110,28 @@ class gabaritBloc
      */
     public function buildForm($upload_path, $id_gab_page)
     {
-        $form = "\n"
-                . '<fieldset><legend>' . $this->_gabarit->getName() . '(s)</legend><div class="sort-box">';
+        
+        $form = '';
+        
         $champs = $this->_gabarit->getChamps();
-
-        foreach ($this->_values as $value) {
-            $form .= '<fieldset class="sort-elmt" style="margin-left:30px;"><legend>' . $this->_gabarit->getName() . '</legend><div>'
-                    . '<div class="line">'
-                    . '<label for="visible-' . $this->_gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) . '">Visible</label>'
-                    . '<input type="checkbox" id="visible-' . $this->_gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) . '" class="changevisible"' . (isset($value['visible']) && $value['visible'] ? ' checked="checked"' : '') . ' />'
-                    . '<input type="hidden" value="' . (isset($value['visible']) && $value['visible'] ? 1 : 0) . '" name="visible[]" />'
-                    . '</div><div' . (isset($value['visible']) && $value['visible'] ? '' : ' class="translucide"') . '>'
-                    . '<input type="hidden" name="id_' . $this->_gabarit->getTable() . '[]" value="' . (isset($value['id']) ? $value['id'] : '') . '" />';
-
-            foreach ($champs as $champ) {
-                $value_champ = isset($value[$champ['name']]) ? $value[$champ['name']] : '';
-                $id_champ = (isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '') . (isset($value['id']) ? $value['id'] : 0);
-                $form .= $this->_buildChamp($champ, $value_champ, $id_champ, $upload_path, $id_gab_page);
-            }
-
-            $form .= '</div></div>'
-                    . '<div>'
-                    . '<a href="#" class="button bleu delBloc' . ( count($value) > 1 ? '' : ' translucide' )
-                    . '" style="float:right;"><span class="bleu"><img src="img/back/supprimer.png" border="0" alt="supprimer"/></span></a>'
-                    . '<a href="#" class="button bleu sort-move"><span class="bleu"><img src="img/back/deplacer.png" alt="Déplacer" /></span></a>'
-                    . '</div>'
-                    . '</fieldset>';
-        }
-
-        $form .= '<div class="buttonright"><a class="button bleu addBloc" href="#"><span class="bleu">Ajouter un bloc</span></a></div>';
-        $form .= '</div></fieldset>';
+        
+        $type = strtolower("default");
+        
+//        if(count($champs) == 1 && $champs[0]["type"] == "JOIN" && $champs[0]["params"]["VIEW"] == "checkbox") {
+//            $type = strtolower("checkbox");
+//        }
+        
+        $classNameType = $type . "fieldset";
+        
+        require_once "gabarit/fieldset/$type/$classNameType.php";
+        $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values, $upload_path, $id_gab_page,   isset($this->_meta) ? $this->_meta : null );
+        $fieldset->start();
+        $form .= $fieldset;
 
         return $form;
+        
+        
+        
     }
 
     /**
@@ -169,7 +159,7 @@ class gabaritBloc
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";
-        $field = new $classNameType($champ, $label, $value, $id, $classes);
+        $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page);
         $field->start();
         $form .= $field;
 

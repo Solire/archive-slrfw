@@ -109,7 +109,9 @@ class Translate
 
         /* = Chargement des mask de traduction
           `--------------------- */
+        
         foreach ($this->_translate[$this->_locale] as $Key => $Value) {
+//            echo 'INSERT INTO traduction SET cle = ' . Registry::get("db")->quote($Key) . ', valeur = ' . Registry::get("db")->quote($Key) . ', id_version = 1 ;';
             if (!preg_match("/^([0-9\,\.]+) (.+)/", $Key, $Foo))
                 continue;
             $this->_translateMask[$this->_locale][$Foo[2]][$Foo[1]] = $Value;

@@ -41,7 +41,7 @@ class MainController extends ActionController
 			$this->_post = $_POST;
 		}
         
-        if (isset ($_GET['id_version']) || isset ($_POST['id_version'])) {
+        if (isset ($_GET['id_version'])) {
             $id_version = isset ($_GET['id_version']) ? $_GET['id_version'] : $_POST['id_version'];
             setcookie ("id_version", $id_version, 0, "/" . Registry::get("baseroot") . "back/");
             define("BACK_ID_VERSION", $id_version);

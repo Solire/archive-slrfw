@@ -31,110 +31,125 @@ class PageController extends MainController
      *
      * @return void
      */
-    public function startAction() {
+    public function startAction()
+    {
         $this->_view->enable(FALSE);
-                
+
         if (isset($_GET['rub'])) {
 
-            if (isset ($_GET['prub'])) {
-                $prubid = $this->_gabaritManager->getIdByRewriting(1, $_GET['prub']);
+            if (isset($_GET['prub'])) {
+                $prubid = $this->_gabaritManager->getIdByRewriting(ID_VERSION, $_GET['prub']);
                 if (!$prubid)
-                    $this->pageNotFound ();
-                                
+                    $this->pageNotFound();
+
                 $this->_rubriqueParent = $this->_gabaritManager->getPage(ID_VERSION, $prubid);
                 $this->_view->rubriqueParent = $this->_rubriqueParent;
-                
             }
             else
                 $prubid = 0;
-            
-            $this->_rubriqueId = $this->_gabaritManager->getIdByRewriting(1, $_GET['rub'], $prubid);
-            
+
+            $this->_rubriqueId = $this->_gabaritManager->getIdByRewriting(ID_VERSION, $_GET['rub'], $prubid);
+
             if (!$this->_rubriqueId)
-                $this->pageNotFound ();
-            
-            $this->_rubrique = $this->_gabaritManager->getPage(1, $this->_rubriqueId);
+                $this->pageNotFound();
+
+            $this->_rubrique = $this->_gabaritManager->getPage(ID_VERSION, $this->_rubriqueId);
             $this->_view->rubrique = $this->_rubrique;
-            
-            if (isset ($_GET['rew'])) {
-                $this->_pageId = $this->_gabaritManager->getIdByRewriting(1, $_GET['rew'], $this->_rubriqueId);
-                
+
+            if (isset($_GET['rew'])) {
+                $this->_pageId = $this->_gabaritManager->getIdByRewriting(ID_VERSION, $_GET['rew'], $this->_rubriqueId);
+
                 if (!$this->_pageId)
-                    $this->pageNotFound ();
-                
+                    $this->pageNotFound();
+
                 $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_pageId, 0, TRUE);
-                
+
                 if (isset($this->_rubriqueParent)) {
-                    $firstchild = $this->_gabaritManager->getFirstChild(1, $this->_rubriqueParent->getMeta("id"));
+                    $firstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $this->_rubriqueParent->getMeta("id"));
                     if ($firstchild) {
-                        $firstfirstchild = $this->_gabaritManager->getFirstChild(1, $firstchild->getMeta("id"));
-                        
+                        $firstfirstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $firstchild->getMeta("id"));
+
                         if ($firstfirstchild)
                             $this->_view->fil_ariane[] = array(
-                                "label"    => $this->_rubriqueParent->getMeta("titre"),
-                                "url"      => $this->_rubriqueParent->getMeta("rewriting") . "/"
-                                            . $firstchild->getMeta("rewriting") . "/"
-                                            . $firstfirstchild->getMeta("rewriting") . ".html",
+                                "label" => $this->_rubriqueParent->getMeta("titre"),
+                                "url" => $this->_rubriqueParent->getMeta("rewriting") . "/"
+                                . $firstchild->getMeta("rewriting") . "/"
+                                . $firstfirstchild->getMeta("rewriting") . ".html",
                             );
                         else
                             $this->_view->fil_ariane[] = array(
-                                "label"    => $this->_rubriqueParent->getMeta("titre"),
-                                "url"      => $this->_rubriqueParent->getMeta("rewriting") . "/"
-                                            . $firstchild->getMeta("rewriting") . ".html",
+                                "label" => $this->_rubriqueParent->getMeta("titre"),
+                                "url" => $this->_rubriqueParent->getMeta("rewriting") . "/"
+                                . $firstchild->getMeta("rewriting") . ".html",
                             );
                     }
-                    
-                    $firstchild = $this->_gabaritManager->getFirstChild(1, $this->_rubrique->getMeta("id"));
+
+                    $firstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $this->_rubrique->getMeta("id"));
                     $this->_view->fil_ariane[] = array(
-                        "label"    => $this->_rubrique->getMeta("titre"),
-                        "url"      => $this->_rubriqueParent->getMeta("rewriting") . "/"
-                                    . $this->_rubrique->getMeta("rewriting") . "/"
-                                    . $firstchild->getMeta("rewriting") . ".html",
+                        "label" => $this->_rubrique->getMeta("titre"),
+                        "url" => $this->_rubriqueParent->getMeta("rewriting") . "/"
+                        . $this->_rubrique->getMeta("rewriting") . "/"
+                        . $firstchild->getMeta("rewriting") . ".html",
                     );
                 }
                 else {
-                    $firstchild = $this->_gabaritManager->getFirstChild(1, $this->_rubrique->getMeta("id"));
+                    $firstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $this->_rubrique->getMeta("id"));
                     $this->_view->fil_ariane[] = array(
-                        "label"    => $this->_rubrique->getMeta("titre"),
-                        "url"      => $this->_rubrique->getMeta("rewriting") . "/"
-                                    . $firstchild->getMeta("rewriting") . ".html",
-                    );               
+                        "label" => $this->_rubrique->getMeta("titre"),
+                        "url" => $this->_rubrique->getMeta("rewriting") . "/"
+                        . $firstchild->getMeta("rewriting") . ".html",
+                    );
                 }
-                
-                
+
+
                 $this->_view->fil_ariane[] = array(
-                    "label"    => $this->_page->getMeta("titre"),
-                    "url"      => "",
+                    "label" => $this->_page->getMeta("titre"),
+                    "url" => "",
                 );
-                
+
                 $this->_seo->setTitle($this->_page->getMeta("bal_title"));
                 $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
                 $this->_seo->setKeywords(explode(" ", $this->_page->getMeta("bal_key")));
                 $this->_view->page = $this->_page;
                 $view = $this->_page->getGabarit()->getName();
-            }
-            else {        
-                $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_rubriqueId, 0, TRUE);
-                $this->_pages = $this->_gabaritManager->getList(1, $this->_rubriqueId, FALSE, TRUE, "ordre", "asc");
-                
-//                if (!$this->_pages)
-//                    $this->pageNotFound ();
-                
-                $this->_view->fil_ariane[] = array(
-                    "label"    => $this->_rubrique->getMeta("titre"),
-                    "url"      => "",//$this->_rubrique->getMeta("rewriting") . '/',
-                );
-                
-                foreach ($this->_pages as $page) {
-                    $gabarit = $this->_gabaritManager->getGabarit($page->getMeta("id_gabarit"));
-                    $page->setGabarit($gabarit);
-                    $values = $this->_gabaritManager->getValues($page);
-                    $page->setValues($values);                    
+            } else {
+                $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_rubriqueId, 0, false);
+
+                if ($this->_rubrique->getGabarit()->getName() != "sous_rub_scenario") {
+                    $this->_pages = $this->_gabaritManager->getList(ID_VERSION, $this->_rubriqueId, FALSE, TRUE, "ordre", "asc");
+                    foreach ($this->_pages as &$page) {
+                        $gabarit = $this->_gabaritManager->getGabarit($page->getMeta("id_gabarit"));
+                        $page->setGabarit($gabarit);
+                        $values = $this->_gabaritManager->getValues($page);
+                        $page->setValues($values);
+                        $blocs = $this->_gabaritManager->getBlocs($gabarit, $page->getMeta("id"));
+                        foreach ($blocs as $blocName => $bloc) {
+                            $valuesBloc = $this->_gabaritManager->getBlocValues($bloc, $page->getMeta("id"), ID_VERSION);
+                            if ($valuesBloc) {
+                                $bloc->setValues($valuesBloc);
+                            }
+                        }
+                        $page->setBlocs($blocs);
+                    }
+                    $this->_view->pages = $this->_pages;
                 }
-                
-                $this->_seo->disableIndex();
+
+
+
+
+
+
+
+                $this->_view->fil_ariane[] = array(
+                    "label" => $this->_rubrique->getMeta("titre"),
+                    "url" => "",
+                );
+
+
+
+//                $this->_seo->disableIndex();
                 $this->_view->page = $this->_page;
-                $this->_view->pages = $this->_pages;
+
                 $view = $this->_rubrique->getGabarit()->getName();
             }
         }
@@ -142,19 +157,34 @@ class PageController extends MainController
         else {
             $this->_pageId = 1;
 
-            
-            $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_pageId, 0, TRUE);
-            
+
+            $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_pageId, 0, true, true);
+
             $this->_seo->setTitle($this->_page->getMeta("bal_title"));
             $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
             $this->_seo->setKeywords(explode(" ", $this->_page->getMeta("bal_key")));
+
+
             $this->_view->page = $this->_page;
+
             $view = $this->_page->getGabarit()->getName();
         }
 
+
+
+        //Balise META
+        $this->_seo->setTitle($this->_page->getMeta("bal_title"));
+        $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
+        $this->_seo->addKeyword($this->_page->getMeta("bal_key"));
+        if ($this->_page->getMeta("no_index"))
+            $this->_seo->disableIndex();
+
+
         $this->shutdown();
         $this->_view->display("page", $view);
-    } // end startAction
+    }
+
+    
 
 }
 

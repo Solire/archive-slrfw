@@ -1,77 +1,80 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; text/css; charset=utf-8" />
-        
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; text/css; charset=utf-8" />
+
         <title>Module de gestion du site <?php echo $this->site; ?></title>
-		<meta name="AUTHOR" content="SOLIRE" />
-		<meta name="ROBOTS" content="noindex, nofollow" />
-		<meta name="GOOGLEBOT" content="noindex, nofollow" />
+        <meta name="AUTHOR" content="SOLIRE" />
+        <meta name="ROBOTS" content="noindex, nofollow" />
+        <meta name="GOOGLEBOT" content="noindex, nofollow" />
 
-		<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-		<meta name="viewport" content="width=1220; user-scalable=yes" />
-		
-		<base href="<?php echo $this->Url; ?>" />
-                
+        <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+        <meta name="viewport" content="width=1220; user-scalable=yes" />
+
+        <base href="<?php echo $this->Url; ?>" />
+
         <link rel="shortcut icon" href="img/back/favicon.ico" />
-		
+
         <link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/admin/style.css" />
-		<link type="text/css" rel="stylesheet" media="screen" href="css/back/jquery-ui-1.8.7.custom.css" />
+        <link type="text/css" rel="stylesheet" media="screen" href="css/back/jquery-ui-1.8.7.custom.css" />
 
-		<!--[if lte IE 8]>
-		<link rel="stylesheet" href="ie8.css" type="text/css" />
-		<![endif]-->
+        <!--[if lte IE 8]>
+        <link rel="stylesheet" href="ie8.css" type="text/css" />
+        <![endif]-->
 
-		<!--[if lte IE 7]>
-		<link rel="stylesheet" href="ie.css" type="text/css" />
-		<![endif]-->
+        <!--[if lte IE 7]>
+        <link rel="stylesheet" href="ie.css" type="text/css" />
+        <![endif]-->
 
-		<!--[if lte IE 6]>
-		   <link rel="stylesheet" href="ie6.css" type="text/css" />
-		<![endif]-->
-        
+        <!--[if lte IE 6]>
+           <link rel="stylesheet" href="ie6.css" type="text/css" />
+        <![endif]-->
+
         <?php echo $this->css; ?>
-        
+
         <style type="text/css">
             .option1, .option1:disabled {color:#fff; background-color:#3485C9; padding-top:5px;}
             .option2, .option2:disabled {color:#fff; background-color:#67A5D7; padding-top:2px; padding-left:15px;}
             .option3 {font-size:1em; padding-left:40px;}
             .ui-autocomplete {max-height:100px; overflow-y:auto; overflow-x:hidden; padding-right:20px;}
             #tableau td {text-align:center;}
-		</style>
+        </style>
 
         <?php echo $this->javascript; ?>
-	</head>
-	<body>
-		<div id="global">
+    </head>
+    <body>
+        <div id="global">
 
-			<div id="header">
+            <div id="header">
 
-				<div class="container">
+                <div class="container">
 
-					<ul id="menu">
-						<li class="gen">Module d'admin :<br /><br /><b><?php echo $this->site; ?></b><br /><i><?php echo $this->utilisateur->get("nom"); ?></i></li>
-                        
-						<li><a href="page/liste.html" class="bouton<?php if ($this->action == "liste") echo ' active' ?>">Pages<span>Pages</span></a></li>
-						
+                    <ul id="menu">
+                        <li class="gen">Module d'admin :<br /><br /><b><?php echo $this->site; ?></b><br /><i><?php echo $this->utilisateur->get("nom"); ?></i></li>
+                        <li><a href="page/liste.html" class="bouton<?php if ($this->action == "liste") echo ' active' ?>">Pages<span>Pages</span></a></li>
+
                         <li><a href="media/start.html" class="bouton<?php if ($this->action == "fichier") echo ' active' ?>">Fichiers<span>Fichiers</span></a></li>
-                       
-						<li class="bis" style="border-left:1px solid #a1a1a1;"><a href="sign/signout.html" class="bis"><b>Déconnexion</b></a></li>
-					</ul>
+
+                        
+                        <li><a href="translate/list.html" class="bouton<?php if ($this->action == "translate") echo ' active' ?>">Traduction<span>Traduction</span></a></li>
+
+                        
+                        <li class="bis" style="border-left:1px solid #a1a1a1;"><a href="sign/signout.html" class="bis"><b>Déconnexion</b></a></li>
+                    </ul>
                 </div>
-			</div>
+            </div>
 
-			<div id="corps">
-               <?php echo $this->content(); ?>
-			</div>
+            <div id="corps">
+                <?php echo $this->content(); ?>
+            </div>
 
-			<div id="footer">
-				<div class="bloc">
-					<p>Outil de gestion de contenu développé par <a href="http://www.solire.fr" target="_blank">Solire</a> pour <?php echo $this->site; ?></p>
-				</div>
-			</div>
+            <div id="footer">
+                <div class="bloc">
+                    <p>Outil de gestion de contenu développé par <a href="http://www.solire.fr" target="_blank">Solire</a> pour <?php echo $this->site; ?></p>
+                </div>
+            </div>
 
-		</div>
+        </div>
 
-	</body>
+    </body>
 </html>

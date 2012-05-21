@@ -3,19 +3,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
-"Last-Translator: MONNOT Stéphane <monnot.stephane@gmail.com>\n"
+"Last-Translator: Monnot Stéphane <smonnot@solire.fr>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 # Title menu
-msgid "Accueil"
-msgstr "Accueil"
+msgid "Valeur par défaut"
+msgstr "Traduction"
 
-msgid "Images"
-msgstr "Images"
-
-msgid "Contact"
-msgstr "Contact"
+msgid "Valeur par défaut 2"
+msgstr "Traduction"
 
