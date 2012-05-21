@@ -25,20 +25,81 @@ class PageController extends MainController
      * 
      * @return void
      */
-    public function listeAction() {
+    public function listeAction()
+    {
         $this->_javascript->addLibrary("back/liste.js");
-        
+
+        $gabaritsList = array();
+
         if ($this->_utilisateur->get("niveau") == "solire")
             $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
         else
             $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
-        $this->_view->gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
-        
-        $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
-        $this->_view->pages = $this->_pages;
-        
-        $this->_view->versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
 
+
+        //Si on a un fichier de conf
+        if (isset($_GET["config"])) {
+            $config = Registry::get('mainconfig');
+            require_once($config->get('back', 'dirs') . "gabarit/" . $_GET["config"] . ".cfg.php");
+            $gabConfig = $config;
+            $gabaritsList = $gabConfig["gabarit"];
+        }
+
+        //Si on a une liste de gabarit dans l'url
+        if (isset($_GET["gabarit"])) {
+            $gabaritsList = $_GET["gabarit"];
+        }
+
+
+
+
+        //Si on liste que certains gabarits
+        if (count($gabaritsList) > 0) {
+            $query .= " WHERE id IN ( " . implode(", ", $gabaritsList) . ")";
+            //Permet de séparer les différents gabarits
+            if (isset($_GET["gabaritByGroup"])) {
+                $this->_view->gabaritByGroup = true;
+                foreach ($gabaritsList as $gabariId) {
+                    $this->_view->pagesGroup[$gabariId] = $this->_gabaritManager->getList(BACK_ID_VERSION, 0, $gabariId);
+                }
+                
+
+            } else {
+                $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0, $gabaritsList);
+                $this->_view->pagesGroup[0] = 1;
+            }
+        } else {
+            $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
+            $this->_view->pagesGroup[0] = 1;
+        }
+
+
+
+        $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        $this->_view->gabarits = $this->_gabarits;
+
+        if (isset($gabConfig) && isset($gabConfig["bouton"]) && isset($gabConfig["bouton"]["group"])) {
+            $this->_view->gabarits = array();
+            $this->_view->gabaritGroup = true;
+            foreach ($gabConfig["bouton"]["group"] as $group) {
+                $gabaritsGroup = array(
+                    "label" => $group["name"],
+                );
+                foreach ($group["gabarit"] as $gab) {
+                    $this->_gabarits[$gab]["label"] = ucfirst(trim(preg_replace("#" . $group["name"] . "#", "", $this->_gabarits[$gab]["label"])));
+                    $gabaritsGroup["gabarit"][$gab] = $this->_gabarits[$gab];
+                }
+                $this->_view->gabarits[] = $gabaritsGroup;
+            }
+        }
+
+
+
+
+
+        $this->_view->pages = $this->_pages;
+
+        $this->_view->versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**

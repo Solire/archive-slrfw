@@ -1,0 +1,531 @@
+
+
+<style>
+    .dataTables_filter, .dataTables_info {display: none;}
+</style>
+
+
+<table cellpadding="0" width="100%" cellspacing="0" border="0" class="display" style="margin-top:0px;" id="tableau-simple">
+    <thead>
+        <tr>
+            <?php
+            $details = "";
+            $filterIndividualColumn = null;
+            $filterIndividualColumnShow = false;
+
+            if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
+                $filterIndividualColumn .= '<td></td>';
+                ?>
+                <th></th>
+                <?php
+            }
+            ?>
+            <?php
+            foreach ($this->config["columns"] as $key => $column) {
+                if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
+                    if ((isset($column["show_detail"]) && $column["show_detail"]))
+                        $details[] = $column["title"] . "|" . ($key + 1);
+                if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+                    $filterIndividualColumn .= '<td>';
+                    ?>
+
+                    <th  class="<?php echo isset($column["editable"]) && $column["editable"] ? "editable" : ""; ?>" width="25%"><?php echo $column["title"]; ?></th>
+
+                    <?php
+                    if (isset($column["filter_field"]) && $column["filter_field"]) {
+                        $filterIndividualColumnShow = true;
+                        $filterIndividualColumn .= '<input style="width:100%;" type="text" name="search_' . $column["name"] . '" value="Recherche par ' . $column["title"] . '" class="search_init" />';
+                    }
+                    ?>
+
+
+
+                    <?php
+                    $filterIndividualColumn .= '</td>';
+                }
+            }
+            ?>
+
+        </tr>
+
+        <?php
+        if ($filterIndividualColumnShow && 0) {
+            ?>
+            <tr><?php echo $filterIndividualColumn; ?></tr>
+            <?php
+        }
+        ?>
+
+    </thead>
+    <tbody>
+
+    </tbody>
+    <tfoot>
+        <tr>
+            <?php
+            if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
+                $filterIndividualColumn .= '<td></td>';
+                ?>
+                <th></th>
+                <?php
+            }
+
+            foreach ($this->config["columns"] as $column) {
+                if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+                    ?>
+                    <th width="25%"><?php echo $column["title"]; ?></th>
+                    <?php
+                }
+            }
+            ?>
+        </tr>
+    </tfoot>
+</table>
+<script type="text/javascript">
+    
+    
+    
+    
+    // get visible columns
+    $.fn.getColumnsShown = function(dTable)
+    {
+        vCols = new Array();
+
+        $.each(dTable.fnSettings().aoColumns, function(c){
+            if(dTable.fnSettings().aoColumns[c].bVisible == true){
+                vCols = vCols.concat(c)
+            }
+        });
+
+        return vCols;
+    }
+
+    
+    var oTable2;
+    $(document).ready(function() {
+        
+        
+        
+        //        /* Add the events etc before DataTables hides a column */
+        //        $("thead input").keyup( function () {
+        //            /* Filter on the column (the index) of this element */
+        //            oTable2.fnFilter( this.value, oTable2.oApi._fnVisibleToColumnIndex( 
+        //            oTable2.fnSettings(), $(this).parent().index() ) );
+        //        } );
+        //	
+        //        /*
+        //         * Support functions to provide a little bit of 'user friendlyness' to the textboxes
+        //         */
+        //        $("thead input").each( function (i) {
+        //            this.initVal = this.value;
+        //        } );
+        //	
+        //        $("thead input").focus( function () {
+        //            if ( this.className == "search_init" )
+        //            {
+        //                this.className = "";
+        //                this.value = "";
+        //            }
+        //        } );
+        //	
+        //        $("thead input").blur( function (i) {
+        //            if ( this.value == "" )
+        //            {
+        //                this.className = "search_init";
+        //                this.value = this.initVal;
+        //            }
+        //        } );
+        
+        
+        
+<?php
+if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
+    ?>
+                /* Details */
+                function fnFormatDetails ( oTable2, nTr )
+                {
+                    var aData = oTable2.fnGetData( nTr );
+                    var sOut = '<div class="innerDetails">'+'<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+    <?php
+    if (is_array($details) && count($details) > 0)
+        foreach ($details as $detail) {
+            list($detailName, $detailId) = explode("|", $detail);
+            ?>
+                                if(aData[<?php echo $detailId; ?>] != '')
+                                sOut += '<tr><td><?php echo $detailName; ?></td><td>'+aData[<?php echo $detailId; ?>]+'</td></tr>';
+
+                                                                                                                                                                                                                                                        
+            <?php
+        }
+    ?>
+                    sOut += '</table>';
+                                                                                                                                 
+                    return sOut;
+                }
+                var anOpen2 = [];
+                var anOpen2Id = [];
+                $('#tableau-simple tbody td img').live( 'click', function () {
+                    var nTr = $(this).parents('tr')[0];
+                    var i = $.inArray( nTr, anOpen2 );
+                    /* Only one open*/
+                    //                    $(anOpen2).each( function () {
+                    //                        if ( this !== nTr ) {
+                    //                            $('td:first img', this).click();
+                    //                        }
+                    //                    } );
+                    if ( i === -1 ) {
+                        /* Open this row */
+                        this.src = "img/back/details_close.png";
+                        var odd="even";
+                        if ($(nTr).hasClass("odd")) {
+                            odd = "odd";
+                        }
+                        var nDetailsRow = oTable2.fnOpen( nTr, fnFormatDetails(oTable2, nTr), 'details-other' );
+                        $('div.innerDetails', nDetailsRow).slideDown();
+                        anOpen2.push( nTr );
+                        anOpen2Id.push( $(nTr).attr("id") );
+                        $(nDetailsRow).addClass(odd)
+                        $("td", nDetailsRow).addClass("highlighted")
+                        $(nDetailsRow).hover(function() {
+                            var odd = "even";
+                                                                        
+                            if ($(nTr).hasClass("odd")) {
+                                odd = "odd";
+                            }
+                            if ($(nTr).hasClass(odd)) {
+                                $(nTr).find("td").addClass("highlighted")
+                            }
+                                                                        
+                        },function() {
+                            var odd = "even"
+                            if ($(nTr).hasClass("odd")) {
+                                odd = "odd";
+                            }
+                            if ($(nTr).hasClass(odd)) {
+                                $(nTr).find("td").removeClass("highlighted")
+                            }
+                        })
+                        
+                        
+                                                        
+                    }
+                    else {
+                        /* This row is already open - close it */
+                        this.src = "img/back/details_open.png";
+                        $('div.innerDetails', $(nTr).next()[0]).slideUp( function () {
+                            oTable2.fnClose( nTr );
+                            anOpen2.splice( i, 1 );
+                            anOpen2Id.splice( i, 1 );
+                        } );
+                    }
+                                                                                   
+                } );
+                /* Fin détails */
+    <?php
+}
+?>
+        
+        
+        
+        
+        oTable2 = $('#tableau-simple').dataTable( {
+            "aLengthMenu": [
+            
+        ],
+            "iDisplayLength": -1,
+            "bInfo": false,
+            "bPaginate": false,
+
+            'oLanguage': {
+                "sProcessing": "Chargement...",
+                "sLengthMenu": "Montrer _MENU_ <?php echo $this->config["table"]["title_item"] ?>s par page",
+                "sZeroRecords": "Aucun<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?> trouvé<?php echo $this->config["table"]["suffix_genre"] ?>",
+                "sEmptyTable": "Pas de <?php echo $this->config["table"]["title_item"] ?>",
+                "sInfo": "<?php echo $this->config["table"]["title_item"] ?>s _START_ à  _END_ sur _TOTAL_ <?php echo $this->config["table"]["title_item"] ?>s",
+                "sInfoEmpty": "Aucun<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>",
+                "sInfoFiltered": "(filtre sur _MAX_ <?php echo $this->config["table"]["title_item"] ?>s)",
+                "sInfoPostFix": "",
+                "sSearch": "Chercher:",
+                "sUrl": "",
+                "oPaginate": {
+                    "sFirst": "",
+                    "sPrevious": "",
+                    "sNext": "",
+                    "sLast": ""
+                }
+            },
+            "aaSorting": [
+<?php
+foreach ($this->config["columns"] as $column) {
+    $numCol = 0;
+    if (isset($column["show"]) && $column["show"]) {
+        ?>
+        <?php
+        if (isset($column["default_sorting"]) && $column["default_sorting"]) {
+            ?>
+                                        [ <?php echo isset($this->config["table"]["detail"]) && $this->config["table"]["detail"] ? $numCol + 1 : $numCol; ?>, "<?php echo $column["default_sorting_direction"]; ?>" ],        
+            <?php
+        } else {
+            ?>
+            <?php
+        }
+        $numCol++;
+    }
+}
+?>
+            ],
+            "aoColumns": [
+<?php
+if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
+    echo '{ "bSortable": false},';
+?>
+                
+<?php
+foreach ($this->config["columns"] as $column) {
+    $numCol = 0;
+    if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+        ?>
+        <?php
+        if (isset($column["show_detail"]) && $column["show_detail"] && (!isset($column["show"]) || !$column["show"])) {
+            ?>
+                                        { "bVisible":    false },
+            <?php
+        } else {
+            ?>
+                                        null,
+            <?php
+        }
+        $numCol++;
+    }
+}
+?>
+            ],
+<?php
+if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
+    
+    ?>
+                
+                "fnPreDrawCallback": function (oSettings) {
+                    /* Fermer les details a chaque modification */
+                    $("#tableau-simple tr td:first img[src$='details_close.png']").click();
+                },
+                
+<?php ?>
+            
+            
+            "sDom": '<"H"TClfr>t<"F"ip>',
+            "bJQueryUI": false,
+            "bFilter": false,
+            "bSortCellsTop": true,
+            "bProcessing": true,
+            "bServerSide": true,
+            "oTableTools": {
+                "sSwfPath": "/back/swf/back/copy_cvs_xls_pdf.swf",
+                "aButtons": [
+<?php
+if (isset($this->config["extra"]) && isset($this->config["extra"]["copy"]) && $this->config["extra"]["copy"]) {
+    ?>
+                            {
+                                "sExtends":    "collection",
+                                "sButtonText": "Copier",
+                                "aButtons":    [  
+                                    {
+                                        "sExtends": "copy",
+                                        "sButtonText": "Colonnes visibles",
+                                        "sCharSet": "utf8",
+                                        "mColumns": "visible"
+                                    },
+                                    {
+                                        "sExtends": "copy",
+                                        "sButtonText": "Toutes colonnes",
+                                        "sCharSet": "utf8",
+                                        "mColumns": "all"
+                                    }
+                                ]
+                            },
+    <?php
+}
+?>
+<?php
+if (isset($this->config["extra"]) && isset($this->config["extra"]["print"]) && $this->config["extra"]["print"]) {
+    ?>
+                            {
+                                "sExtends": "print",
+                                "sButtonText": "Imprimer",
+                                "sCharSet": "utf8",
+                                "mColumns": "all"
+                            },
+    <?php
+}
+?>
+<?php
+if (isset($this->config["extra"]) && isset($this->config["extra"]["pdf"]) && $this->config["extra"]["pdf"]) {
+    ?>
+                            {
+                                "sExtends":    "collection",
+                                "sButtonText": "PDF",
+                                "aButtons":    [  
+                                    {
+                                        "sExtends": "pdf",
+                                        "sButtonText": "Colonnes visibles",
+                                        "sPdfOrientation": "landscape",
+                                        "sCharSet": "utf8",
+                                        "mColumns": "visible"
+                                    },
+                                    {
+                                        "sExtends": "pdf",
+                                        "sButtonText": "Toutes colonnes",
+                                        "sPdfOrientation": "landscape",
+                                        "sCharSet": "utf8",
+                                        "mColumns": "all"
+                                    }
+                                ]
+                            },
+    <?php
+}
+?>
+<?php
+if (isset($this->config["extra"]) && isset($this->config["extra"]["csv"]) && $this->config["extra"]["csv"]) {
+    ?>
+                            {
+                                "sExtends":    "collection",
+                                "sButtonText": "CSV",
+                                "aButtons":    [  
+                                    {
+                                        "sExtends": "csv",
+                                        "sButtonText": "Colonnes visibles",
+                                        "sCharSet": "utf8",
+                                        "mColumns": "visible"
+                                    },
+                                    {
+                                        "sExtends": "csv",
+                                        "sButtonText": "Toutes colonnes",
+                                        "sCharSet": "utf8",
+                                        "mColumns": "all"
+                                    }
+                                ]
+                            },
+    <?php
+}
+?>
+                    
+                    
+                    
+                    
+                    
+                ]
+            },
+<?php
+if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"]) && $this->config["extra"]["hide_columns"]) {
+    ?>
+                    "oColVis": {
+    <?php
+    if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
+        echo ' "aiExclude": [ 0 ],';
+    ?>
+                                
+                        "buttonText": "Cacher des colonnes"
+                    },
+    <?php
+}
+?>
+            
+            
+            "sAjaxSource": "<?php echo $_GET["controller"]; ?>/json.html?name=<?php echo $_GET["name"]; ?>"
+            
+
+        } ).columnFilter({
+<?php
+if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"]) && $this->config["extra"]["hide_columns"]) {
+    ?>
+                    bUseColVis: true,
+    <?php
+}
+?>
+
+            aoColumns: [ 
+<?php
+if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
+    echo ' null,';
+?>
+               
+<?php
+foreach ($this->config["columns"] as $column) {
+    $numCol = 0;
+    if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+        ?>
+        <?php
+        if (!isset($column["filter_field"])) {
+            ?>
+                                        null,
+            <?php
+        } else if ($column["filter_field"] == "text") {
+            ?>
+                                        { type: "text"},
+
+            <?php
+        } else if ($column["filter_field"] == "select") {
+            ?>
+                                        { type: "select", values : <?php echo json_encode($column["values"]); ?>},
+                                                                                                                                                                                                                                                                                                                            
+            <?php
+        }
+        $numCol++;
+    }
+}
+?> ] });
+                
+                $('td', oTable2.fnGetNodes()).livequery(function() {
+                    $(this).hover(function() {
+                        var odd = "even"
+                        if ($(this).parent().hasClass("odd")) {
+                            odd = "odd";
+                        }
+                        if ($(this).parent().next().hasClass(odd)) {
+                            $(this).parent().next().find("td").addClass("highlighted")
+                        }
+                        
+                    },function() {
+                        var odd = "even"
+                        if ($(this).parent().hasClass("odd")) {
+                            odd = "odd";
+                        }
+                        if ($(this).parent().next().hasClass(odd)) {
+                            $(this).parent().next().find("td").removeClass("highlighted")
+                        }
+                    })
+                    if(!$("#tableau-simple thead tr th").eq($(this).index()).hasClass("editable"))
+                        return true;
+                    /* Apply the jEditable handlers to the table */
+                    $(this).editable( '<?php echo $_GET["controller"]; ?>/editable.html?name=<?php echo $_GET["name"]; ?>'  , {
+                        indicator : 'Sauvegarde en cours ...',
+                        placeholder   : 'Cliquer pour éditer ...',
+                        "callback": function( sValue, y ) {
+                            var aPos = oTable2.fnGetPosition( this );
+                            oTable2.fnUpdate( sValue, aPos[0], aPos[1] );
+                        },
+                        "submitdata": function ( value, settings ) {
+                            return {
+                                "row_id": this.parentNode.getAttribute('id'),
+                                "column": oTable2.fnGetPosition( this )[2]
+                            };
+                        },
+                        "height": "14px"
+                    } );
+                })
+        
+<?php
+if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixedheader"]) {
+    ?>
+                        new FixedHeader( oTable2, { "bottom": false } );
+    <?php
+}
+?>
+        
+            });
+    
+
+    
+</script>
+
+

@@ -14,67 +14,128 @@
 <h1>Liste des pages</h1>
 
 <?php
-foreach ($this->gabarits as $gabarit) {
-    if ($this->utilisateur->get("niveau") != "solire" && !$gabarit["creable"])
-        continue;
-    ?>        
-    <div style="float:left;margin-right:10px;">
-        <a href="page/display.html?id_gabarit=<?php echo $gabarit['id'] ?>" class="button vert">
-            <span class="vert"><?php echo $gabarit['label'] ?></span>
-        </a>
-    </div>
-<?php } ?>
+if ($this->gabaritGroup) {
+    foreach ($this->gabarits as $gabaritGroup) {
+        ?>        
+        <div style="float:left; margin-right:10px; display:block; position:relative;">
+            <a href="#" class="button vert group-gabarit">
+                <span class="vert"><?php echo $gabaritGroup['label'] ?></span>
+            </a>
+            <div style="display:none;" class="group-gab">
+                <?php
+                foreach ($gabaritGroup["gabarit"] as $gabarit) {
+                    if ($this->utilisateur->get("niveau") != "solire" && !$gabarit["creable"])
+                        continue;
+                    ?>        
+                    <div>
+                        <a href="page/display.html?id_gabarit=<?php echo $gabarit['id'] ?>"><?php echo $gabarit['label'] ?></a>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+
+        <?php
+    }
+} else {
+    foreach ($this->gabarits as $gabarit) {
+        if ($this->utilisateur->get("niveau") != "solire" && !$gabarit["creable"])
+            continue;
+        ?>        
+        <div style="float:left;margin-right:10px;">
+            <a href="page/display.html?id_gabarit=<?php echo $gabarit['id'] ?>" class="button vert">
+                <span class="vert"><?php echo $gabarit['label'] ?></span>
+            </a>
+        </div>
+        <?php
+    }
+}
+?>
+
 
 <div class="clear"></div>
 
-<div class="sort-box">
 
-<?php if (count($this->pages) > 0) {
-    foreach ($this->pages as $page) { ?>
+<?php
+foreach ($this->pagesGroup as $keyGroup => $group) {
+    //Si on affiche les pages par type de gabarits
+    if (isset($this->gabaritByGroup) && $this->gabaritByGroup) {
+        ?>
+        <fieldset id="gab_page_6" class="sort-elmt">
 
-            <fieldset class="<?php echo $page->getMeta("id_gabarit") == 1 ? '' : 'sort-elmt' ?>" id="gab_page_<?php echo $page->getMeta('id'); ?>">
+            <legend title="<?php echo $this->gabarits[$keyGroup]["label"]; ?>  ">
+                <?php echo $this->gabarits[$keyGroup]["label"]; ?>                    
+            </legend>
 
-                <legend title="<?php echo $page->getMeta('rewriting') ?>">
-        <?php echo $page->getMeta('titre'); ?><?php if ($page->getMeta('nbre_enfants') > 0) { ?> - <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i><?php } ?>
-                </legend>
-                <div class="sort-box" style="display:none;"></div>
+            <?php
+            $this->pages = $group;
+        }
+        ?>
+            <div class="sort-box" <?php echo isset($this->gabaritByGroup) && $this->gabaritByGroup ? 'style="display:none;"' : ''; ?>>
 
-                <div class="line cat-modif">
+            <?php
+            if (count($this->pages) > 0) {
+                foreach ($this->pages as $page) {
+                    ?>
 
-        <?php if ($page->getMeta("id_gabarit") == 1) { ?>
-                        <div style="float:left;">
-                            <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
-                        </div>
-                        <?php } else { ?>
-                        <div style="float:left;">
-                            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["sortable"]) { ?>
-                                <a title="Déplacer '<?php echo $page->getMeta('titre'); ?>'" class="button bleu sort-move" href="#"><span class="bleu"><img alt="Déplacer" src="img/back/deplacer.png" /></span></a>
+                    <fieldset class="<?php echo $page->getMeta("id_gabarit") == 1 ? '' : 'sort-elmt' ?>" id="gab_page_<?php echo $page->getMeta('id'); ?>">
+
+                        <legend title="<?php echo $page->getMeta('rewriting') ?>">
+                            <?php echo $page->getMeta('titre'); ?><?php if ($page->getMeta('nbre_enfants') > 0) { ?> - <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i><?php } ?>
+                        </legend>
+                        <div class="sort-box" style="display:none;"></div>
+
+                        <div class="line cat-modif">
+
+                            <?php if ($page->getMeta("id_gabarit") == 1) { ?>
+                                <div style="float:left;">
+                                    <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
+                                </div>
+                            <?php } else { ?>
+                                <div style="float:left;">
+                                    <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["sortable"]) { ?>
+                                        <a title="Déplacer '<?php echo $page->getMeta('titre'); ?>'" class="button bleu sort-move" href="#"><span class="bleu"><img alt="Déplacer" src="img/back/deplacer.png" /></span></a>
+                                    <?php } ?>
+                                    <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["editable"]) { ?>
+                                        <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
+                                    <?php } ?>
+                                    <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["make_hidden"]) { ?>
+                                        <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+                                    <?php } ?>
+                                </div>
+                                <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["deletable"]) { ?>
+                                    <div style="float:right;">
+                                        <a title="Supprimer '<?php echo $page->getMeta('titre'); ?>'" style="float:right; display:<?php echo $page->getMeta('nbre_enfants') > 0 ? 'none' : 'block'; ?>;" class="button bleu supprimer" href="#"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
+                                    </div>
+                                <?php } ?>
                             <?php } ?>
-                            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["editable"]) { ?>
-                                <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
-                            <?php } ?>
-                            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["make_hidden"]) { ?>
-                                <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
-                        <?php } ?>
                         </div>
-            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["deletable"]) { ?>
-                            <div style="float:right;">
-                                <a title="Supprimer '<?php echo $page->getMeta('titre'); ?>'" style="float:right; display:<?php echo $page->getMeta('nbre_enfants') > 0 ? 'none' : 'block'; ?>;" class="button bleu supprimer" href="#"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
-                            </div>
+
+                    </fieldset>
+
+                    <?php
+                }
+            } else {
+                ?>
+
+                <p>Aucune page</p>
+
             <?php } ?>
-        <?php } ?>
-                </div>
 
-            </fieldset>
+        </div>
+        <?php
+        //Si on affiche les pages par type de gabarits
+        if (isset($this->gabaritByGroup) && $this->gabaritByGroup) {
+            ?>
+        </fieldset>
+        <?php
+    }
+}
+?>
 
-    <?php }
-} else { ?>
 
-        <p>Aucune page</p>
 
-<?php } ?>
-
-</div>
 
 
 <div class="buttonfixed"><a href="#" class="button vert enregistrerordre"><span class="vert ">Enregistrer Ordre</span></a></div>

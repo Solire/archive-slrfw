@@ -18,7 +18,7 @@ class gabaritBloc
      *
      * @var array 
      */
-    protected $_values = array(array());
+    protected $_values = array();
 
     public function __construct()
     {

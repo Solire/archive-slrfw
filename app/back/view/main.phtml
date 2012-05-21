@@ -56,10 +56,9 @@
                         <li><a href="media/start.html" class="bouton<?php if ($this->action == "fichier") echo ' active' ?>">Fichiers<span>Fichiers</span></a></li>
 
                         
-                        <li><a href="translate/list.html" class="bouton<?php if ($this->action == "translate") echo ' active' ?>">Traduction<span>Traduction</span></a></li>
-
-                        
-                        <li class="bis" style="border-left:1px solid #a1a1a1;"><a href="sign/signout.html" class="bis"><b>Déconnexion</b></a></li>
+                        <li class="bis" style="border-left:1px solid #a1a1a1;">
+                            <a href="translate/list.html" class="bis">Traduction</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -70,7 +69,8 @@
 
             <div id="footer">
                 <div class="bloc">
-                    <p>Outil de gestion de contenu développé par <a href="http://www.solire.fr" target="_blank">Solire</a> pour <?php echo $this->site; ?></p>
+                    <p>Outil de gestion de contenu développé par <a href="http://www.solire.fr" target="_blank">Solire</a> pour <?php echo $this->site; ?></br>
+                    <a href="sign/signout.html"><b>Déconnexion</b></a></p>
                 </div>
             </div>
 

@@ -39,16 +39,14 @@ RewriteRule ^locale/(.{5})/LC_MESSAGES_JS/(.*).js$                          loca
 
 
 
-RewriteRule ^(mobile/|back/|config/)?css/(.+)$                                                      public_html/medias/css/$2 [L]
-RewriteRule ^(mobile/|back/|config/)?img/(.*)$                                                      public_html/medias/img/$2 [L]
-RewriteRule ^(mobile/|back/|config/)?js/(.+)$                                                       public_html/medias/js/$2 [L]
+RewriteRule ^(mobile/|back/)?css/(.+)$                                                      public_html/medias/css/$2 [L]
+RewriteRule ^(mobile/|back/)?img/(.*)$                                                      public_html/medias/img/$2 [L]
+RewriteRule ^(mobile/|back/)?js/(.+)$                                                       public_html/medias/js/$2 [L]
 
 RewriteRule ^([0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$                         public_html/medias/upload/$1/$2 [L]
 
 
 
-RewriteRule ^config/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=config&%{QUERY_STRING} [L]
-RewriteRule ^config/$                                                       public_html/index.php?application=config&%{QUERY_STRING} [L]
 RewriteRule ^mobile/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=mobile&%{QUERY_STRING} [L]
 RewriteRule ^mobile/$                                                       public_html/index.php?application=mobile&%{QUERY_STRING} [L]
 RewriteRule ^back/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=back&%{QUERY_STRING} [L]
