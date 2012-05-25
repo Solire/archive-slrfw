@@ -76,11 +76,4 @@ class MainController extends ActionController
 
 
     }
-    
-    public function pageNotFound() {
-        header('HTTP/1.0 404 Not Found');
-        echo "Page Not found";
-        exit();
-    }
-
 }

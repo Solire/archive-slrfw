@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @package Controller
+ * @filesource
+ */
 require_once 'view.php';
 require_once 'translate-mysql.php';
 require_once 'log.php';
@@ -9,20 +12,30 @@ require_once 'project.php';
 require_once 'loader/javascript.php';
 require_once 'loader/css.php';
 
+/**
+ * @package Controller
+ * @api
+ */
 class ActionController
 {
 
     protected $_request = null;
-    
+
+    /**
+     * Url absolue du site
+     * Elle sera enregistrée sous le nom $Url dans l'objet View
+     * @var string
+     * @uses View::$Url
+     */
     protected $_url = null;
     protected $_root = null;
-    
+
     /**
      *
      * @var Config
      */
     protected $_mainConfig = null;
-    
+
     /**
      *
      * @var Config
@@ -31,10 +44,10 @@ class ActionController
 
     /**
      *
-     * @var Config 
+     * @var Config
      */
     protected $_envConfig = null;
-    
+
     /**
      *
      * @var View
@@ -79,7 +92,7 @@ class ActionController
 
     /**
      *
-     * @var Translate 
+     * @var Translate
      */
     protected $_translate = null;
 
@@ -91,14 +104,14 @@ class ActionController
 
     public function start()
     {
-        
+
     }
 
 //end start()
 
     public function shutdown()
     {
-        
+
 
         $this->_view->Url = $this->_url;
 
@@ -128,11 +141,11 @@ class ActionController
 
     public function __construct()
     {
-               
+
         $this->_mainConfig = Registry::get('mainconfig');
         $this->_appConfig = Registry::get('appconfig');
         $this->_envConfig = Registry::get('envconfig');
-        
+
         $this->_request = $_REQUEST;
         $this->_url = Registry::get('basehref');
         $this->_root = Registry::get('baseroot');
@@ -147,7 +160,7 @@ class ActionController
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
         $this->_view->envConfig = Registry::get('envconfig');
-        
+
         $this->_view->seo = $this->_seo;
 
         if (isset($this->_option["mobile.enable"])) {
@@ -157,7 +170,7 @@ class ActionController
             Registry::set("base", $mobile->baseHref());
         }
         //Fin Gestion version pc/mobile
-        //Version mobile 
+        //Version mobile
         //Caching des données
 //        Header("Cache-Control: must-revalidate");
 //        $offset = 60; //1 minute de caching
@@ -176,7 +189,7 @@ class ActionController
 
     /**
      * Redirection
-     * 
+     *
      * @param string $controller
      * @param string $action
      * @param array $params
@@ -195,22 +208,45 @@ class ActionController
     /**
      *
      * @param string $url
-     * @param bool $relative 
+     * @param bool $relative
      */
     public function simpleRedirect($url, $relative = false)
     {
         if ($relative)
             $url = Registry::get("basehref") . $url;
-        
+
         header("Location: $url");
-        
+
         exit();
+    }
+
+    /**
+     * Transforme la page en cour en une erreur 404
+     * @uses ActionController::redirectError() 404
+     */
+    final public function pageNotFound()
+    {
+        $this->redirectError(404);
+    }
+
+    /**
+     * Transforme la page en une erreur HTTP
+     * @param string $codeError code erreur HTTP
+     * @uses HttpException
+     */
+    final public function redirectError($codeError = null)
+    {
+        $exc = new HttpException('Erreur HTTP');
+        if (!empty($codeError))
+            $exc->http($codeError);
+
+        throw $exc;
     }
 
     /**
      *
      * @param array $inputs
-     * @return bool 
+     * @return bool
      */
     public function issetAndNotEmpty($inputs)
     {
@@ -221,7 +257,7 @@ class ActionController
 
         return true;
     }
-    
+
     public function _($string) {
         return $this->_translate->_($string);
     }
