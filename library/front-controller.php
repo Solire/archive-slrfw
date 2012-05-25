@@ -147,8 +147,13 @@ class FrontController
         define("SUF_VERSION", $version['suf']);
     }
 
-    public static function run($application = "front")
+    public static function run()
     {
+        if (isset($_REQUEST['application']) && !empty($_REQUEST['application'])) {
+            $application =  $_REQUEST['application'];
+        } else {
+            $application =  'front';
+        }
         $front = self::getInstance($application);
         $applicationPath = '../' . $front->_applicationConfig['path'];
 
