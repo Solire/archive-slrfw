@@ -1,12 +1,18 @@
 <?php
+/**
+ * Gestionnaire de connexion à la base de données
+ * @package Library
+ * @subpackage Core
+ */
 
+require_once 'mypdo.php';
 /**
  * Gestionnaire de connexion à la base de données
  *
  * @version 1.3
+ * @package Library
+ * @subpackage Core
  */
-require_once 'mypdo.php';
-
 class DB
 {
 
@@ -27,7 +33,7 @@ class DB
 
     private function __construct()
     {
-        
+
     }
 
     /**
@@ -35,7 +41,7 @@ class DB
      *
      *
      * @param array $ini doit être sous la forme :
-     *      dsn => ''        // chaine de connexion propre à pdo, par exemple : 
+     *      dsn => ''        // chaine de connexion propre à pdo, par exemple :
      * "mysql:dbname=%s;host=%s" ou "mysql:dbname=%s;host=%s;port=%s"
      *      host => ''       // host de la connexion à la bdd
      *      dbname => ''     // Nom de la base de données
@@ -53,16 +59,16 @@ class DB
      */
     public static function factory($ini, $otherDbName = null)
     {
-        
+
         if ($otherDbName)
             $ini['dbname'] = $otherDbName;
-        
+
         if (isset(self::$present[$ini['dbname']]))
             return self::$present[$ini['dbname']];
-        
+
 
         $DSN = sprintf($ini['dsn'], $ini['dbname'], $ini['host'], $ini['port']);
-        
+
         self::$present[$ini['dbname']] =
                 new MyPDO($DSN, $ini['user'], $ini['password'], self::$config);
 

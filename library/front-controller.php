@@ -1,7 +1,26 @@
 <?php
+/**
+ * @package Controller
+ */
 
+/**
+ * @package Controller
+ * @api
+ */
 class FrontController
 {
+
+    /**
+     * Configuration principale du site
+     * @var Config
+     */
+    public static $mainConfig;
+
+    /**
+     * Configuration de l'environnement utilisé
+     * @var Config
+     */
+    public static $envConfig;
 
     private static $_singleton = null;
     private $_dirs = null;
@@ -15,24 +34,122 @@ class FrontController
     const CONTROLLER_ACTION_NOT_EXISTS = 2;
     const VIEW_FILE_NOT_EXISTS = 3;
 
-    private function __construct($mainIni, $envIni, $application)
+    private function __construct($application)
     {
-        $this->_dirs = $mainIni->get("dirs");
-        $this->_applicationConfig = $mainIni->get('app_' . $application);
-        $this->_format = $mainIni->get("format");
-        $this->_debug = $envIni->get("debug");
+        $this->_dirs = self::$mainConfig->get("dirs");
+        $this->_applicationConfig = self::$mainConfig->get('app_' . $application);
+        $this->_format = self::$mainConfig->get("format");
+        $this->_debug = self::$mainConfig->get("debug");
     }
 
-    public static function getInstance($mainIni, $envIni, $application)
+    /**
+     * Renvois une instance du FrontController
+     * @return FrontController
+     */
+    public static function getInstance($application)
     {
         if (!self::$_singleton)
-            self::$_singleton = new self($mainIni, $envIni, $application);
+            self::$_singleton = new self($application);
         return self::$_singleton;
     }
 
-    public static function run($mainIni, $envIni, $application = "front")
+    /**
+     * Initialise les données nécessaires pour FrontController
+     */
+    public function init()
     {
-        $front = self::getInstance($mainIni, $envIni, $application);
+
+        /* = Chargement de la configuration
+          ------------------------------- */
+        self::$mainConfig = new Config('../config/main.ini');
+
+        /* = Detection de l'environnement
+          ------------------------------- */
+        $localHostnames = explode(',', self::$mainConfig->get('detect', 'development'));
+        if (in_array($_SERVER['SERVER_NAME'], $localHostnames) === true)
+            $env = 'local';
+        else
+            $env = 'online';
+
+        self::$envConfig = new Config("../config/$env.ini");
+
+
+        /* = Fichiers de configuration
+          ------------------------------- */
+        Registry::set('mainconfig', self::$mainConfig);
+        Registry::set('envconfig', self::$envConfig);
+
+        /* = base de données
+          ------------------------------- */
+        $db = DB::factory(self::$envConfig->get('database'));
+        Registry::set('db', $db);
+
+        /* = ?????
+          ------------------------------- */
+        $application = isset($_REQUEST['application']) ? $_REQUEST['application'] : 'front';
+        $appConfig = null;
+        if (file_exists("../config/app_$application.ini"))
+            $appConfig = new Config("../config/app_$application.ini");
+        Registry::set("appconfig", $appConfig);
+
+        /* = url
+          ------------------------------- */
+        $baseHrefSuffix = isset($_REQUEST['application']) ? $_REQUEST['application'] . '/' : '';
+        Registry::set('base', self::$envConfig->get('url', 'base'));
+        Registry::set('basehref', self::$envConfig->get('url', 'base') . $baseHrefSuffix);
+        Registry::set('baseroot', self::$envConfig->get('root', 'base'));
+
+
+        /* = Ce que je ne sais pas ce que ça fout là
+          ------------------------------- */
+        $log = Log::newLog($db);
+        Registry::set('log', $log);
+        Registry::set('options', self::$mainConfig->get('options'));
+        Registry::set('email', self::$envConfig->get('email'));
+
+        Registry::set('site', self::$mainConfig->get('name', 'project'));
+
+        /* = ????????????????
+          ------------------------------- */
+        if (isset($_GET['version-force'])) {
+            $_SESSION['version-force'] = $_GET['version-force'];
+        }
+        if (isset($_SESSION['version-force'])) {
+            $sufVersion = $_SESSION['version-force'];
+        } else {
+            $sufVersion = isset($_GET['version']) ? $_GET['version'] : 'FR';
+        }
+
+        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+
+        if ($serverUrl != 'solire-01' && $serverUrl != "ks389489.kimsufi.com") {
+            Registry::set("url", "http://www." . $serverUrl . '/');
+            Registry::set("basehref", "http://www." . $serverUrl . '/');
+        }
+
+        if (isset($_GET["basehref-force"])) {
+            $serverUrl = str_replace('www.', '', $_GET["basehref-force"]);
+            Registry::set("url", "http://" . $_GET["basehref-force"] . '');
+            Registry::set("basehref", "http://" . $_GET["basehref-force"] . '');
+        }
+
+        $query = "SELECT * FROM `version` WHERE `domaine` = '$serverUrl'";
+        $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+
+        if (!isset($version["id"])) {
+            $query = "SELECT * FROM `version` WHERE `suf` LIKE " . $db->quote($sufVersion);
+            $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+        }
+
+
+        Registry::set("analytics", $version['analytics']);
+        define("ID_VERSION", $version['id']);
+        define("SUF_VERSION", $version['suf']);
+    }
+
+    public static function run($application = "front")
+    {
+        $front = self::getInstance($application);
         $applicationPath = '../' . $front->_applicationConfig['path'];
 
         $controller = str_replace("-", "", strtolower(isset($_GET["controller"]) ? $_GET["controller"] : $front->getDefault("controller")));
@@ -68,15 +185,15 @@ class FrontController
         $instance->start();
         $instance->$method();
         $instance->shutdown();
-        
+
         if ($view->isEnabled()) {
             if (!$view->exists($controller, $action)) {
                 $front->debug(self::VIEW_FILE_NOT_EXISTS, array($view));
                 return false;
             }
-            
+
             $view->display($controller, $action, false);
-            
+
         }
 
         return true;

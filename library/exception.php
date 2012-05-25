@@ -25,15 +25,28 @@ class MarvinException extends Exception
      * Titre du message d'erreur
      * @var string
      */
-    private $_code = 'Erreur';
+    private $_title = 'Erreur';
+
+    /**
+     * Instancie une erreur qui fera l'objet d'un rapport
+     * @param Exception $exc
+     * @param string $title Facultatif Titre de l'erreur
+     */
+    public function __construct(Exception $exc, $title = null)
+    {
+        parent::__construct($exc->getMessage(), 0, $exc);
+
+        if (!empty($title))
+            $this->title($title);
+    }
 
     /**
      * Ajoute un code HTTP à l'erreur
      * @param int $code
      */
-    public function title($code)
+    public function title($string)
     {
-        $this->_code = $code;
+        $this->_title = $string;
     }
 
     /**
@@ -42,7 +55,7 @@ class MarvinException extends Exception
      */
     public function getTitle()
     {
-        return $this->_code;
+        return $this->_title;
     }
 }
 
@@ -126,6 +139,10 @@ class HttpException extends Exception
      */
     public function getHttp()
     {
+        if ($this->getCode() !== 0) {
+            return $this->getCode();
+        }
+
         return $this->_code;
     }
 }
