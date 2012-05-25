@@ -77,14 +77,14 @@ class Marvin
 
         $traces = $this->exc->getTrace();
         foreach ($traces as $trace) {
-
             foreach ($trace['args'] as $key => $arg) {
                 $trace['args'][$key] = $this->varDump($arg);
             }
-
-            $trace['showFile'] = $this->readLines(
-                $trace['file'], $trace['line']
-            );
+            if (isset($trace['file'], $trace['line'])) {
+                $trace['showFile'] = $this->readLines(
+                    $trace['file'], $trace['line']
+                );
+            }
             $this->trace[] = $trace;
         }
     }
