@@ -122,7 +122,7 @@ class FrontController
 
         $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
 
-        if ($serverUrl != 'solire-01' && $serverUrl != "ks389489.kimsufi.com") {
+        if ($env != 'local') {
             Registry::set("url", "http://www." . $serverUrl . '/');
             Registry::set("basehref", "http://www." . $serverUrl . '/');
         }
