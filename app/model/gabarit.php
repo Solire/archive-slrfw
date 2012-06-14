@@ -10,9 +10,11 @@ class gabarit
     
     private $_id_parent;
     
-	private $_table;
+    private $_table;
 
     private $_name;
+    
+    private $_meta;
     
     private $_label;
 
@@ -82,6 +84,10 @@ class gabarit
     
     public function getName() {
         return $this->_name;
+    }
+    
+    public function getMeta() {
+        return $this->_meta;
     }
     
     public function getLabel() {
