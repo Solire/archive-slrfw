@@ -14,7 +14,7 @@
 <h1>Liste des pages</h1>
 
 <?php
-if ($this->gabaritGroup) {
+if (isset($this->gabaritGroup) && $this->gabaritGroup) {
     foreach ($this->gabarits as $gabaritGroup) {
         ?>        
         <div style="float:left; margin-right:10px; display:block; position:relative;">
