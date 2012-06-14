@@ -31,10 +31,11 @@ class gabarit
     
     private $_parents = array();
     
-    public function __construct($id = 0, $id_parent = 0, $name = '', $label = '') {
+    public function __construct($id = 0, $id_parent = 0, $name = '', $label = '', $meta = TRUE) {
         $this->_id = $id;
         $this->_id_parent = $id_parent;
         $this->_name = $name;
+        $this->_meta = $meta;
         $this->_label = $label;
     }
     
