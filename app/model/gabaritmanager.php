@@ -79,7 +79,7 @@ class gabaritManager extends manager
         }
 
         $page->setGabarit($gabarit);
-
+        
         $blocs = $this->getBlocs($gabarit, $id_gab_page);
         $page->setBlocs($blocs);
 
@@ -103,7 +103,7 @@ class gabaritManager extends manager
                 }
             }
         }
-
+        
         return $page;
     }
 
