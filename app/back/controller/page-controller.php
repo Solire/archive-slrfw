@@ -274,6 +274,12 @@ class PageController extends MainController
         
         exit(json_encode($json));
     }
+    
+    public function autocompleteLinkAction() {
+        header("content-type: application/x-javascript; charset=UTF-8");
+        $json = file_get_contents($this->_url . "../sitemap.xml?visible=0&json=1&onlylink=1" );
+        exit("var tinyMCELinkList = " . $json . ";");
+    }
 
     
     /**

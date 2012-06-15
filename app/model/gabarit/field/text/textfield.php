@@ -9,7 +9,11 @@ require_once 'gabarit/field/gabaritfield.php';
  */
 class TextField extends GabaritField
 {
-
+    public function start() {
+        parent::start();
+        if($this->params["LINK"])
+            $this->classes .= " autocomplete-link";
+    }
 }
 
 ?>

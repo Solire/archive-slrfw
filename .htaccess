@@ -32,7 +32,7 @@ RewriteRule ^robots.txt$											- [L]
 RewriteRule ^private/											- [L]
 
 
-RewriteRule ^sitemap.xml$											index.php?controller=sitemap&action=start [L]
+RewriteRule ^sitemap.xml$											index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
 
 
 RewriteRule ^locale/(.{5})/LC_MESSAGES_JS/(.*).js$                          locale/$1/LC_MESSAGES_JS/$2.js [L]

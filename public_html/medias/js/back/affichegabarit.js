@@ -41,7 +41,8 @@ var initTinyMCE = function () {
         convert_urls : true,
         document_base_url : "../../../../",
         //        content_css : "css/back/style-tinymce.css",
-        external_image_list_url : "back/media/autocomplete.html?tinyMCE"
+        external_image_list_url : "back/media/autocomplete.html?tinyMCE",
+        external_link_list_url : "back/page/autocomplete-link.html"
     });    
 }
 

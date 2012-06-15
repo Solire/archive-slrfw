@@ -2,119 +2,131 @@
 
 require "main-controller.php";
 
-class SitemapController extends MainController
-{
+class SitemapController extends MainController {
 
     private $_cache = null;
 
-    public function start()
-    {
+    public function start() {
         parent::start();
         $this->_cache = Registry::get("cache");
     }
 
-    public function startAction()
-    {
+    public function startAction() {
+        global $pagesResult;
         $this->_view->main(false);
-        header("Content-Type: application/xml");
+
+
+        $visible = TRUE;
+        if (isset($_GET["visible"]) && $_GET["visible"] == 0) {
+            $visible = FALSE;
+        }
+
+
+        $format = "xml";
+        if (isset($_GET["json"]) && $_GET["json"] == 1) {
+            $format = "json";
+            $title = FALSE;
+        }
+
 
         $this->_pages = array();
 
-        $this->_rubriques = $this->_gabaritManager->getList(ID_VERSION, 0, array(2, 3, 4, 5), TRUE);
 
+        $accueil = $this->_gabaritManager->getPage(ID_VERSION, 1);
         $this->_pages[] = array(
+            "title" => $accueil->getMeta("titre"),
+            "visible" => $accueil->getMeta("visible"),
             "path" => '',
-            "importance" => "10",
-            "lastmod" => ""
+            "importance" => $accueil->getMeta("importance"),
+            "lastmod" => substr($accueil->getMeta("date_modif"), 0, 10)
         );
 
+        $this->_rubriques = $this->_gabaritManager->getList(ID_VERSION, 0, array(6, 7, 8, 9, 10), $visible);
 
-        $this->_pages[] = array(
-            "path" => 'plan-du-site.html',
-            "importance" => "6",
-            "lastmod" => ""
-        );
 
         foreach ($this->_rubriques as $ii => $rubrique) {
-            $pages = $this->_gabaritManager->getList(ID_VERSION, $rubrique->getMeta('id'), FALSE, 1);
+            $this->_pages[] = array(
+                "title" => $rubrique->getMeta("titre"),
+                "visible" => $rubrique->getMeta("visible"),
+                "path" => $rubrique->getMeta('rewriting') . '.html',
+                "importance" => $rubrique->getMeta('importance'),
+                "lastmod" => substr($rubrique->getMeta('date_modif'), 0, 10)
+            );
+
+
+
+
+            $pages = $this->_gabaritManager->getList(ID_VERSION, $rubrique->getMeta('id'), FALSE, $visible);
+
+
+
             $rubrique->setChildren($pages);
             foreach ($pages as $page) {
                 $this->_pages[] = array(
+                    "title" => $page->getMeta("titre"),
+                    "visible" => $page->getMeta("visible"),
                     "path" => $rubrique->getMeta('rewriting') . '/' . $page->getMeta('rewriting') . '.html',
                     "importance" => $page->getMeta('importance'),
-                    "lastmod" => substr($page->getMeta('date_modif'), 0, 10)
+                    "lastmod" => substr($rubrique->getMeta("id_parent") == 8 ? $page->getMeta('date_crea') : $page->getMeta('date_modif'), 0, 10)
                 );
+
+                $pages = $this->_gabaritManager->getList(ID_VERSION, $page->getMeta('id'), FALSE, $visible);
+
+
+                $rubrique->setChildren($pages);
+                foreach ($pages as $page) {
+                    $this->_pages[] = array(
+                        "title" => $page->getMeta("titre"),
+                        "visible" => $page->getMeta("visible"),
+                        "path" => $rubrique->getMeta('rewriting') . '/' . $page->getMeta('rewriting') . '.html',
+                        "importance" => $page->getMeta('importance'),
+                        "lastmod" => substr($rubrique->getMeta("id_parent") == 8 ? $page->getMeta('date_crea') : $page->getMeta('date_modif'), 0, 10)
+                    );
+                }
             }
         }
 
-        //Scenario
-        $query = "  
-                        SELECT DISTINCT `gab_page`.`id`";
-        $query .= "  
-                        FROM `gab_page`";
-        $query .= " 
-                        INNER JOIN `main_page_scenario_region` ON  `gab_page`.`id` = `main_page_scenario_region`.`id_gab_page`
-                        AND `main_page_scenario_region`.`id_version` = " . ID_VERSION . " AND `main_page_scenario_region`.`suppr` = 0
-                        AND `main_page_scenario_region`.`visible` =1";
-        $query .= " 
-                        INNER JOIN `main_page_scenario_theme` ON  `gab_page`.`id` = `main_page_scenario_theme`.`id_gab_page` 
-                        AND `main_page_scenario_theme`.`id_version` = " . ID_VERSION . " AND `main_page_scenario_theme`.`suppr` = 0
-                        AND `main_page_scenario_theme`.`visible` =1";
-
-        $query .= " 
-                        WHERE `gab_page`.suppr = 0 
-                        AND `gab_page`.visible = 1
-                        AND `gab_page`.id_version = " . ID_VERSION . "
-                    ";
-
-        $scenarios = $this->_db->query($query)->fetchAll();
-
-        $scenariosData = $this->_loadScenarios($scenarios);
-        $this->scenarios = $scenariosData["scenarios"];
-
-
-        if (isset($this->scenarios) && count($this->scenarios) > 0) {
-            foreach ($this->scenarios as $scenario) {
-                $rewriteParents = $scenario->getParent(1)->getMeta("rewriting") . "/" . $scenario->getParent(0)->getMeta("rewriting") . "/";
-                $url = $rewriteParents . $scenario->getMeta('rewriting') . '.html';
-                $this->_pages[] = array(
-                    "path" => $url,
-                    "importance" => $scenario->getMeta('importance'),
-                    "lastmod" => $scenario->getMeta('date_modif')
-                );
-            }
-        }
-        
+        if ($format == "xml")
+            header("Content-Type: application/xml");
         $this->_view->pages = $this->_pages;
+
+        if ($format == "json") {
+            header('Cache-Control: no-cache, must-revalidate');
+            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+            header('Content-type: application/json');
+
+            $pages = $this->_pages;
+
+            if (isset($_GET["term"]) && $_GET["term"] != "") {
+                $term = $_GET["term"];
+                $pagesResult = array();
+                array_walk($pages, array($this, "filter"), $term);
+                $pages = $pagesResult;
+            }
+
+            $this->_view->enable(false);
+
+            foreach ($pages as $page) {
+                $page["title"] = ($page["visible"] ? "&#10003;" : "&#10005;") . ' ' . $page["title"];
+                if (isset($_GET["onlylink"]) && $_GET["onlylink"] == 1) {
+                    $pagesClone[] = array(
+                        $page["title"],
+                        $page["path"],
+                    );
+                } else {
+                    $pagesClone[] = $page;
+                }
+            }
+            $pages = $pagesClone;
+            echo json_encode($pages);
+        }
     }
 
-    private function _loadScenarios($scenarios)
-    {
-        $citiesId = array();
-        $scenariosLies = array();
-        //Scenario joint
-        if (count($scenarios) > 0) {
-            foreach ($scenarios as $scenario) {
-                $scenar = $this->_gabaritManager->getPage(ID_VERSION, $scenario["id"]);
-                if (!is_object($scenar))
-                    continue;
-                $scenariosLies[] = $scenar;
-                $villes = array();
-
-                foreach ($scenar->getBlocs("itineraire")->getValues() as $key => $itineraire) {
-                    if ($itineraire["villes"] == "")
-                        continue;
-                    $citiesId = array_merge($citiesId, explode(",", $itineraire["villes"]));
-                    $scenar->getBlocs("itineraire")->setValue($key, explode(",", $itineraire["villes"]), "villes");
-                    $villes = array_merge($villes, explode(",", $itineraire["villes"]));
-                }
-                $scenar->setValue("villes", $villes);
-            }
+    function filter($page, $index, $searchString) {
+        global $pagesResult;
+        if (stripos($page["title"], $searchString) !== false) {
+            $pagesResult[] = $page;
         }
-        return array(
-            "cities" => $citiesId,
-            "scenarios" => $scenariosLies,
-        );
     }
 
 }
