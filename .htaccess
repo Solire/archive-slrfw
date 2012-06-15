@@ -42,6 +42,7 @@ RewriteRule ^locale/(.{5})/LC_MESSAGES_JS/(.*).js$                          loca
 RewriteRule ^(mobile/|back/)?css/(.+)$                                                      public_html/medias/css/$2 [L]
 RewriteRule ^(mobile/|back/)?img/(.*)$                                                      public_html/medias/img/$2 [L]
 RewriteRule ^(mobile/|back/)?js/(.+)$                                                       public_html/medias/js/$2 [L]
+RewriteRule ^(mobile/|back/)?swf/(.*)$                                                      public_html/medias/swf/$2 [L]
 
 RewriteRule ^([0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$                         public_html/medias/upload/$1/$2 [L]
 
