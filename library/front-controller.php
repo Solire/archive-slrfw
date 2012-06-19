@@ -70,6 +70,10 @@ class FrontController
             $env = 'local';
         else
             $env = 'online';
+        
+        /* = Detection de l'application à charger (Defaut : front)
+          ------------------------------- */
+        $application = isset($_REQUEST['application']) ? $_REQUEST['application'] : 'front';
 
         self::$envConfig = new Config("../config/$env.ini");
 
@@ -78,19 +82,15 @@ class FrontController
           ------------------------------- */
         Registry::set('mainconfig', self::$mainConfig);
         Registry::set('envconfig', self::$envConfig);
-
-        /* = base de données
-          ------------------------------- */
-        $db = DB::factory(self::$envConfig->get('database'));
-        Registry::set('db', $db);
-
-        /* = ?????
-          ------------------------------- */
-        $application = isset($_REQUEST['application']) ? $_REQUEST['application'] : 'front';
         $appConfig = null;
         if (file_exists("../config/app_$application.ini"))
             $appConfig = new Config("../config/app_$application.ini");
         Registry::set("appconfig", $appConfig);
+
+        /* = base de données
+          ------------------------------- */
+        $db = DB::factory(self::$envConfig->get('database'));
+        Registry::set('db', $db);        
 
         /* = url
           ------------------------------- */
@@ -99,17 +99,7 @@ class FrontController
         Registry::set('basehref', self::$envConfig->get('url', 'base') . $baseHrefSuffix);
         Registry::set('baseroot', self::$envConfig->get('root', 'base'));
 
-
-        /* = Ce que je ne sais pas ce que ça fout là
-          ------------------------------- */
-        $log = Log::newLog($db);
-        Registry::set('log', $log);
-        Registry::set('options', self::$mainConfig->get('options'));
-        Registry::set('email', self::$envConfig->get('email'));
-
-        Registry::set('site', self::$mainConfig->get('name', 'project'));
-
-        /* = ????????????????
+        /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
         if (isset($_GET['version-force'])) {
             $_SESSION['version-force'] = $_GET['version-force'];
@@ -120,18 +110,16 @@ class FrontController
             $sufVersion = isset($_GET['version']) ? $_GET['version'] : 'FR';
         }
 
-        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
-
         if ($env != 'local') {
+            $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
             Registry::set("url", "http://www." . $serverUrl . '/');
             Registry::set("basehref", "http://www." . $serverUrl . '/');
+        } else {
+            $serverUrl = str_replace("solire-02", $_SERVER['SERVER_NAME'] . ":" .  $_SERVER['SERVER_PORT'], Registry::get("basehref"));
+            Registry::set("url", $serverUrl);
+            Registry::set("basehref", $serverUrl);
         }
 
-        if (isset($_GET["basehref-force"])) {
-            $serverUrl = str_replace('www.', '', $_GET["basehref-force"]);
-            Registry::set("url", "http://" . $_GET["basehref-force"] . '');
-            Registry::set("basehref", "http://" . $_GET["basehref-force"] . '');
-        }
 
         $query = "SELECT * FROM `version` WHERE `domaine` = '$serverUrl'";
         $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
