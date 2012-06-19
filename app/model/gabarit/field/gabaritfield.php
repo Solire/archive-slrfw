@@ -62,6 +62,8 @@ abstract class GabaritField
         ob_start();
         include($file);
         $output = ob_get_clean();
+        if($this->champ["aide"]!= "")
+            $output .= '<div class"aide" id="aide-champ' . $this->champ['id'] . '" style="display: none">' . $this->champ["aide"] . '</div>';
         return $output;
     }
 
