@@ -117,7 +117,7 @@ class gabaritManager extends manager
         $query = "SELECT * FROM `gab_gabarit` WHERE `id` = $id_gabarit";
         $row = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
 
-        $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'], $row['label'],  $row['meta']);
+        $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'], $row['label'],  $row['main'],  $row['creable'],  $row['deletable'],  $row['sortable'],  $row['make_hidden'],  $row['editable'],  $row['meta']);
         if ($row['id_api'] > 0) {
             $query = "SELECT `name` FROM `gab_api` WHERE `id` = " . $row['id_api'];
             $api = $this->_db->query($query)->fetchColumn();

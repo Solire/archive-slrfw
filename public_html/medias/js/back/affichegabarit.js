@@ -422,8 +422,8 @@ $(function(){
             i = $('.openlang').index($(this));
 			
             if($('.langue').eq(i).is(':hidden')) {
-                $('.openlang.active').removeClass('active').addClass('translucide');
-                $(this).removeClass('translucide').addClass('active');
+                $('.openlang').parent(".active").removeClass('active').addClass('translucide');
+                $(this).parent("a").removeClass('translucide').addClass('active');
 				
                 $('.langue:visible').slideUp(500);
                 $('.langue').eq(i).slideDown(500);
@@ -766,7 +766,7 @@ $(function(){
             $this.qtip('show')
         })
         
-         $(".mceEditor").live("mouseout", function() {
+        $(".mceEditor").live("mouseout", function() {
             var id = $(this).attr("id").split("_")
             var name = id[0];
             
@@ -779,5 +779,28 @@ $(function(){
         })
         
     });
+    
+    
+    $(".visible-lang").click(function() {
+        var $this = $(this);
+        var value = $(this).val().split("|")
+        var id_gab_page = parseInt(value[0]);
+        var id_version = parseInt(value[1]);
+        var checked = $this.is(':checked');
+		
+        $.post(
+            'page/visible.html',
+            {
+                id_gab_page : id_gab_page,
+                id_version : id_version,
+                visible     : checked ? 1 : 0
+            },
+            function(data){                
+                if(data.status != 'success')
+                    $this.attr('checked', !checked);
+            },
+            'json'
+            );
+    })
 
 });

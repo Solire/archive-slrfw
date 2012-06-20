@@ -152,10 +152,12 @@ class PageController extends MainController
             foreach ($versions as $version) {
                 $page = $this->_gabaritManager->getPage($version['id'], $id_gab_page);
                 
-                $devant .= '<a href="#" class="button bleu openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide')
-                         . '"><span class="bleu">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
-                         . $version['nom'] . '" /></span></a>';
-                
+                $devant .= '<div style="height: 50px;float: left;"><a title="' . $version['nom'] . '"  onclick="" class="button bleu ' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide')
+                         . '"><span class="bleu openlang">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
+                         . $version['nom'] . '" /></span>' 
+                         . ( $page->getGabarit()->getMake_hidden() ? '<label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-' . $version['id'] . '">Visible : </label><input class="visible-lang" value="' . $page->getMeta("id") . '|' . $version['id'] .'" id="visible-' . $version['id'] . '" style="" ' . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" />' : '')
+                         . '</a></div>';
+
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                        . '"><div class="clearin"></div>'
                        . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta())
@@ -293,8 +295,14 @@ class PageController extends MainController
 
         $json = array('status' => "error");
         
+        $idVersion = BACK_ID_VERSION;
+        
+        if(isset($_POST["id_version"]) && $_POST["id_version"] > 0) {
+            $idVersion = intval($_POST["id_version"]);
+        }
+        
         if (is_numeric($_POST['id_gab_page']) && is_numeric($_POST['visible'])) {
-            $query = "UPDATE `gab_page` SET `visible` = " . $_POST['visible'] . " WHERE id_version =  " . BACK_ID_VERSION . " AND `id` = " . $_POST['id_gab_page'];
+            $query = "UPDATE `gab_page` SET `visible` = " . $_POST['visible'] . " WHERE id_version =  " . $idVersion . " AND `id` = " . $_POST['id_gab_page'];
             if ($this->_db->query($query)) {
                 $json['status'] = "success";
                 $json['debug'] = $query;
