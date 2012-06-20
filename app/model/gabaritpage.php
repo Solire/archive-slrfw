@@ -236,7 +236,7 @@ class gabaritPage extends gabaritBloc {
         if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
             $form .= '<div ' . $noMeta . ' class="line">'
                    . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting</label>'
-                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="form-controle form-oblig form-mix" />'
+                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="' . ($meta ? 'form-controle form-oblig form-mix' : '') . '" />'
                    . '</div>';
         }
 
