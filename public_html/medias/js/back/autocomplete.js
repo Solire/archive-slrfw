@@ -42,7 +42,9 @@ $(function(){
                 },220);
                 
             }
-        });; 
+        }).keyup(function(){
+            $(this).parent().find(".join").val('')
+        }); 
     });
     
     $(".autocomplete-link").livequery(function(){ 

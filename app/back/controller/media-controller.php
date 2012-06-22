@@ -42,9 +42,7 @@ class MediaController extends MainController {
             $sens    = isset($_REQUEST['orderby']['sens'])  ? $_REQUEST['orderby']['sens']  : '';
             
             $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
-//            $sous_rubrique = $this->_page->getParent(2);
-//            if ($sous_rubrique)
-                $this->_files = $this->_fileManager->getList($this->_page->getMeta("id"), $search, $orderby, $sens);
+            $this->_files = $this->_fileManager->getList($this->_page->getMeta("id"), $search, $orderby, $sens);
         }
         
         foreach ($this->_files as &$file) {
@@ -204,7 +202,14 @@ class MediaController extends MainController {
         
         $id_gab_page = isset($_REQUEST['id_gab_page']) && $_REQUEST['id_gab_page'] ? $_REQUEST['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
         
-        $extensionsImage = array("jpeg", "jpg", "png", "gif");
+        if (isset($_REQUEST['extensions'])) {
+            $extensions = explode(";", $_REQUEST['extensions']);
+        }
+        else {
+            $extensions = FALSE;
+        }
+        
+//        $extensionsImage = array("jpeg", "jpg", "png", "gif");
 
         $json = array();
 
@@ -212,8 +217,8 @@ class MediaController extends MainController {
         $tinyMCE = isset($_GET['tinyMCE']);
                
         if ($id_gab_page) {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page, 0);            
-            $files = $this->_fileManager->getSearch($term, $this->_page->getMeta("id"));
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page, 0);
+            $files = $this->_fileManager->getSearch($term, $this->_page->getMeta("id"), $extensions);
 
             foreach ($files as $file) {
                 if (!$tinyMCE || fileManager::isImage($file['rewriting'])) {
@@ -231,8 +236,8 @@ class MediaController extends MainController {
 //                    $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $file['id_gab_page']);
                     $realpath = Registry::get("base") . $file['id_gab_page'] . '/'. $file['rewriting'];
 
-                    $ext = array_pop(explode(".", $file['rewriting']));
-                    if (in_array($ext, $extensionsImage)) {
+//                    $ext = array_pop(explode(".", $file['rewriting']));
+                    if (fileManager::isImage($file['rewriting'])) {
                         $sizes = getimagesize($serverpath);
                         $size = $sizes[0] . " x " . $sizes[1];
                     }

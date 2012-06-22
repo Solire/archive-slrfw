@@ -4,6 +4,8 @@
     </label>
     <input type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" />
     
+    <input type="hidden" class="extensions" value="<?php  echo $this->params["EXTENSIONS.ALLOW"]; ?>" />
+    
     <a href="<?php echo ($this->value ? Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" class="previsu">
         <?php echo $this->value; ?>
     </a>

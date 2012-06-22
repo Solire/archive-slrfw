@@ -153,13 +153,13 @@ class PageController extends MainController
                 $page = $this->_gabaritManager->getPage($version['id'], $id_gab_page);
                 
                 $devant .= '<div style="height: 50px;float: left;"><a title="' . $version['nom'] . '"  onclick="" class="button bleu ' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide')
-                         . '"><span class="bleu openlang">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
-                         . $version['nom'] . '" /></span>' ;
-                         if($page->getMeta("rewriting") != "")
-                            $devant .= ( $page->getGabarit()->getMake_hidden() || $this->_utilisateur->get("niveau") == "solire" ? '<label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-' . $version['id'] . '">Visible : </label><input class="visible-lang" value="' . $page->getMeta("id") . '|' . $version['id'] .'" id="visible-' . $version['id'] . '" style="" ' . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" />' : '');
-                         else 
-                            $devant .= '<label style="color:red;text-shadow:none;margin-left:10px;"">Non traduit</label>';
-                         $devant .= '</a></div>';
+                         . '"><span class="bleu openlang">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="' . $version['nom'] . '" /></span>' ;
+                
+                if($page->getMeta("rewriting") != "")
+                    $devant .= ( $page->getGabarit()->getMake_hidden() || $this->_utilisateur->get("niveau") == "solire" ? '<label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-' . $version['id'] . '">Visible : </label><input class="visible-lang" value="' . $page->getMeta("id") . '|' . $version['id'] .'" id="visible-' . $version['id'] . '" style="" ' . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" />' : '');
+                else 
+                    $devant .= '<label style="color:red;text-shadow:none;margin-left:10px;"">Non traduit</label>';
+                    $devant .= '</a></div>';
 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                        . '"><div class="clearin"></div>'

@@ -326,7 +326,23 @@ $(function(){
             var tthis = $(this);
             
             tthis.autocomplete({
-                source:'media/autocomplete.html',
+                source: function(request, response) {
+                    var data = {
+                        term : request.term,
+                        id_gab_page : $('[name=id_gab_page]').val()
+                    }
+                    
+                    if (tthis.siblings('.extensions').length > 0)
+                        data.extensions = tthis.siblings('.extensions').val();
+                    
+                    $.getJSON(
+                        'media/autocomplete.html',
+                        data,
+                        function( data, status, xhr ) {
+                            response( data );
+                        }
+                    );
+                },
                 minLength: 0,
                 select: function(event, ui) {
                     if($(this).siblings('.previsu').length > 0)
@@ -335,20 +351,20 @@ $(function(){
                     if (typeof ui.item.file_id != "undefined") $(this).addClass('atelecharger-' + ui.item.file_id)
                     $(this).autocomplete("close");
 					
-                    return false
+                    return false;
                 }
             }).focus(function(){
                 if (this.value == "")
                 {
                     clearTimeout(timer);
                     timer = setTimeout(function(){
-                        if (tthis.val() == "")
-                        {
+                        if (tthis.val() == "") {
                             tthis.autocomplete('search', '');
                         }
                     },220);
                 }
-            })
+            });
+            
             tthis.data("autocomplete")._renderItem = function(ul, item){
                 var ext = item.value.split('.').pop();
                 var prev = (extensionsImage.indexOf(ext)!=-1) ? '<img src="'+item.vignette+'" height="40" />' : '';
@@ -549,7 +565,7 @@ $(function(){
                     if (extensionsImage.indexOf(ext) != -1)
                         ligne += '<img class="vignette" src="' + response.minipath + '" alt="' + ext + '" /></a></td>';
                     else
-                        ligne += '<img class="vignette" src="styles/admin/images/' + ext + '.png" alt="' + ext + '" /></a></td>';
+                        ligne += '<img class="vignette" src="img/back/' + ext + '.png" alt="' + ext + '" /></a></td>';
 
                     ligne += '<td>' + response.size + '</td>';
                     ligne += '<td>' + response.date.substr(0, 10) + '<br />' + response.date.substr(11) + '</td>';
@@ -575,11 +591,11 @@ $(function(){
     
     $('#pickfiles').live('click', function(){
         return false;
-    })
+    });
 
     var uploader_popup = $('<div>', {
         id : 'uploader_popup'
-    }).load('media/popuplistefichiers.html', function(){
+    }).load('media/popuplistefichiers.html?id_gab_page=' + $('[name=id_gab_page]').val(), function(){
         $(this).dialog({
             autoOpen : false
         });
@@ -594,52 +610,6 @@ $(function(){
         });
     });
         
-        
-    //	$('.jointure-autocomplete').each(function(){
-    //        var id_gabarit = $(this).attr('id').split('_').pop();
-    //        var $content = $(this).siblings('.jointure-autocomplete-content');
-    //        
-    //        $(this).autocomplete({
-    //            source : function(request, response) {
-    //                var deja = [];      
-    //                $('[name="jointure[' + id_gabarit + '][]"]', $content).each(function(){
-    //                    deja.push($(this).val());
-    //                });
-    //
-    //                $.getJSON('page/autocomplete.html', {term : request.term, id_gabarit : id_gabarit, deja : deja}, response);
-    //            },
-    //            minLength : 0,
-    //            select: function(event, ui) {
-    //                console.log(parseInt(ui.item.value));
-    //                
-    //                var content = '<div class="sort-elmt ligne" id="gab_page_' + ui.item.value + '">'
-    //                            + '<input type="hidden" value="' + ui.item.value + '" name="jointure[' + id_gabarit + '][]">'
-    //                            + '<a style="float: right;" class="button bleu delBloc" href="#"><span class="bleu"><img src="img/back/supprimer.png" alt="Supprimer"></span></a>'
-    //                            + '<a class="button bleu sort-move" href="#"><span class="bleu"><img src="img/back/deplacer.png" alt="déplacer"></span></a>'
-    //                            + '<a class="button bleu"><span class="bleu" style="padding-top:8px;"><input type="checkbox"' + (parseInt(ui.item.visible) > 0 ? ' checked="checked"' : '') + ' class="rendrevisible"></span></a>'
-    //                            + '<a target="_blank" style="margin-left:20px;" href="page/display.html?id_gab_page='
-    //                            + ui.item.value
-    //                            + '"><b>'
-    //                            + ui.item.label
-    //                            + '</b></a></div>';
-    //                        
-    ////                    '<a class="jointure-elmt" href="#"><input type="hidden" value="' + ui.item.value + '" name="jointure[' + id_gabarit + '][]"><span>' + ui.item.label + '</span><span class="ui-icon ui-icon-closethick">close</span></a>';          
-    //                
-    //                $content.append(content);
-    //                
-    //                if ($('.sort-elmt', $content).length > 1)
-    //                    $('.sort-elmt .delBloc', $content).removeClass('translucide');
-    //                
-    //                $content.sortable('refresh');
-    //                $(this).val('');
-    //
-    //                return false;
-    //            }
-    //        }).focusin(function(){
-    //            $(this).keyup()
-    //        });
-    //    });
-    
     $('.rendrevisible').live('click', function(){
         var $this = $(this);
         var id_gab_page = parseInt($this.parents('.sort-elmt').first().attr('id').split('_').pop());
@@ -733,7 +703,7 @@ $(function(){
             var name = id[0];
             var contentRule = [];
             var content = '<img style="float:left;" src="img/back/help.gif" alt="Aide" /><div style="margin-left:35px;margin-top:7px;">';
-            if($(this).hasClass("form-oblig"))
+            if($(this).siblings('textarea').hasClass("form-oblig"))
                 contentRule.push('<span style="color:red">Obligatoire</span>');
             else {
                 contentRule.push('<span style="color:#1292CC">Facultatif</span>');

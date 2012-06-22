@@ -169,7 +169,7 @@ $(function () {
 			if (extensionsImage.indexOf(ext) != -1)
 				ligne += '<img class="vignette" src="' + response.minipath + '" alt="' + ext + '" /></a></td>';
 			else
-				ligne += '<img class="vignette" src="styles/admin/images/' + ext + '.png" alt="' + ext + '" /></a></td>';
+				ligne += '<img class="vignette" src="img/back/' + ext + '.png" alt="' + ext + '" /></a></td>';
 			
             ligne += '<td>' + response.size + '</td>';
             ligne += '<td>' + response.width + '</td>';
