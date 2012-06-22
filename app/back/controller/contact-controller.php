@@ -7,7 +7,7 @@ class ContactController extends MainController
 
     private $_cache = null;
     private $_config = null;
-
+    
     /**
      * Toujours executé avant l'action.
      *
