@@ -11,7 +11,7 @@ class TextField extends GabaritField
 {
     public function start() {
         parent::start();
-        if($this->params["LINK"])
+        if(isset($this->params["LINK"]) && $this->params["LINK"])
             $this->classes .= " autocomplete-link";
     }
 }

@@ -93,17 +93,30 @@ class fileManager extends manager {
         return $files;
     }
     
-    public function getSearch($term, $id_gab_page = 0) {
+    public function getSearch($term, $id_gab_page = 0, $extensions = FALSE) {
         $query = "SELECT * FROM `media_fichier` WHERE `suppr` = 0";
         
         if ($id_gab_page)
             $query .= " AND `id_gab_page` = $id_gab_page";
         
-        $term = "%" . array_pop(explode("/", $term)) . "%";
+//        $term = "%" . array_pop(explode("/", $term)) . "%";
+        $term = "%" . $term . "%";
         $query .= " AND `rewriting` LIKE " . $this->_db->quote($term);
-        
+                
         $files = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         
+        if (is_array($extensions)) {
+            $files2 = array();
+            foreach ($files as $file) {
+                $ext = pathinfo($file['rewriting'], PATHINFO_EXTENSION);
+                if (in_array($ext, $extensions)) {
+                    $files2[] = $file;
+                }
+            }
+            
+            return $files2;
+        }
+
         return $files;
     }
     
