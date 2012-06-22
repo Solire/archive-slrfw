@@ -86,10 +86,30 @@ class Tools {
     }
 
     //ENVOI DE MAIL EN UTF8
-    static function mail_utf8($to, $subject = '(No subject)', $message = '', $header = '')
-    {
+    static function mail_utf8($to, $subject = '(No subject)', $message = '', $header = '') {
         $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/plain; charset="UTF-8"' . "\r\n";
         mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $message, $header_ . $header);
+    }
+
+    static function RelativeTime($timestamp) {
+        $difference = time() - $timestamp;
+        $periods = array("seconde", "minute", "heure", "jour", "semaine",
+            "mois", "année", "décennie");
+        $lengths = array("60", "60", "24", "7", "4.35", "12", "10");
+
+        if ($difference > 0) { // this was in the past
+            $ending = "il y a";
+        } else { // this was in the future
+            $difference = -$difference;
+            $ending = "dans";
+        }
+        for ($j = 0; $difference >= $lengths[$j]; $j++)
+            $difference /= $lengths[$j];
+        $difference = round($difference);
+        if ($difference != 1)
+            $periods[$j].= "s";
+        $text = "$ending $difference $periods[$j]";
+        return $text;
     }
 
     //RENVOI UNE CHAINE DE N (=$car) CARACTERES ALEATOIREMENT

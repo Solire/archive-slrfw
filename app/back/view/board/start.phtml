@@ -1,0 +1,76 @@
+<form>
+    <select name="id_version" method="get" onchange="$(this).parent().submit()">
+        <?php
+        foreach ($this->versions as $version) {
+            ?>
+            <option <?php echo BACK_ID_VERSION == $version['id'] ? 'selected="selected"' : ''; ?> value="<?php echo $version['id'] ?>"><?php echo $version['nom'] ?></option>
+            <?php
+        }
+        ?>
+
+    </select>
+</form>
+
+
+<h1>Tableau de bord</h1>
+
+
+
+<div id="columns">
+    <ul id="column1" class="column">
+        <li class="widget color-green" id="intro">
+            <div class="widget-head">
+                <h3>Introduction</h3>
+            </div>
+            <div class="widget-content">
+                <p>
+                    Le tableau de bord vous permet de visualiser les dernières pages éditées et créées par type de page. Vous pouvez réorganiser chaque bloc du tableau de bord, l'état de celui-ci sera sauvegardé pour votre utilisateur.
+                </p>
+            </div>
+        </li>
+
+    </ul>
+    <?php foreach ($this->pages as $idGabarit => $pagesGabarit) {
+        ?>
+        <ul id="column1" class="column">
+
+            <li class="widget <?php echo $pagesGabarit["color"] ?>" id="gabarit-<?php echo $idGabarit ?>">
+                <div class="widget-head">
+                    <h3><?php echo $pagesGabarit["gabarit"]["label"] ?></h3>
+                </div>
+                <div class="widget-content">
+                    <h4>Dernières pages créées</h4>
+                    <ul>
+                        <?php foreach ($pagesGabarit["pages"] as $page) {
+                            ?>
+                        <li>
+                            <a href="page/display.html?id_gab_page=<?php echo $page->getMeta("id") ?>"><?php echo $page->getMeta("titre") ?></a><?php echo $page->getMeta("rewriting") == "" ? ' <span style="color:red">Non traduit</span>' : '' ?> 
+                            <div class="board-human-time"><?php echo Tools::RelativeTime(strtotime($page->getMeta("date_crea"))); ?></div>
+                        </li>
+                            <?php
+                        }
+                        ?>
+                    </ul>
+                    <hr />
+                    <h4>Dernières pages éditées</h4>
+                    <ul>
+                        <?php foreach ($pagesGabarit["pages_mod"] as $page) {
+                            ?>
+                            <li>
+                                <a href="page/display.html?id_gab_page=<?php echo $page->getMeta("id") ?>"><?php echo $page->getMeta("titre") ?></a><?php echo $page->getMeta("rewriting") == "" ? ' <span style="color:red">Non traduit</span>' : '' ?>
+                                <div class="board-human-time"><?php echo Tools::RelativeTime(strtotime($page->getMeta("date_modif"))); ?></div>
+                            </li>
+                            <?php
+                        }
+                        ?>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        <?php
+    }
+    ?>
+
+
+
+</div>
