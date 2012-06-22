@@ -422,8 +422,8 @@ $(function(){
             i = $('.openlang').index($(this));
 			
             if($('.langue').eq(i).is(':hidden')) {
-                $('.openlang.active').removeClass('active').addClass('translucide');
-                $(this).removeClass('translucide').addClass('active');
+                $('.openlang').parent(".active").removeClass('active').addClass('translucide');
+                $(this).parent("a").removeClass('translucide').addClass('active');
 				
                 $('.langue:visible').slideUp(500);
                 $('.langue').eq(i).slideDown(500);
@@ -694,11 +694,22 @@ $(function(){
         $('.form-controle:not([name="titre_rew"])', formu).livequery(function() {
             var id = $(this).attr("id").split("_")
             var name = id[0];
-
-            if($('#aide-' + name, formu).length == 0)
-                return true;
-            var $this = $(this)
+            var contentRule = [];
+            var content = '<img style="float:left;" src="img/back/help.gif" alt="Aide" /><div style="margin-left:35px;margin-top:7px;">';
+            if($(this).hasClass("form-oblig"))
+                contentRule.push('<span style="color:red">Obligatoire</span>');
+            else {
+                contentRule.push('<span style="color:#1292CC">Facultatif</span>');
+            }
             
+            var $this = $(this)
+            if($('#aide-' + name, formu).length != 0)
+                content += $('#aide-' + name, formu).html() + '<br /><hr style="color: gray;background-color: gray;height: 1px;border: 0;" />'
+            
+                
+            content += '<i>' + contentRule.join(' - ') + '</i>';
+            
+            content += '</div>';
             
             $this.attr('autocomplete','off').qtip({
                 position: {
@@ -706,7 +717,7 @@ $(function(){
                     at: 'center right' // at the bottom 
                 },
                 content: {
-                    text:  $('#aide-' + name, formu).clone()
+                    text:  content
                 },
                 style: {
                     classes: 'ui-tooltip-shadow ui-tooltip-bootstrap'
@@ -720,10 +731,23 @@ $(function(){
         $(".mceEditor").live("mouseover", function() {
             var id = $(this).attr("id").split("_")
             var name = id[0];
-
-            if($('#aide-' + name, formu).length == 0)
-                return true;
+            var contentRule = [];
+            var content = '<img style="float:left;" src="img/back/help.gif" alt="Aide" /><div style="margin-left:35px;margin-top:7px;">';
+            if($(this).hasClass("form-oblig"))
+                contentRule.push('<span style="color:red">Obligatoire</span>');
+            else {
+                contentRule.push('<span style="color:#1292CC">Facultatif</span>');
+            }
+            
+            
             var $this = $(this)
+            if($('#aide-' + name, formu).length != 0)
+                content += $('#aide-' + name, formu).html() + '<br /><hr style="color: gray;background-color: gray;height: 1px;border: 0;" />'
+            
+                
+            content += '<i>' + contentRule.join(' - ') + '</i>';
+            
+            content += '</div>';
             
             $this.attr('autocomplete','off').qtip({
                 
@@ -732,7 +756,7 @@ $(function(){
                     at: 'center right' // at the bottom 
                 },
                 content: {
-                    text:  $('#aide-' + name, formu).clone()
+                    text:  content
                 },
                 style: {
                     classes: 'ui-tooltip-shadow ui-tooltip-bootstrap'
@@ -742,12 +766,11 @@ $(function(){
             $this.qtip('show')
         })
         
-         $(".mceEditor").live("mouseout", function() {
+        $(".mceEditor").live("mouseout", function() {
             var id = $(this).attr("id").split("_")
             var name = id[0];
-
-            if($('#aide-' + name, formu).length == 0)
-                return true;
+            
+            
             var $this = $(this)
             
             
@@ -756,5 +779,28 @@ $(function(){
         })
         
     });
+    
+    
+    $(".visible-lang").click(function() {
+        var $this = $(this);
+        var value = $(this).val().split("|")
+        var id_gab_page = parseInt(value[0]);
+        var id_version = parseInt(value[1]);
+        var checked = $this.is(':checked');
+		
+        $.post(
+            'page/visible.html',
+            {
+                id_gab_page : id_gab_page,
+                id_version : id_version,
+                visible     : checked ? 1 : 0
+            },
+            function(data){                
+                if(data.status != 'success')
+                    $this.attr('checked', !checked);
+            },
+            'json'
+            );
+    })
 
 });

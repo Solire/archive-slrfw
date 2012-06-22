@@ -14,6 +14,18 @@ class gabarit
 
     private $_name;
     
+    private $_main;
+    
+    private $_creable;
+    
+    private $_deletable;
+    
+    private $_sortable;
+    
+    private $_make_hidden;
+    
+    private $_editable;
+    
     private $_meta;
     
     private $_label;
@@ -31,10 +43,16 @@ class gabarit
     
     private $_parents = array();
     
-    public function __construct($id = 0, $id_parent = 0, $name = '', $label = '', $meta = TRUE) {
+    public function __construct($id = 0, $id_parent = 0, $name = '', $label = '', $main = TRUE, $creable = TRUE, $deletable = TRUE, $sortable = TRUE, $make_hidden = TRUE, $editable = TRUE, $meta = TRUE) {
         $this->_id = $id;
         $this->_id_parent = $id_parent;
         $this->_name = $name;
+        $this->_main = $main;
+        $this->_creable = $creable;
+        $this->_deletable = $deletable;
+        $this->_sortable = $sortable;
+        $this->_make_hidden = $make_hidden;
+        $this->_editable = $editable;
         $this->_meta = $meta;
         $this->_label = $label;
     }
@@ -85,6 +103,30 @@ class gabarit
     
     public function getName() {
         return $this->_name;
+    }
+    
+    public function getMain() {
+        return $this->_main;
+    }
+    
+    public function getCreable() {
+        return $this->_creable;
+    }
+    
+    public function getDeletable() {
+        return $this->_deletable;
+    }
+    
+    public function getSortable() {
+        return $this->_sortable;
+    }
+    
+    public function getMake_hidden() {
+        return $this->_make_hidden;
+    }
+    
+    public function getEditable() {
+        return $this->_editable;
     }
     
     public function getMeta() {
