@@ -873,4 +873,316 @@ class gabaritManager extends manager
         return TRUE;
     }
 
+    /**
+     * <p>Sauve une page et ses blocs dynamique.</p>
+     * @param array $donnees
+     * @return gabaritPage 
+     */
+    public function previsu($donnees)
+    {
+        $this->_versions = $this->_db->query("SELECT `id` FROM `version`")->fetchAll(PDO::FETCH_COLUMN);
+
+        $updating = ($donnees['id_gab_page'] > 0);
+
+        $version = isset($donnees['id_version']) ? $donnees['id_version'] : 1;
+
+        if ($updating)
+            $page = $this->getPage($version, $donnees['id_gab_page'], 0);
+        else
+            $page = $this->getPage($version, 0, $donnees['id_gabarit']);
+
+        $id_gab_page = $this->_previsuMeta($page, $donnees);
+
+        if (!$id_gab_page)
+            return NULL;
+
+        $page = $this->getPage($version, $id_gab_page, 0);
+
+        $this->_previsuPage($page, $donnees);
+
+        $blocs = $page->getBlocs();
+        foreach ($blocs as $bloc) {
+            $this->_previsuBloc($bloc, $id_gab_page, $page->getMeta("id_version"), $donnees);
+        }
+
+        $page = $this->getPage($version, $page->getMeta("id"), 0);
+        return $page;
+    }
+
+    /**
+     *
+     * @param gabaritPage $page
+     * @param array $donnees
+     * @return type 
+     */
+    private function _previsuMeta($page, $donnees)
+    {
+        $updating = $donnees['id_gab_page'] > 0;
+
+        // Insertion dans la table `gab_page`.
+        if ($updating) {
+//            $titre_rew = $page->getVersion("exotique") > 0 ? $donnees['titre_rew'] : $donnees['titre'];
+//            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
+
+//            $query = "UPDATE `gab_page` SET"
+//                    . " `titre`      = " . $this->_db->quote($donnees['titre']) . ","
+//                    . ($page->getVersion("exotique") > 0 ? " `titre_rew`      = " . $this->_db->quote($donnees['titre_rew']) . "," : "")
+//                    . " `bal_title`  = " . $this->_db->quote($donnees['bal_title'] ? $donnees['bal_title'] : $donnees['titre']) . ","
+//                    . " `bal_key`    = " . $this->_db->quote($donnees['bal_key']) . ","
+//                    . " `bal_descr`	= " . $this->_db->quote($donnees['bal_descr']) . ","
+//                    . " `importance`	= " . $donnees['importance'] . ","
+//                    . " `date_modif`	= NOW(),"
+//                    . " `no_index`   = " . (isset($donnees['no_index']) && $page->getMeta("id") != 1 ? $donnees['no_index'] : 0)
+//                    . ", `rewriting`		= " . $this->_db->quote($rewriting)
+//                    . " WHERE `id` = " . $page->getMeta("id")
+//                    . " AND `id_version` = " . $page->getMeta("id_version");
+
+            $meta = array(
+                "titre"             => $donnees['titre'],
+                "bal_title"         => $donnees['bal_title'],
+                "bal_key"           => $donnees['bal_key'],
+                "bal_descr"         => $donnees['bal_descr'],
+                "id_version"        => $page->getMeta("id_version"),
+                "id"                => $page->getMeta("id"),
+            );
+            
+            $meta = array_merge($page->getMeta(), $meta);
+            
+//            if (!$this->_db->query($query))
+//                return FALSE;
+
+//            return $page->getMeta("id");
+        }
+        else {
+            $id_parent = isset($donnees['id_parent']) && $donnees['id_parent'] ? $donnees['id_parent'] : 0;
+
+//            $rewriting = $this->_db->rewrit($donnees['titre'], 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
+//
+//            $ordre = $this->_db->query("SELECT MAX(`ordre`) FROM `gab_page` WHERE id_parent = $id_parent")->fetchColumn();
+//            $ordre = $ordre ? $ordre + 1 : 1;
+
+//            $id_gab_page = 0;
+//            foreach ($this->_versions as $version) {
+//                $query = "INSERT INTO `gab_page` SET "
+//                        . "`id` = "             . ($id_gab_page > 0 ? $id_gab_page : "NULL") . ","
+//                        . "`id_gabarit` = "     . $page->getGabarit()->getId() . ","
+//                        . "`titre` = "          . $this->_db->quote($donnees['titre']) . ","
+//                        . "`rewriting` = "      . ($id_gab_page > 0 || $version['id'] > 1 ? "''" : $this->_db->quote($rewriting)) . ","
+//                        . "`bal_title` = "      . $this->_db->quote($donnees['bal_title'] ? $donnees['bal_title'] : $donnees['titre']) . ","
+//                        . "`bal_key` = "        . $this->_db->quote($donnees['bal_key']) . ","
+//                        . "`bal_descr` = "      . $this->_db->quote($donnees['bal_descr']) . ","
+//                        . "`no_index` = "       . (isset($donnees['no_index']) ? $donnees['no_index'] : 0) . ","
+//                        . "`importance` = "     . $donnees['importance'] . ","
+//                        . "`id_parent` = "      . $id_parent . ", "
+//                        . "`ordre` = "          . $ordre . ","
+//                        . "`date_crea` = NOW(),"
+//                        . "`date_modif` = NOW(),"
+//                        . "`visible` = 0,"
+//                        . "`id_version` = "     . $version['id'];
+
+                $meta = array(
+                    "id"                => 0,
+                    "id_parent"         => $id_parent,
+                    "id_version"        => $page->getMeta("id_version"),
+                    "id_gabarit"        => $page->getGabarit()->getId(),
+                    "titre"             => $donnees['titre'],
+                    "bal_title"         => $donnees['bal_title'],
+                    "bal_key"           => $donnees['bal_key'],
+                    "bal_descr"         => $donnees['bal_descr'],
+                );
+
+//                if (!$this->_db->exec($query))
+//                    return FALSE;
+//
+//                if ($id_gab_page == 0)
+//                    $id_gab_page = $this->_db->lastInsertId();
+//            }
+
+//            return $id_gab_page;
+        }
+        
+        $page->setMeta($meta);
+    }
+
+    /**
+     *
+     * @param gabaritPage $page
+     * @param array $donnees
+     * @return type 
+     */
+    private function _previsuPage($page, $donnees)
+    {
+//        $updating = $donnees['id_gab_page'] > 0;
+
+        $gabarit        = $page->getGabarit();
+//        $table          = $gabarit->getTable();
+
+//        $id_gab_page    = $page->getMeta("id");
+//        $id_version     = $page->getMeta("id_version");
+//
+        $allchamps      = $gabarit->getChamps();
+//        $champsExiste   = count($allchamps);
+
+//        if ($updating) {
+//            $query = "";
+//            $where = "WHERE `id_version` = $id_version AND `id_gab_page` = $id_gab_page";
+//
+//            $queryT = "";
+//            $whereT = "WHERE `id_gab_page` = $id_gab_page";
+//        } else {
+//            $query = "INSERT INTO `$table` SET `id_gab_page` = $id_gab_page,";
+//        }
+
+        $values = array();
+        
+        foreach ($allchamps as $name_group => $champs) {
+            foreach ($champs as $champ) {
+                if ($champ["visible"] == 0)
+                    continue;
+                
+                $value = $donnees['champ' . $champ['id']][0];
+                
+                if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA')
+                    $value = str_replace('"', '&quot;', $value);
+
+                if ($champ['typedonnee'] == 'DATE')
+                    $value = Tools::formate_date_nombre($value, "/", "-");
+
+//                if ($champ['trad'] == 0 && $updating)
+//                    $queryT .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
+
+//                $query .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
+                
+                $values[$champ['name']] = $value;
+            }
+        }
+
+//        if ($updating) {
+//            if ($champsExiste) {
+//                if ($query != "")
+//                    $queryTmp = "UPDATE `$table` SET " . substr($query, 0, -1) . " " . $where;
+//                if (!$this->_db->query($queryTmp)) {
+//                    echo "echec de l'update d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
+//                    return FALSE;
+//                }
+//
+//                if ($queryT != "")
+//                    $queryTmp = "UPDATE `$table` SET " . substr($query, 0, -1) . " " . $whereT;
+//
+//                if (!$this->_db->query($queryTmp)) {
+//                    echo "echec de l'update d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
+//                    return FALSE;
+//                }
+//            }
+//        } else {
+//            foreach ($this->_versions as $id_version) {
+//                $queryTmp = $query . "`id_version` = $id_version";
+//
+//                if (!$this->_db->exec($queryTmp)) {
+//                    echo "echec de l'insertion d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
+//                    return FALSE;
+//                }
+//            }
+//        }
+
+//        return TRUE;
+        
+        
+        $page->setValues($values);
+    }
+
+    /**
+     *
+     * @param gabaritBloc $bloc
+     * @param int $id_gab_page
+     * @param int $id_version
+     * @param array $donnees
+     * @return boolean 
+     */
+    private function _previsuBloc($bloc, $id_gab_page, $id_version, &$donnees)
+    {
+        $gabarit = $bloc->getGabarit();
+//        $table = $gabarit->getTable();
+        $champs = $gabarit->getChamps();
+
+        $values = array();
+        
+//        $ordre = 1;
+        foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
+            $value = array();
+            
+//            $updating = ($id_bloc > 0);
+//            $visible = array_shift($donnees['visible']);
+//            if ($updating) {
+//                $query = "UPDATE `$table` SET"
+//                        . " `ordre` = $ordre,"
+//                        . " `visible` = $visible,";
+//            } else {
+//                $query = "INSERT INTO `$table` SET"
+//                        . " `id_gab_page` = $id_gab_page,"
+//                        . " `ordre`       = $ordre,"
+//                ;
+//            }
+
+            foreach ($champs as $champ) {
+                if ($champ["visible"] == 0)
+                    continue;
+                $value = array_shift($donnees['champ' . $champ['id']]);
+
+                if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA')
+                    $value = str_replace('"', '&quot;', $value);
+
+                if ($champ['typedonnee'] == 'DATE')
+                    $value = Tools::formate_date_nombre($value, "/", "-");
+
+                $value[$champ['name']] = $value;
+//                $query .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
+            }
+
+            
+            $values[] = $value;
+
+//            if ($updating) {
+//                $queryTmp = substr($query, 0, -1) . " WHERE `id_version` = $id_version AND `id` = $id_bloc";
+//
+//                if (!$this->_db->query($queryTmp)) {
+//                    echo "Echec de l'update d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
+//                    return FALSE;
+//                }
+//            } else {
+//                $id_bloc = 0;
+//                foreach ($this->_versions as $id_version) {
+//                    $queryTmp = $query . " `id_version`  = $id_version";
+//
+//                    if ($id_bloc)
+//                        $queryTmp .= ", `id` = $id_bloc,  `visible`     = 0";
+//                    else {
+//                        $queryTmp .= ", `id` = $id_bloc,  `visible`     = $visible";
+//                    }
+//
+//                    if (!$this->_db->exec($queryTmp)) {
+//                        echo "Echec de l'insertion d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
+//                        return FALSE;
+//                    }
+//
+//                    $id_bloc = $this->_db->lastInsertId();
+//                }
+//            }
+
+//            $ids_blocs[] = $id_bloc;
+//            $ordre++;
+        }
+
+//        $query = "UPDATE `$table` SET `suppr` = NOW()"
+//                . " WHERE `suppr` = 0 AND `id_gab_page` = $id_gab_page"// AND `id_version` = $id_version"
+//                . " AND `id` NOT IN (" . implode(",", $ids_blocs) . ")";
+
+//        $this->_db->query($query);
+        
+        
+        $bloc->setValues($values);
+        
+        return TRUE;
+    }
+
 }

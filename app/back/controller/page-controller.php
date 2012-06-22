@@ -195,7 +195,7 @@ class PageController extends MainController
             $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $this->_page->getGabarit()->getMeta());
             $this->_form = $form;        
         }
-        
+                
         $this->_view->page = $this->_page;
         $this->_view->form = $this->_form;
     }
