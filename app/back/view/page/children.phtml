@@ -11,9 +11,15 @@
     <div class="line cat-modif">
 
         <div style="float:left;">
-            <a title="Déplacer '<?php echo $page->getMeta('titre'); ?>'" class="button bleu sort-move" href="#"><span class="bleu"><img alt="Déplacer" src="img/back/deplacer.png" /></span></a>
-            <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
-            <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["sortable"]) { ?>
+                <a title="Déplacer '<?php echo $page->getMeta('titre'); ?>'" class="button bleu sort-move" href="#"><span class="bleu"><img alt="Déplacer" src="img/back/deplacer.png" /></span></a>
+            <?php } ?>
+            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["editable"]) { ?>
+                <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
+            <?php } ?>
+            <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["make_hidden"] || $page->getMeta('visible') == 0) { ?>
+                <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?><?php echo $page->getMeta('rewriting') ==  "" ? ' disabled="disabled"' : ''; ?> /></span></a>
+            <?php } ?>
         </div>
 
         <div style="float:right;">

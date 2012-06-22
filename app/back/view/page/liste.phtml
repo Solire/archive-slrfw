@@ -100,8 +100,8 @@ foreach ($this->pagesGroup as $keyGroup => $group) {
                                     <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["editable"]) { ?>
                                         <a title="Modifier '<?php echo $page->getMeta('titre'); ?>'" class="button bleu" href="page/display.html?id_gab_page=<?php echo $page->getMeta('id'); ?>"><span class="bleu"><img alt="Modifier" src="img/back/voir.png" /></span></a>
                                     <?php } ?>
-                                    <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["make_hidden"]) { ?>
-                                        <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+                                    <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["make_hidden"] || $page->getMeta('visible') == 0) { ?>
+                                        <a title="Rendre visible '<?php echo $page->getMeta('titre'); ?>'" class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?><?php echo $page->getMeta('rewriting') ==  "" ? ' disabled="disabled"' : ''; ?> /></span></a>
                                     <?php } ?>
                                 </div>
                                 <?php if ($this->utilisateur->get("niveau") == "solire" || $this->gabarits[$page->getMeta("id_gabarit")]["deletable"]) { ?>
