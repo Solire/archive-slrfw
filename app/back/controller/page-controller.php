@@ -132,12 +132,14 @@ class PageController extends MainController
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
         $this->_javascript->addLibrary("back/formgabarit.js");
         $this->_javascript->addLibrary("back/jquery/jquery.tipsy.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.qtip.min.js");
         $this->_javascript->addLibrary("back/affichegabarit.js");
         
         $this->_javascript->addLibrary("back/autocomplete_multi/jquery.tokeninput.js");
         $this->_javascript->addLibrary("back/autocomplete_multi.js");
         
         $this->_css->addLibrary("back/tipsy.css");
+        $this->_css->addLibrary("back/jquery.qtip.min.css");
         $this->_css->addLibrary("back/autocomplete_multi/token-input.css");
         $this->_css->addLibrary("back/autocomplete_multi/token-input-facebook.css");
         

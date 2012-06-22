@@ -681,5 +681,80 @@ $(function(){
             });
         });
     } 
+    
+    
+    /*
+ * Message daide
+ */
+    $('form').each(function(){
+            
+        var formu = $(this);
+        
+        
+        $('.form-controle:not([name="titre_rew"])', formu).livequery(function() {
+            var id = $(this).attr("id").split("_")
+            var name = id[0];
+
+            if($('#aide-' + name, formu).length == 0)
+                return true;
+            var $this = $(this)
+            
+            
+            $this.attr('autocomplete','off').qtip({
+                position: {
+                    my: 'left center',  // Position my top left...
+                    at: 'center right' // at the bottom 
+                },
+                content: {
+                    text:  $('#aide-' + name, formu).clone()
+                },
+                style: {
+                    classes: 'ui-tooltip-shadow ui-tooltip-bootstrap'
+                }
+                
+            });
+            
+ 
+        })
+        
+        $(".mceEditor").live("mouseover", function() {
+            var id = $(this).attr("id").split("_")
+            var name = id[0];
+
+            if($('#aide-' + name, formu).length == 0)
+                return true;
+            var $this = $(this)
+            
+            $this.attr('autocomplete','off').qtip({
+                
+                position: {
+                    my: 'left center',  // Position my top left...
+                    at: 'center right' // at the bottom 
+                },
+                content: {
+                    text:  $('#aide-' + name, formu).clone()
+                },
+                style: {
+                    classes: 'ui-tooltip-shadow ui-tooltip-bootstrap'
+                }
+                
+            });
+            $this.qtip('show')
+        })
+        
+         $(".mceEditor").live("mouseout", function() {
+            var id = $(this).attr("id").split("_")
+            var name = id[0];
+
+            if($('#aide-' + name, formu).length == 0)
+                return true;
+            var $this = $(this)
+            
+            
+            
+            $this.qtip('hide')
+        })
+        
+    });
 
 });
