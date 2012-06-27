@@ -97,7 +97,7 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
                                     <?php
                                     if ($page->getMeta("rewriting") != "") {
                                         if ($page->getGabarit()->getMake_hidden()
-                                                || $this->_utilisateur->get("niveau") == "solire"
+                                                || $this->utilisateur->get("niveau") == "solire"
                                                 || !$page->getMeta("visible")
                                         ) {
                                             ?>
