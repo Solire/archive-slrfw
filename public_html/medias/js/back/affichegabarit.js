@@ -438,8 +438,8 @@ $(function(){
             i = $('.openlang').index($(this));
 			
             if($('.langue').eq(i).is(':hidden')) {
-                $('.openlang').parent(".active").removeClass('active').addClass('translucide');
-                $(this).parent("a").removeClass('translucide').addClass('active');
+                $('.openlang').removeClass('active').addClass('translucide');
+                $(this).removeClass('translucide').addClass('active');
 				
                 $('.langue:visible').slideUp(500);
                 $('.langue').eq(i).slideDown(500);
@@ -471,7 +471,7 @@ $(function(){
         browse_button : 'pickfiles',
         max_file_size : '1000mb',
         chunk_size : '7mb',
-        url : basehref + 'media/upload.html',
+        url : basehref + 'media/upload.html?id_gab_page=' + $('[name=id_gab_page]').val(),
         flash_swf_url : basehref + 'js/admin/plupload/plupload.flash.swf',
         silverlight_xap_url : basehref + 'js/admin/plupload/plupload.silverlight.xap',
         filters : [
@@ -674,12 +674,11 @@ $(function(){
             
             var $this = $(this)
             if($('#aide-' + name, formu).length != 0)
-                content += $('#aide-' + name, formu).html() + '<br /><hr style="color: gray;background-color: gray;height: 1px;border: 0;" />'
-            
-                
-            content += '<i>' + contentRule.join(' - ') + '</i>';
-            
-            content += '</div>';
+                content += $('#aide-' + name, formu).html()
+            else {
+                return false
+            }
+              
             
             $this.attr('autocomplete','off').qtip({
                 position: {
@@ -712,12 +711,13 @@ $(function(){
             
             var $this = $(this)
             if($('#aide-' + name, formu).length != 0)
-                content += $('#aide-' + name, formu).html() + '<br /><hr style="color: gray;background-color: gray;height: 1px;border: 0;" />'
+                content += $('#aide-' + name, formu).html()
+            else {
+                return false
+            }
             
                 
-            content += '<i>' + contentRule.join(' - ') + '</i>';
-            
-            content += '</div>';
+          
             
             $this.attr('autocomplete','off').qtip({
                 
@@ -751,26 +751,6 @@ $(function(){
     });
     
     
-    $(".visible-lang").click(function() {
-        var $this = $(this);
-        var value = $(this).val().split("|")
-        var id_gab_page = parseInt(value[0]);
-        var id_version = parseInt(value[1]);
-        var checked = $this.is(':checked');
-		
-        $.post(
-            'page/visible.html',
-            {
-                id_gab_page : id_gab_page,
-                id_version : id_version,
-                visible     : checked ? 1 : 0
-            },
-            function(data){                
-                if(data.status != 'success')
-                    $this.attr('checked', !checked);
-            },
-            'json'
-            );
-    })
+    
 
 });

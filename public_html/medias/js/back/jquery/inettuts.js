@@ -110,23 +110,27 @@ var iNettuts = {
                     /* STOP event bubbling */
                     e.stopPropagation();    
                 }).toggle(function () {
-                    
-                    
+                    if($(this).parents(settings.widgetSelector).hasClass("collapsed")) {
+                        $(this).click();
+                        return false;
+                    }
+                    $(this).parents(settings.widgetSelector).toggleClass('collapsed').find(".widget-content").css({"display": "block"})
+                        /* Save prefs to cookie: */
+                        iNettuts.savePreferences();
                     $(this)
                     .parents(settings.widgetSelector)
                     .find(settings.contentSelector).slideUp(400, function() {
-                        $(this).parents(settings.widgetSelector).toggleClass('collapsed');
-                        /* Save prefs to cookie: */
-                        iNettuts.savePreferences();
+                        
                     });
                     return false;
                 },function () {
+                    $(this).parents(settings.widgetSelector).toggleClass('collapsed').find(".widget-content").css({"display": "none"})
+                        /* Save prefs to cookie: */
+                        iNettuts.savePreferences();
                     $(this)
                     .parents(settings.widgetSelector)
                     .find(settings.contentSelector).slideDown(400, function() {
-                        $(this).parents(settings.widgetSelector).toggleClass('collapsed');
-                        /* Save prefs to cookie: */
-                        iNettuts.savePreferences();
+                        
                     });
                     return false;
                 }).prependTo($(settings.handleSelector,this));
@@ -280,15 +284,16 @@ var iNettuts = {
                 if(!this.length) {
                     return;
                 }
-                var thisWidgetData = this.split(','),
-                clonedWidget = $('#' + thisWidgetData[0]),
-                colorStylePattern = /\bcolor-[\w]{1,}\b/,
-                thisWidgetColorClass = $(clonedWidget).attr('class').match(colorStylePattern);
                 
-                /* Add/Replace new colour class: */
-                if (thisWidgetColorClass) {
-                    $(clonedWidget).removeClass(thisWidgetColorClass[0]).addClass(thisWidgetData[1]);
-                }
+                var thisWidgetData = this.split(','),
+                clonedWidget = $('#' + thisWidgetData[0])
+//                colorStylePattern = /\bcolor-[\w]{1,}\b/
+//                thisWidgetColorClass = $(clonedWidget).attr('class').match(colorStylePattern);
+//                
+//                /* Add/Replace new colour class: */
+//                if (thisWidgetColorClass) {
+//                    $(clonedWidget).removeClass(thisWidgetColorClass[0]).addClass(thisWidgetData[1]);
+//                }
                 
                 /* Add/replace new title (Bring back reserved characters): */
                 $(clonedWidget).find('h3:eq(0)').html(thisWidgetData[2].replace(/\[-PIPE-\]/g,'|').replace(/\+/g,' ').replace(/\[-COMMA-\]/g,','));

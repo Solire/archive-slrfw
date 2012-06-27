@@ -43,36 +43,118 @@
         <?php echo $this->javascript; ?>
     </head>
     <body>
+        <header>
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a href="" class="brand"><img src="img/back/gray_dark/home_16x16.png"> <?php echo $this->site; ?></a>
+                        <ul class="nav user_menu pull-right">
+                            <li class="hidden-phone hidden-tablet">
+                                <ul class="new_items">
+                                    <?php
+                                    if (count($this->pagesNonTraduites) > 0) {
+                                        ?>
+                                        <li class="sep dropdown">
+                                            <a data-toggle="dropdown" class="dropdown-toggle nav_condensed" href="#"><span class="count_el"><?php echo count($this->pagesNonTraduites); ?></span> pages non traduites <b class="caret"></b></a>
+                                            <ul class="dropdown-menu">
+                                                <?php
+                                                foreach ($this->pagesNonTraduites as $pageNonTraduite) {
+                                                    ?>
+                                                    <li><a href="page/display.html?id_gab_page=<?php echo $pageNonTraduite["id"] ?>"> <?php echo $pageNonTraduite["titre"] ?></a></li>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </ul>
+                                        </li>
+                                        <?php
+                                    }
+                                    ?>
+
+                                </ul>
+                            </li>
+                            <li class="divider-vertical hidden-phone hidden-tablet"></li>
+                            <li class="dropdown">
+                                <a data-toggle="dropdown" style="padding-bottom: 0" class="dropdown-toggle nav_condensed" href="#"><img alt="<?php echo $this->versions[BACK_ID_VERSION]['nom'] ?>" src="img/flags/all/24/<?php echo strtolower($this->versions[BACK_ID_VERSION]['suf']) ?>.png" /> <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <?php
+                                    foreach ($this->versions as $version) {
+                                        ?>
+                                        <li><a href="" onclick="var h = window.location.href;window.location = (h + (h.indexOf('?') != -1 ? '&id_version=<?php echo $version['id'] ?>' : '?id_version=<?php echo $version['id'] ?>'));return false;"><img style="display: block;float: left;margin-top: 1px;" alt="<?php echo $version['nom'] ?>" src="img/flags/all/16/<?php echo strtolower($version['suf']) ?>.png" />&nbsp;&nbsp;<?php echo $version['nom'] ?></a></li>
+                                        <?php
+                                    }
+                                    ?>
+                                </ul>
+                            </li>
+                            <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+
+
+                            </li>
+                            <li class="dropdown<?php echo $this->controller == "user" ? ' gradient-blue text-light-white' : ''; ?>">
+                                <a data-toggle="dropdown" class="dropdown-toggle" href="#"><?php echo $this->utilisateur->get("civilite"); ?> <?php echo $this->utilisateur->get("nom"); ?> <?php echo $this->utilisateur->get("prenom"); ?> <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="user/start.html"><b>Mon profil</b></a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="sign/signout.html"><b>Déconnexion</b></a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <a class="btn_menu" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-align-justify icon-white"></span>
+                        </a>
+                        <div class="nav-collapse">
+                            <nav>
+                                <ul class="nav">
+
+                                    <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
+                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                    <li<?php echo $this->controller == "page" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="page/liste.html">Pages</a></li>
+                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                    <li<?php echo $this->controller == "media" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="media/start.html">Fichiers</a></li>
+                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                    <li<?php echo $this->controller == "translate" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=translate" class="bis">Traduction</a></li>
+                                    <!--                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>-->
+                                    <!--                                    <li class="dropdown">
+                                                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Menu déroulant <b class="caret"></b></a>
+                                                                            <ul class="dropdown-menu">
+                                                                                <li><a href="#">Sous menu 1</a></li>
+                                                                                <li><a href="#">Sous menu 2</a></li>
+                                                                                <li><a href="#">Sous menu 3</a></li>
+                                                                            </ul>
+                                                                        </li>-->
+
+
+                                </ul>
+                            </nav>    
+                        </div>	
+                        <div class="cb"></div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        </header>
         <div id="global">
 
-            <div id="header">
+            <section>
+                <article>
+                    <div id="corps">
 
-                <div class="container">
+                        <?php echo $this->content(); ?>
+                    </div>
+                    <div id="footer">
+                        <div class="bloc">
+                            <p>Outil de gestion de contenu développé par <a href="http://www.solire.fr" target="_blank">Solire</a>
 
-                    <ul id="menu">
-                        <li class="gen">Module d'admin :<br /><br /><b><?php echo $this->site; ?></b><br /><i><?php echo $this->utilisateur->get("nom"); ?></i></li>
-                        <li><a href="board/start.html" class="bouton<?php if ($this->action == "board") echo ' active' ?>">Tableau de bord<span>Tableau de bord</span></a></li>
-                        <li><a href="page/liste.html" class="bouton<?php if ($this->action == "liste") echo ' active' ?>">Pages<span>Pages</span></a></li>
-                        <li><a href="media/start.html" class="bouton<?php if ($this->action == "fichier") echo ' active' ?>">Fichiers<span>Fichiers</span></a></li>
 
-                        
-                        <li class="bis" style="border-left:1px solid #a1a1a1;">
-                            <a href="translate/list.html" class="bis">Traduction</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+                            </p>
+                        </div>
+                    </div>
+                </article>
 
-            <div id="corps">
-                <?php echo $this->content(); ?>
-            </div>
+            </section>
 
-            <div id="footer">
-                <div class="bloc">
-                    <p>Outil de gestion de contenu développé par <a href="http://www.solire.fr" target="_blank">Solire</a> pour <?php echo $this->site; ?></br>
-                    <a href="sign/signout.html"><b>Déconnexion</b></a></p>
-                </div>
-            </div>
 
         </div>
 

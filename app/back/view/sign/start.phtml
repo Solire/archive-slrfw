@@ -8,6 +8,7 @@
 		<base href="<?php echo $this->Url; ?>" />
 
 		<link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/admin/style.css" />
+		<link type="text/css" rel="stylesheet" media="screen" href="css/back/newstyle.css" />
         
         <?php echo $this->javascript; ?>
         <script type="text/javascript">
@@ -19,7 +20,9 @@
 		</script>
 	</head>
 	<body style="background:#efefef;">
-		<div style="margin-top:15%; margin-right:auto; margin-left:auto; width:488px; background-color:#fff; padding:20px;">
+            <section>
+                
+		<article style="margin-top:15%; margin-right:auto; margin-left:auto; width:488px; padding:20px;">
             <form method="post" action="<?php echo $this->action; ?>">
 				<fieldset>
 					<legend><b>Module d'administration</b></legend>
@@ -35,10 +38,12 @@
 					</div>
 
 					<div class="buttonright">
-						<a href="#" class="button vert formsubmit" id="intro" style="float:right;"><span class="vert">Connexion</span></a>
+                                            <div class="btn gradient-green">
+						<a href="#" class="formsubmit" id="intro" style="float:right;">Connexion</a>
 					</div>
 				</fieldset>
 			</form>
-		</div>
+		</article>
+            </section>
 	</body>
 </html>
