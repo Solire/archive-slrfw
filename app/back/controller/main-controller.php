@@ -38,7 +38,7 @@ class MainController extends ActionController
         $this->_css->addLibrary("back/sticky.css");
         
         $this->_view->site = Registry::get("project-name");
-        $this->_view->controller = $_GET["controller"];
+        $this->_view->controller = isset($_GET["controller"]) ? $_GET["controller"] : "";
         
         $this->_utilisateurManager = new utilisateurManager();
         $this->_gabaritManager     = new gabaritManager();
