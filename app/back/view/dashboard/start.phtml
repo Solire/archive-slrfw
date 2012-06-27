@@ -1,20 +1,5 @@
 
 
-<?php if($_GET["name"] == "mail") { ?>
-<form method="get" action="dashboard/start.html">
-    <input type="hidden" name="name" value="mail" />
-    <select name="id_version"  onchange="$(this).parent().submit()">
-        <?php
-        foreach ($this->versions as $version) {
-            ?>
-            <option <?php echo BACK_ID_VERSION == $version['id'] ? 'selected="selected"' : ''; ?> value="<?php echo $version['id'] ?>"><?php echo $version['nom'] ?></option>
-            <?php
-        }
-        ?>
-    </select>
-</form>
-<?php } ?>
-
 
 <style>
 
@@ -180,6 +165,9 @@
 
 
 <h1><?php echo $this->config["table"]["title"] ?></h1>
+
+<?php $this->add('breadcrumbs.phtml'); ?>
+
 
 <?php
 if ($_GET["name"] == "client") {
@@ -759,8 +747,8 @@ foreach ($this->config["columns"] as $column) {
                     if(!$("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable"))
                     return true;
                     /* Apply the jEditable handlers to the table */
-                    var type = $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-textarea") ? 'textarea' : "input" ;
-                    var type = $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-autogrow") ? 'autogrow' : "input" ;
+                    var type = $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-textarea") ? 'textarea' : "text" ;
+                    type = $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-autogrow") ? 'autogrow' : type ;
                     $(this).editable( '<?php echo $_GET["controller"]; ?>/editable.html?name=<?php echo $_GET["name"]; ?>'  , {
                         type      : type,
                         br2nl      : $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-br2nl") ? true : false ,

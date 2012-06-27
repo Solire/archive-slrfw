@@ -98,6 +98,11 @@ class FrontController
         Registry::set('base', self::$envConfig->get('url', 'base'));
         Registry::set('basehref', self::$envConfig->get('url', 'base') . $baseHrefSuffix);
         Registry::set('baseroot', self::$envConfig->get('root', 'base'));
+        
+        /* = Informations générales sur le site
+          ------------------------------- */
+        $baseHrefSuffix = isset($_REQUEST['application']) ? $_REQUEST['application'] . '/' : '';
+        Registry::set('project-name', self::$mainConfig->get('name', 'project'));
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */

@@ -25,22 +25,22 @@
 .widget-head a.collapse  {
     float: left;
     display: inline;
-    background: url(img/buttons.gif) no-repeat -52px 0;
-    width: 14px;
-    height: 14px;
+    background-image: url('../../img/back/white/minus_alt_16x16.png');
+    width: 16px;
+    height: 16px;
     text-indent: -9999em;
-    margin: 8px 0 8px 4px;
+    margin: 6px 0 8px 4px;
     outline: none;
 }
 
 .collapsed .widget-head a.collapse  {
     float: left;
     display: inline;
-    background: url(img/buttons.gif) no-repeat -38px 0;
-    width: 14px;
-    height: 14px;
+    background-image: url('../../img/back/white/plus_alt_16x16.png');
+    width: 16px;
+    height: 16px;
     text-indent: -9999em;
-    margin: 8px 0 8px 4px;
+    margin: 6px 0 8px 4px;
     outline: none;
 }
 

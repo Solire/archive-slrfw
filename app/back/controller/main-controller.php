@@ -27,11 +27,18 @@ class MainController extends ActionController
     public function start() {
         $this->_javascript->addLibrary("back/jquery/jquery-1.4.4.min.js");
         $this->_javascript->addLibrary("back/jquery/jquery-ui-1.8.9.custom.min.js");
-        $this->_javascript->addLibrary("back/menu.js");
+        $this->_javascript->addLibrary("back/main.js");
         $this->_javascript->addLibrary("back/jquery/jquery.cookie.js");
+        $this->_javascript->addLibrary("back/jquery/sticky.js");
         
-        $this->_view->site = Registry::get("site");
-        $this->_view->action = "liste";
+        $this->_javascript->addLibrary("back/jquery/jquery.stickyPanel.min.js");
+        
+        $this->_javascript->addLibrary("back/newstyle.js");
+        $this->_css->addLibrary("http://www.solire.fr/admin/newstyle.css");
+        $this->_css->addLibrary("back/sticky.css");
+        
+        $this->_view->site = Registry::get("project-name");
+        $this->_view->controller = $_GET["controller"];
         
         $this->_utilisateurManager = new utilisateurManager();
         $this->_gabaritManager     = new gabaritManager();
@@ -63,5 +70,14 @@ class MainController extends ActionController
         
         $this->_view->javascript = $this->_javascript;
         $this->_view->css = $this->_css;
+        $this->_view->versions = $this->_db->query("SELECT `version`.id, `version`.* FROM `version`")->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        
+        $this->_view->breadCrumbs = array();
+        $this->_view->breadCrumbs[] = array(
+            "label" => '<img src="img/back/gray_dark/home_12x12.png"> ' . $this->_view->site,
+            "url" => "./",
+        );
+        
+        $this->_view->pagesNonTraduites = $this->_db->query("SELECT * FROM `gab_page` gp WHERE rewriting = '' AND gp.suppr = 0 AND id_gabarit != 2 AND id_version = " . BACK_ID_VERSION)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -17,13 +17,13 @@
                         <?php echo $this->champsHTML; ?>
                     </div></div>
                 <div>
-                    <a href="#" class="button bleu delBloc<?php echo ( count($value) > 1 ? '' : ' translucide' ) ?>" style="float:right;">
-                        <span class="bleu"><img src="img/back/supprimer.png" border="0" alt="supprimer"/></span></a>
-                    <a href="#" class="button bleu sort-move"><span class="bleu"><img src="img/back/deplacer.png" alt="Déplacer" /></span></a>
+                    <div class="btn gradient-blue fr"><a href="#" class="delBloc<?php echo ( count($value) > 1 ? '' : ' translucide' ) ?>">
+                            <img src="img/back/supprimer.png" border="0" alt="supprimer"/></a></div>
+                    <div class="btn gradient-blue"><a href="#" class="sort-move"><img src="img/back/deplacer.png" alt="Déplacer" /></a></div>
                 </div>
             </fieldset>
             <?php
         }
         ?>
-        <div class="buttonright"><a class="button bleu addBloc" href="#"><span class="bleu">Ajouter un bloc</span></a></div>
+        <div class="buttonright"><div class="btn gradient-blue"><a class="addBloc" href="#">Ajouter un bloc</a></div></div>
     </div></fieldset>

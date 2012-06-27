@@ -25,18 +25,18 @@ class BoardController extends MainController {
         $this->_javascript->addLibrary("back/jquery/inettuts.js");
         $this->_css->addLibrary("back/inettuts.css");
         $this->_view->action = "board";
-        
+
         $idUtilisateur = $this->_utilisateur->get("id");
         $query = "SELECT board_state.cookie FROM `board_state` WHERE `board_state`.id_utilisateur = $idUtilisateur";
         $boardStateCookie = $this->_db->query($query)->fetchColumn();
-        
-        if($boardStateCookie) {
-            setcookie("inettuts-widget-preferences", urldecode($boardStateCookie), time()+60*60*24*30);
+
+        if ($boardStateCookie) {
+            setcookie("inettuts-widget-preferences", urldecode($boardStateCookie), time() + 60 * 60 * 24 * 30);
         }
-        
 
 
-        $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.id NOT IN (1,2) ORDER BY id";
+
+        $query = "SELECT `gab_gabarit`.id, count(DISTINCT gab_page.id) nbpages, `gab_gabarit`.* FROM `gab_gabarit` LEFT JOIN gab_page ON gab_page.id_gabarit = gab_gabarit.id AND gab_page.suppr = 0 WHERE `gab_gabarit`.id NOT IN (1,2) GROUP BY gab_gabarit.id ORDER BY gab_gabarit.id";
         $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
         $pages = array();
 
@@ -82,24 +82,26 @@ class BoardController extends MainController {
         }
         $this->_view->pages = $pages;
 
-        $this->_view->versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
+        $this->_view->breadCrumbs[] = array(
+            "label" => "Tableau de bord",
+            "url" => "board/start.html",
+        );
     }
-    
+
     public function saveStateAction() {
         $this->_view->enable(false);
         $idUtilisateur = $this->_utilisateur->get("id");
         $cookieString = $this->_db->quote(urldecode($_POST["cookie"]));
-        
+
         $this->_db->exec("REPLACE INTO board_state SET id_utilisateur=$idUtilisateur, cookie=$cookieString");
     }
-    
+
     public function deleteStateAction() {
         $this->_view->enable(false);
         $idUtilisateur = $this->_utilisateur->get("id");
-        
+
         $this->_db->exec("DELETE FROM board_state WHERE id_utilisateur=$idUtilisateur");
         setcookie("inettuts-widget-preferences", null, 0);
-        
     }
 
 }

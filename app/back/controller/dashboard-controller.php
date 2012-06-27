@@ -18,6 +18,7 @@ class DashboardController extends MainController {
 
 
         if (isset($_GET["name"])) {
+            
             require_once $configMain->get('list', 'dirs') . $_GET["name"] . ".cfg.php";
             $this->_view->name = str_replace(array(".", "-"), "_", $_GET["name"]) . '_' . time();
             $this->_config = $config;
@@ -33,6 +34,8 @@ class DashboardController extends MainController {
                 $params["filter"] = $_GET["filter"];
                 $this->_view->additionalParams = http_build_query($params);
             }
+        } else {
+            $this->simpleRedirect ($this->_url);
         }
     }
 
@@ -117,6 +120,7 @@ class DashboardController extends MainController {
 
 
         $sFilterColumn = array();
+        $generalWhere = "";
 
         foreach ($this->_config["columns"] as $column) {
             if (isset($column["filter"]))
@@ -128,7 +132,7 @@ class DashboardController extends MainController {
 
         foreach ($this->_config["columns"] as &$column) {
 
-            if ($column["filter_field"] == "select") {
+            if (isset($column["filter_field"]) && $column["filter_field"] == "select") {
                 /* Jointure sur autre table */
                 if (isset($column["from"]) && $column["from"]) {
                     $aFilterJoin = array();
@@ -165,7 +169,13 @@ class DashboardController extends MainController {
         }
 
         $this->_view->config = $this->_config;
-        $this->_view->versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
+        
+        $this->_view->breadCrumbs[] = array(
+            "label" => $this->_config["table"]["title"],
+            "url" => "",
+        );
+        
+        
     }
 
     public function editableAction() {
