@@ -1,6 +1,7 @@
 <div class="line<?php echo $this->champ['media']; ?>">
     <label for="<?php echo $this->id; ?>">
-        <span><?php echo $this->label; ?></span><br /><br />
+                <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
+<br /><br />
         <span class="switch-editor"><span>html</span>&nbsp;<span class="translucide">visuel</span></span>
     </label>
     <textarea name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?> tiny" rows="5" cols="20"><?php echo $this->value; ?></textarea>
