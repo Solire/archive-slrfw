@@ -261,13 +261,21 @@ $(function(){
     });
 	
     var previsu = $('<div>', {
-        id : 'previsu'
+        id: 'previsu'
     }).dialog({
         title : "Prévisualisation",
-        autoOpen : false,
+        
+        autoOpen: false,
         close: function(event, ui){
             image = $(null);
-        }
+        },
+        height: "auto",
+        width: "auto",
+        maxHeight : $(window).height()-230,
+        maxWidth : $(window).width()-180
+    }).css({
+        "max-height" : $(window).height()-230,
+        "max-width" : $(window).width()-180
     });
 
 	
@@ -295,11 +303,30 @@ $(function(){
         return false;
     });
 	
+    
+    
     $('.previsu').live('click', function(){
-        image=$(this);
-        var link=$(this).attr('href');
-        previsu.html('<img src="'+link+'" />');
-        previsu.dialog('open');
+        image = $(this);
+
+        var link = $(this).attr('href');
+        var ext = link.split('.').pop().toLowerCase();
+
+        $('<img>', {'src' : link}).load(function(){
+            if (extensionsImage.indexOf(ext) != -1) {
+                previsu.dialog( "option" , "height" , "auto" );
+                previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
+                previsu.dialog( "option" , "maxHeight" , $(window).height()-230 );
+
+                previsu.html(this);
+            }
+            else {
+                previsu.dialog( "option" , "height" , 0 );
+                previsu.html('');
+            }
+            previsu.dialog('close');	
+            previsu.dialog('open');
+            previsu.dialog('option', 'position', "center");
+        });
 		
         return false;
     });
