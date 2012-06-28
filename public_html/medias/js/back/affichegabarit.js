@@ -226,7 +226,9 @@ $(function(){
 
         $('textarea.tiny', adupliquer).tinymce('enableOnly');
         $('textarea.tiny', clone).tinymce('enableOnly');
-
+        $('textarea', clone).autogrow({
+            minHeight :   150
+        });
         return false;
     });
 	
@@ -750,7 +752,9 @@ $(function(){
         
     });
     
-    
+    $('textarea').autogrow({
+        minHeight :   150
+    });
     
 
 });
