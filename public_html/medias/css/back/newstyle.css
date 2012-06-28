@@ -1,3 +1,1102 @@
+/***************************************
+* reset.
+***************************************/
+/* http://meyerweb.com/eric/thoughts/2007/05/01/reset-reloaded/ */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+body {
+	line-height: 1;
+	font-family: Arial, sans-serif; /*"Lucida Grande", Tahoma, Helvetica, sans-serif;*/
+	background: #f0f0f0 url(../../img/back/solire-fond.png) scroll repeat-x;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+	text-decoration: none;
+}
+
+del {
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+th {
+	font-style:italic;
+	font-weight:normal;
+}
+
+/***************************************
+* layout
+***************************************/
+b{
+	font-size: 100%; /*110%*/
+}
+
+em{
+	/*color: red; */
+	font-style:italic;
+}
+
+h1, h2, h3 {
+	font-family:Georgia;
+	font-weight:normal;
+	display:block;
+}
+
+#global{
+	background: #fff;
+	margin: 0 auto;
+	width: 1060px;
+}
+
+#header{
+	height: 97px;
+	position:relative;
+	z-index:1;
+	background: url(images/solire-sprite.png) scroll repeat-x;
+}
+
+/*#corps{
+	height: 97px;
+	position:relative;
+	z-index:1;
+}*/
+
+#pageContainer{
+	position:relative;
+	float: left;
+	margin-bottom:0;
+	width: 1060px;
+	min-height:304px;
+}
+
+#pageContent {
+	margin-right: 240px; /*Set right margin to RightColumnWidth*/
+}
+
+#footer{
+	clear: both;
+	background: #fff url(images/solire-sprite.png) top left repeat-x;
+	height:98px;
+	padding:0;
+	width: 1060px;
+}
+
+#footer .bloc {
+	position:relative;
+	width: 100%;
+	display:block;
+	float:left;
+	background: #fff url(images/solire-sprite.png) 0 -650px scroll repeat-x;
+}
+
+#footer .bloc p {
+	color:#000;
+	font-size:0.7em;
+	padding:60px 10px;
+	text-align:right;
+}
+
+.container{
+	margin: 0px; 
+	margin-top: 0;
+	font-size:1em;
+}
+#ffscrollbarfix {
+	position: absolute;
+	top: 0;
+	bottom: -0.1px;
+	width: 1em;
+	z-index: -1;
+}
+html { min-height: 100%; margin-bottom: 1px; }
+
+.map_canvas {
+    width:600px;
+    height:400px;
+}
+
+/* Accueil */
+
+#pageContent  {
+	position:relative;
+	min-height:500px;
+	padding:10px;
+	display:block; 
+	background: #fff url(images/solire-sprite.png) 0 -650px scroll repeat-x;
+}
+
+h1  {
+	position:relative;
+	display:block;
+	color:#3485c9;
+	font-weight:bold;
+	font-size:22px;
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+h2  {
+	position:relative;
+	display:block;
+	color:#A1A1A1;
+	font-weight:bold;
+	font-size:18px;
+	margin-bottom:10px;
+}
+
+h3 {
+	position:relative;
+	display:block;
+	color:#777;
+	font-weight:bold;
+	font-size:16px;
+	margin-bottom:10px;
+}
+
+
+/* LOGO */
+
+.logo {
+	background:url(images/solire-sprite.png) -234px -394px no-repeat;
+}
+
+.logo a{
+	display:block;
+	height:98px;
+	width:181px;
+}
+
+.logo span {
+	position:absolute;
+	left:-1000px;
+}
+
+
+/* IMAGE DE FOND A TAILLE VARIABLE */
+
+.bg-container .bg-background {
+	height:400px;
+	left:0;
+	overflow:hidden;
+	position:relative;
+	width:100%;
+}
+
+.bg-container .bg-background img {
+	left:0;
+	position:absolute;
+}
+
+.bg-background h1 {
+	color:#fff;
+	font-size:20px;
+}
+
+img.bgImg {
+	display:block;
+	height:400px;
+	left:0;
+	min-width:100%;
+	position:absolute;
+	top:97px;
+	width:100%;
+	z-index:0;
+}
+
+.bg-content{
+	position:absolute;
+	top:148px;
+	padding-left:28px;
+	z-index:1000;
+}
+
+
+/***************************************
+* BOUTON
+***************************************/
+.clear { /* generic container (i.e. div) for floating buttons */
+	overflow: hidden;
+	width: 100%;
+	border-bottom:1px dotted #3485c9;
+	margin-top:10px;
+	padding-top:10px;
+	margin-bottom:10px;
+	clear:both;
+}
+
+.clearin { /* generic container (i.e. div) for floating buttons */
+	overflow: hidden;
+	width: 100%;
+	border-bottom:1px dotted #ccc;
+	margin-top:10px;
+	padding-top:10px;
+	margin-bottom:10px;
+}
+
+.buttonleft {
+	height: 38px;
+	display:block;
+	margin-bottom:10px;
+	clear:both;
+}
+
+.buttonright {
+	margin-top:10px;
+	float:right;
+	height: 38px;
+	clear:both;
+}
+	 
+a.button {
+     color: #fff;
+     display: block;
+     float: left;
+     height: 38px;
+     padding-right: 16px; /* sliding doors padding */
+     text-decoration: none;
+     font-weight:bold;
+	 cursor:pointer;
+	 font-size:15px;
+	 padding-top : 0px;
+	 padding-bottom : 0px;
+	text-shadow: 0px 1px 0px #555;
+}
+a.vert {
+	 background: transparent url('images/bouton-d.png') no-repeat scroll right 0px;
+}
+a.bleu {
+	 background: transparent url('images/bouton-d.png') no-repeat scroll right -76px;
+}
+a.button span {
+     display: block;
+     padding: 11px 0 11px 16px;
+	 cursor:pointer;
+}
+table a.button span {
+     display: block;
+     padding: 11px 0 11px 16px;
+	 cursor:pointer;
+}
+a.button span.vert {
+	background: transparent url('images/bouton-g.png') no-repeat;
+}
+a.button span.bleu {
+	background: transparent url('images/bouton-g.png') no-repeat left -76px;
+}
+a:hover.button {
+     outline: none; /* hide dotted outline in Firefox */
+	 text-decoration:none;
+}
+a:hover.vert {
+	background: transparent url('images/bouton-d.png') no-repeat scroll right -38px;
+}
+a:hover.bleu {
+	background: transparent url('images/bouton-d.png') no-repeat scroll right -114px;
+}
+a:hover span {
+     outline: none; /* hide dotted outline in Firefox */
+	 text-decoration:none;
+	 cursor:pointer;
+}
+a:hover span.vert {
+	 background: transparent url('images/bouton-g.png') no-repeat left -38px;
+	 color:#fff;
+}
+a:hover span.bleu {
+	 background: transparent url('images/bouton-g.png') no-repeat left -114px;
+	 color:#fff;
+}
+
+a.btright {
+	position:absolute;
+	bottom:40px;
+	right:40px;
+	clear:both;
+}
+
+.buttonwidget{
+	position:relative;
+	display:block;
+	height:40px;
+	margin-top:16px;
+}
+
+
+
+a { 
+	COLOR: #3485C9;
+	font-size:12px;
+	text-decoration:none;
+}
+
+a:hover { 
+	COLOR: #3485C9;
+	text-decoration:underline;
+}
+
+/* Firefox Dotted Outline Fix */
+a:active { 
+	outline: none;
+}
+
+/* Firefox Dotted Outline Fix */
+a:focus { 
+	-moz-outline-style: none;
+}
+
+
+li.sepa {
+	position:relative;
+	width:2px;
+	height:96px;
+	display:block;
+	float:left;
+	background:url(images/solire-sprite.png) -239px -499px scroll repeat-x;
+}
+
+/* Menu Body */
+ul#menu {
+	width:100%;
+	height:97px;
+/*	background:url(bg.png) repeat-x;*/
+	list-style:none;
+	margin:0;
+	padding:0;
+	padding-top:0px;
+}
+
+/* Float LI Elements - horizontal display */
+ul#menu li.gen {
+	display:block;
+	height:77px;
+	padding:10px;
+	font-size:12px;
+	font-family:arial, sans serif;
+	color:#a1a1a1;
+	border-right:1px solid #a1a1a1;
+}
+
+/* Float LI Elements - horizontal display */
+ul#menu li {
+	float:left;
+}
+
+/* Link - common attributes */
+ul#menu li a {
+	display:block;
+	height:97px;
+	position:relative;
+	text-decoration:none;
+	font-size:16px;
+}
+/* Specify width and background position attributes specifically for the class: "home" */
+ul#menu li a.bouton {
+	background:url(images/solire-sprite.png) no-repeat scroll bottom left;
+	min-width:40px;
+	height:60px;
+	background-position:-0px -98px;
+	text-align:center;
+	font-family:arial, sans serif;
+	font-size:18px;
+	color:#a1a1a1;
+	padding-top:37px;
+	padding-left:10px;
+	padding-right:10px;
+	text-shadow: 0px 1px 0px #fff;
+}
+
+ul#menu li.bis {
+	display:block;
+	height:77px;
+	padding:10px;
+	font-size:12px;
+	font-family:arial, sans serif;
+	color:#a1a1a1;
+	border-right:1px solid #a1a1a1;
+}
+
+ul#menu li.bis a, ul#menu li.gen a  {
+	height:14px;
+	text-align:left;
+	font-family:arial, sans serif;
+	font-size:12px;
+	color:#a1a1a1;
+	padding-left:4px;
+	text-shadow: 0px 1px 0px #fff;
+}
+
+ul#menu li.bis a:hover, ul#menu li.gen a:hover  {
+	color:#333;
+}
+
+/* Span (on hover) - common attributes */
+ul#menu li a span {
+	background:url(images/solire-sprite.png) no-repeat scroll bottom left;
+	display:block;
+	position:absolute;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+	z-index:100;
+	opacity:1;
+}
+
+/* Span (on hover) - display pointer */
+ul#menu li a span:hover {
+	background:url(images/solire-sprite.png) no-repeat scroll bottom left;
+	cursor:pointer;
+	height:97px;
+}
+
+/* Shift background position on hover for the class: "home" */
+ul#menu li a.bouton span {
+	background-position:0px -196px;
+	color:#fff;
+	font-size:18px;
+	height:60px;
+	padding-top:37px;
+	text-shadow: 0px 1px 2px #3485C9;
+}
+
+ul#menu li a.bouton.active {
+	color:#fff;
+	font-size:18px;
+	height:60px;
+	padding-top:37px;
+	text-shadow: 0 0px 0px #333;
+	background:#3485C9;
+}
+
+/* Sous Menu Body */
+dl.sousmenu {
+	width:100%;
+/*	background:url(bg.png) repeat-x;*/
+	list-style:none;
+	margin:0;
+	padding:0;
+	padding-top:0px;
+	background-color:#3385C9;
+	margin-bottom:20px;
+	display:block;
+	height:22px;
+}
+
+dl.sousmenu dt {
+	float:left;
+	margin:0;
+	padding:0;
+	
+}
+
+dl.sousmenu dt a {
+	text-align:center;
+	font-size:12px;
+	color:#fff;
+	text-shadow: 0px 1px 0px #666;
+	font-weight:bold;
+	padding: 4px 10px 4px 10px;
+	display:block;
+	border-top:1px solid #3385C9;
+	border-bottom:1px solid #3385C9;
+	border-right:1px solid #fff;
+}
+
+dl.sousmenu dt a:hover {
+	text-align:center;
+	font-size:12px;
+	color:#3385C9;
+	text-shadow: 0px 1px 0px #ccc;
+	padding: 4px 10px 4px 10px;
+	background-color:#fff;
+	border-top:1px solid #3385C9;
+	border-bottom:1px solid #3385C9;
+	border-right:1px solid #3385C9;
+	text-decoration:none;
+}
+
+dl.sousmenu dt.active {
+	text-decoration:none;
+	background-color:#105FA0;
+}
+
+/***************************************
+* PAGE
+***************************************/
+#corps {
+	 background-color: #FFFFFF;
+	 min-height:400px;
+	 padding:10px;
+}
+
+a.bleu2 {
+	background:url("images/bouton-d.png") no-repeat scroll right -76px transparent;
+	}
+
+a.button2 {
+	color:#FFF;
+	cursor:pointer;
+	display:block;
+	float:left;
+	font-weight:bold;
+	height:38px;
+	padding-right:16px;
+	text-decoration:none;
+}
+	
+a.button2 span.bleu2 {
+	background:url("images/bouton-g.png") no-repeat scroll left -76px transparent;
+}
+
+a.button2 span {
+	cursor:pointer;
+	display:block;
+	padding:11px 0 9px 16px;
+}
+
+a:hover.button2 {
+	outline: none; /* hide dotted outline in Firefox */
+	text-decoration:none;
+}
+
+a:hover.bleu2 {
+	background: transparent url('images/bouton-d.png') no-repeat scroll right -114px;
+}
+
+a:hover span {
+	outline: none; /* hide dotted outline in Firefox */
+	text-decoration:none;
+	cursor:pointer;
+}
+
+a:hover span.bleu2 {
+	background: transparent url('images/bouton-g.png') no-repeat left -114px;
+}
+			
+#contentfooter {
+	background: #fff url(images/solire-sprite.png) 0 -650px scroll repeat-x;
+	background-color:transparent;
+	height:263px;
+	width:100%;
+	float:right;
+	margin-top:-263px;
+}
+	 
+.group-gab {
+	display:none; 
+	position: absolute; 
+	margin-top:29px; 
+	background-color:#fff;
+	padding:4px 0 10px 0; 
+	width:98%; 
+	line-height:16px;
+	border-left:1px solid #bbb;
+	border-bottom:1px solid #bbb;
+	border-right:1px solid #bbb;
+	border-top:0px solid #bbb;
+	border-radius: 0px 0px 10px 10px;
+	-moz-border-radius: 0px 0px 10px 10px/*{cornerRadius}*/;
+	-webkit-border-radius: 0px 0px 10px 10px/*{cornerRadius}*/;
+	border-radius: 0px 0px 10px 10px/*{cornerRadius}*/; 
+	/* ARRONDI IE*/
+ 	 behavior: url(js/PIE/PIE.htc);
+	box-shadow: 0px 3px 3px #ccc;
+	-moz-box-shadow: 0px 3px 3px #ccc;
+	-webkit-box-shadow: 0px 3px 3px #ccc;
+	-khtml-box-shadow: 0px 3px 3px #ccc;
+}
+	 
+.group-gab  a{
+	padding:0 6px;
+}
+	 
+	 
+/* FORMULAIRE */
+
+
+form { 
+	margin:0 auto;
+	width:100%;
+}
+
+form legend, legend {
+	font-family:georgia;
+	color:#a1a1a1;
+	cursor:pointer;
+	font-weight:bold;
+	padding:10px;
+} 
+
+form legend:hover, legend:hover {
+	font-family:georgia;
+	color:#3485C9;
+	cursor:pointer;
+} 
+
+form label {
+	float: left;
+	margin-right:6px;
+	text-align:right;
+	width:200px; 
+	font-size:12px;
+	display:block;
+	height:20px;
+	padding-top:10px;
+} 
+
+
+form input   {
+/*	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;*/
+    background: linear-gradient(center top , #a1a1a1 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -o-linear-gradient(center top , #a1a1a1 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -moz-linear-gradient(center top , #a1a1a1 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(center top , #a1a1a1 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(center top , #a1a1a1 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, center top, center bottom, color-stop(0, #a1a1a1), color-stop(1, #EFEFEF)) repeat scroll 0 0 transparent;
+
+	border:1px solid #a1a1a1;
+	padding:2px;
+	font-size:14px;
+	color:#38393C;
+	height:26px;
+	width:420px; 
+}
+
+form input.mini   {
+	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;
+	border:1px solid #a1a1a1;
+	padding:2px;
+	font-size:14px;
+	color:#38393C;
+	height:26px;
+	width:100px; 
+}
+	
+/*form input.disabled, form input.disabled:hover {
+	background: #a1a1a1 url(images/solire-sprite.png) 0 0px scroll repeat-x;
+	border:1px solid #ccc;
+	padding:2px;
+	font-size:12px;
+	color:#999;
+	height:26px;
+	text-align:left;
+}
+	*/
+
+form input[type=file], form input.file   {
+	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;
+	border:1px solid #a1a1a1;
+	padding:2px;
+	font-size:14px;
+	color:#38393C;
+	height:26px;
+	width:230px; 
+}
+	
+
+form input[type=file]:hover, form input.file :hover    {
+	background: url(images/solire-sprite.png) 0 -40px scroll repeat-x;
+	border:1px solid #3485c9;
+	color:#000;
+}
+	
+form input[type=checkbox] { 
+	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;
+	border:1px solid #a1a1a1;
+	font-size:12px;
+	color:#38393C;
+	height:26px;
+	width:12px;
+}
+	
+form select { 
+	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;
+	border:1px solid #a1a1a1;
+	padding:2px;
+	font-size:12px;
+	color:#38393C;
+	height:26px;
+}
+	
+form select.mini, select.filter { 
+	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;
+	border:1px solid #a1a1a1;
+	padding:2px;
+	font-size:12px;
+	color:#38393C;
+	height:26px;
+	width:60px
+}
+	
+form textarea {  
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #A1A1A1;
+    color: #38393C;
+    font-size: 14px;
+    height: 150px;
+    min-height: 150px;
+    padding: 2px;
+    width: 500px;
+}
+
+form  .line {
+	margin: 3px;
+	display: block;
+	clear: both;
+}
+
+form  .line .content {
+	padding-top:12px; 
+	float:left;
+}
+
+form .error input, form .error table.mceLayout {
+	border : 1px solid #EE0000;
+}
+
+form .error label {
+	color:#EE0000;
+}
+
+form .case label,.form .case input {
+	float:left;
+	min-width:20px;
+	width:auto;
+}
+
+form li {
+	display:block;
+	list-style:none;
+	font-size:12px;
+	margin-top:10px;
+}
+
+form .desc {
+	font-size:10px;
+	margin-top:1em;
+	text-align:right;
+	padding-bottom:10px;
+}
+
+form select:hover {
+	background-color:#fff; 
+	border:1px solid #B0B0B0;
+}
+	
+/*form input:hover {
+	background: url(images/solire-sprite.png) 0 -40px scroll repeat-x;
+	border:1px solid #3485c9;
+	color:#000;
+}*/
+	
+form textarea:hover {
+	background-image: url(images/input-fondbis.gif);
+	border:1px solid #3485c9;
+}
+	
+form fieldset, fieldset{
+	clear:both;
+	margin-bottom:20px;
+	border:1px solid #dddddd;
+}
+
+form label.mois   {
+	float: left;
+	margin-right:6px;
+	text-align:right;
+	width:26px; 
+	font-size:12px;
+	display:block;
+	height:20px;
+	padding-top:10px;
+}
+
+/*ajout thomas*/
+.translucide{
+	opacity : 0.5;
+	-moz-opacity : 0.5;
+	-ms-filter: "alpha(opacity=50)"; /* IE 8 */
+	filter : alpha(opacity=50);
+}
+
+form textarea.tinyAdvanced {
+	background: white 0 0px scroll repeat-x;
+	width: 560px;
+	height: 300px;
+	padding:10px;
+	font-size:14px;
+}
+
+
+.message {
+	display:block; 
+	border:1px dotted #3485c9;
+	padding:10px;
+	margin-bottom:10px;
+	background-color: #f0f0f0;
+	font-weight:bold;
+}	
+
+
+.critere {
+	display:block; 
+	width:280px; 
+	border-left:1px dotted #3485c9;
+	padding:4px;
+	float:left;
+	font-size:12px;
+}	
+
+.critere form {
+	height:130px;
+	border-bottom:1px dotted #3485c9;
+	margin-bottom:20px;
+	}
+
+
+.ref {
+	display:block; 
+	width:120px; 
+	padding:4px;
+	float:left;
+	font-size:12px;
+}
+
+.categorie {
+	display:block; 
+	width:100%; 
+	border-bottom:1px dotted #CCC;
+	padding:4px;
+	float:left;
+}
+
+.right {
+	text-align:right;
+}	
+
+.note {
+	font-size:11px; 
+	color:red;
+	margin-bottom:10px;
+	font-style:italic;
+	display:block;
+	text-align:right;
+	font-weight:bold;
+	}
+
+.empty{
+	background-color:#efefef;
+	display:block;
+	height:20px;
+	}
+	
+.closepopup {
+position:absolute;
+top:10px;
+right:10px;
+}
+
+
+.barre {
+	text-decoration:line-through;
+	font-style:italic;
+	color:#999;
+}	
+
+.buttonfixed {
+    position: fixed !important;
+    bottom: 85px !important;
+    z-index: 20000 !important;
+	display:block;
+	cursor:pointer;
+	color:#333;
+	margin-left:1050px;
+}
+
+#ligne, .ligne {
+	display:block;
+	border-top:1px dotted #CCC;
+	padding-top:6px;
+	padding-bottom:6px;
+	min-height:14px;
+	max-height:36px;
+	clear:both;
+	font-size:14px;
+}
+
+
+th {
+text-align:center; 
+font-size:12px; 
+padding:4px;
+background-color:#efefef;
+border-left:1px dotted #3485c9;
+}
+
+td {
+FONT-SIZE: 12px;
+vertical-align: middle;
+line-height:14px;
+border-left:1px dotted #3485c9;
+padding:4px;
+font-size:12px;
+}
+
+td a { 
+FONT-SIZE: 12px;
+COLOR: #333;
+text-align : left;
+padding : 0px;
+text-decoration:none;
+} 
+
+td a:hover { 
+text-decoration:underline;
+}
+
+#tableau_wrapper {
+	font-size: 12px;
+	vertical-align: middle;
+	padding-top:2px;
+	padding-bottom:2px;
+	line-height:14px;
+}
+
+#tableau {
+	margin-top:10px;
+	white-space:nowrap;
+	border-collapse:collapse;
+	background-color:#FFFFFF;
+	clear:both;
+}
+
+#tableau_length, #tableau_filter{
+	float:left;
+/*	height: 20px;*/
+	margin-top:10px;
+	margin-left: 10px;
+}
+
+#tableau tbody{
+	border-top: 1px dotted #333333;
+	border-bottom: 1px dotted #333333;
+}
+
+#tableau thead th{
+	cursor: pointer;
+}
+
+#tableau td {
+	padding:2px;
+}
+
+#tableau td.center {
+	text-align: center;
+}
+
+#tableau tr {
+	background-color:#FFFFFF;
+}
+
+#tableau tr.even{
+	background-color:#EFEFEF;
+}
+
+#tableau .offColor {
+	background-color:#f6f6f6;
+}
+
+#tableau .header a{
+	color:white;
+}
+
+#tableau_info{
+	float: left;
+}
+
+#tableau_paginate{
+	float:right;
+}
+
+#tableau_previous{
+	height: 16px;
+	width: 16px;
+	float:left;
+}
+
+#tableau_next{
+	height: 16px;
+	width: 16px;
+	float:left;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***************************************************/
+/*********************** STYLE 2012 ****************/
+/***************************************************/
+
+
+
 
 ::selection {
 	background: #5CC327; /* Safari */
@@ -9,6 +1108,42 @@
 }
 
 
+
+
+form input, form textarea {
+/*    padding: 9px;*/
+    border: solid 1px #E5E5E5;
+    outline: 0;
+    font: normal 13px/100% Verdana, Tahoma, sans-serif;
+/*    width: 200px;*/
+    background: url(../../img/back/solire-sprite.png) 0 0px scroll repeat-x;
+    background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));
+    background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);
+    box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
+    -moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 4px;
+    -webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 4px;
+}
+
+form textarea {
+/*    width: 400px;*/
+/*    max-width: 400px;*/
+/*    height: 150px;*/
+    line-height: 150%;
+}
+
+form input:hover, form textarea:hover, form input:focus, form textarea:focus {
+    border-color: #C9C9C9;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 8px;
+}
+
+form label {
+    margin-left: 10px;
+    color: #999999;
+}
+
+
+
+
 .navbar {
     margin-bottom: 18px;
     overflow: visible;
@@ -16,6 +1151,13 @@
 .navbar-inner {
     background-color: #F6F6F6;
     background-image: -moz-linear-gradient(center top , #F6F6F6, #DFE0E0);
+    background-image: linear-gradient(center top , #F6F6F6, #DFE0E0);
+    background-image: -o-linear-gradient(center top , #F6F6F6, #DFE0E0);
+    background-image: -webkit-linear-gradient(center top , #F6F6F6, #DFE0E0);
+    background-image: -ms-linear-gradient(center top , #F6F6F6, #DFE0E0);
+
+    background-image: -webkit-gradient(linear, center top, center bottom, color-stop(0, #F6F6F6), color-stop(1, #DFE0E0));
+    
     background-repeat: repeat-x;
     border-radius: 4px 4px 4px 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 rgba(0, 0, 0, 0.1) inset;
@@ -207,6 +1349,13 @@
 .navbar .btn-navbar {
     background-color: #2C2C2C;
     background-image: -moz-linear-gradient(center top , #333333, #222222);
+    background-image: linear-gradient(center top , #333333, #222222);
+    background-image: -o-linear-gradient(center top , #333333, #222222);
+    background-image: -webkit-linear-gradient(center top , #333333, #222222);
+    background-image: -ms-linear-gradient(center top , #333333, #222222);
+
+    background-image: -webkit-gradient(linear, center top, center bottom, color-stop(0, #333333), color-stop(1, #222222));
+    
     background-repeat: repeat-x;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) inset, 0 1px 0 rgba(255, 255, 255, 0.075);
@@ -547,7 +1696,13 @@ body {
 }
 
 .btn {
+    background: linear-gradient(center top , #F9F9F9 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -o-linear-gradient(center top , #F9F9F9 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
     background: -moz-linear-gradient(center top , #F9F9F9 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(center top , #F9F9F9 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(center top , #F9F9F9 0%, #EFEFEF 100%) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, center top, center bottom, color-stop(0, #F9F9F9), color-stop(1, #EFEFEF)) repeat scroll 0 0 transparent;
+    
     border: 1px solid #E2E2E2;
 
     border-radius: 6px 6px 6px 6px;
@@ -603,15 +1758,30 @@ body {
 
 .gradient-green{
     background: -moz-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -o-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, center top, center bottom, color-stop(0, #69D731), color-stop(1, #5CC327)) repeat scroll 0 0 transparent;
 }
 
 .gradient-red{
     background: -moz-linear-gradient(center top , #DE492A 0%, #AE432E 100%) repeat scroll 0 0 transparent;
+    background: linear-gradient(center top , #DE492A 0%, #AE432E 100%) repeat scroll 0 0 transparent;
+    background: -o-linear-gradient(center top , #DE492A 0%, #AE432E 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(center top , #DE492A 0%, #AE432E 100%) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(center top , #DE492A 0%, #AE432E 100%) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, center top, center bottom, color-stop(0, #DE492A), color-stop(1, #AE432E)) repeat scroll 0 0 transparent;
 }
 
 .gradient-blue, 
 .ui-widget-header {
     background: -moz-linear-gradient(center top , #4AB0DD 0%, #0A7ECA 100%) repeat scroll 0 0 transparent;
+    background: linear-gradient(center top , #4AB0DD 0%, #0A7ECA 100%) repeat scroll 0 0 transparent;
+    background: -o--moz--gradient(center top , #4AB0DD 0%, #0A7ECA 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(center top , #4AB0DD 0%, #0A7ECA 100%) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(center top , #4AB0DD 0%, #0A7ECA 100%) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, center top, center bottom, color-stop(0, #4AB0DD), color-stop(1, #0A7ECA)) repeat scroll 0 0 transparent;
 }
 
 .navbar .nav > li.gradient-green > a, .navbar .nav > li.gradient-blue > a,  .gradient-green a, .gradient-blue a, .gradient-green, .gradient-blue, .gradient-green h3, .gradient-blue h3,
@@ -706,10 +1876,14 @@ article {
 hr { 
     border: 0; 
     height: 1px; 
-    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
-    background-image: -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
-    background-image: -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
-    background-image: -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); }
+
+    background: -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) repeat scroll 0 0 transparent;
+    background: linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) repeat scroll 0 0 transparent;
+    background: -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, left, right, color-stop(0, #000000), color-stop(0.5, #000000), color-stop(1, #000000)) repeat scroll 0 0 transparent;
+}
 
 
 .cf {
@@ -913,6 +2087,12 @@ fieldset {
 
 #corps .btn-create-container .dropdown-menu li > a:hover, #corps .btn-create-container .dropdown-menu .active > a, #corps .btn-create-container .dropdown-menu .active > a:hover {
     background: -moz-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -o-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -ms-linear-gradient(center top , #69D731 0%, #5CC327 100%) repeat scroll 0 0 transparent;
+    background: -webkit-gradient(linear, center top, center bottom, color-stop(0, #69D731), color-stop(1, #5CC327)) repeat scroll 0 0 transparent;
+    
     color: #FFF;
     font-weight: bold;
 }
