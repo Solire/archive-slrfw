@@ -78,6 +78,8 @@ class MainController extends ActionController
             "url" => "./",
         );
         
+        $this->_view->appConfig = $this->_appConfig;
+        
         $this->_view->pagesNonTraduites = $this->_db->query("SELECT * FROM `gab_page` gp WHERE rewriting = '' AND gp.suppr = 0 AND id_gabarit != 2 AND id_version = " . BACK_ID_VERSION)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

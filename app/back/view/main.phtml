@@ -105,7 +105,14 @@
                             <nav>
                                 <ul class="nav">
 
+                                    <?php
+                                    //Si le tableau de board est activé
+                                    if ($this->appConfig->get("active", "board")) {
+                                        ?>
                                     <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
+                                        <?php
+                                    }
+                                    ?>
                                     <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
                                     <li<?php echo $this->controller == "page" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="page/liste.html">Pages</a></li>
                                     <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
