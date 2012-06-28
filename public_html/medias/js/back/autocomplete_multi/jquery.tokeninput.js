@@ -25,9 +25,9 @@ var DEFAULT_SETTINGS = {
     processPrePopulate: false,
 
     // Display settings
-    hintText: "Type in a search term",
-    noResultsText: "No results",
-    searchingText: "Searching...",
+    hintText: "Tapez un terme de recherche",
+    noResultsText: "Aucun résultat",
+    searchingText: "Recherche en cours...",
     deleteText: "&times;",
     animateDropdown: true,
     theme: null,
