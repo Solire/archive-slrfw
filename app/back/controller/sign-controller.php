@@ -11,10 +11,10 @@ class SignController extends MainController {
         
         $this->_view->main(false);
         
-        $this->_view->action = 'page/liste.html';
+        $this->_view->action = $this->_appConfig->get("page-default", "general");
         
         if ($this->_utilisateur->isconnected())
-            $this->simpleRedirect ("page/liste.html", TRUE);
+            $this->simpleRedirect ($this->_appConfig->get("page-default", "general"), TRUE);
     }
 
     public function signoutAction() {
