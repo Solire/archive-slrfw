@@ -15,7 +15,7 @@ class BoardController extends MainController {
     public function start() {
         parent::start();
         $configMain = Registry::get('mainconfig');
-        
+               
         if(!$this->_appConfig->get("active", "board")) {
             exit();
         }
