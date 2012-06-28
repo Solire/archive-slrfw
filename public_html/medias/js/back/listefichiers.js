@@ -282,21 +282,22 @@ $(function () {
         var link = $(this).attr('href');
         var ext = link.split('.').pop().toLowerCase();
 
-        if (extensionsImage.indexOf(ext) != -1) {
-            previsu.dialog( "option" , "height" , "auto" );
-            previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
-            previsu.dialog( "option" , "maxHeight" , $(window).height()-230 );
+        $('<img>', {'src' : link}).load(function(){
+            if (extensionsImage.indexOf(ext) != -1) {
+                previsu.dialog( "option" , "height" , "auto" );
+                previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
+                previsu.dialog( "option" , "maxHeight" , $(window).height()-230 );
 
-            previsu.html('<img src="' + link + '" />');
-        }
-        else {
-            previsu.dialog( "option" , "height" , 0 );
-            previsu.html('');
-        }
-        previsu.dialog('close');	
-        previsu.dialog('open');
-        previsu.dialog('option', 'position', "center");
-
+                previsu.html(this);
+            }
+            else {
+                previsu.dialog( "option" , "height" , 0 );
+                previsu.html('');
+            }
+            previsu.dialog('close');	
+            previsu.dialog('open');
+            previsu.dialog('option', 'position', "center");
+        });
 		
         return false;
     });
