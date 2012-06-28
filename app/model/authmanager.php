@@ -11,6 +11,12 @@ class authManager extends manager {
 	 * @var string
 	 */
 	protected $_query;
+        
+        /**
+	 *
+	 * @var MyPDO
+	 */
+	protected $_db;
 	
 	/**
 	 *

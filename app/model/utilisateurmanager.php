@@ -28,6 +28,24 @@ class utilisateurManager extends authManager {
 		
 		return FALSE;
 	}
+        
+        public function changePassword(&$utilisateur, $login, $password, $newPassword) {
+		$query = "SELECT * FROM `utilisateur` WHERE `email` = :login";
+		$data = parent::connect($query, $login, $password);
+                
+		if($data) {			
+                        $id = intval($data["id"]);
+                        $pass = $this->_db->quote(sha1($newPassword));
+                        $query = "UPDATE `utilisateur` SET `$this->_colonnePassword` = $pass WHERE `id` = $id";
+                        $this->_db->exec($query);
+                        $this->connect($utilisateur, $data["id"], $newPassword);
+			return TRUE;
+		}
+		
+		return FALSE;
+	}
+        
+        
 //	public function connect($utilisateur, $login, $password) {
 //		$query = "SELECT * FROM `utilisateur` WHERE `email` = :login";
 //		return parent::connect($query, $login, $password);	

@@ -1,7 +1,7 @@
-<h1>Profil</h1>
+<h1>Mon profil</h1>
 
 <?php $this->add('breadcrumbs.phtml'); ?>
-<form>
+<!--<form>
     <fieldset>
         <legend>Informations générales</legend>
         <div class="line">
@@ -25,20 +25,21 @@
         </div>
         <div class="btn gradient-green cb fr"><a class="formajaxsubmit" href="#">Modfier vos informations générales</a></div>
     </fieldset>
-    
-    
+</form>-->
+
+<form method="post" action="user/change-password.html">
     <fieldset>
         <legend>Modifier le mot de passe</legend>
         <div class="line">
-            <label>Ancien mot de passe</label>
-            <input type="password" value="" name="ancien_password" class="form-controle form-oblig form-mix" />
+            <label>Mot de passe actuel</label>
+            <input type="password" value="" name="old_password" class="form-controle form-oblig form-mix" />
         </div>
-        
+
         <div class="line">
             <label>Nouveau mot de passe</label>
             <input type="password" value="" name="new_password" class="form-controle form-oblig form-mix" />
         </div>
-        
+
         <div class="line">
             <label>Confirmation du nouveau mot de passe</label>
             <input type="password" value="" name="new_password_c" class="form-controle form-oblig form-mix" />
@@ -46,7 +47,7 @@
 
         <div class="btn gradient-green cb fr"><a class="formajaxsubmit" href="#">Mettre à jour votre mot de passe</a></div>
     </fieldset>
-    
+
 
 
 
