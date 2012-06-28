@@ -34,7 +34,8 @@ class MainController extends ActionController
         $this->_javascript->addLibrary("back/jquery/jquery.stickyPanel.min.js");
         
         $this->_javascript->addLibrary("back/newstyle.js");
-        $this->_css->addLibrary("http://www.solire.fr/admin/newstyle.css");
+        $this->_css->addLibrary("back/jquery-ui-1.8.7.custom.css");
+        $this->_css->addLibrary("http://www.solire.fr/style_solire_fw/css/back/newstyle.css");
         $this->_css->addLibrary("back/sticky.css");
         
         $this->_view->site = Registry::get("project-name");
