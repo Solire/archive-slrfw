@@ -38,7 +38,7 @@ class MainController extends ActionController
         $this->_css->addLibrary("back/sticky.css");
         
         $this->_view->site = Registry::get("project-name");
-        $this->_view->controller = isset($_GET["controller"]) ? $_GET["controller"] : "";
+        $this->_view->controller = $_GET["controller"];
         
         $this->_utilisateurManager = new utilisateurManager();
         $this->_gabaritManager     = new gabaritManager();
@@ -63,7 +63,7 @@ class MainController extends ActionController
         if (isset($this->_post['log']) && isset($this->_post['pwd']) && $this->_post['log'] && $this->_post['pwd'])
             $this->_utilisateurManager->connect($this->_utilisateur, $this->_post['log'], $this->_post['pwd']);
         
-        if (!$this->_utilisateur->isconnected() && isset($_GET['action']) && $_GET['action'] != "start")
+        if (!$this->_utilisateur->isconnected() && isset($_GET['action']) && isset($_GET['controller'])  && $_GET['controller'] . "/" . $_GET['action'] != "sign/start")
             $this->simpleRedirect ("sign/start.html", TRUE);
         
         $this->_view->utilisateur = $this->_utilisateur;
