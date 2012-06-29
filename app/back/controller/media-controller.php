@@ -21,7 +21,6 @@ class MediaController extends MainController {
     }
 
     public function startAction() {
-        $this->_view->action = "fichier";
 
         $extensionsImage = array("jpeg", "jpg", "png", "gif");
 
@@ -208,7 +207,7 @@ class MediaController extends MainController {
 
         $id_gab_page = isset($_REQUEST['id_gab_page']) && $_REQUEST['id_gab_page'] ? $_REQUEST['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
         
-        if (isset($_REQUEST['extensions'])) {
+        if (isset($_REQUEST['extensions']) && $_REQUEST['extensions'] != "") {
             $extensions = explode(";", $_REQUEST['extensions']);
         }
         else {

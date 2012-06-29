@@ -236,6 +236,7 @@ $(function(){
         id : 'confirm'
     }).dialog({
         title : "Attention",
+        resizable : false,
         buttons: {
             "Ok" : function(){
                 if(sort_elmt.find('textarea.tiny').length > 0)
@@ -261,13 +262,21 @@ $(function(){
     });
 	
     var previsu = $('<div>', {
-        id : 'previsu'
+        id: 'previsu'
     }).dialog({
         title : "Prévisualisation",
-        autoOpen : false,
+        
+        autoOpen: false,
         close: function(event, ui){
             image = $(null);
-        }
+        },
+        height: "auto",
+        width: "auto",
+        maxHeight : $(window).height()-230,
+        maxWidth : $(window).width()-180
+    }).css({
+        "max-height" : $(window).height()-230,
+        "max-width" : $(window).width()-180
     });
 
 	
@@ -295,11 +304,30 @@ $(function(){
         return false;
     });
 	
+    
+    
     $('.previsu').live('click', function(){
-        image=$(this);
-        var link=$(this).attr('href');
-        previsu.html('<img src="'+link+'" />');
-        previsu.dialog('open');
+        image = $(this);
+
+        var link = $(this).attr('href');
+        var ext = link.split('.').pop().toLowerCase();
+
+        $('<img>', {'src' : link}).load(function(){
+            if (extensionsImage.indexOf(ext) != -1) {
+                previsu.dialog( "option" , "height" , "auto" );
+                previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
+                previsu.dialog( "option" , "maxHeight" , $(window).height()-230 );
+
+                previsu.html(this);
+            }
+            else {
+                previsu.dialog( "option" , "height" , 0 );
+                previsu.html('');
+            }
+            previsu.dialog('close');	
+            previsu.dialog('open');
+            previsu.dialog('option', 'position', "center");
+        });
 		
         return false;
     });
@@ -369,10 +397,10 @@ $(function(){
             
             tthis.data("autocomplete")._renderItem = function(ul, item){
                 var ext = item.value.split('.').pop();
-                var prev = (extensionsImage.indexOf(ext)!=-1) ? '<img src="'+item.vignette+'" height="40" />' : '';
+                var prev = (extensionsImage.indexOf(ext)!=-1) ? '<img src="'+item.vignette+'" height="25" />' : '';
                 return $( "<li></li>" )
                 .data( "item.autocomplete", item )
-                .append( '<a>'+item.label+'&nbsp;'+prev+'</a>' )
+                .append( '<a>'+prev+'<span>'+item.label+'<span></a>' )
                 .appendTo( ul );
             };
         
@@ -571,16 +599,22 @@ $(function(){
 
                     ligne += '<td>' + response.size + '</td>';
                     ligne += '<td>' + response.date.substr(0, 10) + '<br />' + response.date.substr(11) + '</td>';
-                    ligne += '<td><a href="' + response.path + '" class="previsu button bleu"><span class="bleu"><img alt="supprimer" src="img/back/voir.png" /></span></a></td>';
+                    ligne += '<td><div class="btn gradient-blue"><a href="' + response.path + '" class="previsu"><img alt="supprimer" src="img/back/voir.png" /></a></a></td>';
 
                     file.tr.attr("id", "fileid_" + response.id);
                     file.tr.html(ligne);
+                    
+                    
                 }
                 else {
                     file.tr.remove();
                 }
                 
                 uploader.splice(0, 1);
+                
+                if (uploader.files.length == 0) {
+                    reloadDatatable()
+                }
                 
                 if (uploader.files.length == 0 && formsubmit.done && formsubmit.search) {
                     $('.formajaxsubmit:visible').click();
@@ -594,16 +628,26 @@ $(function(){
     $('#pickfiles').live('click', function(){
         return false;
     });
+    
+    
+    
 
     var uploader_popup = $('<div>', {
         id : 'uploader_popup'
     }).load('media/popuplistefichiers.html?id_gab_page=' + $('[name=id_gab_page]').val(), function(){
+        
         $(this).dialog({
-            autoOpen : false
+            autoOpen : false,
+            width : 625,
+            resizable : false,
+            height : 'auto'
         });
                 
         $('.uploader_popup').click(function(){
+            if(oTable == null)
+                reloadDatatable();
             uploader_popup.dialog("open");
+            
             //            uploader.init();
             uploaderInit();
             //            uploader.refresh();
@@ -756,5 +800,47 @@ $(function(){
         minHeight :   150
     });
     
+    
 
 });
+
+var oTable = null;
+
+function reloadDatatable() {
+    if(oTable != null) {
+        oTable.fnDestroy();
+    }
+                       
+    $("#tableau").css({
+        width : "100%"
+    })
+    oTable = $("#tableau").dataTable({
+        "bJQueryUI": true,
+        "aoColumns": [
+        {
+            "bSortable": false
+        },                
+        null,
+        null,
+        null,
+        ],
+        'oLanguage': {
+            "sProcessing": "Chargement...",
+            "sLengthMenu": "Montrer _MENU_ fichiers par page",
+            "sZeroRecords": "Aucun fichier trouvé",
+            "sEmptyTable": "Pas de fichier",
+            "sInfo": "fichiers _START_ à  _END_ sur _TOTAL_ fichiers",
+            "sInfoEmpty": "Aucun fichier",
+            "sInfoFiltered": "(filtre sur _MAX_ fichiers)",
+            "sInfoPostFix": "",
+            "sSearch": "Chercher:",
+            "sUrl": "",
+            "oPaginate": {
+                "sFirst": "",
+                "sPrevious": "",
+                "sNext": "",
+                "sLast": ""
+            }
+        }
+    } )
+}

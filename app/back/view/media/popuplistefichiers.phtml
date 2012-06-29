@@ -1,15 +1,17 @@
         <div>
-            <a href="#" class="button vert" id="pickfiles">
-                <span class="vert">ajouter un fichier</span>
+            <div class="btn gradient-green">
+            <a href="#" id="pickfiles">
+                ajouter un fichier
             </a>
+                </div>
         </div>
 
         <table id="tableau" style="width:100%;">
             <thead>
                 <tr>
-                    <th>&nbsp;<a id="rewriting" class="css_right ui-icon ui-icon-carat-2-n-s"></a></th>
-                    <th>Taille<a id="taille" class="css_right ui-icon ui-icon-carat-2-n-s"></a></th>
-                    <th>Date / Heure<a id="date_crea" class="css_right ui-icon ui-icon-carat-1-s"></a></th>
+                    <th>&nbsp;</th>
+                    <th>Taille</th>
+                    <th>Date / Heure</th>
                     <th style="width: 50px;">&nbsp;</th>
                 </tr>
             </thead>
@@ -26,7 +28,12 @@
                     </td>
                     <td><?php echo $file['taille']; ?></td>
                     <td><?php echo Tools::formate_date_nombre(substr($file['date_crea'], 0, 10), '-', '/'); ?><br /><?php echo substr($file['date_crea'], 11); ?></td>
-                    <td><a href="<?php echo $file['path']; ?>" class="previsu button bleu"><span class="bleu"><img alt="Gérer" src="img/back/voir.png" /></span></a></td>
+                    <td>
+                        <div class="btn gradient-blue">
+                            <a href="<?php echo $file['path']; ?>" class="previsu"><img alt="Gérer" src="img/back/voir.png" /></a>
+                        </diV>
+                        
+                    </td>
                 </tr>
                 
 <?php } ?>
