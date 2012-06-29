@@ -234,6 +234,7 @@ $(function () {
     });
 	
     image = $(null);
+    
 	
     var previsu = $('<div>', {
         id: 'previsu'
@@ -277,8 +278,8 @@ $(function () {
     });
 
     $('.previsu').live('click', function(){
+        previsu.dialog('close');	
         image = $(this);
-
         var link = $(this).attr('href');
         var ext = link.split('.').pop().toLowerCase();
 
@@ -294,11 +295,11 @@ $(function () {
                 previsu.dialog( "option" , "height" , 0 );
                 previsu.html('');
             }
-            previsu.dialog('close');	
+            
             previsu.dialog('open');
             previsu.dialog('option', 'position', "center");
         });
-		
+	
         return false;
     });
     
