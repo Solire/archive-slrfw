@@ -116,7 +116,7 @@
                                     <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
                                     <li<?php echo $this->controller == "media" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="media/start.html">Fichiers</a></li>
                                     <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
-                                    <li<?php echo $this->controller == "translate" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=translate" class="bis">Traduction</a></li>
+                                    <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "translate" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=translate" class="bis">Traduction</a></li>
                                     <!--                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>-->
                                     <!--                                    <li class="dropdown">
                                                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Menu déroulant <b class="caret"></b></a>

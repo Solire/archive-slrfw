@@ -21,7 +21,6 @@ class MediaController extends MainController {
     }
 
     public function startAction() {
-        $this->_view->action = "fichier";
 
         $extensionsImage = array("jpeg", "jpg", "png", "gif");
 

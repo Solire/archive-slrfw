@@ -167,6 +167,9 @@ class PageController extends MainController {
         $this->_javascript->addLibrary("back/jquery/jquery.qtip.min.js");
         $this->_javascript->addLibrary("back/affichegabarit.js");
         $this->_javascript->addLibrary("back/jquery/jquery.autogrow.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
+        $this->_css->addLibrary("back/demo_table_jui.css");
+        
         
         $this->_javascript->addLibrary("back/autocomplete_multi/jquery.tokeninput.js");
         $this->_javascript->addLibrary("back/autocomplete_multi.js");

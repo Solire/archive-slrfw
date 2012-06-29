@@ -104,9 +104,10 @@ class fileManager extends manager {
         $query .= " AND `rewriting` LIKE " . $this->_db->quote($term);
                 
         $files = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        
+
         if (is_array($extensions)) {
             $files2 = array();
+            
             foreach ($files as $file) {
                 $ext = pathinfo($file['rewriting'], PATHINFO_EXTENSION);
                 if (in_array($ext, $extensions)) {
