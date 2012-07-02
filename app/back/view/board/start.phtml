@@ -12,12 +12,12 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
     if (!$pagesGabarit["gabarit"]["creable"])
         continue;
     ?>
-                    <div class="btn btn-shortcut fl">
-                        <a href="page/display.html?id_gabarit=<?php echo $pagesGabarit["gabarit"]["id"] ?>" class="" title="">
-                            <img src="img/back/gray_dark/document_alt_stroke_24x32.png" alt="">
-                            <b>Créer un<?php echo $pagesGabarit["gabarit"]["genre"] == "f" ? 'e' : '' ?> <?php echo $pagesGabarit["gabarit"]["label"] ?></b>
-                        </a>
-                    </div>
+                        <div class="btn btn-shortcut fl">
+                            <a href="page/display.html?id_gabarit=<?php echo $pagesGabarit["gabarit"]["id"] ?>" class="" title="">
+                                <img src="img/back/gray_dark/document_alt_stroke_24x32.png" alt="">
+                                <b>Créer un<?php echo $pagesGabarit["gabarit"]["genre"] == "f" ? 'e' : '' ?> <?php echo $pagesGabarit["gabarit"]["label"] ?></b>
+                            </a>
+                        </div>
     <?php
 }
 ?>
@@ -40,7 +40,7 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
             </div>
         </li>
     </ul>
-    <ul id="column1" class="column">
+    <ul id="column2" class="column">
         <li class="widget gradient-green"  id="resume">
             <div class="widget-head gradient-green">
                 <h3>Résumé</h3>
@@ -76,91 +76,27 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
         </li>
 
     </ul>
-    <?php foreach ($this->pages as $idGabarit => $pagesGabarit) {
-        ?>
-        <ul id="column1" class="column">
-
-            <li class="widget gradient-blue" id="gabarit-<?php echo $idGabarit ?>">
-                <div class="widget-head gradient-blue">
-                    <h3><?php echo $pagesGabarit["gabarit"]["label"] ?></h3>
-                </div>
-                <div class="widget-content">
-
-
-                    <h4>Dernières pages créées</h4>
-                    <ul>
-                        <?php foreach ($pagesGabarit["pages"] as $page) {
-                            ?>
-                            <li class="<?php echo $page->getMeta("visible") ? '' : 'translucide' ?>">
-                                <a href="page/display.html?id_gab_page=<?php echo $page->getMeta("id") ?>"><?php echo $page->getMeta("titre") ?></a>
-                                <div class="fr">
-                                    <?php
-                                    if ($page->getMeta("rewriting") != "") {
-                                        if ($page->getGabarit()->getMake_hidden()
-                                                || $this->utilisateur->get("niveau") == "solire"
-                                                || !$page->getMeta("visible")
-                                        ) {
-                                            ?>
-                                            <div style="margin-left: 6px;margin-top: -4px;">
-                                                <label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-<?php echo $page->getMeta("id"); ?>-<?php echo $page->getMeta("id_version"); ?>">Visible : </label>
-                                                <input class="visible-lang visible-lang-<?php echo $page->getMeta("id") . '-' . $page->getMeta("id_version"); ?>" value="<?php echo $page->getMeta("id") . '|' . $page->getMeta("id_version"); ?>" id="visible-<?php echo $page->getMeta("id"); ?>-<?php echo $page->getMeta("id_version"); ?>" type="checkbox" <?php echo ($page->getMeta("visible") ? 'checked="checked"' : ''); ?> />
-                                            </div>
-                                            <?php
-                                        }
-                                    } else {
-                                        ?>
-                                        <span class="notification gradient-red" style="margin-left: 6px;">Non traduit</span>
-                                        <?php
-                                    }
-                                    ?>
-                                </div>
-                                <div class="board-human-time"><?php echo Tools::RelativeTime(strtotime($page->getMeta("date_crea"))); ?></div>
-                            </li>
-                            <?php
-                        }
-                        ?>
-                    </ul>
-                    <hr />
-                    <h4>Dernières pages éditées</h4>
-                    <ul>
-                        <?php foreach ($pagesGabarit["pages_mod"] as $page) {
-                            ?>
-                            <li class="<?php echo $page->getMeta("visible") ? '' : 'translucide' ?>">
-                                <a href="page/display.html?id_gab_page=<?php echo $page->getMeta("id") ?>"><?php echo $page->getMeta("titre") ?></a>
-                                <div class="fr">
-                                    <?php
-                                    if ($page->getMeta("rewriting") != "") {
-                                        if ($page->getGabarit()->getMake_hidden()
-                                                || $this->utilisateur->get("niveau") == "solire"
-                                                || !$page->getMeta("visible")
-                                        ) {
-                                            ?>
-                                            <div style="margin-left: 6px;margin-top: -4px;">
-                                                <label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-<?php echo $page->getMeta("id"); ?>-<?php echo $page->getMeta("id_version"); ?>-m">Visible : </label>
-                                                <input class="visible-lang visible-lang-<?php echo $page->getMeta("id") . '-' . $page->getMeta("id_version"); ?>" value="<?php echo $page->getMeta("id") . '|' . $page->getMeta("id_version"); ?>" id="visible-<?php echo $page->getMeta("id"); ?>-<?php echo $page->getMeta("id_version"); ?>-m" type="checkbox" <?php echo ($page->getMeta("visible") ? 'checked="checked"' : ''); ?> />
-                                            </div>
-                                            <?php
-                                        }
-                                    } else {
-                                        ?>
-                                        <span class="notification gradient-red" style="margin-left: 6px;">Non traduit</span>
-                                        <?php
-                                    }
-                                    ?>
-                                </div>
-                                <div class="board-human-time"><?php echo Tools::RelativeTime(strtotime($page->getMeta("date_modif"))); ?></div>
-                            </li>
-                            <?php
-                        }
-                        ?>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-        <?php
-    }
-    ?>
-
+    <ul id="column3" class="column"></ul>
 
 
 </div>
+
+<div class="cb"></div>
+<hr />
+
+<div rel="dashboard/start.html?name=board&nomain=1&nojs=1" class="load-ajax"></div>
+
+
+<link rel="stylesheet" href="css/back/sticky.css" type="text/css" media="screen" title="" charset="utf-8" />
+<link rel="stylesheet" href="css/back/demo_table_jui.css" type="text/css" media="screen" title="" charset="utf-8" />
+<link rel="stylesheet" href="css/back/ColVis.css" type="text/css" media="screen" title="" charset="utf-8" />
+<link rel="stylesheet" href="css/back/TableTools_JUI.css" type="text/css" media="screen" title="" charset="utf-8" />
+<script src="js/back/jquery/jquery.livequery.min.js" type="text/javascript"></script>
+<script src="js/back/jquery/jquery.dataTables.min.js" type="text/javascript"></script>
+<script src="js/back/jquery/jquery.jeditable.js" type="text/javascript"></script>
+<script src="js/back/jquery/jquery.autogrow.js" type="text/javascript"></script>
+<script src="js/back/jquery/jquery.jeditable.autogrow.js" type="text/javascript"></script>
+<script src="js/back/jquery/FixedHeader.js" type="text/javascript"></script>
+<script src="js/back/jquery/jquery.dataTables.columnFilter.js" type="text/javascript"></script>
+<script src="js/back/jquery/ZeroClipboard.js" type="text/javascript"></script>
+<script src="js/back/jquery/TableTools.js" type="text/javascript"></script>

@@ -7,7 +7,7 @@ require_once 'gabarit/fieldset/gabaritfieldset.php';
  *
  * @author shin
  */
-class CheckboxFieldSet extends GabaritFieldSet
+class SimpleFieldSet extends GabaritFieldSet
 {
     
     public function start()

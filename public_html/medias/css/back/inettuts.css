@@ -33,7 +33,7 @@ hr {
     float: left;
     width: 32.5%;
     /* Min-height: */
-    min-height: 250px;
+    min-height: 190px;
     height: auto !important; 
     height: 400px;
 }
@@ -42,8 +42,9 @@ hr {
 /*	#columns #column1 { background: url(img/column-bg-left.png) no-repeat right top; }
         #columns #column3 { background: url(img/column-bg-right.png) no-repeat left top; }
 */
-#columns #column1 .widget { margin: 10px 10px 0 10px;   font-size: 0.8em; }
-#columns #column3 .widget { margin: 30px 25px 0 35px; }
+
+
+#columns #column1 .widget, #columns #column2 .widget, #columns #column3 .widget { margin: 10px 10px 0 10px;   font-size: 0.8em; }
 #columns .widget {
     margin: 30px 20px 0 20px;
     padding: 2px;
@@ -137,6 +138,11 @@ hr {
 
 .dragging {
     box-shadow: 0 0 7px #666666;
+}
+
+ul li.widget-placeholder {
+    margin: 0px;
+    padding: 0;
 }
 
 .widget h4 {

@@ -31,6 +31,7 @@ var iNettuts = {
                 editable: false
             }
         }
+        
     },
 
     init : function () {
@@ -276,7 +277,8 @@ var iNettuts = {
         
         /* For each column */
         $(settings.columns).each(function(i){
-            
+            if(!cookie.split('|')[i])
+                return;
             var thisColumn = $(this),
             widgetData = cookie.split('|')[i].split(';');
             $(widgetData).each(function(){
@@ -320,5 +322,9 @@ var iNettuts = {
 };
 $(function(){
     iNettuts.init();
+    $(".load-ajax").each(function() {
+        $(this).load($(this).attr("rel"))
+    })
+    
 });
 

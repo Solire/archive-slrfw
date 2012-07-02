@@ -164,9 +164,21 @@
 
 
 
-<h1><?php echo $this->config["table"]["title"] ?></h1>
 
-<?php $this->add('breadcrumbs.phtml'); ?>
+
+<?php
+if (isset($_GET["nomain"]) && $_GET["nomain"] == 1) {
+    ?>
+
+    <?php
+} else {
+    ?>
+    <h1><?php echo $this->config["table"]["title"] ?></h1>
+    <?php $this->add('breadcrumbs.phtml'); ?>
+    <?php
+}
+?>
+
 
 
 <?php
@@ -353,15 +365,15 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                     if(aData[<?php echo $detailId; ?>] != '')
                                     sOut += '<tr><td><?php echo $detailName; ?></td><td>'+aData[<?php echo $detailId; ?>]+'</td></tr>';
 
-                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                
             <?php
         }
     ?>
                     sOut += '</table>';
-                                                                                                                                                                             
+                                                                                                                                                                                         
                     return sOut;
                 }
-                            
+                                        
                 $('#tableau-<?php echo $this->name ?> tbody td img.detail').live( 'click', function () {
                     var nTr = $(this).parents('tr')[0];
                     var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
@@ -379,7 +391,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                             odd = "odd";
                         }
                         var nDetailsRow = oTable_<?php echo $this->name ?>.fnOpen( nTr, fnFormatDetails(oTable_<?php echo $this->name ?>, nTr), 'details-other' );
-                                                                    
+                                                                                
                         $('div.innerDetails', nDetailsRow).slideDown();
                         anOpen_<?php echo $this->name ?>.push( nTr );
                         anOpen_<?php echo $this->name ?>Id.push( $(nTr).attr("id") );
@@ -387,14 +399,14 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                         $("td", nDetailsRow).addClass("highlighted")
                         $(nDetailsRow).hover(function() {
                             var odd = "even";
-                                                                                                                    
+                                                                                                                                
                             if ($(nTr).hasClass("odd")) {
                                 odd = "odd";
                             }
                             if ($(nTr).hasClass(odd)) {
                                 $(nTr).find("td").addClass("highlighted")
                             }
-                                                                                                                    
+                                                                                                                                
                         },function() {
                             var odd = "even"
                             if ($(nTr).hasClass("odd")) {
@@ -404,11 +416,11 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                 $(nTr).find("td").removeClass("highlighted")
                             }
                         })
-                                                                    
+                                                                                
                         $(".ajax-load", nDetailsRow).each(function() {
                             loadAjax($(this), $(nTr).attr("id"));
                         })
-                                                            
+                                                                        
                         $(".ajax-click-load", nDetailsRow).each(function() {
                             $(this).bind('click', function() {
                                 var j = $.inArray( this, anOpen_<?php echo $this->name ?>2 );
@@ -425,13 +437,13 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                     $(this).parent().find(".ajax-on-click").slideUp();
                                 }
                             })
-                                                            
-                                                                
-                                                                
+                                                                        
+                                                                            
+                                                                            
                         })
-                                                                    
-                                                                    
-                                                                                                    
+                                                                                
+                                                                                
+                                                                                                                
                     }
                     else {
                         /* This row is already open - close it */
@@ -442,7 +454,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                             anOpen_<?php echo $this->name ?>Id.splice( i, 1 );
                         } );
                     }
-                                                                                                                               
+                                                                                                                                           
                 } );
                 /* Fin détails */
     <?php
@@ -487,8 +499,9 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
             },
             "aaSorting": [
 <?php
+$numCol = 0;
 foreach ($this->config["columns"] as $column) {
-    $numCol = 0;
+    
     if (isset($column["show"]) && $column["show"]) {
         ?>
         <?php
@@ -522,9 +535,15 @@ foreach ($this->config["columns"] as $column) {
                                         { "bVisible":    false },
             <?php
         } else {
-            ?>
-                                        null,
-            <?php
+            if (!isset($column["special"])) {
+                ?>
+                                                null,
+                <?php
+            } else {
+                ?>
+                                                { "bSortable": false},
+                <?php
+            }
         }
         $numCol++;
     }
@@ -671,7 +690,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"
     if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
         echo ' "aiExclude": [ 0 ],';
     ?>
-                                                                            
+                                                                                        
                         "buttonText": "Cacher des colonnes"
                     },
     <?php
@@ -715,7 +734,7 @@ foreach ($this->config["columns"] as $column) {
         } else if ($column["filter_field"] == "select") {
             ?>
                                         { type: "select", values : <?php echo json_encode($column["values"]); ?>},
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
             <?php
         }
         $numCol++;

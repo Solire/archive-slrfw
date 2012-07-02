@@ -18,7 +18,7 @@ class DashboardController extends MainController {
 
 
         if (isset($_GET["name"])) {
-            
+
             require_once $configMain->get('list', 'dirs') . $_GET["name"] . ".cfg.php";
             $this->_view->name = str_replace(array(".", "-"), "_", $_GET["name"]) . '_' . time();
             $this->_config = $config;
@@ -35,7 +35,7 @@ class DashboardController extends MainController {
                 $this->_view->additionalParams = http_build_query($params);
             }
         } else {
-            $this->simpleRedirect ($this->_url);
+            $this->simpleRedirect($this->_url);
         }
     }
 
@@ -86,7 +86,7 @@ class DashboardController extends MainController {
             <meta http-equiv="Content-Type" content="text/html; text/css; charset=utf-8" />
             <base href="' . $this->_url . '" />';
             if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
-                echo '<link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/admin/style.css" />
+                echo '
             <link type="text/css" rel="stylesheet" media="screen" href="css/back/jquery-ui-1.8.7.custom.css" />
             ' . $this->_css . '
             ' . $this->_javascript;
@@ -139,11 +139,12 @@ class DashboardController extends MainController {
 
                     foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
                         if ($sColIndexVal == "THIS") {
-                            $sVal = "`" . $sTable . "`.`" . $column["name"] . "`";
+                            $sVal = "";
+//                            $sVal = "`" . $sTable . "`.`" . $column["name"] . "`";
                         } else {
                             $sVal = $this->_db->quote($sColIndexVal);
                         }
-                        $aFilterJoin[] = "`" . $column["from"]["table"] . "_$iKeyJoin`.`" . $sColIndex . "` = " . $sVal;
+                        $aFilterJoin[] = "`" . $column["from"]["table"] . "`.`" . $sColIndex . "` = " . $sVal;
                     }
 
                     $aVal = array();
@@ -169,13 +170,11 @@ class DashboardController extends MainController {
         }
 
         $this->_view->config = $this->_config;
-        
+
         $this->_view->breadCrumbs[] = array(
             "label" => $this->_config["table"]["title"],
             "url" => "",
         );
-        
-        
     }
 
     public function editableAction() {
@@ -262,7 +261,10 @@ class DashboardController extends MainController {
 
         /* Traitement des definition de columns */
         foreach ($this->_config["columns"] as $keyCol => $column) {
-
+            if (!isset($column["name"]) && isset($column["special"])) {
+                $aColumnsRaw[$keyCol] = $column["special"];
+                continue;
+            }
 
             /* Contenu statique */
             if (isset($column["content"]) && !isset($column["name"])) {
@@ -355,16 +357,18 @@ class DashboardController extends MainController {
 
 //            echo '<pre>', print_r($aColumns, true), '</pre>';
 //            echo '<pre>', print_r($aColumnsRaw, true), '</pre>';
-//            echo '<pre>', print_r($aColumns, true), '</pre>';
 //            echo '<pre>', print_r($aColumnsAdvanced["name"], true), '</pre>';
 
 
             if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+
                 $aColumns[$keyCol] = $column["name"];
                 $aColumnsRaw[$keyCol] = $columnRawName;
                 $aColumnsAdvanced[] = $columnAdvancedName;
                 $aColumnsContent[$keyCol] = isset($column["content"]) && isset($column["name"]) ? $column["content"] : false;
                 $aColumnsFunctions[$keyCol] = isset($column["nl2br"]) ? array("nl2br") : false;
+                if (!$aColumnsFunctions[$keyCol])
+                    $aColumnsFunctions[$keyCol] = isset($column["php_function"]) ? $column["php_function"] : false;
             }
 
             if (isset($column["name"])) {
@@ -538,17 +542,21 @@ class DashboardController extends MainController {
             foreach ($aColumnsRaw as $aColRawKey => $aColRaw) {
                 if ($aColumnsRaw[$aColRawKey] != ' ') {
                     /* General output */
-                    if ($aColumnsContent[$aColRawKey] !== false) {
-                        $searchTag = array_merge($aColumnsTag, array("[#THIS#]"));
-                        $replaceTag = array_merge($aRow, array($aRow[$aColumnsRaw[$aColRawKey]]));
-                        $row[] = $aRow[$aColumnsRaw[$aColRawKey]] = str_replace($searchTag, $replaceTag, $aColumnsContent[$aColRawKey]);
+                    if (!isset($aColumnsContent[$aColRawKey])) {
+                        $row[] = $this->$aColRaw($aRow);
                     } else {
-                        $row[] = $aRow[$aColumnsRaw[$aColRawKey]];
-                    }
-                    if ($aColumnsFunctions[$aColRawKey] !== false) {
-                        foreach ($aColumnsFunctions[$aColRawKey] as $function) {
-                            $row[count($row) - 2] = call_user_func($function, $row[count($row) - 2]);
-                            $row[count($row) - 2] = preg_replace("/(\r\n|\n|\r)/", "", $row[count($row) - 2]);
+                        if ($aColumnsContent[$aColRawKey] !== false) {
+                            $searchTag = array_merge($aColumnsTag, array("[#THIS#]"));
+                            $replaceTag = array_merge($aRow, array($aRow[$aColumnsRaw[$aColRawKey]]));
+                            $row[] = $aRow[$aColumnsRaw[$aColRawKey]] = str_replace($searchTag, $replaceTag, $aColumnsContent[$aColRawKey]);
+                        } else {
+                            $row[] = $aRow[$aColumnsRaw[$aColRawKey]];
+                        }
+                        if ($aColumnsFunctions[$aColRawKey] !== false) {
+                            foreach ($aColumnsFunctions[$aColRawKey] as $function) {
+                                $row[count($row) - 2] = call_user_func($function, $row[count($row) - 2]);
+                                $row[count($row) - 2] = preg_replace("/(\r\n|\n|\r)/", "", $row[count($row) - 2]);
+                            }
                         }
                     }
                 }
@@ -564,26 +572,20 @@ class DashboardController extends MainController {
         echo json_encode($output);
     }
 
-    public function hasPjAction() {
-        $this->_view->enable(FALSE);
-        $idClient = intval($_POST["id"]);
-        $nbPj = $this->_db->query("SELECT COUNT(*) FROM media_fichier WHERE id_gab_page = $idClient")->fetchColumn();
-        if ($nbPj > 0)
-            echo json_encode(TRUE);
-        else {
-            echo json_encode(FALSE);
+    public function buildAction($data) {
+        $actionHtml = '<div style="width:145px">';
+        
+        if ($this->_utilisateur->get("niveau") == "solire" || $this->_gabarits[$data["id_gabarit"]]["editable"]) {
+            $actionHtml .= '<div class="btn btn-mini gradient-blue fl" ><a title="Modifier" href="page/display.html?id_gab_page=' . $data["id"] . '"><img alt="Modifier" src="img/back/white/pen_alt_stroke_12x12.png" /></a></div>';
         }
-    }
-
-    public function hasHistoryAction() {
-        $this->_view->enable(FALSE);
-        $idCommande = intval($_POST["id"]);
-        $nbPj = $this->_db->query("SELECT COUNT(*) FROM historique_commande WHERE id_commande = $idCommande")->fetchColumn();
-        if ($nbPj > 0)
-            echo json_encode(TRUE);
-        else {
-            echo json_encode(FALSE);
+        if (($this->_utilisateur->get("niveau") == "solire" || $this->_gabarits[$data["id_gabarit"]]["make_hidden"] || $data["visible"] == 0) && $data["rewriting"] != "") {
+            $actionHtml .= '<div class="btn btn-mini gradient-blue fl" ><a title="Rendre visible \'' . $data["titre"] . '\'" style="padding: 3px 7px 3px;"><input type="checkbox" value="' . $data["id"] . '-' . $data["id_version"] . '" class="visible-lang visible-lang-' . $data["id"] . '-' . $data["id_version"] . '" ' . ($data["visible"] > 0 ? ' checked="checked"' : '') . '/></a></div>';
         }
+        if ($data["rewriting"] == "") {
+            $actionHtml .= '<div class="btn btn-mini gradient-red fl"><a style="color:white;line-height: 12px;" href="page/display.html?id_gab_page=' . $data["id"] . '">Non traduit</a></div>';
+        }
+        $actionHtml .= '</div>';
+        return $actionHtml;
     }
 
 }

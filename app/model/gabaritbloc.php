@@ -108,7 +108,7 @@ class gabaritBloc
      *
      * @return type 
      */
-    public function buildForm($upload_path, $id_gab_page)
+    public function buildForm($upload_path, $id_gab_page, $versionId)
     {
         
         $form = '';
@@ -117,14 +117,14 @@ class gabaritBloc
         
         $type = strtolower("default");
         
-//        if(count($champs) == 1 && $champs[0]["type"] == "JOIN" && $champs[0]["params"]["VIEW"] == "checkbox") {
-//            $type = strtolower("checkbox");
-//        }
+        if(count($champs) == 1 && $champs[0]["type"] == "JOIN" && $champs[0]["params"]["VIEW"] == "simple") {
+            $type = strtolower("simple");
+        }
         
         $classNameType = $type . "fieldset";
         
         require_once "gabarit/fieldset/$type/$classNameType.php";
-        $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values, $upload_path, $id_gab_page,   isset($this->_meta) ? $this->_meta : null );
+        $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values, $upload_path, $id_gab_page,   isset($this->_meta) ? $this->_meta : null , $versionId);
         $fieldset->start();
         $form .= $fieldset;
 
@@ -159,7 +159,7 @@ class gabaritBloc
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";
-        $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page);
+        $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, 0);
         $field->start();
         $form .= $field;
 

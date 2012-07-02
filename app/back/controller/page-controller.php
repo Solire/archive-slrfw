@@ -166,6 +166,7 @@ class PageController extends MainController {
         $this->_javascript->addLibrary("back/jquery/jquery.tipsy.js");
         $this->_javascript->addLibrary("back/jquery/jquery.qtip.min.js");
         $this->_javascript->addLibrary("back/affichegabarit.js");
+        $this->_javascript->addLibrary("back/join-simple.js");
         $this->_javascript->addLibrary("back/jquery/jquery.autogrow.js");
         $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
         $this->_css->addLibrary("back/demo_table_jui.css");
@@ -214,7 +215,7 @@ class PageController extends MainController {
 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                         . '"><div class="clearin"></div>'
-                        . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta())
+                        . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta(), $version["id"])
                         . '</div>';
             }
 
@@ -224,7 +225,7 @@ class PageController extends MainController {
         } else {
             $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, 0, $id_gabarit);
 
-            $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $this->_page->getGabarit()->getMeta());
+            $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $this->_page->getGabarit()->getMeta(), 1);
             $this->_form = $form;
         }
 
@@ -310,7 +311,7 @@ class PageController extends MainController {
         $queryFilter = str_replace("[ID]", $idGabPage, $_REQUEST["query_filter"]);
         $table = $_REQUEST["table"];
         $labelField = "";
-        $lang = BACK_ID_VERSION;
+        $lang = $_REQUEST["id_version"];
         $gabPageJoin = "";
 
 
@@ -333,7 +334,9 @@ class PageController extends MainController {
                     FROM `$table` 
                     $gabPageJoin
                     WHERE $filterVersion " . ($queryFilter != "" ? "AND (" . $queryFilter . ")" : "") . " AND $labelField  LIKE '%$term%'";
-
+        
+        
+        
         $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
         exit(json_encode($json));

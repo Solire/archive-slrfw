@@ -17,10 +17,11 @@ abstract class GabaritField
     protected $idGabPage;
     protected $uploadPath;
     protected $id;
+    protected $versionId;
     protected $classes;
     protected $db;
 
-    public function __construct($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, $db = null)
+    public function __construct($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, $versionId, $db = null)
     {
         if (isset($champ["params"])) {
             $this->params = $champ["params"];
@@ -38,6 +39,7 @@ abstract class GabaritField
         $this->value = $value;
         $this->id = $id;
         $this->classes = $classes;
+        $this->versionId = $versionId;
     }
 
     public function start()

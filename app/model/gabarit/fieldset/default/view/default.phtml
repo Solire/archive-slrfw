@@ -3,6 +3,7 @@
 
         <?php
         foreach ($this->values as $value) {
+            
             $this->_buildChamps($value);
             ?>
             <fieldset class="sort-elmt" style="margin-left:30px;"><legend><?php echo $this->valueLabel; ?></legend>
@@ -17,7 +18,7 @@
                         <?php echo $this->champsHTML; ?>
                     </div></div>
                 <div>
-                    <div class="btn gradient-blue fr"><a href="#" class="delBloc<?php echo ( count($value) > 1 ? '' : ' translucide' ) ?>">
+                    <div class="btn gradient-blue fr"><a href="#" class="delBloc<?php echo ( count($this->values) > 1 ? '' : ' translucide' ) ?>">
                             <img src="img/back/white/trash_stroke_16x16.png" border="0" alt="supprimer"/></a></div>
                     <div class="btn gradient-blue"><a href="#" class="sort-move"><img src="img/back/deplacer.png" alt="Déplacer" /></a></div>
                 </div>

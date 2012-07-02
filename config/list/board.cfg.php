@@ -9,31 +9,88 @@ $config = array(
         "hide_columns" => false,
     ),
     "table" => array(
-        "name" => "traduction",
-        "title" => "Edition des traductions",
-        "title_item" => "traduction",
-        "suffix_genre" => "e",
-        "fixedheader" => true,
+        "name" => "gab_page",
+        "title" => "Liste des contenus",
+        "title_item" => "contenu",
+        "suffix_genre" => "",
+        "fixedheader" => false,
     ),
     "columns" => array(
+        /* Champs requis pour les actions*/
         array(
-            "name" => "cle",
+            "name" => "id_gabarit",
+        ),
+        array(
+            "name" => "id_version",
+        ),
+        array(
+            "name" => "id",
+        ),
+        array(
+            "name" => "visible",
+        ),
+        array(
+            "name" => "rewriting",
+        ),
+        /* ****************************** */
+        array(
+            "name" => "titre",
             "index" => true,
             "show" => true,
             "filter_field" => "text",
-            "title" => "Texte initial",
+            "title" => "Titre",
         ),
         array(
-            "name" => "valeur",
-            "editable" => true,
+            "name" => "id_gabarit",
+            "from" => array(
+                "table" => "gab_gabarit",
+                "columns" => array(
+                    array(
+                        "name" => "label",
+                    ),
+                ),
+                "index" => array(
+                    "id" => "THIS",
+                )
+            ),
+            "show" => true,
+            "filter_field" => "select",
+            "title" => "Type de contenu",
+        ), array(
+            "name" => "date_crea",
+            "php_function" => array(
+                "Tools::RelativeTimeFromDate"
+            ),
+            "index" => true,
             "show" => true,
             "filter_field" => "text",
-            "title" => "Traduction",
+            "title" => "Créé",
+        ),
+        array(
+            "name" => "date_modif",
+            "php_function" => array(
+                "Tools::RelativeTimeFromDate"
+            ),
+            "index" => true,
+            "show" => true,
+            "filter_field" => "text",
+            "title" => "Édité",
+            "default_sorting" => true,
+            "default_sorting_direction" => "desc",
         ),
         array(
             "name" => "id_version",
             "index" => true,
             "filter" => BACK_ID_VERSION,
+        ),
+        array(
+            "special" => "buildAction",
+            "show" => true,
+            "title" => "Actions",
+        ),
+        array(
+            "name" => "suppr",
+            "filter" => 0,
         ),
     ),
 );

@@ -81,6 +81,9 @@ class MainController extends ActionController
         
         $this->_view->appConfig = $this->_appConfig;
         
+        $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+        $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        
         $this->_view->pagesNonTraduites = $this->_db->query("SELECT * FROM `gab_page` gp WHERE rewriting = '' AND gp.suppr = 0 AND id_gabarit != 2 AND id_version = " . BACK_ID_VERSION)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

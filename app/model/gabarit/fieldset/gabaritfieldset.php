@@ -18,9 +18,10 @@ abstract class GabaritFieldSet
     protected $idGabPage;
     protected $champs;
     protected $meta;
+    protected $versionId;
     protected $db;
 
-    public function __construct($gabarit,  $champs, $values, $upload_path, $id_gab_page, $meta,  $db = null)
+    public function __construct($gabarit,  $champs, $values, $upload_path, $id_gab_page, $meta, $versionId,  $db = null)
     {
         $this->gabarit = $gabarit;
         if(count($values) == 0)
@@ -30,6 +31,7 @@ abstract class GabaritFieldSet
         $this->idGabPage = $id_gab_page;
         $this->uploadPath = $upload_path;
         $this->meta = $meta;
+        $this->versionId = $versionId;
     }
 
     public function start()
@@ -68,8 +70,9 @@ abstract class GabaritFieldSet
      * @param int $id_gab_page nom du dossier dans lequel sont les images.
      * @return string 
      */
-    protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page)
+    protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page, $gabarit = null)
     {
+        
         $form = '';
         if($champ["visible"] == 0)
             return $form;
@@ -83,8 +86,14 @@ abstract class GabaritFieldSet
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";
-        $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page);
-        $field->start();
+        $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, $this->versionId);
+        //Cas pour les bloc dyn de champ join avec un seul champs et de type simple
+        if($gabarit != null) {
+            $field->start($gabarit);
+        } else {
+            $field->start();
+        }
+        
         $form .= $field;
 
         if ($type == "join")

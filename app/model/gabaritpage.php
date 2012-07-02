@@ -200,7 +200,7 @@ class gabaritPage extends gabaritBloc {
      * @param type $mobile
      * @return string 
      */
-    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE) {        
+    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $versionId) {        
         $metaId = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
         $metaLang = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : 1;
         
@@ -280,7 +280,7 @@ class gabaritPage extends gabaritBloc {
                . '</div>'
                . '</fieldset>';
 
-		$form .= $this->buildForm($upload_path);
+		$form .= $this->buildForm($upload_path, $versionId);
 		
 		$form .= '<div class="buttonfixed">'
                . ($mobile ? '<div class="btn gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
@@ -300,7 +300,7 @@ class gabaritPage extends gabaritBloc {
      *
      * @return type 
      */
-	public function buildForm($upload_path) {      
+	public function buildForm($upload_path, $versionId) {      
         $form = '<input type="hidden" name="id_' . $this->_gabarit->getTable() . '" value="' . (isset($this->_values['id']) ? $this->_values['id'] : '') . '" />';
         
         $allchamps = $this->_gabarit->getChamps();
@@ -318,7 +318,7 @@ class gabaritPage extends gabaritBloc {
         }
         
         foreach ($this->_blocs as $blocName => $bloc)
-            $form .=  $bloc->buildForm($upload_path, $id_gab_page);
+            $form .=  $bloc->buildForm($upload_path, $id_gab_page, $versionId);
         
 		return $form;
 	}

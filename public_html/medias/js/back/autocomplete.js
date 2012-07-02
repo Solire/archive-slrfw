@@ -10,12 +10,14 @@ $(function(){
                 var labelField = $input.parent().find("input.join-label_field").val();
                 var queryFilter = $input.parent().find("input.join-query_filter").val();
                 var idGabPage = $("input[name='id_gab_page']").val();
+                var idVersion = $input.parents("form:first").find("input[name='id_version']").val();
                 
                 $.getJSON( 
                     "page/autocomplete-join.html", 
                     {
                         table : table,
                         id_field : idField,
+                        id_version : idVersion,
                         label_field : labelField,
                         query_filter : queryFilter,
                         id_gab_page : idGabPage,

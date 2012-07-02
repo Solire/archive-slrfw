@@ -90,6 +90,11 @@ class Tools {
         $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/plain; charset="UTF-8"' . "\r\n";
         mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $message, $header_ . $header);
     }
+    
+    static function RelativeTimeFromDate($date) {
+        $timestamp = strtotime($date);
+        return self::RelativeTime($timestamp);
+    }
 
     static function RelativeTime($timestamp) {
         $difference = time() - $timestamp;
