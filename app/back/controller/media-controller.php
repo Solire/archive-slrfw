@@ -58,7 +58,7 @@ class MediaController extends MainController {
         foreach ($this->_files as &$file) {
             $ext = strtolower(array_pop(explode(".", $file['rewriting'])));
 
-            $file['path'] = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
+            $file['path'] = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
                     . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                     . $file['rewriting'];
 
@@ -69,7 +69,7 @@ class MediaController extends MainController {
             $file['class'] = 'hoverprevisu vignette';
 
             if (array_key_exists($ext, fileManager::$_extensions['image'])) {
-                $file['path_mini'] = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
+                $file['path_mini'] = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
                         . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                         . $this->_upload_vignette . DIRECTORY_SEPARATOR
                         . $file['rewriting'];
