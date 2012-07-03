@@ -488,7 +488,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                 "sInfoEmpty": "Aucun<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>",
                 "sInfoFiltered": "(filtre sur _MAX_ <?php echo $this->config["table"]["title_item"] ?>s)",
                 "sInfoPostFix": "",
-                "sSearch": "Chercher:",
+                "sSearch": "",
                 "sUrl": "",
                 "oPaginate": {
                     "sFirst": "",
@@ -535,7 +535,7 @@ foreach ($this->config["columns"] as $column) {
                                         { "bVisible":    false },
             <?php
         } else {
-            if (!isset($column["special"])) {
+            if (isset($column["name"])) {
                 ?>
                                                 null,
                 <?php
@@ -741,7 +741,7 @@ foreach ($this->config["columns"] as $column) {
     }
 }
 ?> ] });
-                
+                $('.dataTables_filter input').attr("placeholder", "Recherche...");
                 $('td', oTable_<?php echo $this->name ?>.fnGetNodes()).livequery(function() {
                     $(this).hover(function() {
                         var odd = "even"

@@ -82,7 +82,8 @@ class MediaController extends MainController {
                 $file['path_mini'] = "img/back/$ext.png";
             }
 
-            $file['poids'] = (round((100 * $file['taille']) / (8 * 1024)) / 100) . " Ko";
+//            $file['poids'] = (round((100 * $file['taille']) / (8 * 1024)) / 100) . " Ko";
+            $file['poids'] = Tools::format_taille($file['taille']);
         }
 
         $this->_view->files = $this->_files;
@@ -277,5 +278,6 @@ class MediaController extends MainController {
 
         exit(json_encode($json));
     }
+    
 
 }

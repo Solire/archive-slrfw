@@ -160,10 +160,13 @@ class DashboardController extends MainController {
                     }
 
                     $columnAdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
+                    
                     $column["name"] = $columnAdvancedName . " `" . $column["name"] . "`";
 //                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`  ORDER BY " . $columnAdvancedName . " ASC")->fetchAll(PDO::FETCH_COLUMN);
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`")->fetchAll(PDO::FETCH_COLUMN);
                 } else {
+                    if(isset($column["sql"]))
+                        $column["name"] = $column["sql"];
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM " . $this->_config["table"]["name"] . " WHERE " . $column["name"] . " <> '' AND $generalWhere  ORDER BY " . $column["name"] . " ASC")->fetchAll(PDO::FETCH_COLUMN);
                 }
             }
@@ -261,14 +264,20 @@ class DashboardController extends MainController {
 
         /* Traitement des definition de columns */
         foreach ($this->_config["columns"] as $keyCol => $column) {
-            if (!isset($column["name"]) && isset($column["special"])) {
+            
+            $aColumnsFunctions[$keyCol] = false;
+            if (isset($column["php_function"])) {
+                $aColumnsFunctions[$keyCol] = isset($column["php_function"]) ? $column["php_function"] : false;
+            }
+            if (isset($column["special"])) {
                 $aColumnsRaw[$keyCol] = $column["special"];
-                continue;
+                $aColumnsFunctions[$keyCol] = isset($column["special"]) ? $column["special"] : false;
+                if(!isset($column["name"]))
+                    continue;
             }
 
             /* Contenu statique */
-            if (isset($column["content"]) && !isset($column["name"])) {
-
+            if (isset($column["content"])) {
                 $columnRawName = "content_$keyCol";
                 $columnAdvancedName = $this->_db->quote($column["content"]);
                 $column["name"] = $columnAdvancedName . " `content_$keyCol`";
@@ -366,9 +375,10 @@ class DashboardController extends MainController {
                 $aColumnsRaw[$keyCol] = $columnRawName;
                 $aColumnsAdvanced[] = $columnAdvancedName;
                 $aColumnsContent[$keyCol] = isset($column["content"]) && isset($column["name"]) ? $column["content"] : false;
-                $aColumnsFunctions[$keyCol] = isset($column["nl2br"]) ? array("nl2br") : false;
                 if (!$aColumnsFunctions[$keyCol])
-                    $aColumnsFunctions[$keyCol] = isset($column["php_function"]) ? $column["php_function"] : false;
+                    $aColumnsFunctions[$keyCol] = isset($column["nl2br"]) ? array("nl2br") : false;
+                
+                    
             }
 
             if (isset($column["name"])) {
@@ -542,15 +552,23 @@ class DashboardController extends MainController {
             foreach ($aColumnsRaw as $aColRawKey => $aColRaw) {
                 if ($aColumnsRaw[$aColRawKey] != ' ') {
                     /* General output */
-                    if (!isset($aColumnsContent[$aColRawKey])) {
-                        $row[] = $this->$aColRaw($aRow);
+                    
+                    if ($aColumnsFunctions[$aColRawKey] !== false && is_array($aColumnsFunctions[$aColRawKey]) === false) {
+                        $row[] = $this->$aColumnsFunctions[$aColRawKey]($aRow);
                     } else {
                         if ($aColumnsContent[$aColRawKey] !== false) {
                             $searchTag = array_merge($aColumnsTag, array("[#THIS#]"));
                             $replaceTag = array_merge($aRow, array($aRow[$aColumnsRaw[$aColRawKey]]));
                             $row[] = $aRow[$aColumnsRaw[$aColRawKey]] = str_replace($searchTag, $replaceTag, $aColumnsContent[$aColRawKey]);
                         } else {
-                            $row[] = $aRow[$aColumnsRaw[$aColRawKey]];
+                            
+                            if(isset($this->_config["extra"]["highlightedSearch"]) && $this->_config["extra"]["highlightedSearch"] && $_GET["sSearch"] != "" && $aColumnsFunctions[$aColRawKey] === false) {
+//                                $row[] = $aRow[$aColumnsRaw[$aColRawKey]];
+                                $words = strpos($_GET["sSearch"], " ") !== false ? explode(" ", $_GET["sSearch"]) : array($_GET["sSearch"]);
+                                $row[] = Tools::highlightedSearch($aRow[$aColumnsRaw[$aColRawKey]], $words);
+                            } else {
+                                $row[] = $aRow[$aColumnsRaw[$aColRawKey]];
+                            }
                         }
                         if ($aColumnsFunctions[$aColRawKey] !== false) {
                             foreach ($aColumnsFunctions[$aColRawKey] as $function) {
@@ -558,6 +576,7 @@ class DashboardController extends MainController {
                                 $row[count($row) - 2] = preg_replace("/(\r\n|\n|\r)/", "", $row[count($row) - 2]);
                             }
                         }
+                        
                     }
                 }
             }
@@ -573,7 +592,7 @@ class DashboardController extends MainController {
     }
 
     public function buildAction($data) {
-        $actionHtml = '<div style="width:145px">';
+        $actionHtml = '<div style="width:94px">';
         
         if ($this->_utilisateur->get("niveau") == "solire" || $this->_gabarits[$data["id_gabarit"]]["editable"]) {
             $actionHtml .= '<div class="btn btn-mini gradient-blue fl" ><a title="Modifier" href="page/display.html?id_gab_page=' . $data["id"] . '"><img alt="Modifier" src="img/back/white/pen_alt_stroke_12x12.png" /></a></div>';
@@ -581,8 +600,20 @@ class DashboardController extends MainController {
         if (($this->_utilisateur->get("niveau") == "solire" || $this->_gabarits[$data["id_gabarit"]]["make_hidden"] || $data["visible"] == 0) && $data["rewriting"] != "") {
             $actionHtml .= '<div class="btn btn-mini gradient-blue fl" ><a title="Rendre visible \'' . $data["titre"] . '\'" style="padding: 3px 7px 3px;"><input type="checkbox" value="' . $data["id"] . '-' . $data["id_version"] . '" class="visible-lang visible-lang-' . $data["id"] . '-' . $data["id_version"] . '" ' . ($data["visible"] > 0 ? ' checked="checked"' : '') . '/></a></div>';
         }
+        
+        $actionHtml .= '</div>';
+        return $actionHtml;
+    }
+    
+    public function buildTraduit($data) {
+        $actionHtml = '<div style="width:98px">';
+        
+        
         if ($data["rewriting"] == "") {
-            $actionHtml .= '<div class="btn btn-mini gradient-red fl"><a style="color:white;line-height: 12px;" href="page/display.html?id_gab_page=' . $data["id"] . '">Non traduit</a></div>';
+            $actionHtml .= '<div class="btn btn-mini gradient-red"><a style="color:white;line-height: 12px;" href="page/display.html?id_gab_page=' . $data["id"] . '">Non traduit</a></div>';
+        } else {
+            $actionHtml .= '<div class="btn btn-mini gradient-green"><a style="color:white;line-height: 12px;" href="page/display.html?id_gab_page=' . $data["id"] . '">Traduit</a></div>';
+
         }
         $actionHtml .= '</div>';
         return $actionHtml;

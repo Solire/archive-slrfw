@@ -95,7 +95,9 @@
                                     <li><a href="sign/signout.html"><b>Déconnexion</b></a></li>
                                 </ul>
                             </li>
+                            
                         </ul>
+
                         <a class="btn_menu" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-align-justify icon-white"></span>
                         </a>
@@ -107,7 +109,7 @@
                                     //Si le tableau de board est activé
                                     if ($this->appConfig->get("active", "board")) {
                                         ?>
-                                    <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
+                                        <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
                                         <?php
                                     }
                                     ?>

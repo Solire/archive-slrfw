@@ -7,6 +7,7 @@ $config = array(
         "pdf" => false,
         "csv" => false,
         "hide_columns" => false,
+        "highlightedSearch" => true,
     ),
     "table" => array(
         "name" => "gab_page",
@@ -16,7 +17,7 @@ $config = array(
         "fixedheader" => false,
     ),
     "columns" => array(
-        /* Champs requis pour les actions*/
+        /* Champs requis pour les actions */
         array(
             "name" => "id_gabarit",
         ),
@@ -32,7 +33,7 @@ $config = array(
         array(
             "name" => "rewriting",
         ),
-        /* ****************************** */
+        /*         * ***************************** */
         array(
             "name" => "titre",
             "index" => true,
@@ -63,7 +64,7 @@ $config = array(
             ),
             "index" => true,
             "show" => true,
-            "filter_field" => "text",
+//            "filter_field" => "text",
             "title" => "Créé",
         ),
         array(
@@ -73,7 +74,7 @@ $config = array(
             ),
             "index" => true,
             "show" => true,
-            "filter_field" => "text",
+//            "filter_field" => "text",
             "title" => "Édité",
             "default_sorting" => true,
             "default_sorting_direction" => "desc",
@@ -84,13 +85,29 @@ $config = array(
             "filter" => BACK_ID_VERSION,
         ),
         array(
-            "special" => "buildAction",
-            "show" => true,
-            "title" => "Actions",
-        ),
-        array(
             "name" => "suppr",
             "filter" => 0,
-        ),
+        )
     ),
 );
+//Si autre langue que version de base
+if (BACK_ID_VERSION != 1) {
+    $config["columns"][] = array(
+        "special" => "buildTraduit",
+        "sql" => "IF(`gab_page`.`rewriting` = '', '&#10005; Non traduit', '&#10003; Traduit')",
+        "show" => true,
+        "title" => "Traduction",
+        "filter_field" => "select",
+        "name"  =>  "rewriting"
+    );
+}
+$config["columns"][] = array(
+    "special" => "buildAction",
+    "sql" => "IF(`gab_page`.`visible` = 0, '&#10005; Non visible', '&#10003; Visible')",
+    "filter_field" => "select",
+    "show" => true,
+    "title" => "Actions",
+    "name"  =>  "visible",
+);
+
+

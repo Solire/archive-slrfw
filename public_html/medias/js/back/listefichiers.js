@@ -34,7 +34,9 @@ function reloadDatatable(data) {
         null,
         null,
         null,
-        null,
+        {
+            "bSortable": false
+        },
         ],
         'oLanguage': {
             "sProcessing": "Chargement...",
@@ -45,7 +47,7 @@ function reloadDatatable(data) {
             "sInfoEmpty": "Aucun fichier",
             "sInfoFiltered": "(filtre sur _MAX_ fichiers)",
             "sInfoPostFix": "",
-            "sSearch": "Chercher:",
+            "sSearch": "",
             "sUrl": "",
             "oPaginate": {
                 "sFirst": "",
@@ -55,6 +57,7 @@ function reloadDatatable(data) {
             }
         }
     } )
+    $('.dataTables_filter input').attr("placeholder", "Recherche...");
 }
 
 

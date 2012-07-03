@@ -6,7 +6,7 @@
                 </div>
         </div>
 
-        <table id="tableau" style="width:100%;">
+        <table id="tableau" class="display" style="width:100%;">
             <thead>
                 <tr>
                     <th>&nbsp;</th>
@@ -26,7 +26,7 @@
                             <img class="<?php echo $file['class']; ?>" src="<?php echo $file['path_mini']; ?>" alt="<?php echo $file['rewriting']; ?>" />
                         </a>
                     </td>
-                    <td><?php echo $file['taille']; ?></td>
+                    <td><?php echo $file['poids']; ?></td>
                     <td><?php echo Tools::formate_date_nombre(substr($file['date_crea'], 0, 10), '-', '/'); ?><br /><?php echo substr($file['date_crea'], 11); ?></td>
                     <td>
                         <div class="btn gradient-blue">

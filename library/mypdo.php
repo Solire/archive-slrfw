@@ -113,11 +113,11 @@ class MyPDO extends PDO
         }
         unset($p);
         if ($params == NULL) {
-            try {
+//            try {
                 $funcQuery = parent::query($query);
-            } catch (Exception $exc) {
-                return FALSE;
-            }
+//            } catch (Exception $exc) {
+//                return FALSE;
+//            }
 
             return $funcQuery;
         } else {

@@ -90,10 +90,40 @@ class Tools {
         $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/plain; charset="UTF-8"' . "\r\n";
         mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $message, $header_ . $header);
     }
-    
+
     static function RelativeTimeFromDate($date) {
         $timestamp = strtotime($date);
         return self::RelativeTime($timestamp);
+    }
+
+    static function format_taille($valeur) {
+        $strTmp = "";
+
+        if (preg_match("#^[0-9]{1,}$#", $valeur)) {
+            if ($valeur >= 1000000) {
+                // Taille supÃ©rieur Ã  1 MegaOctet
+                $strTmp = sprintf("%01.2f", $valeur / 1000000);
+                // Suppression des "0" en fin de chaine
+                $strTmp = preg_replace("#[\.]{1}[0]{1,}$#", "", $strTmp) . " Mo";
+            } else if ($valeur >= 1000) {
+                // Taille infÃ©rieur Ã  1 MegaOctet
+                $strTmp = sprintf("%01.2f", $valeur / 1000);
+                // Suppression des "0" en fin de chaine
+                $strTmp = preg_replace("#[\.]{1}[0]{1,}$#", "", $strTmp) . " Ko";
+            } else if ($valeur >= 0) {
+                // Taille infÃ©rieur Ã  1 KiloOctet
+                $strTmp = $valeur . " octect";
+                if ($valeur > 0)
+                    $strTmp .= "s";
+            }
+            else {
+                $strTmp = $valeur;
+            }
+        } else {
+            $strTmp = $valeur;
+        }
+
+        return $strTmp;
     }
 
     static function RelativeTime($timestamp) {
@@ -321,6 +351,47 @@ class Tools {
     static function formate_date_nombre($dateUS, $glueBefore = '-', $glueAfter = '-') {
         return implode($glueAfter, array_reverse(explode($glueBefore, $dateUS)));
     }
+    
+    static function regexAccents($chaine)
+    {
+        mb_internal_encoding("UTF-8");
+        mb_regex_encoding('UTF-8');
+        $accent = array('a', 'à', 'á', 'â', 'ã', 'ä', 'å', 'c', 'ç', 'e', 'è', 'é', 'ê', 'ë', 'i', 'ì', 'í', 'î', 'ï', 'o', 'ð', 'ò', 'ó', 'ô', 'õ', 'ö', 'u', 'ù', 'ú', 'û', 'ü', 'y', 'ý', 'ý', 'ÿ');
+        $inter = array('%01', '%02', '%03', '%04', '%05', '%06', '%07', '%08', '%09', '%10', '%11', '%12', '%13', '%14', '%15', '%16', '%17', '%18',
+            '%19', '%20', '%21', '%22', '%23', '%24', '%25', '%26', '%27', '%28', '%29', '%30', '%31', '%32', '%33', '%34', '%35');
+        $regex = array('[aàáâãäå]', '[aàáâãäå]', '[aàáâãäå]', '[aàáâãäå]', '[aàáâãäå]', '[aàáâãäå]', '[aàáâãäå]',
+            '[cç]', '[cç]',
+            '[eèéêë]', '[eèéêë]', '[eèéêë]', '[eèéêë]', '[eèéêë]',
+            '[iìíîï]', '[iìíîï]', '[iìíîï]', '[iìíîï]', '[iìíîï]',
+            '[oðòóôõö]', '[oðòóôõö]', '[oðòóôõö]', '[oðòóôõö]', '[oðòóôõö]', '[oðòóôõö]', '[oðòóôõö]',
+            '[uùúûü]', '[uùúûü]', '[uùúûü]', '[uùúûü]',
+            '[yýýÿ]', '[yýýÿ]', '[yýýÿ]', '[yýýÿ]');
+        $chaine = str_ireplace($accent, $inter, $chaine);
+        $chaine = str_replace($inter, $regex, $chaine);
+        return $chaine;
+    }
+    
+    static function highlightedSearch($chaine, $keywords)
+    {
+
+        mb_internal_encoding("UTF-8");
+        mb_regex_encoding('UTF-8');
+        for ($Z = 0; $Z < count($keywords); $Z++) {
+            if (str_replace(' ', '', $keywords) != "") {
+                $keywords[$Z] = '#(' . self::regexAccents(str_replace(array('<¤>', '</¤>'), '', $keywords[$Z])) . ')#iu';
+            } else {
+                array_splice($keywords, $Z, 1);
+                $Z--;
+            }
+        }
+        if (is_array($keywords) && count($keywords) > 0) {
+            $chaine = preg_replace($keywords, '<¤>$1</¤>', $chaine);
+            $chaine = str_replace(array('<¤>', '</¤>'), array('<strong>', '</strong>'), $chaine);
+        }
+        return $chaine;
+    }
+    
+        
 
 }
 

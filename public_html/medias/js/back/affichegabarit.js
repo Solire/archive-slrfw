@@ -637,6 +637,7 @@ $(function(){
     }).load('media/popuplistefichiers.html?id_gab_page=' + $('[name=id_gab_page]').val(), function(){
         
         $(this).dialog({
+            title : "Fichiers",
             autoOpen : false,
             width : 625,
             resizable : false,
@@ -822,7 +823,9 @@ function reloadDatatable() {
         },                
         null,
         null,
-        null,
+        {
+            "bSortable": false
+        },
         ],
         'oLanguage': {
             "sProcessing": "Chargement...",
@@ -833,7 +836,7 @@ function reloadDatatable() {
             "sInfoEmpty": "Aucun fichier",
             "sInfoFiltered": "(filtre sur _MAX_ fichiers)",
             "sInfoPostFix": "",
-            "sSearch": "Chercher:",
+            "sSearch": "",
             "sUrl": "",
             "oPaginate": {
                 "sFirst": "",
@@ -843,4 +846,5 @@ function reloadDatatable() {
             }
         }
     } )
+    $('.dataTables_filter input').attr("placeholder", "Recherche...");
 }

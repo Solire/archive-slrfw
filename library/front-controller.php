@@ -221,15 +221,12 @@ class FrontController
                 self::CONTROLLER_ACTION_NOT_EXISTS => "Impossible de trouver l'action <strong>%s</strong> pour le contr&ocirc;leur <strong>%s</strong> dans le fichier <strong>%s</strong>.",
                 self::VIEW_FILE_NOT_EXISTS => "Le fichier de vue <strong>%s</strong> n'existe pas.",
             );
-
-            $error = date("[d-m-Y][h:i:s]") . " " . vsprintf($errors[$idx], $params);
-
-            $fp = fopen($this->_debug["framework"], "a+");
-            fputs($fp, date("[d-m-Y][h:i:s]") . " " . vsprintf($errors[$idx], $params) . PHP_EOL);
-            fclose($fp);
-
-            if ($this->_debug["display"])
-                echo $error;
+            $message = $errors[$idx];
+            throw new MarvinException(new Exception($message));
+        } else {
+            $error = new HttpException('');
+            $error->http(404);
+            throw $error;
         }
     }
 

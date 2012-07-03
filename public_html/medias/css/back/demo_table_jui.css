@@ -131,25 +131,97 @@ table.display thead th div.DataTables_sort_wrapper span {
 .dataTables_length {
 	width: 40%;
 	float: left;
+        font-weight: bold;
+        color: #FFFFFF;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
 }
 
 .dataTables_filter {
 	width: 50%;
 	float: right;
 	text-align: right;
+        font-weight: bold;
+        color: #FFFFFF;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
 }
+
+
+
+#dark {
+   
+}
+
+#dark #search {
+   
+
+}
+
+#dark #search input[type="text"] {
+    
+    border: 0 none;
+    font: bold 12px Arial,Helvetica,Sans-serif;
+    color: #777;
+    width: 150px;
+    
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    -webkit-transition: all 0.7s ease 0s;
+    -moz-transition: all 0.7s ease 0s;
+    -o-transition: all 0.7s ease 0s;
+    transition: all 0.7s ease 0s;
+    }
+
+#dark #search input[type="text"]:focus {
+    width: 200px;
+    }
+
 
 .dataTables_filter input {
     
     border:1px solid #a1a1a1;
-    padding:2px;
-    font-size:14px;
+    font: bold 12px Arial,Helvetica,Sans-serif;
     color:#38393C;
+/*    background: -moz-linear-gradient(center top , #FFFFFF, #EEEEEE 1px, #FFFFFF 25px) repeat scroll 0 0 transparent;*/
+background: url(../../img/back/search-white.png)no-repeat 10px 5px #fcfcfc;
+    border: 1px solid #E5E5E5;
+    font-style: italic;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    -webkit-transition: all 0.7s ease 0s;
+    -moz-transition: all 0.7s ease 0s;
+    -o-transition: all 0.7s ease 0s;
+    transition: all 0.7s ease 0s;
+    color: #BEBEBE;
+    font-size: 14px;
+    padding: 4px 15px 4px 35px;
+    width: 130px;
+    
+
+}
+
+.dataTables_filter input:hover {
+    border-color: #C9C9C9;
+}
+
+.dataTables_filter input:focus {
+    width: 160px;
+    background: url(../../img/back/search-white-focus.png)no-repeat 10px 5px #fcfcfc;
+    color: #666;
 }
 
 .dataTables_info {
 	width: 50%;
 	float: left;
+        font-weight: bold;
+        color: #FFFFFF;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
 }
 
 .dataTables_paginate {
@@ -289,13 +361,15 @@ table.display tr.even.gradeU {
 
 tr.odd {
 	background-color: #EEE;
-        border-left: 1px dotted #CFCFCF;
-    border-top: 1px solid #E6E6E6;
+
+}
+
+ td {
+    border: 1px solid #CFCFCF;
 }
 
 tr.even {
-    border-left: 1px dotted #CFCFCF;
-    border-top: 1px solid #E6E6E6;
+
 	background-color: white;
 }
 
@@ -336,6 +410,21 @@ tfoot input {
 
 tfoot input.search_init {
 	color: #999;
+        border:1px solid #a1a1a1;
+    
+/*    background: -moz-linear-gradient(center top , #FFFFFF, #EEEEEE 1px, #FFFFFF 25px) repeat scroll 0 0 transparent;*/
+    border: 1px solid #E5E5E5;
+/*    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);*/
+    font-size: 14px;
+    border-radius: 2px 2px 2px 2px;
+/*    height: 26px;*/
+/*    padding: 2px;*/
+/*    padding-left: 5px;
+    padding-right: 5px;*/
+}
+
+tfoot input.search_init:hover {
+    border-color: #C9C9C9;
 }
 
 td.group {
