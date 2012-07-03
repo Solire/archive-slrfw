@@ -561,9 +561,8 @@ class DashboardController extends MainController {
                             $replaceTag = array_merge($aRow, array($aRow[$aColumnsRaw[$aColRawKey]]));
                             $row[] = $aRow[$aColumnsRaw[$aColRawKey]] = str_replace($searchTag, $replaceTag, $aColumnsContent[$aColRawKey]);
                         } else {
-                            
                             if(isset($this->_config["extra"]["highlightedSearch"]) && $this->_config["extra"]["highlightedSearch"] && $_GET["sSearch"] != "" && $aColumnsFunctions[$aColRawKey] === false) {
-//                                $row[] = $aRow[$aColumnsRaw[$aColRawKey]];
+                                $_GET["sSearch"] = trim($_GET["sSearch"]);
                                 $words = strpos($_GET["sSearch"], " ") !== false ? explode(" ", $_GET["sSearch"]) : array($_GET["sSearch"]);
                                 $row[] = Tools::highlightedSearch($aRow[$aColumnsRaw[$aColRawKey]], $words);
                             } else {
