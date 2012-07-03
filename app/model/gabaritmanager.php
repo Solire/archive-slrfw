@@ -22,6 +22,11 @@ class gabaritManager extends manager {
         return $this->_db->query($query)->fetchColumn();
     }
 
+    /**
+     *
+     * @param int $id_version
+     * @return array 
+     */
     public function getVersion($id_version) {
         $query = "SELECT * FROM `version` WHERE `id` = " . $id_version;
         $data = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
@@ -329,7 +334,12 @@ class gabaritManager extends manager {
         foreach ($joinFields as $joinName => $joinField) {
             if (count($joinField['values']) == 0)
                 continue;
-            $query = "SELECT `gab_page`.`id`, `gab_page`.* FROM `gab_page` WHERE `id_version` = $id_version " . ($visible ? " AND `visible` = 1" : "") . " AND  `id`  IN (" . implode(",", $joinField['values']) . ") AND `suppr` = 0";
+            $query  = "SELECT `gab_page`.`id`, `gab_page`.*"
+                    . " FROM `gab_page`"
+                    . " WHERE `id_version` = $id_version"
+                    . ($visible ? " AND `visible` = 1" : "")
+                    . " AND  `id`  IN (" . implode(",", $joinField['values']) . ")"
+                    . " AND `suppr` = 0";
             $meta = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
             if (!$meta)
                 continue;

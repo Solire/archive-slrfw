@@ -56,5 +56,8 @@ try {
 } catch (HttpException $exc) {
     Error::http($exc->getHttp());
 } catch (Exception $exc) {
+    $marv = new Marvin('debug', $exc);
+    $marv->display();
+    
     Error::run();
 }

@@ -93,7 +93,7 @@ h1, h2, h3 {
 	height: 97px;
 	position:relative;
 	z-index:1;
-	background: url(images/solire-sprite.png) scroll repeat-x;
+	background: url(../../img/solire-sprite.png) scroll repeat-x;
 }
 
 /*#corps{
@@ -713,16 +713,9 @@ form input.mini   {
 	width:100px; 
 }
 	
-/*form input.disabled, form input.disabled:hover {
-	background: #a1a1a1 url(images/solire-sprite.png) 0 0px scroll repeat-x;
-	border:1px solid #ccc;
-	padding:2px;
-	font-size:12px;
-	color:#999;
-	height:26px;
-	text-align:left;
+form input:disabled, form input:disabled:hover {
+	color:#aaa;
 }
-	*/
 
 form input[type=file], form input.file   {
 	background: url(images/solire-sprite.png) 0 0px scroll repeat-x;
@@ -822,17 +815,6 @@ form .desc {
 form select:hover {
 	background-color:#fff; 
 	border:1px solid #B0B0B0;
-}
-	
-/*form input:hover {
-	background: url(images/solire-sprite.png) 0 -40px scroll repeat-x;
-	border:1px solid #3485c9;
-	color:#000;
-}*/
-	
-form textarea:hover {
-	background-image: url(images/input-fondbis.gif);
-	border:1px solid #3485c9;
 }
 	
 form fieldset, fieldset{
@@ -1178,13 +1160,14 @@ form label {
     text-decoration: none;
 }
 .navbar .brand {
-    color: #999999;
+    color: #333;
     display: block;
     float: left;
-    font-size: 20px;
+    font-size: 12px;
     font-weight: 200;
     line-height: 1;
     padding: 10px 20px 12px;
+    border-right:1px solid #fff;
 }
 .navbar .navbar-text {
     line-height: 40px;

@@ -2,5 +2,4 @@
 /nbproject/
 
 # dossiers de documentations
-~files/
-~export/
+~*/

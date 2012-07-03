@@ -92,6 +92,9 @@ class Tools {
     }
 
     static function RelativeTimeFromDate($date) {
+        if (substr($date, 0, 10) == "0000-00-00")
+            return "";
+        
         $timestamp = strtotime($date);
         return self::RelativeTime($timestamp);
     }
