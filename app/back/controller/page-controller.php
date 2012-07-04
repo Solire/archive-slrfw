@@ -23,32 +23,27 @@ class PageController extends MainController {
 
 //end start()
 
-    
+
     public function matriceAction() {
         $this->_view->enable(FALSE);
-        
-        $query  = "SELECT `c`.*,"
+        //TODO
+        $query = "SELECT `c`.*,"
                 . " `table_field_id`.`value` `table_field_id_value`,"
                 . " `table_name`.`value` `table_name_value`,"
                 . " `table_field_label`.`value` `table_field_label_value`"
-                
                 . " FROM `gab_champ` `c`"
-                
                 . " JOIN `gab_champ_param_value` `table_field_id`"
                 . " ON `table_field_id`.`id_champ` = `c`.`id` AND `table_field_id`.`code_champ_param` LIKE 'TABLE.FIELD.ID'"
-                
                 . " JOIN `gab_champ_param_value` `table_name`"
                 . " ON `table_name`.`id_champ` = `c`.`id` AND `table_name`.`code_champ_param` LIKE 'TABLE.NAME'"
-                
                 . " JOIN `gab_champ_param_value` `table_field_label`"
                 . " ON `table_field_label`.`id_champ` = `c`.`id` AND `table_field_label`.`code_champ_param` LIKE 'TABLE.FIELD.LABEL'"
-                
                 . " WHERE `c`.`type` LIKE 'JOIN'";
         $champs = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
-        
+
         foreach ($champs as $champ) {
             if ($champ['type_parent'] == "bloc") {
-                $query  = "SELECT"
+                $query = "SELECT"
                         . " `g`.`id`,"
                         . " CONCAT(`a`.`name`, '_', `g`.`name`, '_', `b`.`name`),"
                         . " CONCAT(`a`.`name`, '_', `g`.`name`)"
@@ -57,13 +52,12 @@ class PageController extends MainController {
                         . " JOIN `gab_api` `a` ON `a`.`id` = `g`.`id_api`"
                         . " WHERE `b`.`id` = " . $champ['id_parent'];
                 $results = $this->_db->query($query)->fetch(PDO::FETCH_NUM);
-                
-                $id_gabarit     = $results[0];
-                $blocOrigin     = $results[1];
-                $tableOrigin    = $results[2];
-            }
-            else {
-                $query  = "SELECT"
+
+                $id_gabarit = $results[0];
+                $blocOrigin = $results[1];
+                $tableOrigin = $results[2];
+            } else {
+                $query = "SELECT"
                         . " `g`.`id`,"
                         . " CONCAT(`a`.`name`, '_', `g`.`name`)"
                         . " FROM `gab_gabarit` `g`"
@@ -71,24 +65,24 @@ class PageController extends MainController {
                         . " WHERE `g`.`id` = " . $champ['id_parent'];
                 $results = $this->_db->query($query)->fetch(PDO::FETCH_NUM);
 
-                $id_gabarit     = $results[0];
-                $tableOrigin    = $results[1];
+                $id_gabarit = $results[0];
+                $tableOrigin = $results[1];
             }
 
             $liste = $this->_gabaritManager->getList(BACK_ID_VERSION, FALSE, $id_gabarit);
-            
+
             foreach ($liste as $ii => $page) {
                 $fullPage = $this->_gabaritManager->getPage(BACK_ID_VERSION, $page->getMeta("id"), 0, TRUE);
-                
+
                 $liste[$ii] = $fullPage;
             }
-            
-            echo    $tableOrigin . '<br />' . $champ['table_name_value']
-                    . '<pre>' . print_r($liste, true) . '</pre>' 
-                    . '<hr />';
+
+            echo $tableOrigin . '<br />' . $champ['table_name_value']
+            . '<pre>' . print_r($liste, true) . '</pre>'
+            . '<hr />';
         }
     }
-    
+
     /**
      * 
      * @return void
@@ -105,23 +99,13 @@ class PageController extends MainController {
 
 
         //Si on a un fichier de conf
-        if (isset($_GET["config"])) {
-            $config = Registry::get('mainconfig');
-            require_once($config->get('back', 'dirs') . "gabarit/" . $_GET["config"] . ".cfg.php");
-            $gabConfig = $config;
-            $gabaritsList = $gabConfig["gabarit"];
-        }
+        $indexConfig = intval($_GET["c"]);
+        $currentConfigPageModule = $this->_configPageModule[$indexConfig];
 
-        //Si on a une liste de gabarit dans l'url
-        if (isset($_GET["gabarit"])) {
-            $gabaritsList = $_GET["gabarit"];
-        }
-
-
-
+        $gabaritsList = $currentConfigPageModule["gabarits"];
 
         //Si on liste que certains gabarits
-        if (count($gabaritsList) > 0) {
+        if ($gabaritsList != "*" && count($gabaritsList) > 0) {
             $query .= " WHERE id IN ( " . implode(", ", $gabaritsList) . ")";
             //Permet de séparer les différents gabarits
             if (isset($_GET["gabaritByGroup"])) {
@@ -145,22 +129,40 @@ class PageController extends MainController {
         //Liste des début de label à regrouper pour les boutons de création
         $groupIdentifications = array("Rubrique ", "Sous rubrique ", "Page ");
         foreach ($this->_gabarits as $gabarit) {
+            $found = false;
+
             $gabaritsGroup = array(
                 "label" => $gabarit["label"],
             );
 
             //Si utilisateur standart à le droit de créer ce type de gabarit ou si utilisateur solire
             if ($gabarit["creable"] || $this->_utilisateur->get("niveau") == "solire") {
+
+                //Si on a un regroupement des boutons personnalisés dans le fichier de config
+                if (isset($currentConfigPageModule["boutons"]) && isset($currentConfigPageModule["boutons"]["groups"])) {
+                    foreach ($currentConfigPageModule["boutons"]["groups"] as $customGroup) {
+                        //Si le gabarit courant appartien à un des groupes personnalisés
+                        if (in_array($gabarit["id"], $customGroup["gabarits"])) {
+                            $gabaritsGroup = array(
+                                "label" => $customGroup["label"],
+                            );
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+
                 //On parcourt les Début de label à regrouper
-                $found = false;
-                foreach ($groupIdentifications as $groupIdentification) {
-                    if (preg_match("/^$groupIdentification/", $gabarit["label"])) {
-                        $gabaritsGroup = array(
-                            "label" => $groupIdentification,
-                        );
-                        $gabarit["label"] = ucfirst(trim(preg_replace("#^" . $groupIdentification . "#", "", $gabarit["label"])));
-                        $found = true;
-                        break;
+                if ($found == false) {
+                    foreach ($groupIdentifications as $groupIdentification) {
+                        if (preg_match("/^$groupIdentification/", $gabarit["label"])) {
+                            $gabaritsGroup = array(
+                                "label" => $groupIdentification,
+                            );
+                            $gabarit["label"] = ucfirst(trim(preg_replace("#^" . $groupIdentification . "#", "", $gabarit["label"])));
+                            $found = true;
+                            break;
+                        }
                     }
                 }
                 $gabaritsGroup["gabarit"][] = $gabarit;
@@ -182,7 +184,7 @@ class PageController extends MainController {
         $this->_view->pages = $this->_pages;
 
         $this->_view->breadCrumbs[] = array(
-            "label" => "Liste des pages",
+            "label" => $currentConfigPageModule["label"],
             "url" => "page/liste.html",
         );
     }
@@ -199,7 +201,7 @@ class PageController extends MainController {
 
         $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
         $this->_view->gabarits = $this->_gabarits;
-        
+
         $this->_view->main(FALSE);
         $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $_REQUEST['id_parent']);
         if (count($this->_pages) == 0)
@@ -236,8 +238,8 @@ class PageController extends MainController {
         $this->_javascript->addLibrary("back/jquery/jquery.autogrow.js");
         $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
         $this->_css->addLibrary("back/demo_table_jui.css");
-        
-        
+
+
         $this->_javascript->addLibrary("back/autocomplete_multi/jquery.tokeninput.js");
         $this->_javascript->addLibrary("back/autocomplete_multi.js");
 
@@ -295,13 +297,39 @@ class PageController extends MainController {
             $this->_form = $form;
         }
 
+
+
+        //on recupere la sous rubrique de page a laquelle il appartient pour le breadCrumbs et le lien retour
+        $found = false;
+        foreach ($this->_configPageModule as $index => $currentConfigPageModule) {
+            //Si le gabarit courant appartien à un des groupes personnalisés
+            if ($currentConfigPageModule["gabarits"] == "*" || in_array($this->_page->getGabarit()->getId(), $currentConfigPageModule["gabarits"])) {
+                $indexPageList = $index;
+                $found = true;
+                break;
+            }
+
+            if ($found) {
+                break;
+            }
+        }
+
+
+
         $this->_view->page = $this->_page;
         $this->_view->form = $this->_form;
 
-        $this->_view->breadCrumbs[] = array(
-            "label" => "Liste des pages",
-            "url" => "page/liste.html",
-        );
+        if ($found) {
+            $this->_view->breadCrumbs[] = array(
+                "label" => $this->_configPageModule[$indexPageList]["label"],
+                "url" => "page/liste.html?c=" . $indexPageList,
+            );
+        } else {
+            $this->_view->breadCrumbs[] = array(
+                "label" => "Liste des pages",
+                "url" => "page/liste.html",
+            );
+        }
 
         $this->_view->breadCrumbs[] = array(
             "label" => "Gestion des pages",
@@ -396,16 +424,119 @@ class PageController extends MainController {
             $labelField = "`$table`.`" . $_REQUEST["label_field"] . "`";
         }
 
-        $sql    = "SELECT `$table`.$idField id, $labelField label"
+        $sql = "SELECT `$table`.$idField id, $labelField label"
                 . " FROM `$table`"
                 . " $gabPageJoin"
                 . " WHERE $filterVersion "
                 . ($queryFilter != "" ? "AND (" . $queryFilter . ")" : "")
                 . " AND $labelField  LIKE '%$term%'";
-        
+
         $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-        
+
         exit(json_encode($json));
+    }
+
+    /**
+     * 
+     * @return void
+     */
+    public function liveSearchAction() {
+        $this->_view->enable(FALSE);
+        $this->_view->main(FALSE);
+
+        $pages = array();
+
+
+        $qSearch = isset($_GET["term"]) ? $_GET["term"] : "";
+
+        /*
+         * Traitement de la chaine de recherche
+         */
+
+        $searchTab = array();
+
+        //Variable qui contient la chaine de recherche
+        $stringSearch = strip_tags(trim($qSearch));
+        $this->filter->stringSearch = $stringSearch;
+
+        //Si un seul mot
+        if (strpos($stringSearch, " ") === false) {
+            $searchTab[0] = $stringSearch;
+        } else {
+            //Si plusieurs  mots on recupere un tableau de mots
+            $searchTab = preg_split("#[ ]+#", $stringSearch);
+        }
+
+        //Tableau de mot(s)
+        $this->filter->words = $searchTab;
+
+        //On teste si un mot est supérieurs à 3 caractères
+        $this->filter->errors["len_words"] = true;
+        for ($i = 0, $I = count($this->filter->words); $i < $I; $i++) {
+            if (trim($this->filter->words[$i]) != "" && strlen(trim($this->filter->words[$i])) >= 2) {
+                $this->filter->errors["len_words"] = false;
+            }
+        }
+
+        if ($this->filter->errors["len_words"]) {
+            echo json_encode(null);
+            return;
+        }
+
+        //Pour chaque mot ou essaie de mettre au singulier ou pluriel
+        // + Traitement de la chaine de recherche (elimine mot trop court
+        $mode[] = "s";
+        $mode[] = "p";
+        $i = 0;
+        foreach ($this->filter->words as $t1) {
+            foreach ($mode as $m) {
+                if (strlen($t1) >= 2) {
+                    $this->filter->wordsAdvanced[$i++] = (($m == "s") ? $this->singulier($t1) : $this->pluriel($t1));
+                }
+            }
+        }
+
+        //Tri des mots par strlen
+        if (is_array($this->filter->wordsAdvanced))
+            usort($this->filter->wordsAdvanced, array($this, "length_cmp"));
+
+        if ($qSearch != null) {
+            $filterWords[] = 'CONCAT(" ", gab_page.titre, " ") LIKE ' . $this->_db->quote("%" . $this->filter->stringSearch . "%");
+
+            if (isset($this->filter->wordsAdvanced) && is_array($this->filter->wordsAdvanced) && count($this->filter->wordsAdvanced) > 0)
+                foreach ($this->filter->wordsAdvanced as $word) {
+                    $filterWords[] = 'CONCAT(" ", gab_page.titre, " ") LIKE ' . $this->_db->quote("%" . $word . "%");
+                }
+
+            foreach ($filterWords as $filterWord) {
+                $orderBy[] = "IF($filterWord , 0, 1)";
+            }
+        }
+
+
+        $sql = "SELECT `gab_page`.`id` id, gab_page.titre label, gab_page.titre visible, gab_gabarit.label gabarit_label,  CONCAT('page/display.html?id_gab_page=', `gab_page`.`id`) url"
+                . " FROM `gab_page`"
+                . " LEFT JOIN `gab_gabarit`"
+                . "     ON `gab_page`.id_gabarit = `gab_gabarit`.id"
+                . "     AND `gab_gabarit`.editable = 1"
+                . " WHERE `gab_page`.`id_version` = " . BACK_ID_VERSION
+                . " AND `gab_page`.`suppr` = 0 "
+                . (isset($filterWords) ? " AND (" . implode(" OR ", $filterWords) . ")" : '')
+                . " ORDER BY " . implode(",", $orderBy) . " LIMIT 10";
+
+        $pagesFound = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($pagesFound as $page) {
+            $pages[] = array(
+                "label" => Tools::highlightedSearch($page["label"], $this->filter->wordsAdvanced, true),
+                "id" => $page["id"],
+                "gabarit_label" => $page["gabarit_label"],
+                "url" => $page["url"],
+            );
+        }
+
+
+        exit(json_encode($pages));
     }
 
     /**
@@ -487,6 +618,18 @@ class PageController extends MainController {
         echo $ok ? 'Succès' : 'Echec';
 
         return FALSE;
+    }
+
+    protected function singulier($mot) {
+        return (substr($mot, -1) == "s") ? substr($mot, 0, -1) : $mot;
+    }
+
+    protected function pluriel($mot) {
+        return (substr($mot, -1) == "s") ? $mot : ($mot . 's');
+    }
+
+    protected function length_cmp($a, $b) {
+        return strlen($b) - strlen($a);
     }
 
 }

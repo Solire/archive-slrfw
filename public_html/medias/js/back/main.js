@@ -45,6 +45,42 @@ $(function() {
             'json'
             );
     }) 
+    
+    
+    /*
+     * Moteur de recherche Autocompletion sur les contenus
+     */
+    if($(".live-search").length > 0 )
+        $(".live-search").autocomplete({
+            source: function( request, response ) {
+                
+            $.getJSON( 
+                "page/live-search.html", 
+                {
+                term : request.term
+                }, function( data, status, xhr ) {
+                response( data );
+                })
+            },
+            open: function() {
+            $(this).data("autocomplete").menu.element.hide().slideDown(150);
+            },  
+            minLength: 2,
+            appendTo: ".navbar-fixed-top",
+            select: function(e, ui) {
+            var baseHref = $("base").attr("href");
+            window.location.href = baseHref + ui.item.url;
+            return false;
+            }
+                
+            }).data( "autocomplete" )._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+            .data( "item.autocomplete", item )
+            .append( '<a><span>' + item.label + '</span><br /><span style="font-style:italic">&nbsp; > ' + item.gabarit_label + '</span></a>' )
+            .appendTo( ul );
+        };
+    
+    
 
 });
 

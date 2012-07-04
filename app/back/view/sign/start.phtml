@@ -1,48 +1,100 @@
 <!doctype html public "-//W3C//DTD HTML 4.0//EN">
 <html>
-	<head>
-		<title>Connexion</title>
-		<meta name="ROBOTS" content="noindex, nofollow" />
-		<meta name="GOOGLEBOT" content="noindex, nofollow" />
+    <head>
+        <title>Connexion</title>
+        <meta name="ROBOTS" content="noindex, nofollow" />
+        <meta name="GOOGLEBOT" content="noindex, nofollow" />
 
-		<base href="<?php echo $this->Url; ?>" />
+        <base href="<?php echo $this->Url; ?>" />
 
-		<link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/style_solire_fw/css/back/newstyle.css" />
-        
+        <link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/style_solire_fw/css/back/newstyle.css" />
+        <link rel="stylesheet" href="css/back/sticky.css" type="text/css" media="screen" title="" charset="utf-8" />
+        <style>
+            .top-right, .top-left { 
+                top: -3px;
+            }
+        </style>
         <?php echo $this->javascript; ?>
+        <script type="text/javascript" src="js/back/jquery/vibrate.js"></script>
         <script type="text/javascript">
-			var keypressaction = function(event){
-				if(event.keyCode == 13) $('.formsubmit').trigger('click');
-			}
 
-			$(document).bind('keypress', keypressaction);
-		</script>
-	</head>
-	<body style="background:#efefef;">
-            <section>
-                
-		<article style="margin-top:15%; margin-right:auto; margin-left:auto; width:488px; padding:20px;">
+            $(document).ready(function() {
+
+                $(".formsubmit-signin").click( function(e) {
+                    e.preventDefault()
+                    // configurations for the buzzing effect. Be careful not to make it too annoying!
+                    var conf = {
+                        frequency: 5000,
+                        spread: 100,
+                        duration: 500000
+                    };
+                    
+                    var tthis = $(this);
+                    var ok = true;
+                    var formu = tthis.parents('form').first();
+                    $.post(formu.attr('action'), formu.serialize(), function(data){
+                        if(data.success) {
+                            $.sticky(data.message, "success")  
+                            $(formu).delay(800).queue(function(){ 
+                                document.location.href = formu.attr('action');
+                            })
+                        } else {
+                            formu.parents("article:first").vibrate(conf);
+                            // let's also display a notification
+                            $.sticky(data.message, "error")
+			
+                            // clear the fields to discourage brute forcing :)
+                            $("#log").val("");
+                            $("#pwd").val("");
+                        }
+                        
+                            
+                    }, 'json' ); 
+                        
+        
+		
+                    
+		
+                    
+                });
+	
+            });
+
+
+        </script>
+        <script type="text/javascript">
+            var keypressaction = function(event){
+                if(event.keyCode == 13) $('.formsubmit-signin').trigger('click');
+            }
+
+            $(document).bind('keypress', keypressaction);
+        </script>
+    </head>
+    <body style="background:#efefef;">
+    <section>
+
+        <article style="margin-top:15%; margin-right:auto; margin-left:auto; width:488px; padding:20px;">
             <form method="post" action="<?php echo $this->action; ?>">
-				<fieldset>
-					<legend><b>Module d'administration</b></legend>
+                <fieldset>
+                    <legend><b>Module d'administration</b></legend>
 
-					<div class="line">
-						<label for="log">Identifiant</label>
-						<input type="text" name="log" id="log" class="form-controle form-oblig form-mix mini" size="50" maxlength="100" />
-					</div>
+                    <div class="line">
+                        <label for="log">Identifiant</label>
+                        <input type="text" name="log" id="log" class="form-controle form-oblig form-mix mini" size="50" maxlength="100" />
+                    </div>
 
-					<div class="line">
-						<label for="pwd">Mot de passe</label>
-						<input type="password" name="pwd" id="pwd" class="form-controle form-oblig form-mix mini" size="50" maxlength="100" />
-					</div>
+                    <div class="line">
+                        <label for="pwd">Mot de passe</label>
+                        <input type="password" name="pwd" id="pwd" class="form-controle form-oblig form-mix mini" size="50" maxlength="100" />
+                    </div>
 
-					<div class="buttonright">
-                                            <div class="btn gradient-green">
-						<a href="#" class="formsubmit" id="intro" style="float:right;">Connexion</a>
-					</div>
-				</fieldset>
-			</form>
-		</article>
-            </section>
-	</body>
+                    <div class="buttonright">
+                        <div class="btn gradient-green">
+                            <a href="#" class="formsubmit-signin" id="intro" style="float:right;">Connexion</a>
+                        </div>
+                </fieldset>
+            </form>
+        </article>
+    </section>
+</body>
 </html>
