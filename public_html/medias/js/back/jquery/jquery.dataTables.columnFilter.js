@@ -26,7 +26,7 @@
         var asInitVals, i, label, th;
 
         //var sTableId = "table";
-        var sRangeFormat = "From {from} to {to}";
+        var sRangeFormat = "Du {from} au {to}";
         //Array of the functions that will override sSearch_ parameters
         var afnSearch_ = new Array();
         var aiCustomSearch_Indexes = new Array();
@@ -242,19 +242,36 @@
         }
 
 
-        function fnCreateDateRangeInput(oTable) {
+        function fnCreateDateRangeInput(oTable, pastOnly) {
             th.html(_fnRangeLabelPart(0));
             var sFromId = oTable.attr("id") + '_range_from_' + i;
             var from = $('<input type="text" class="date_range_filter" id="' + sFromId + '" rel="' + i + '"/>');
-            from.datepicker();
-            th.append(from);
-            th.append(_fnRangeLabelPart(1));
             var sToId = oTable.attr("id") + '_range_to_' + i;
             var to = $('<input type="text" class="date_range_filter" id="' + sToId + '" rel="' + i + '"/>');
+            from.datepicker({
+                maxDate: pastOnly ? '0' : undefined,
+                //                changeMonth: true,
+                numberOfMonths: 1
+//                onSelect: function( selectedDate ) {
+//                    to.datepicker( "option", "minDate", selectedDate );
+//                }
+                
+            });
+            th.append(from);
+            th.append(_fnRangeLabelPart(1));
+            
+            
             th.append(to);
             th.append(_fnRangeLabelPart(2));
             th.wrapInner('<span class="filterColumn filter_date_range" />');
-            to.datepicker();
+            to.datepicker({
+            maxDate: pastOnly ? '0' : undefined,
+                //			changeMonth: true,
+                numberOfMonths: 1
+//                onSelect: function( selectedDate ) {
+//                    from.datepicker( "option", "maxDate", selectedDate );
+//                }
+            });
             var index = i;
             aiCustomSearch_Indexes.push(i);
 
@@ -570,7 +587,7 @@
             sRangeSeparator: "~",
             iFilteringDelay: 500,
             aoColumns: null,
-            sRangeFormat: "From {from} to {to}"
+            sRangeFormat: "Du {from} au {to}"
         };
 
         properties = $.extend(defaults, options);
@@ -628,6 +645,7 @@
             $(aoFilterCells).each(function (index) {//fix for ColVis
                 i = index;
                 var aoColumn = {
+                    pastonly: false,
                     type: "text",
                     bRegex: false,
                     bSmart: true,
@@ -671,7 +689,7 @@
                             fnCreateRangeInput(oTable);
                             break;
                         case "date-range":
-                            fnCreateDateRangeInput(oTable);
+                            fnCreateDateRangeInput(oTable, aoColumn.pastonly);
                             break;
                         case "checkbox":
                             fnCreateCheckbox(oTable, aoColumn.values);
@@ -709,10 +727,10 @@
                         "value": columnsShown
                     } );
 
-                    $.getJSON( sSource, aoData, function (json) {
-                        /* Do whatever additional processing you want on the callback, then tell DataTables */
-                        fnCallback(json)
-                    } );
+//                    $.getJSON( sSource, aoData, function (json) {
+//                        /* Do whatever additional processing you want on the callback, then tell DataTables */
+//                        fnCallback(json)
+//                    } );
                     for (j = 0; j < aiCustomSearch_Indexes.length; j++) {
                         var index = aiCustomSearch_Indexes[j];
 
@@ -724,7 +742,7 @@
                     aoData.push({
                         "name": "sRangeSeparator", 
                         "value": properties.sRangeSeparator
-                        });
+                    });
 
                     if (fnServerDataOriginal != null) {
                         try {
