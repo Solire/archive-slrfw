@@ -99,7 +99,7 @@ class PageController extends MainController {
 
 
         //Si on a un fichier de conf
-        $indexConfig = intval($_GET["c"]);
+        $indexConfig = isset($_GET["c"]) && intval($_GET["c"]) ? intval($_GET["c"]) : 0;
         $currentConfigPageModule = $this->_configPageModule[$indexConfig];
 
         $gabaritsList = $currentConfigPageModule["gabarits"];
