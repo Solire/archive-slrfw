@@ -96,7 +96,7 @@
                             <li class="dropdown<?php echo $this->controller == "user" ? ' gradient-blue text-light-white' : ''; ?>">
                                 <a data-toggle="dropdown" class="dropdown-toggle" href="#"><?php echo $this->utilisateur->get("nom"); ?> <?php echo $this->utilisateur->get("prenom"); ?> <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="user/start.html"><b>Mon profil</b></a></li>
+                                    <li class="<?php echo $this->controller == "user" && $this->action == "start" ? 'active' : ''; ?>"><a href="user/start.html"><b>Mon profil</b></a></li>
                                     <li class="divider"></li>
                                     <li><a href="sign/signout.html"><b>Déconnexion</b></a></li>
                                 </ul>
@@ -118,6 +118,7 @@
                                     if ($this->appConfig->get("active", "board")) {
                                         ?>
                                         <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
+                                        
                                         <?php
                                     }
                                     ?>
@@ -125,14 +126,16 @@
                                     <?php
                                     if (count($this->menuPage) > 1) {
                                         ?>
-                                        <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
                                         <li class="dropdown<?php echo $this->controller == "page" ? ' gradient-blue text-light-white' : ''; ?>">
                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Pages <b class="caret"></b></a>
                                             <ul class="dropdown-menu">
                                                 <?php
                                                 foreach ($this->menuPage as $indexMenuPage => $mPage) {
+                                                    $active = ""; 
+                                                    if(isset($_GET["c"]) && $_GET["c"] == $indexMenuPage)
+                                                        $active = "active";
                                                     ?>
-                                                    <li><a href="page/liste.html?c=<?php echo $indexMenuPage ?>"> <?php echo $mPage["label"] ?></a></li>
+                                                    <li class="<?php echo $active; ?>"><a href="page/liste.html?c=<?php echo $indexMenuPage ?>"> <?php echo $mPage["label"] ?></a></li>
                                                     <?php
                                                 }
                                                 ?>

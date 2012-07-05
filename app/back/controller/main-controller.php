@@ -39,6 +39,7 @@ class MainController extends ActionController {
 
         $this->_view->site = Registry::get("project-name");
         $this->_view->controller = isset($_GET["controller"]) ? $_GET["controller"] : "";
+        $this->_view->action = isset($_GET["action"]) ? $_GET["action"] : "";
 
         $this->_utilisateurManager = new utilisateurManager();
         $this->_gabaritManager = new gabaritManager();
