@@ -144,7 +144,7 @@ class Tools {
         for ($j = 0; $difference >= $lengths[$j]; $j++)
             $difference /= $lengths[$j];
         $difference = round($difference);
-        if ($difference != 1)
+        if ($difference != 1 && $periods[$j] != "mois")
             $periods[$j].= "s";
         $text = "$ending $difference $periods[$j]";
         return $text;
