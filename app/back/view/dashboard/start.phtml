@@ -181,29 +181,7 @@ if (isset($_GET["nomain"]) && $_GET["nomain"] == 1) {
 
 
 
-<?php
-if ($_GET["name"] == "client") {
-    ?>
-    <div style="float:left;margin-right:10px;">
-        <a class="button vert" href="page/display.html?id_gabarit=15">
-            <span class="vert">Client</span>
-        </a>
-    </div>
-    <?php
-}
-?>
 
-<?php
-if ($_GET["name"] == "commande") {
-    ?>
-    <div style="float:left;margin-right:10px;">
-        <a class="button vert" href="page/display.html?id_gabarit=16">
-            <span class="vert">Bon de commande</span>
-        </a>
-    </div>
-    <?php
-}
-?>
 
 
 <table cellpadding="0" width="100%" cellspacing="0" border="0" class="display" style="margin-top:0px;" class="shin-datatable" id="tableau-<?php echo $this->name ?>">
