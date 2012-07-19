@@ -141,6 +141,10 @@ class ActionController
 
     public function __construct()
     {
+        
+        if (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            $this->_ajax = true;
+        }
 
         $this->_mainConfig = Registry::get('mainconfig');
         $this->_appConfig = Registry::get('appconfig');
