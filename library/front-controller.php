@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package Controller
  */
@@ -7,8 +8,7 @@
  * @package Controller
  * @api
  */
-class FrontController
-{
+class FrontController {
 
     /**
      * Configuration principale du site
@@ -21,7 +21,6 @@ class FrontController
      * @var Config
      */
     public static $envConfig;
-
     private static $_singleton = null;
     private $_dirs = null;
     private $_default = null;
@@ -34,8 +33,7 @@ class FrontController
     const CONTROLLER_ACTION_NOT_EXISTS = 2;
     const VIEW_FILE_NOT_EXISTS = 3;
 
-    private function __construct($application)
-    {
+    private function __construct($application) {
         $this->_dirs = self::$mainConfig->get("dirs");
         $this->_applicationConfig = self::$mainConfig->get('app_' . $application);
         $this->_format = self::$mainConfig->get("format");
@@ -46,8 +44,7 @@ class FrontController
      * Renvois une instance du FrontController
      * @return FrontController
      */
-    public static function getInstance($application)
-    {
+    public static function getInstance($application) {
         if (!self::$_singleton)
             self::$_singleton = new self($application);
         return self::$_singleton;
@@ -56,8 +53,7 @@ class FrontController
     /**
      * Initialise les données nécessaires pour FrontController
      */
-    public function init()
-    {
+    public function init() {
 
         /* = Chargement de la configuration
           ------------------------------- */
@@ -70,7 +66,7 @@ class FrontController
             $env = 'local';
         else
             $env = 'online';
-        
+
         /* = Detection de l'application à charger (Defaut : front)
           ------------------------------- */
         $application = isset($_REQUEST['application']) ? $_REQUEST['application'] : 'front';
@@ -90,7 +86,7 @@ class FrontController
         /* = base de données
           ------------------------------- */
         $db = DB::factory(self::$envConfig->get('database'));
-        Registry::set('db', $db);        
+        Registry::set('db', $db);
 
         /* = url
           ------------------------------- */
@@ -98,11 +94,12 @@ class FrontController
         Registry::set('base', self::$envConfig->get('url', 'base'));
         Registry::set('basehref', self::$envConfig->get('url', 'base') . $baseHrefSuffix);
         Registry::set('baseroot', self::$envConfig->get('root', 'base'));
-        
+
         /* = Informations générales sur le site
           ------------------------------- */
         $baseHrefSuffix = isset($_REQUEST['application']) ? $_REQUEST['application'] . '/' : '';
         Registry::set('project-name', self::$mainConfig->get('name', 'project'));
+        $emails = $envConfig->get("email");
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
@@ -119,10 +116,23 @@ class FrontController
             $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
             Registry::set("url", "http://www." . $serverUrl . '/');
             Registry::set("basehref", "http://www." . $serverUrl . '/');
+            
+            
+            //Ajout d'un prefix au mail
+            if (isset($emails["prefix"]) && $emails["prefix"] != "") {
+                $prefix = $emails["prefix"];
+                unset($emails["prefix"]);
+                foreach ($emails as &$email) {
+                    $email = $prefix . $email;
+                }
+            }
+            Registry::set("email", $emails);
+            
         } else {
-            $serverUrl = str_replace("solire-02", $_SERVER['SERVER_NAME'] . ":" .  $_SERVER['SERVER_PORT'], Registry::get("basehref"));
+            $serverUrl = str_replace("solire-02", $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'], Registry::get("basehref"));
             Registry::set("url", $serverUrl);
             Registry::set("basehref", $serverUrl);
+            Registry::set("email", $emails);
         }
 
 
@@ -140,12 +150,11 @@ class FrontController
         define("SUF_VERSION", $version['suf']);
     }
 
-    public static function run()
-    {
+    public static function run() {
         if (isset($_REQUEST['application']) && !empty($_REQUEST['application'])) {
-            $application =  $_REQUEST['application'];
+            $application = $_REQUEST['application'];
         } else {
-            $application =  'front';
+            $application = 'front';
         }
         $front = self::getInstance($application);
         $applicationPath = '../' . $front->_applicationConfig['path'];
@@ -191,29 +200,24 @@ class FrontController
             }
 
             $view->display($controller, $action, false);
-
         }
 
         return true;
     }
 
-    public function getDefault($key)
-    {
+    public function getDefault($key) {
         return (isset($this->_applicationConfig[$key . '-default']) ? $this->_applicationConfig[$key . '-default'] : '');
     }
 
-    public function getDir($key)
-    {
+    public function getDir($key) {
         return (isset($this->_dirs[$key]) ? $this->_dirs[$key] : '');
     }
 
-    public function getFormat($key)
-    {
+    public function getFormat($key) {
         return (isset($this->_format[$key]) ? $this->_format[$key] : '');
     }
 
-    public function debug($idx, $params)
-    {
+    public function debug($idx, $params) {
         if ($this->_debug["enable"]) {
             $errors = array(
                 self::CONTROLLER_FILE_NOT_EXISTS => "Le fichier de contr&ocirc;leur <strong>%s</strong> n'existe pas.",
