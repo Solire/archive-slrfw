@@ -99,7 +99,7 @@ class FrontController {
           ------------------------------- */
         $baseHrefSuffix = isset($_REQUEST['application']) ? $_REQUEST['application'] . '/' : '';
         Registry::set('project-name', self::$mainConfig->get('name', 'project'));
-        $emails = $envConfig->get("email");
+        $emails = self::$envConfig->get("email");
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
