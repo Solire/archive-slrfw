@@ -13,12 +13,24 @@ if (count($this->pages) > 0) {
                 }
                 ?>
                 <?php echo $page->getMeta('titre'); ?>
+                <br />
                 <?php if ($page->getMeta("date_modif") != "0000-00-00 00:00:00" && $page->getMeta("rewriting") != "") { ?>
-                    (<span class="board-human-time" style="color: inherit">Dernière édition <?php echo $page->getMeta("date_modif") != "0000-00-00 00:00:00" ? Tools::RelativeTime(strtotime($page->getMeta("date_modif"))) : ''; ?></span>)
+                    <span class="board-human-time" style="color: inherit">Dernière édition <?php echo $page->getMeta("date_modif") != "0000-00-00 00:00:00" ? Tools::RelativeTime(strtotime($page->getMeta("date_modif"))) : ''; ?></span>
                     <?php
                 }
                 ?>
-                <?php if ($page->getMeta('nbre_enfants') > 0) { ?> - <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i><?php } ?>
+                <span class="page-info" style="color: inherit">    
+                    <?php if ($page->getMeta('nbre_enfants') > 0) { ?> 
+                        |
+                        <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i>
+                    <?php } else { ?>
+                        <?php if ($page->getMeta("id_gabarit") != 1 && $page->getMeta("id_gabarit") != 2) { ?>
+                            |
+                            <i>Type : <?php echo $this->gabarits[$page->getMeta("id_gabarit")]["label"] ?></i>
+                        <?php } ?>
+                    <?php } ?>
+                </span>
+
             </legend>
             <div class="sort-box" style="display:none;"></div>
 
@@ -51,17 +63,17 @@ if (count($this->pages) > 0) {
 
         </fieldset>
 
-                                        <!--<div id="gab_page_<?php echo $page->getMeta('id') ?>" class="sort-elmt ligne">
-                                                    
-                                            <a href="#" class="button bleu supprimer" style="float: right;"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
+                                                <!--<div id="gab_page_<?php echo $page->getMeta('id') ?>" class="sort-elmt ligne">
+                                                            
+                                                    <a href="#" class="button bleu supprimer" style="float: right;"><span class="bleu"><img alt="Supprimer" src="img/back/supprimer.png"></span></a>
 
-                                            <a href="#" class="button bleu sort-move"><span class="bleu"><img alt="déplacer" src="img/back/deplacer.png"></span></a>
+                                                    <a href="#" class="button bleu sort-move"><span class="bleu"><img alt="déplacer" src="img/back/deplacer.png"></span></a>
 
-                                            <a class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
+                                                    <a class="button bleu"><span style="padding-top:8px;" class="bleu"><input type="checkbox" class="rendrevisible"<?php echo $page->getMeta('visible') > 0 ? ' checked="checked"' : ''; ?> /></span></a>
 
-                                            <a href="page/display.html?id_gab_page=<?php echo $page->getMeta('id') ?>" style="margin-left:20px;" title="<?php echo $page->getMeta('rewriting') ?>"><b><?php echo $page->getMeta('titre') ?></b></a>
+                                                    <a href="page/display.html?id_gab_page=<?php echo $page->getMeta('id') ?>" style="margin-left:20px;" title="<?php echo $page->getMeta('rewriting') ?>"><b><?php echo $page->getMeta('titre') ?></b></a>
 
-                                        </div>-->
+                                                </div>-->
 
         <?php
     }
