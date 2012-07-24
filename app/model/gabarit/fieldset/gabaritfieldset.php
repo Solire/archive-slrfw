@@ -86,6 +86,7 @@ abstract class GabaritFieldSet
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";
+        $id .= "_" . $this->versionId;
         $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, $this->versionId);
         //Cas pour les bloc dyn de champ join avec un seul champs et de type simple
         if($gabarit != null) {

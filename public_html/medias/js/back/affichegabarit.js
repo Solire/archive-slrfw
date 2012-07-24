@@ -118,7 +118,6 @@ $(function(){
             if(this.$el.attr('id')=='')
                 this.$el.attr('id', 'tempId');
             var tinyId = this.$el.attr('id');
-
             tinyMCE.execCommand('mceAddControl',false,tinyId);
         },
         change : function(){
@@ -226,7 +225,7 @@ $(function(){
 
         $('textarea.tiny', adupliquer).tinymce('enableOnly');
         $('textarea.tiny', clone).tinymce('enableOnly');
-        $('textarea', clone).autogrow({
+        $('textarea:not(.tiny)', clone).autogrow({
             minHeight :   150
         });
         return false;
