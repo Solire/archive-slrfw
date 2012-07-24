@@ -642,7 +642,13 @@ class gabaritManager extends manager {
 
         // Insertion dans la table `gab_page`.
         if ($updating) {
-            $titre_rew = $page->getVersion("exotique") > 0 ? $donnees['titre_rew'] : $donnees['titre'];
+            //Cas d'une page qui n'a pas été traduite
+            if($page->getMeta("rewriting") == "") {
+                $titre_rew = $donnees['rewriting'] != "" ? $donnees['rewriting'] : ($page->getVersion("exotique") > 0 ? $donnees['titre_rew'] : $donnees['titre']);
+            } else {
+                $titre_rew = $donnees['rewriting'];
+            }
+            
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
 
             $query = "UPDATE `gab_page` SET"
@@ -666,8 +672,8 @@ class gabaritManager extends manager {
         }
         else {
             $id_parent = isset($donnees['id_parent']) && $donnees['id_parent'] ? $donnees['id_parent'] : 0;
-
-            $rewriting = $this->_db->rewrit($donnees['titre'], 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
+            $titre_rew = $donnees['rewriting'] != "" ? $donnees['rewriting'] : $donnees['titre'];
+            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
 
             $ordre = $this->_db->query("SELECT MAX(`ordre`) FROM `gab_page` WHERE id_parent = $id_parent")->fetchColumn();
             $ordre = $ordre ? $ordre + 1 : 1;
