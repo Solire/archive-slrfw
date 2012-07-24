@@ -243,8 +243,8 @@ class gabaritPage extends gabaritBloc {
         $form .= '<fieldset ' . $noMeta . '><legend>Balise Meta</legend><div style="display:none;">'
 
               . '<div class="line">'
-              . '<label for="rewriting-' . $metaLang . '">Rewriting' . ($meta && $metaId && isset($this->_meta['titre_rew']) && $this->_meta['titre_rew'] != "" ? ' <span class="required">*</span>' : '' ) . '</label>'
-              . '<input type="text" name="rewriting" id="rewriting-' . $metaLang . '" value="' . (isset($this->_meta['rewriting']) ? $this->_meta['rewriting'] : '') . '" class="' . ($meta && $metaId && isset($this->_meta['titre_rew']) && $this->_meta['titre_rew'] != "" ? 'form-controle form-oblig form-mix' : '') . '"  />'
+              . '<label for="rewriting-' . $metaLang . '">Rewriting' . ($meta && $metaId && isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? ' <span class="required">*</span>' : '' ) . '</label>'
+              . '<input type="text" name="rewriting" id="rewriting-' . $metaLang . '" value="' . (isset($this->_meta['rewriting']) ? $this->_meta['rewriting'] : '') . '" class="' . ($meta && $metaId && isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? 'form-controle form-oblig form-mix' : '') . '"  />'
               . '</div>'
 
               . '<div class="line">'
