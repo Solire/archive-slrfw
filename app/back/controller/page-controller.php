@@ -260,7 +260,7 @@ class PageController extends MainController {
 
 
 
-                $devant .= '<div style="height: 50px;float: left;">'
+                $devant .= '<div style="height: 54px;float: left;">'
                         . '<div class="btn gradient-blue" style="margin-bottom: 5px;display:block;"><a title="' . $version['nom'] . '" class="openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
                         . $version['nom'] . '" /></a></div>';
 
@@ -269,7 +269,7 @@ class PageController extends MainController {
                             || $this->_utilisateur->get("niveau") == "solire"
                             || !$page->getMeta("visible")
                     ) {
-                        $devant .= '<div style="margin-left: 6px;margin-top: -4px;"><label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-'
+                        $devant .= '<div style="margin-left: 6px;margin-top: -7px;"><label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-'
                                 . $version['id'] . '">Visible : </label><input class="visible-lang" value="'
                                 . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" style="" '
                                 . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /></div>';
