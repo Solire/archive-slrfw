@@ -167,7 +167,7 @@ class DashboardController extends MainController {
                 } else {
                     if (isset($column["sql"]))
                         $column["name"] = $column["sql"];
-                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM " . $this->_config["table"]["name"] . " WHERE " . $column["name"] . " <> '' AND $generalWhere  ORDER BY " . $column["name"] . " ASC")->fetchAll(PDO::FETCH_COLUMN);
+                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM " . $this->_config["table"]["name"] . " WHERE " . $column["name"] . " <> '' " . ($generalWhere == "" ? "" : "AND $generalWhere" ) . "  ORDER BY " . $column["name"] . " ASC")->fetchAll(PDO::FETCH_COLUMN);
                 }
             }
         }
@@ -244,6 +244,7 @@ class DashboardController extends MainController {
         $aColumns = array();
         $aColumnsFull = array();
         $aColumnsRaw = array();
+        $aColumnsDetails = array();
         $aColumnsRawAll = array();
         $aColumnsAdvanced = array();
         $aColumnsContent = array();
@@ -369,6 +370,10 @@ class DashboardController extends MainController {
 //            echo '<pre>', print_r($aColumnsRaw, true), '</pre>';
 //            echo '<pre>', print_r($aColumnsAdvanced["name"], true), '</pre>';
 
+
+            if (isset($column["show_detail"]) && $column["show_detail"]) {
+                $aColumnsDetails[$keyCol] = true;
+            }
 
             if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
 
@@ -558,7 +563,7 @@ class DashboardController extends MainController {
             $row = array();
             $row["DT_RowId"] = "";
             if (isset($this->_config["table"]["detail"]) && $this->_config["table"]["detail"])
-                $row[] = '<img class="detail" src="img/back/details_open.png">';
+                $row[] = '';
             foreach ($aColumnsRaw as $aColRawKey => $aColRaw) {
                 if ($aColumnsRaw[$aColRawKey] != ' ') {
                     /* General output */
@@ -588,6 +593,25 @@ class DashboardController extends MainController {
                     }
                 }
             }
+            
+            if (isset($this->_config["table"]["detail"]) && $this->_config["table"]["detail"]) {
+                $currentId = 1;
+                foreach ($aColumnsRaw as $aColRawKey => $aColRaw) {
+                    
+                    if ($aColumnsRaw[$aColRawKey] != ' ') {
+                        
+                        if (isset($aColumnsDetails[$aColRawKey]) && $aColumnsDetails[$aColRawKey]) {
+                            if ($row[$currentId] != "") {
+                                $row[0] = '<img class="detail" src="img/back/details_open.png">';
+                                break;
+                            }
+                        }
+                        $currentId++;
+                    }
+                }
+            }
+
+
 
             for ($i = 0; $i < count($sIndexColumnRaw); $i++) {
                 $row["DT_RowId"] .= $aRow[$sIndexColumnRaw[$i]] . "|";
