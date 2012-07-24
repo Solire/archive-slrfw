@@ -3,3 +3,8 @@
 
 # dossiers de documentations
 ~*/
+# fichier de config
+/config/local.ini
+/config/online.ini
+/config/main.ini
+
