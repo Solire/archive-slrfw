@@ -222,12 +222,12 @@ $(function(){
         $this.find('.form-date').datepicker($.datepicker.regional['fr']);
 
         initAutocompletePat();
-
-        $('textarea.tiny', adupliquer).tinymce('enableOnly');
-        $('textarea.tiny', clone).tinymce('enableOnly');
-        $('textarea:not(.tiny)', clone).autogrow({
+        $('textarea', clone).autogrow({
             minHeight :   150
         });
+        $('textarea.tiny', adupliquer).tinymce('enableOnly');
+        $('textarea.tiny', clone).tinymce('enableOnly');
+        
         return false;
     });
 	
