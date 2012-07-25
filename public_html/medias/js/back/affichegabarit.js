@@ -230,6 +230,27 @@ $(function(){
         
         return false;
     });
+    
+    $('.301-add').live('click', function(){
+        var $this = $(this).parents('fieldset:first').find('.line:first');
+        var $fieldSet301 = $(this).parents("fieldset:first")
+        var adupliquer = $this;
+        var clone = adupliquer.clone(false).clearForm();
+        $(".301-remove", clone).removeClass("translucide")
+        clone.insertAfter($(this).parents('fieldset:first').find('.line:last'));
+        if($(".301-remove", $fieldSet301).length > 1)
+            $(".301-remove", $fieldSet301).removeClass("translucide")
+        return false;
+    });
+    
+    $('.301-remove:not(.translucide)').live('click', function(){
+        var $this = $(this).parents('.line:first')
+        var $fieldSet301 = $(this).parents("fieldset:first")
+        $this.remove();
+        if($(".301-remove", $fieldSet301).length == 1)
+            $(".301-remove", $fieldSet301).addClass("translucide")
+        return false;
+    });
 	
     var confirm = $('<div>', {
         id : 'confirm'
