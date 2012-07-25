@@ -277,16 +277,16 @@ class gabaritPage extends gabaritBloc {
                . '<input type="checkbox" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
                . '</div>';
         
-               $form .= '<fieldset><legend>Redirection 301 permanent</legend><div style="display:none;">';
+               $form .= '<fieldset style="margin-left: 15px;"><legend>Redirection 301 permanent</legend><div style="display:none;">';
                foreach ($redirections as $keyRedirection => $redirection) {
                    $form .= '<div class="line">'
                           . '<label for="301-' . $metaLang . '">Url</label>'
                           . '<input type="text" name="301[]" id="301-' . $metaLang . '" value="' . $redirection . '" class=""  />'
-                          . '<div class="btn gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 245px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
+                          . '<div class="btn gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 230px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
                           . '</div>';
                }
                
-               $form .= '<div class="btn gradient-blue fr 301-add" style="margin-right: -34px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
+               $form .= '<div class="btn gradient-blue fr 301-add" style="margin-right: -33px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
                       . '</div>';
 
                
