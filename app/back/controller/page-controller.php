@@ -252,13 +252,25 @@ class PageController extends MainController {
 
         if ($id_gab_page) {
             $versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
+
             $form = '';
             $devant = '';
             foreach ($versions as $version) {
                 $page = $this->_gabaritManager->getPage($version['id'], $id_gab_page);
 
+                $urlParent = "";
+                foreach ($this->_gabaritManager->getParents($page->getMeta("id_parent"), $page->getMeta("id_version")) as $parent) {
+                    $urlParent .= $parent->getMeta("rewriting") . "/";
+                }
 
+                $url = $urlParent . $page->getMeta("rewriting") . ".html";
 
+                $redirections = $this->_db->query("
+                    SELECT * 
+                    FROM `redirection` 
+                    WHERE  new = " . $this->_db->quote($url) . "
+                        AND id_version = " . $version['id'] . "
+                ")->fetchAll(PDO::FETCH_COLUMN);
 
                 $devant .= '<div style="height: 54px;float: left;">'
                         . '<div class="btn gradient-blue" style="margin-bottom: 5px;display:block;"><a title="' . $version['nom'] . '" class="openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
@@ -283,7 +295,7 @@ class PageController extends MainController {
 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                         . '"><div class="clearin"></div>'
-                        . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta(), $version["id"])
+                        . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta(), $version["id"], $redirections)
                         . '</div>';
             }
 

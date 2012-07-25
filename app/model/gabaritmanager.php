@@ -334,7 +334,7 @@ class gabaritManager extends manager {
         foreach ($joinFields as $joinName => $joinField) {
             if (count($joinField['values']) == 0)
                 continue;
-            $query  = "SELECT `gab_page`.`id`, `gab_page`.*"
+            $query = "SELECT `gab_page`.`id`, `gab_page`.*"
                     . " FROM `gab_page`"
                     . " WHERE `id_version` = $id_version"
                     . ($visible ? " AND `visible` = 1" : "")
@@ -643,12 +643,12 @@ class gabaritManager extends manager {
         // Insertion dans la table `gab_page`.
         if ($updating) {
             //Cas d'une page qui n'a pas été traduite
-            if($page->getMeta("rewriting") == "") {
+            if ($page->getMeta("rewriting") == "") {
                 $titre_rew = $donnees['rewriting'] != "" ? $donnees['rewriting'] : ($page->getVersion("exotique") > 0 ? $donnees['titre_rew'] : $donnees['titre']);
             } else {
                 $titre_rew = $donnees['rewriting'];
             }
-            
+
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
 
             $query = "UPDATE `gab_page` SET"
@@ -668,9 +668,47 @@ class gabaritManager extends manager {
             if (!$this->_db->query($query))
                 return FALSE;
 
+            $urlParent = "";
+            foreach ($this->getParents($page->getMeta("id_parent"), $page->getMeta("id_version")) as $parent) {
+                $urlParent .= $parent->getMeta("rewriting") . "/";
+            }
+
+            $newUrl = $urlParent . $rewriting . ".html";
+
+            /* = SI le rewriting a été modifié
+              ------------------------------- */
+            if ($rewriting != $page->getMeta("rewriting")) {
+                $donnees["301"][] = $urlParent . $page->getMeta("rewriting") . ".html";
+            }
+
+            $donnees["301"] = array_unique($donnees["301"]);
+
+            /* = On supprime toutes les urls de redirection 301 pour la page courante
+              ------------------------------- */
+            $query2Del = "DELETE FROM `redirection`"
+                    . " WHERE new = " . $this->_db->quote($urlParent . $page->getMeta("rewriting") . ".html")
+                    . " AND id_version = " . $page->getMeta("id_version") . ";";
+            $this->_db->query($query2Del);
+
+            /* = On insert toutes les urls dans le bloc redirection 301
+              ------------------------------- */
+            $queries2 = array();
+            foreach ($donnees["301"] as $redirect301) {
+                $oldUrl = $redirect301;
+                if ($oldUrl != "" && $oldUrl != $newUrl)
+                    $queries2[] = "INSERT INTO `redirection` SET"
+                            . " old = " . $this->_db->quote($oldUrl) . ", "
+                            . " new = " . $this->_db->quote($newUrl) . ", "
+                            . " id_version = " . $page->getMeta("id_version") . ";";
+            }
+
+            foreach ($queries2 as $query2) {
+                $this->_db->query($query2);
+            }
+
+
             return $page->getMeta("id");
-        }
-        else {
+        } else {
             $id_parent = isset($donnees['id_parent']) && $donnees['id_parent'] ? $donnees['id_parent'] : 0;
             $titre_rew = $donnees['rewriting'] != "" ? $donnees['rewriting'] : $donnees['titre'];
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
@@ -699,11 +737,40 @@ class gabaritManager extends manager {
 
 //                echo "$query<br />";
 
+
                 if (!$this->_db->exec($query))
                     return FALSE;
 
+
+
+
                 if ($id_gab_page == 0)
                     $id_gab_page = $this->_db->lastInsertId();
+            }
+
+            $urlParent = "";
+            foreach ($this->getParents($id_parent, $version['id']) as $parent) {
+                $urlParent .= $parent->getMeta("rewriting") . "/";
+            }
+
+            $newUrl = $urlParent . $rewriting . ".html";
+
+            $donnees["301"] = array_unique($donnees["301"]);
+
+            /* = On insert toutes les urls dans le bloc redirection 301
+              ------------------------------- */
+            $queries2 = array();
+            foreach ($donnees["301"] as $redirect301) {
+                $oldUrl = $redirect301;
+                if ($oldUrl != "" && $oldUrl != $newUrl)
+                    $queries2[] = "INSERT INTO `redirection` SET"
+                            . " old = " . $this->_db->quote($oldUrl) . ", "
+                            . " new = " . $this->_db->quote($newUrl) . ", "
+                            . " id_version = 1;";
+            }
+
+            foreach ($queries2 as $query2) {
+                $this->_db->query($query2);
             }
 
             return $id_gab_page;

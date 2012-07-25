@@ -200,13 +200,13 @@ class gabaritPage extends gabaritBloc {
      * @param type $mobile
      * @return string 
      */
-    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $versionId) {        
+    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $versionId, $redirections = array()) {        
         $metaId = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
         $metaLang = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : 1;
-        
         $noMeta = !$meta ? ' style="display: none;" ' : '';
-        
         $parentSelect = '';
+        
+        $redirections = count($redirections) == 0 ? array("") : $redirections;
         
         if ($metaId && $this->_meta['id_parent'] > 0) {            
             $parentSelect = '<div class="line">'
@@ -275,11 +275,23 @@ class gabaritPage extends gabaritBloc {
                . '<div class="line">'
                . '<label for="no_index' . $metaLang . '">No-index</label>'
                . '<input type="checkbox" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
-               . '</div>'
+               . '</div>';
+        
+               $form .= '<fieldset><legend>Redirection 301 permanent</legend><div style="display:none;">';
+               foreach ($redirections as $keyRedirection => $redirection) {
+                   $form .= '<div class="line">'
+                          . '<label for="301-' . $metaLang . '">Url</label>'
+                          . '<input type="text" name="301[]" id="301-' . $metaLang . '" value="' . $redirection . '" class=""  />'
+                          . '<div class="btn gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 245px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
+                          . '</div>';
+               }
+               
+               $form .= '<div class="btn gradient-blue fr 301-add" style="margin-right: -34px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
+                      . '</div>';
 
-               . '</div>'
-               . '</fieldset>';
-
+               
+                $form .= '</div>'
+                       . '</fieldset>';
 		$form .= $this->buildForm($upload_path, $versionId);
 		
 		$form .= '<div class="buttonfixed">'
