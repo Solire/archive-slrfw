@@ -95,22 +95,30 @@ foreach ($this->pagesGroup as $keyGroup => $group) {
                             }
                             ?>
                             <?php echo $page->getMeta('titre'); ?>
-                                <br />
+                            <br />
                             <?php if ($page->getMeta("date_modif") != "0000-00-00 00:00:00" && $page->getMeta("rewriting") != "") { ?>
                                 <span class="board-human-time" style="color: inherit">Dernière édition <?php echo $page->getMeta("date_modif") != "0000-00-00 00:00:00" ? Tools::RelativeTime(strtotime($page->getMeta("date_modif"))) : ''; ?></span>
                                 <?php
                             }
                             ?>
                             <span class="page-info" style="color: inherit">    
-                            <?php if ($page->getMeta('nbre_enfants') > 0) { ?> 
-                                |
-                                <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i>
-                            <?php } else { ?>
-                                <?php if ($page->getMeta("id_gabarit") != 1 && $page->getMeta("id_gabarit") != 2) { ?>
-                                |
-                                <i>Type : <?php echo $this->gabarits[$page->getMeta("id_gabarit")]["label"] ?></i>
+                                <?php if ($page->getMeta('nbre_enfants') > 0) { ?> 
+                                    <?php if ($page->getMeta("date_modif") != "0000-00-00 00:00:00" && $page->getMeta("rewriting") != "") { ?>
+                                        |
+                                        <?php
+                                    }
+                                    ?>
+                                    <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i>
+                                <?php } else { ?>
+                                    <?php if ($page->getMeta("id_gabarit") != 1 && $page->getMeta("id_gabarit") != 2) { ?>
+                                        <?php if ($page->getMeta("date_modif") != "0000-00-00 00:00:00" && $page->getMeta("rewriting") != "") { ?>
+                                            |
+                                            <?php
+                                        }
+                                        ?>
+                                        <i>Type : <?php echo $this->gabarits[$page->getMeta("id_gabarit")]["label"] ?></i>
+                                    <?php } ?>
                                 <?php } ?>
-                            <?php } ?>
                             </span>
 
                         </legend>
