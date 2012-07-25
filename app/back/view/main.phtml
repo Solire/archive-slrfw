@@ -82,7 +82,7 @@
                                     <?php
                                     foreach ($this->versions as $version) {
                                         ?>
-                                        <li><a href="" onclick="var h = window.location.href;window.location = (h + (h.indexOf('?') != -1 ? '&id_version=<?php echo $version['id'] ?>' : '?id_version=<?php echo $version['id'] ?>'));return false;"><img style="display: block;float: left;margin-top: 1px;" alt="<?php echo $version['nom'] ?>" src="img/flags/all/16/<?php echo strtolower($version['suf']) ?>.png" />&nbsp;&nbsp;<?php echo $version['nom'] ?></a></li>
+                                        <li><a href="" onclick="var h = window.location.href;window.location = (h + (h.indexOf('?') != -1 ? '&id_version=<?php echo $version['id'] ?>' : '?id_version=<?php echo $version['id'] ?>'));return false;"><img style="width: 16px; height: 16px;display: block;float: left;margin-top: 1px;" alt="" src="img/flags/all/16/<?php echo strtolower($version['suf']) ?>.png" />&nbsp;&nbsp;<?php echo $version['nom'] ?></a></li>
                                         <?php
                                     }
                                     ?>
