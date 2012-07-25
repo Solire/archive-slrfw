@@ -217,6 +217,7 @@ $(function(){
         var clone = adupliquer.clone(false).clearForm();
         clone.find("ul").remove();
         clone.insertBefore($this);
+        clone.find("legend").html("Nouvel élément")
         $this.parents('.sort-box').sortable('refresh');
         $this.siblings('.sort-elmt').find('.delBloc').removeClass('translucide');
         $this.find('.form-date').datepicker($.datepicker.regional['fr']);

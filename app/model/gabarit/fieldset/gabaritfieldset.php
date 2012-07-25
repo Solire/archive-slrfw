@@ -96,11 +96,16 @@ abstract class GabaritFieldSet
         }
         
         $form .= $field;
-
         if ($type == "join")
             $valueLabel = $field->getValueLabel();
-        else
-            $valueLabel = $value;
+        else {
+            if($value != "") {
+                $valueLabel = mb_strlen($value, 'UTF-8') > 50 ? mb_substr($value, 0, 50, 'UTF-8') . '...' : $value;
+            } else {
+                $valueLabel =  "Nouvel élément";
+            }
+        }
+            
         
         return array(
             'html'  => $form,
@@ -121,7 +126,7 @@ abstract class GabaritFieldSet
             if ($first) {
                 $first = FALSE;
                 $this->valueLabel = $champArray['label'];
-            }
+            } 
         }
         
         $this->champsHTML = $champHTML;
