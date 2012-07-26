@@ -673,7 +673,7 @@ class gabaritManager extends manager {
                 $urlParent .= $parent->getMeta("rewriting") . "/";
             }
 
-            $newUrl = $urlParent . $rewriting . ".html";
+            $newUrl = $urlParent . $rewriting . $page->getGabarit()->getExtension();
 
             /* = SI le rewriting a été modifié
               ------------------------------- */

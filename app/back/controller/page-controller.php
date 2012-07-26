@@ -263,7 +263,7 @@ class PageController extends MainController {
                     $urlParent .= $parent->getMeta("rewriting") . "/";
                 }
 
-                $url = $urlParent . $page->getMeta("rewriting") . ".html";
+                $url = $urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension();
 
                 $redirections = $this->_db->query("
                     SELECT * 
