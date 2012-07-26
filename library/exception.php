@@ -123,14 +123,22 @@ class HttpException extends Exception
      * @var int
      */
     private $_code = 500;
+    
+    /**
+     * Url de redirection
+     * @var string
+     */
+    private $_url = null;
 
     /**
      * Ajoute un code HTTP à l'erreur
      * @param int $code
+     * @param string $url
      */
     public function http($code, $url = null)
     {
         $this->_code = $code;
+        $this->_url = $url;
     }
 
     /**
@@ -143,7 +151,7 @@ class HttpException extends Exception
             return $this->getCode();
         }
 
-        return array($this->_code, $url);
+        return array($this->_code, $this->_url);
     }
 }
 
