@@ -128,7 +128,7 @@ class HttpException extends Exception
      * Ajoute un code HTTP à l'erreur
      * @param int $code
      */
-    public function http($code)
+    public function http($code, $url = null)
     {
         $this->_code = $code;
     }
@@ -143,7 +143,7 @@ class HttpException extends Exception
             return $this->getCode();
         }
 
-        return $this->_code;
+        return array($this->_code, $url);
     }
 }
 

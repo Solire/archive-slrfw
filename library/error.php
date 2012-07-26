@@ -51,6 +51,11 @@ final class Error
      */
     public static function http($code)
     {
+        if (is_array($code)) {
+            $url = $code[1];
+            $code = $code[0];
+        }
+
         self::$_code = $code;
 
         self::setHeader();
