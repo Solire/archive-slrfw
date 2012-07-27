@@ -192,6 +192,11 @@ $(function(){
 		
         return false;
     });
+    
+    //On desactive le click des btn de tri
+    $(".sort-move").live("click", function(e) {
+        e.preventDefault()
+    })
 
     //// GESTION DU TRI
     $('.sort-box').each(function(){
