@@ -531,8 +531,10 @@ $(function(){
                 $('.openlang').removeClass('active').addClass('translucide');
                 $(this).removeClass('translucide').addClass('active');
 				
-                $('.langue:visible').slideUp(500);
-                $('.langue').eq(i).slideDown(500);
+                $('.langue:visible').slideUp(500, function() {
+                    $('.langue').eq(i).slideDown(500);
+                });
+                
             }
 			
             return false;

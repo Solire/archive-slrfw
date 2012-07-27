@@ -294,7 +294,7 @@ class PageController extends MainController {
 
 
                 $form .= '<div class="langue" style="clear:both;' . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
-                        . '"><div class="clearin"></div>'
+                        . '"><div class="clearin" style="margin-top:0"></div>'
                         . $page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $page->getGabarit()->getMeta(), $page->getGabarit()->get301_editable(), $page->getGabarit()->getMeta_titre(), $page->getGabarit()->getExtension(), $version["id"], $redirections)
                         . '</div>';
             }
