@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package Controller
  * @filesource
@@ -16,8 +17,7 @@ require_once 'loader/css.php';
  * @package Controller
  * @api
  */
-class ActionController
-{
+class ActionController {
 
     protected $_request = null;
 
@@ -102,15 +102,13 @@ class ActionController
      */
     protected $_log = null;
 
-    public function start()
-    {
-
+    public function start() {
+        
     }
 
 //end start()
 
-    public function shutdown()
-    {
+    public function shutdown() {
 
 
         $this->_view->Url = $this->_url;
@@ -139,9 +137,8 @@ class ActionController
 
 //end shutdown()
 
-    public function __construct()
-    {
-        
+    public function __construct() {
+
         if (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             $this->_ajax = true;
         }
@@ -184,8 +181,7 @@ class ActionController
 
 //end __construct()
 
-    public function getView()
-    {
+    public function getView() {
         return $this->_view;
     }
 
@@ -199,8 +195,7 @@ class ActionController
      * @param array $params
      * @param <type> $teardown
      */
-    public function redirect($controller, $action, $params = null, $teardown = true)
-    {
+    public function redirect($controller, $action, $params = null, $teardown = true) {
         if (!$params)
             $params = array();
 
@@ -214,8 +209,7 @@ class ActionController
      * @param string $url
      * @param bool $relative
      */
-    public function simpleRedirect($url, $relative = false)
-    {
+    public function simpleRedirect($url, $relative = false) {
         if ($relative)
             $url = Registry::get("basehref") . $url;
 
@@ -223,14 +217,66 @@ class ActionController
 
         exit();
     }
+    
+    /**
+     * Detect les redirection 301 et renvoi l'url si une existe
+     */
+    public function check301() {
+        $url = str_replace("/" . Registry::get("baseroot"), "", $_SERVER['REQUEST_URI']);
+        $urlParts = explode("/", $url);
+        $urlsToTest[] = $url;
+
+        $ajustLen = 0;
+        if (substr($url, -1) == "/") {
+            $ajustLen = 1;
+            unset($urlParts[count($urlParts) - 1]);
+        }
+
+        $urlPartsReverse = array_reverse($urlParts);
+        for ($index = 0; $index < count($urlPartsReverse) - 1; $index++) {
+            $url = substr($url, 0, -strlen($urlPartsReverse[$index]) - $ajustLen);
+            $urlsToTest[] = $url;
+            $ajustLen = 1;
+        }
+
+        $urlPartRedirect = "";
+        $redirection301 = false;
+        foreach ($urlsToTest as $key => $urlToTest) {
+            $query = "SELECT `new`"
+                    . " FROM `redirection`"
+                    . " WHERE id_version = " . ID_VERSION . ""
+                    . " AND `old` LIKE " . $this->_db->quote($urlToTest)
+                    . " LIMIT 1";
+            $redirection301 = $this->_db->query($query)->fetch(PDO::FETCH_COLUMN);
+            if ($redirection301) {
+                $keyChange = $key;
+                $urlPartRedirect = $urlToTest;
+                break;
+            }
+        }
+        
+        if ($redirection301) {
+            $samePart = array_slice($urlPartsReverse, 0, $keyChange);
+            $redirection301 .= implode("/", $samePart);
+            $redirection301 = $this->_url . $redirection301;
+        }
+        
+        return $redirection301;
+    }
 
     /**
-     * Transforme la page en cour en une erreur 404
-     * @uses ActionController::redirectError() 404
+     * Transforme la page en cour en une erreur 301 ou 404
+     * @uses ActionController::redirectError() 301 / 404
      */
-    final public function pageNotFound()
-    {
-        $this->redirectError(404);
+    final public function pageNotFound() {
+
+        $urlRedirect301 = $this->check301();
+
+        if ($urlRedirect301) {
+            $this->redirectError(301, $urlRedirect301);
+        } else {
+            $this->redirectError(404);
+        }
     }
 
     /**
@@ -238,11 +284,10 @@ class ActionController
      * @param string $codeError code erreur HTTP
      * @uses HttpException
      */
-    final public function redirectError($codeError = null)
-    {
+    final public function redirectError($codeError = null, $url = null) {
         $exc = new HttpException('Erreur HTTP');
         if (!empty($codeError))
-            $exc->http($codeError);
+            $exc->http($codeError, $url);
 
         throw $exc;
     }
@@ -252,8 +297,7 @@ class ActionController
      * @param array $inputs
      * @return bool
      */
-    public function issetAndNotEmpty($inputs)
-    {
+    public function issetAndNotEmpty($inputs) {
         foreach ($inputs as $input) {
             if (!isset($this->_request[$input]) || empty($this->_request[$input]))
                 return false;
@@ -265,6 +309,5 @@ class ActionController
     public function _($string) {
         return $this->_translate->_($string);
     }
-
 
 }

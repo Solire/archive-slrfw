@@ -51,9 +51,15 @@ final class Error
      */
     public static function http($code)
     {
+        $url = null;
+        if (is_array($code)) {
+            $url = $code[1];
+            $code = $code[0];
+        }
+        
         self::$_code = $code;
 
-        self::setHeader();
+        self::setHeader($url);
 
         $fileName = 'error/' . $code . '.phtml';
         if (file_exists($fileName))
@@ -100,9 +106,21 @@ final class Error
      * Affiche le header correspondant à l'erreur
      * @uses Error::$_headers
      */
-    private static function setHeader()
+    private static function setHeader($url = null)
     {
         header('HTTP/1.0 ' . self::$_headers[self::$_code]);
+        if($url !== null) {
+            self::setHeaderRedirect($url);
+        }
+    }
+    
+    /**
+     * Affiche le header correspondant à l'erreur
+     * @uses Error::$_headers
+     */
+    private static function setHeaderRedirect($url)
+    {
+        header('Location: ' . $url);
     }
 }
 

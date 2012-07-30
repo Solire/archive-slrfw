@@ -200,10 +200,12 @@ class gabaritPage extends gabaritBloc {
      * @param type $mobile
      * @return string 
      */
-    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $versionId, $redirections = array()) {        
+    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $_301_editable = TRUE, $meta_titre = TRUE, $extension = "/", $versionId, $redirections = array()) {        
         $metaId = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
         $metaLang = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : 1;
         $noMeta = !$meta ? ' style="display: none;" ' : '';
+        $noMetaTitre = !$meta_titre ? ' style="display: none;" ' : '';
+        $noRedirections301 = !$_301_editable ? ';display: none' : '';
         $parentSelect = '';
         
         $redirections = count($redirections) == 0 ? array("") : $redirections;
@@ -228,15 +230,15 @@ class gabaritPage extends gabaritBloc {
 			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
               
               . $parentSelect
-              . '<div ' . $noMeta . ' class="line">'
+              . '<div ' . $noMetaTitre . ' class="line">'
               . '<label for="titre-' . $metaLang . '">Titre <span class="required">*</span> </label>'
-              . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="' . ($meta ? 'form-controle form-oblig form-mix' : '') . '" />'
+              . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
               . '</div>';
         
         if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
-            $form .= '<div ' . $noMeta . ' class="line">'
+            $form .= '<div ' . $noMetaTitre . ' class="line">'
                    . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting <span class="required">*</span> </label>'
-                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="' . ($meta ? 'form-controle form-oblig form-mix' : '') . '" />'
+                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
                    . '</div>';
         }
 
@@ -277,7 +279,7 @@ class gabaritPage extends gabaritBloc {
                . '<input type="checkbox" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
                . '</div>';
         
-               $form .= '<fieldset style="margin-left: 15px;"><legend>Redirection 301 permanent</legend><div style="display:none;">';
+               $form .= '<fieldset  style="margin-left: 15px' . $noRedirections301 . '"><legend>Redirection 301 permanent</legend><div style="display:none;">';
                foreach ($redirections as $keyRedirection => $redirection) {
                    $form .= '<div class="line">'
                           . '<label for="301-' . $metaLang . '">Url</label>'

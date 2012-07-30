@@ -117,7 +117,7 @@ class gabaritManager extends manager {
         $query = "SELECT * FROM `gab_gabarit` WHERE `id` = $id_gabarit";
         $row = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
 
-        $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'], $row['label'], $row['main'], $row['creable'], $row['deletable'], $row['sortable'], $row['make_hidden'], $row['editable'], $row['meta']);
+        $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'], $row['label'], $row['main'], $row['creable'], $row['deletable'], $row['sortable'], $row['make_hidden'], $row['editable'], $row['meta'], $row['301_editable'], $row['meta_titre'], $row['extension']);
         if ($row['id_api'] > 0) {
             $query = "SELECT `name` FROM `gab_api` WHERE `id` = " . $row['id_api'];
             $api = $this->_db->query($query)->fetchColumn();
@@ -673,12 +673,12 @@ class gabaritManager extends manager {
                 $urlParent .= $parent->getMeta("rewriting") . "/";
             }
 
-            $newUrl = $urlParent . $rewriting . ".html";
+            $newUrl = $urlParent . $rewriting . $page->getGabarit()->getExtension();
 
             /* = SI le rewriting a été modifié
               ------------------------------- */
             if ($rewriting != $page->getMeta("rewriting")) {
-                $donnees["301"][] = $urlParent . $page->getMeta("rewriting") . ".html";
+                $donnees["301"][] = $urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension();
             }
 
             $donnees["301"] = array_unique($donnees["301"]);
@@ -686,7 +686,7 @@ class gabaritManager extends manager {
             /* = On supprime toutes les urls de redirection 301 pour la page courante
               ------------------------------- */
             $query2Del = "DELETE FROM `redirection`"
-                    . " WHERE new = " . $this->_db->quote($urlParent . $page->getMeta("rewriting") . ".html")
+                    . " WHERE new = " . $this->_db->quote($urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension())
                     . " AND id_version = " . $page->getMeta("id_version") . ";";
             $this->_db->query($query2Del);
 
@@ -753,7 +753,7 @@ class gabaritManager extends manager {
                 $urlParent .= $parent->getMeta("rewriting") . "/";
             }
 
-            $newUrl = $urlParent . $rewriting . ".html";
+            $newUrl = $urlParent . $rewriting . $page->getGabarit()->getExtension();
 
             $donnees["301"] = array_unique($donnees["301"]);
 

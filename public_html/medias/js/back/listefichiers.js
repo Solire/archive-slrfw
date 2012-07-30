@@ -242,6 +242,19 @@ $(function () {
     var previsu = $('<div>', {
         id: 'previsu'
     }).dialog({
+        show: {
+            effect:   "fade",
+            duration: 1000
+        },
+        hide: {
+            effect:   "fade",
+            duration: 500
+        },
+        open: function(){
+
+            if(!$('.ui-dialog-buttonset button').hasClass("btn"))
+                $('.ui-dialog-buttonset button').attr("class", "").addClass("btn gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
+        },
         title : "Prévisualisation",
         buttons: [
         {
@@ -286,7 +299,9 @@ $(function () {
         var link = $(this).attr('href');
         var ext = link.split('.').pop().toLowerCase();
 
-        $('<img>', {'src' : link}).load(function(){
+        $('<img>', {
+            'src' : link
+        }).load(function(){
             if (extensionsImage.indexOf(ext) != -1) {
                 previsu.dialog( "option" , "height" , "auto" );
                 previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
@@ -300,6 +315,10 @@ $(function () {
             }
             
             previsu.dialog('open');
+            image.parent().effect("transfer", {
+                to: previsu.dialog("widget"),
+                className: "ui-effects-transfer"
+            }, 500);
             previsu.dialog('option', 'position', "center");
         });
 	

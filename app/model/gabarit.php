@@ -29,6 +29,12 @@ class gabarit
     private $_meta;
     
     private $_label;
+    
+    private $_301_editable;
+    
+    private $_meta_titre;
+    
+    private $_extension;
 
     private $_champs = array();
     
@@ -43,7 +49,7 @@ class gabarit
     
     private $_parents = array();
     
-    public function __construct($id = 0, $id_parent = 0, $name = '', $label = '', $main = TRUE, $creable = TRUE, $deletable = TRUE, $sortable = TRUE, $make_hidden = TRUE, $editable = TRUE, $meta = TRUE) {
+    public function __construct($id = 0, $id_parent = 0, $name = '', $label = '', $main = TRUE, $creable = TRUE, $deletable = TRUE, $sortable = TRUE, $make_hidden = TRUE, $editable = TRUE, $meta = TRUE, $_301_editable = TRUE, $meta_titre = TRUE, $extension = "/") {
         $this->_id = $id;
         $this->_id_parent = $id_parent;
         $this->_name = $name;
@@ -53,6 +59,9 @@ class gabarit
         $this->_sortable = $sortable;
         $this->_make_hidden = $make_hidden;
         $this->_editable = $editable;
+        $this->_301_editable = $_301_editable;
+        $this->_meta_titre = $meta_titre;
+        $this->_extension = $extension;
         $this->_meta = $meta;
         $this->_label = $label;
     }
@@ -131,6 +140,18 @@ class gabarit
     
     public function getMeta() {
         return $this->_meta;
+    }
+    
+    public function getExtension() {
+        return $this->_extension;
+    }
+    
+    public function get301_editable() {
+        return $this->_301_editable;
+    }
+    
+    public function getMeta_titre() {
+        return $this->_meta_titre;
     }
     
     public function getLabel() {
