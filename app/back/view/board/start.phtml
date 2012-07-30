@@ -84,7 +84,7 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
 <div class="cb"></div>
 <hr />
 
-<div rel="dashboard/start.html?name=board&nomain=1&nojs=1" class="load-ajax"></div>
+<?php echo $this->datatableRender; ?>
 
 
 <link rel="stylesheet" href="css/back/sticky.css" type="text/css" media="screen" title="" charset="utf-8" />
