@@ -434,7 +434,7 @@ if (isset($this->config["table"]["info"]) && !$this->config["table"]["info"]) {
                 "sInfoEmpty": "Aucun<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>",
                 "sInfoFiltered": "(filtre sur _MAX_ <?php echo $this->config["table"]["title_item"] ?><?php echo isset($this->config["table"]["suffix_plural"]) ? $this->config["table"]["suffix_plural"] : "s" ?>)",
                 "sInfoPostFix": "",
-                "sSearch": "Chercher:",
+                "sSearch": "",
                 "sUrl": "",
                 "oPaginate": {
                     "sFirst": "",
@@ -752,6 +752,13 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
         $elem.load(url)
     }
 
+            
+            // Convert HTML breaks to newline
+            String.prototype.br2nl =
+                function() {
+                return this.replace(/<br\s*\/?>/mg,"\n");
+            };
+    
 </script>
 
 <?php
