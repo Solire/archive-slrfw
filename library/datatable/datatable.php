@@ -392,6 +392,7 @@ class Datatable {
         $aColumns = array();
         $aColumnsFull = array();
         $aColumnsRaw = array();
+        $aColumnsDetails = array();
         $aColumnsRawAll = array();
         $aColumnsAdvanced = array();
         $aColumnsContent = array();
@@ -563,6 +564,10 @@ class Datatable {
             
             if (!isset($column["searchable"]) || $column["searchable"]) {
                 $aColumnsSearchable[] = $columnAdvancedName;
+            }
+            
+            if (isset($column["show_detail"]) && $column["show_detail"]) {
+                $aColumnsDetails[$keyCol] = true;
             }
             
             if (isset($column["show"]) && $column["show"]

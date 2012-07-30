@@ -9,6 +9,7 @@ $config = array(
         "hide_columns" => false,
     ),
     "table" => array(
+        "detail"    =>  true,
         "name" => "traduction",
         "title" => "Edition des traductions",
         "title_item" => "traduction",
@@ -26,7 +27,7 @@ $config = array(
         array(
             "name" => "valeur",
             "editable" => true,
-            "show" => true,
+            "show_detail" => true,
             "filter_field" => "text",
             "title" => "Traduction",
         ),

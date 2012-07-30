@@ -31,7 +31,7 @@ class DashboardController extends MainController {
         } else {
             $datatableClassName = "Datatable";
         }
-        $datatable = new $datatableClassName($_GET, $_GET["name"], $this->_db, "./datatable/", "./datatable/", "images/datatable/");
+        $datatable = new $datatableClassName($_GET, $_GET["name"], $this->_db, "./datatable/", "./datatable/", "img/datatable/");
         
         $datatable->start();
         $datatableString = $datatable;

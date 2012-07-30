@@ -101,7 +101,7 @@ class BoardController extends MainController {
         } else {
             $datatableClassName = "Datatable";
         }
-        $datatable = new $datatableClassName($_GET, $nameConfig, $this->_db, "./datatable/", "./datatable/", "images/datatable/");
+        $datatable = new $datatableClassName($_GET, $nameConfig, $this->_db, "./datatable/", "./datatable/", "img/datatable/");
         $datatable->setUtilisateur($this->_utilisateur);
         $datatable->setGabarits($this->_gabarits);
         
