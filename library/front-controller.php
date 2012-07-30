@@ -118,6 +118,12 @@ class FrontController {
             Registry::set("basehref", "http://www." . $serverUrl . '/');
             
             
+            Registry::set("email", $emails);
+            
+        } else {
+            $serverUrl = str_replace("solire-02", $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'], Registry::get("basehref"));
+            Registry::set("url", $serverUrl);
+            Registry::set("basehref", $serverUrl);
             //Ajout d'un prefix au mail
             if (isset($emails["prefix"]) && $emails["prefix"] != "") {
                 $prefix = $emails["prefix"];
@@ -126,12 +132,6 @@ class FrontController {
                     $email = $prefix . $email;
                 }
             }
-            Registry::set("email", $emails);
-            
-        } else {
-            $serverUrl = str_replace("solire-02", $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'], Registry::get("basehref"));
-            Registry::set("url", $serverUrl);
-            Registry::set("basehref", $serverUrl);
             Registry::set("email", $emails);
         }
 
