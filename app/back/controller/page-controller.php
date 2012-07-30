@@ -368,7 +368,7 @@ class PageController extends MainController {
                 . "Bcc: contact@solire.fr \r\n"
                 . "X-Mailer: PHP/" . phpversion();
 
-        Tools::mail_utf8("Modif site <modif@solire.fr>", "Modification de contenu sur " . Registry::get("site"), $contenu, $headers);
+        Tools::mail_utf8("Modif site <modif@solire.fr>", "Modification de contenu sur " . $this->_mainConfig->get("name", "project"), $contenu, $headers);
 
         $json = array(
             "status" => $this->_page ? "success" : "error",
