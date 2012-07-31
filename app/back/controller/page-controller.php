@@ -447,6 +447,29 @@ class PageController extends MainController {
 
         exit(json_encode($json));
     }
+    
+    /**
+     * 
+     * @return void
+     */
+    public function autocompleteOldLinksAction() {
+        $this->_view->enable(FALSE);
+        $this->_view->main(FALSE);
+
+        $json = array();
+        $term = $_REQUEST["term"];
+        $table = "old_link";
+        $labelField = "`$table`.`link`";
+
+
+        $sql = "SELECT $labelField label"
+                . " FROM `$table`"
+                . " WHERE $labelField  LIKE '%$term%'";
+
+        $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        exit(json_encode($json));
+    }
 
     /**
      * 
