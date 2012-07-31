@@ -1,7 +1,7 @@
 var timer = null;
 
 $(function(){
-    $("input[name=old]").livequery(function(){ 
+    $("input[name=old], table td:first-child input").livequery(function(){ 
         var $input = $(this); 
         $(this).autocomplete({
             source: function( request, response ) {
