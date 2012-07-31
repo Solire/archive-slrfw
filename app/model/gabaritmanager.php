@@ -677,7 +677,7 @@ class gabaritManager extends manager {
 
             /* = SI le rewriting a été modifié
               ------------------------------- */
-            if ($rewriting != $page->getMeta("rewriting")) {
+            if ($rewriting != $page->getMeta("rewriting") && $page->getMeta("rewriting") != "") {
                 $donnees["301"][] = $urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension();
             }
 
