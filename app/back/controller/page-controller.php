@@ -266,7 +266,7 @@ class PageController extends MainController {
                 $url = $urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension();
 
                 $redirections = $this->_db->query("
-                    SELECT * 
+                    SELECT old 
                     FROM `redirection` 
                     WHERE  new = " . $this->_db->quote($url) . "
                         AND id_version = " . $version['id'] . "
