@@ -1,39 +1,70 @@
 <?php
+/**
+ * Gestion du cache scripté
+ *
+ * @package    Library
+ * @subpackage Core
+ * @author     Adrien <aimbert@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 
-
+/**
+ * Gestion du cache scripté
+ * Ce cache se fait en enregistrant le contenu du chache dans un fichier
+ *
+ * @package    Library
+ * @subpackage Core
+ * @author     Adrien <aimbert@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 class Cache
 {
-	/**
-	 *
-	 * @var string cache directory
-	 */
+    /**
+     * Chemin vers le dossier de cache
+     *
+     * @var string cache directory
+     */
     private $_dir = null;
 
-	/**
-	 *
-	 * @param array $ini
-	 */
-    public function __construct($ini) {
-        $this->_dir = $ini["dir"];
+    /**
+     * Instantie le cache
+     *
+     * @param array $ini Contenu du fichier de config pour le cache
+     */
+    public function __construct($ini)
+    {
+        $this->_dir = $ini['dir'];
     }
 
-	/**
-	 *
-	 * @param string $key
-	 * @param mixed $value
-	 */
-    public function set($key, $value) {
+    /**
+     * Mise en cache
+     *
+     * @param string $key   Nom / code de le l'élément à mettre en cache
+     * @param mixed  $value Valeur à mettre en cache
+     *
+     * @return void
+     */
+    public function set($key, $value)
+    {
         file_put_contents($this->_dir . $key, serialize($value));
     }
 
-	/**
-	 *
-	 * @param string $key
-	 * @return mixed
-	 */
-    public function get($key) {
+    /**
+     * Récupère le cache
+     *
+     * @param string $key Nom / code de l'élement en cache
+     *
+     * @return mixed
+     */
+    public function get($key)
+    {
         $file = $this->_dir . $key;
 
-        return (file_exists($file) && date("Ymd") <= date("Ymd", filemtime($file))) ? unserialize(file_get_contents($file)) : false;
+        if (file_exists($file) && date('Ymd') <= date('Ymd', filemtime($file))) {
+            return unserialize(file_get_contents($file));
+        }
+
+        return false;
     }
 }
+

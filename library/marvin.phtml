@@ -1,6 +1,7 @@
 <?php
 /**
  * Affichage du rapport d'erreur Marvin
+ *
  * @author Adrien <aimbert@solire.fr>
  * @package Library
  * @subpackage Error
@@ -36,6 +37,17 @@
                     <?php echo $this->readLines($this->exc->getFile(), $this->exc->getLine()); ?>
                 </div>
             </div>
+<?php if (isset($this->data) && !empty($this->data)) { ?>
+            <h2>Data</h2>
+            <div style="padding:5px;">
+    <?php foreach ($this->data as $data) { ?>
+                <div style="font-style:italic; margin-bottom:10px; border:1px solid #D9D9D9; border-radius: 4px 0px 4px 0px; max-width:97%;">
+                    <div style="background:<?php echo $this->color3; ?>; font-weight:bold; font-style:none; padding-left:20px;"><?php echo $data['key'] ?></div>
+                    <?php echo $data['value'] ?>
+                </div>
+    <?php } // foreach $this->request ?>
+            </div>
+<?php } // If $this->request ?>
 <?php if (isset($this->request) && !empty($this->request)) { ?>
             <h2>Request</h2>
             <div style="padding:5px;">

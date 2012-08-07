@@ -1,9 +1,11 @@
 <?php
 /**
  * Gestionnaire de rapport d'erreur Marvin
- * @author Adrien <aimbert@solire.fr>
- * @package Library
+ *
+ * @package    Library
  * @subpackage Error
+ * @author     Siwaÿll <sanath.labs@gmail.com>
+ * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  * @filesource
  */
 
@@ -12,12 +14,20 @@ include 'geshi/geshi.php';
 /**
  * Marvin est une methode de rapport d'erreur
  *
- * @author Adrien <aimbert@solire.fr>
- * @package Library
+ * @package    Library
  * @subpackage Error
+ * @author     Siwaÿll <sanath.labs@gmail.com>
+ * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 class Marvin
 {
+    /**
+     * Contrôle de l'affichage
+     *
+     * @var boolean
+     */
+    static $display = true;
+
     /**
      * Chemin de configuration du fichier de configuration
      */
@@ -25,17 +35,20 @@ class Marvin
 
     /**
      * Génère un rapport d'alerte
-     * @uses Config
-     * @param string $title Titre du rapport
+     *
+     * @param string    $title Titre du rapport
      * @param Exception $error Exception à exploiter
+     *
+     * @uses Config
      */
     public function __construct($title, $error)
     {
         $this->_config = new Config(self::CONFIG_PATH);
-        if (method_exists($error, 'getPrevious') && $error->getPrevious())
+        if (method_exists($error, 'getPrevious') && $error->getPrevious()) {
             $this->exc = $error->getPrevious();
-        else
+        } else {
             $this->exc = $error;
+        }
         $this->contact = $this->_config->get('mail', 'contact');
         $this->headers = 'Content-type: text/html; charset=utf-8' . "\r\n"
                        . 'From: Marvin <marvin@solire.fr>' . "\r\n";
@@ -48,8 +61,9 @@ class Marvin
         }
 
         $this->title = $title;
-        if (isset($_SERVER['SERVER_NAME']))
+        if (isset($_SERVER['SERVER_NAME'])) {
             $this->title = '[' . $_SERVER['SERVER_NAME'] . '] ' . $this->title;
+        }
 
 
         /* = Chargement des données passées en paramètre de la page
@@ -58,14 +72,17 @@ class Marvin
             foreach ($_REQUEST as $key => $value) {
                 $loc = array();
 
-                if (isset($_GET[$key]))
+                if (isset($_GET[$key])) {
                     $loc[] = 'GET';
+                }
 
-                if (isset($_COOKIE[$key]))
+                if (isset($_COOKIE[$key])) {
                     $loc[] = 'COOKIE';
+                }
 
-                if (isset($_POST[$key]))
+                if (isset($_POST[$key])) {
                     $loc[] = 'POST';
+                }
 
                 $req = array();
                 $req['loc'] = implode(' | ', $loc);
@@ -74,6 +91,19 @@ class Marvin
                 $this->request[] = $req;
             }
         }
+
+        /* = Mise en forme des données suplémentaires, si il y en a
+          ------------------------------- */
+        if (method_exists($error, 'getData')) {
+            $data = $error->getData();
+            foreach ($data as $key => $value) {
+                $req = array();
+                $req['key'] = $key;
+                $req['value'] = $this->varDump($value);
+                $this->data[] = $req;
+            }
+        }
+
 
         $traces = $this->exc->getTrace();
         foreach ($traces as $trace) {
@@ -92,7 +122,8 @@ class Marvin
     /**
      * Renvois la chaine contenant le var_dump() de la variable
      *
-     * @param mixed $var
+     * @param mixed $var Variable à afficher
+     *
      * @return string
      */
     public final function varDump($var)
@@ -105,21 +136,22 @@ class Marvin
     }
 
     /**
-     * Renvois une chaine contenant les lignes du fichiers formatées pour
-     * l'affichage
+     * Renvois une chaine contenant les lignes du fichiers formatées pour l'affichage
      *
-     * @uses GeSHi
-     * @param string $fileName
-     * @param int $line
+     * @param string $fileName Chemin vers le fichier
+     * @param int    $line     Ligne à lire
+     *
      * @return string
+     * @uses GeSHi
      */
     protected function readLines($fileName, $line)
     {
         $file = file($fileName);
         $strFile = '';
         for ($i = $line - 6; $i < $line + 2; $i++) {
-            if ($i < 0 || $i >= count($file))
+            if ($i < 0 || $i >= count($file)) {
                 continue;
+            }
             $strFile .= $file[$i];
         }
         $geshi = new GeSHi($strFile, 'php');
@@ -132,6 +164,8 @@ class Marvin
 
     /**
      * Envois le rapport
+     *
+     * @return void
      */
     public function send()
     {
@@ -144,11 +178,18 @@ class Marvin
 
     /**
      * Affiche le rapport
+     *
+     * @return void
      */
     public function display()
     {
+        if (!self::$display) {
+            return;
+        }
+
         $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
         include $dir . 'marvin.phtml';
         die();
     }
 }
+
