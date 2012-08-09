@@ -192,11 +192,6 @@ $(function(){
 		
         return false;
     });
-    
-    //On desactive le click des btn de tri
-    $(".sort-move").live("click", function(e) {
-        e.preventDefault()
-    })
 
     //// GESTION DU TRI
     $('.sort-box').each(function(){
@@ -261,18 +256,6 @@ $(function(){
     var confirm = $('<div>', {
         id : 'confirm'
     }).dialog({
-        show: {
-            effect:   "fade",
-            duration: 1000
-        },
-        hide: {
-            effect:   "fade",
-            duration: 500
-        },
-        open: function(){
-            if(!$('.ui-dialog-buttonset button').hasClass("btn"))
-                $('.ui-dialog-buttonset button').attr("class", "").addClass("btn gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
-        },
         title : "Attention",
         resizable : false,
         buttons: {
@@ -302,18 +285,6 @@ $(function(){
     var previsu = $('<div>', {
         id: 'previsu'
     }).dialog({
-        show: {
-            effect:   "fade",
-            duration: 1000
-        },
-        hide: {
-            effect:   "fade",
-            duration: 500
-        },
-        open: function(){
-            if(!$('.ui-dialog-buttonset button').hasClass("btn"))
-                $('.ui-dialog-buttonset button').attr("class", "").addClass("btn gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
-        },
         title : "Prévisualisation",
         
         autoOpen: false,
@@ -350,10 +321,6 @@ $(function(){
             sortpar = sort_elmt.parent();
             confirm.html("Etes-vous sur de vouloir supprimer ce bloc?");
             confirm.dialog('open');
-            $('.delBloc', sort_elmt).effect("transfer", {
-                to: confirm.dialog("widget"),
-                className: "ui-effects-transfer"
-            }, 500);
         }
         return false;
     });
@@ -365,31 +332,28 @@ $(function(){
 
         var link = $(this).attr('href');
         var ext = link.split('.').pop().toLowerCase();
+        if (extensionsImage.indexOf(ext) != -1) {
+            $('<img>', {
+                'src' : link
+            }).load(function(){
+                if (extensionsImage.indexOf(ext) != -1) {
+                    previsu.dialog( "option" , "height" , "auto" );
+                    previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
+                    previsu.dialog( "option" , "maxHeight" , $(window).height()-230 );
 
-        $('<img>', {
-            'src' : link
-        }).load(function(){
-            if (extensionsImage.indexOf(ext) != -1) {
-                previsu.dialog( "option" , "height" , "auto" );
-                previsu.dialog( "option" , "maxWidth" , $(window).width()-180 );
-                previsu.dialog( "option" , "maxHeight" , $(window).height()-230 );
-
-                previsu.html(this);
-            }
-            else {
-                previsu.dialog( "option" , "height" , 0 );
-                previsu.html('');
-            }
-            previsu.dialog('close');	
-            previsu.dialog('open');
-            image.parent().effect("transfer", {
-                to: previsu.dialog("widget"),
-                className: "ui-effects-transfer"
-            }, 500);
-            previsu.dialog('option', 'position', "center");
-        });
+                    previsu.html(this);
+                }
+                else {
+                    previsu.dialog( "option" , "height" , 0 );
+                    previsu.html('');
+                }
+                previsu.dialog('close');	
+                previsu.dialog('open');
+                previsu.dialog('option', 'position', "center");
+            });
 		
-        return false;
+            return false;
+        }
     });
 	
     $('legend').live('click', function(){
@@ -531,10 +495,8 @@ $(function(){
                 $('.openlang').removeClass('active').addClass('translucide');
                 $(this).removeClass('translucide').addClass('active');
 				
-                $('.langue:visible').slideUp(500, function() {
-                    $('.langue').eq(i).slideDown(500);
-                });
-                
+                $('.langue:visible').slideUp(500);
+                $('.langue').eq(i).slideDown(500);
             }
 			
             return false;
@@ -699,18 +661,6 @@ $(function(){
     }).load('media/popuplistefichiers.html?id_gab_page=' + $('[name=id_gab_page]').val(), function(){
         
         $(this).dialog({
-            show: {
-                effect:   "fade",
-                duration: 1000
-            },
-            hide: {
-                effect:   "fade",
-                duration: 500
-            },
-            open: function(){
-                if(!$('.ui-dialog-buttonset button').hasClass("btn"))
-                    $('.ui-dialog-buttonset button').attr("class", "").addClass("btn gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
-            },
             title : "Fichiers",
             autoOpen : false,
             width : 625,
@@ -722,12 +672,6 @@ $(function(){
             if(oTable == null)
                 reloadDatatable();
             uploader_popup.dialog("open");
-            
-            previsu.dialog('option', 'position', "center");
-            $(this).parent().effect("transfer", {
-                to: uploader_popup.dialog("widget"),
-                className: "ui-effects-transfer"
-            }, 500);
             
             //            uploader.init();
             uploaderInit();
