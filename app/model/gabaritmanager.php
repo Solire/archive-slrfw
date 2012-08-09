@@ -646,7 +646,7 @@ class gabaritManager extends manager {
             if ($page->getMeta("rewriting") == "") {
                 $titre_rew = $donnees['rewriting'] != "" ? $donnees['rewriting'] : ($page->getVersion("exotique") > 0 ? $donnees['titre_rew'] : $donnees['titre']);
             } else {
-                $titre_rew = $donnees['rewriting'];
+                $titre_rew = $donnees['rewriting'] == "" ? $page->getMeta("rewriting") : $donnees['rewriting'];
             }
 
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
