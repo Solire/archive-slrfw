@@ -179,6 +179,8 @@ class PageController extends MainController
         if ($this->_page->getMeta("no_index"))
             $this->_seo->disableIndex();
 
+        if (method_exists($this, "_" . $view . "Gabarit"))
+            $this->{"_" . $view . "Gabarit"}();
 
         $this->shutdown();
         $this->_view->display("page", $view);
