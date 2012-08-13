@@ -50,15 +50,15 @@ class MediaController extends MainController {
             $orderby = isset($_REQUEST['orderby']['champ']) ? $_REQUEST['orderby']['champ'] : '';
             $sens = isset($_REQUEST['orderby']['sens']) ? $_REQUEST['orderby']['sens'] : '';
 
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
 
             $this->_files = $this->_fileManager->getList($this->_page->getMeta("id"), $search, $orderby, $sens);
         }
 
         foreach ($this->_files as &$file) {
             $ext = strtolower(array_pop(explode(".", $file['rewriting'])));
-
-            $file['path'] = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
+            $prefixPath = $this->_api["id"] == 1 ? ".." . DIRECTORY_SEPARATOR : ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
+            $file['path'] = $prefixPath . $this->_upload_path . DIRECTORY_SEPARATOR
                     . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                     . $file['rewriting'];
 
@@ -69,7 +69,7 @@ class MediaController extends MainController {
             $file['class'] = 'hoverprevisu vignette';
 
             if (array_key_exists($ext, fileManager::$_extensions['image'])) {
-                $file['path_mini'] = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
+                $file['path_mini'] = $prefixPath . $this->_upload_path . DIRECTORY_SEPARATOR
                         . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                         . $this->_upload_vignette . DIRECTORY_SEPARATOR
                         . $file['rewriting'];
@@ -111,7 +111,7 @@ class MediaController extends MainController {
                 "state" => "closed"
             );
         } elseif ($_REQUEST['id'] === "0") {
-            $rubriques = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
+            $rubriques = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], 0);
             foreach ($rubriques as $rubrique)
                 $res[] = array(
                     "attr" => array(
@@ -124,7 +124,7 @@ class MediaController extends MainController {
                     "state" => "closed"
                 );
         } else {
-            $sous_rubriques = $this->_gabaritManager->getList(BACK_ID_VERSION, $_REQUEST['id']);
+            $sous_rubriques = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], $_REQUEST['id']);
 
             foreach ($sous_rubriques as $sous_rubrique) {
                 $nbre = $this->_db->query("SELECT COUNT(*) FROM `media_fichier` WHERE `suppr` = 0 AND `id_gab_page` = " . $sous_rubrique->getMeta('id'))->fetchColumn();
@@ -155,7 +155,7 @@ class MediaController extends MainController {
         $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
 
         if ($id_gab_page) {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
 
             if ($this->_page) {
                 $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
@@ -186,7 +186,12 @@ class MediaController extends MainController {
                 "id" => "id",
             );
         }
-
+        if($json["status"] == "error") {
+            $this->_log->logThis("Upload échoué", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $this->_page->getMeta("id") . '<br /><span style="color:red;">Error ' . $json["error"]["code"] . " : " . $json["error"]["message"] . '</span>');
+        } else {
+            $this->_log->logThis("Upload réussi", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $this->_page->getMeta("id"));
+        }
+        
         exit(json_encode($json));
     }
 
@@ -198,7 +203,11 @@ class MediaController extends MainController {
         $query = "UPDATE `media_fichier` SET `suppr` = NOW() WHERE `id` = " . $id_media_fichier;
         $status = $this->_db->query($query) ? "success" : "error";
         $json = array("status" => $status);
-
+        if(!$json["status"]) {
+            $this->_log->logThis("Suppression de fichier échouée", $this->_utilisateur->get("id"), "<b>Id</b> : " . $id_media_fichier . '<br /><span style="color:red;">Error</span>');
+        } else {
+            $this->_log->logThis("Suppression de fichier réussie", $this->_utilisateur->get("id"), "<b>Id</b> : " . $id_media_fichier);
+        }
         exit(json_encode($json));
     }
 
@@ -224,7 +233,7 @@ class MediaController extends MainController {
         $tinyMCE = isset($_GET['tinyMCE']);
 
         if ($id_gab_page) {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page, 0);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page, 0);
 
             $files = $this->_fileManager->getSearch($term, $this->_page->getMeta("id"), $extensions);
 

@@ -12,12 +12,12 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
     if (!$pagesGabarit["gabarit"]["creable"])
         continue;
     ?>
-                        <div class="btn btn-shortcut fl">
-                            <a href="page/display.html?id_gabarit=<?php echo $pagesGabarit["gabarit"]["id"] ?>" class="" title="">
-                                <img src="img/back/gray_dark/document_alt_stroke_24x32.png" alt="">
-                                <b>Créer un<?php echo $pagesGabarit["gabarit"]["genre"] == "f" ? 'e' : '' ?> <?php echo $pagesGabarit["gabarit"]["label"] ?></b>
-                            </a>
-                        </div>
+                            <div class="btn btn-shortcut fl">
+                                <a href="page/display.html?id_gabarit=<?php echo $pagesGabarit["gabarit"]["id"] ?>" class="" title="">
+                                    <img src="img/back/gray_dark/document_alt_stroke_24x32.png" alt="">
+                                    <b>Créer un<?php echo $pagesGabarit["gabarit"]["genre"] == "f" ? 'e' : '' ?> <?php echo $pagesGabarit["gabarit"]["label"] ?></b>
+                                </a>
+                            </div>
     <?php
 }
 ?>
@@ -29,18 +29,21 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
 
 <div id="columns">
     <ul id="column1" class="column">
-        <li class="widget gradient-green" id="intro">
-            <div class="widget-head gradient-green">
-                <h3>Introduction</h3>
-            </div>
-            <div class="widget-content">
-                <p>
-                    Le tableau de bord vous permet de visualiser les dernières pages éditées et créées par type de page. Vous pouvez réorganiser chaque bloc du tableau de bord, l'état de celui-ci sera sauvegardé pour votre utilisateur.
-                </p>
-            </div>
-        </li>
-    </ul>
-    <ul id="column2" class="column">
+        <?php if ($this->appConfig->get("introduction", "board")) {
+            ?>
+            <li class="widget gradient-green" id="intro">
+                <div class="widget-head gradient-green">
+                    <h3>Introduction</h3>
+                </div>
+                <div class="widget-content">
+                    <p>
+                        Le tableau de bord vous permet de visualiser les dernières pages éditées et créées par type de page. Vous pouvez réorganiser chaque bloc du tableau de bord, l'état de celui-ci sera sauvegardé pour votre utilisateur.
+                    </p>
+                </div>
+            </li>
+
+            <?php }
+        ?>
         <li class="widget gradient-green"  id="resume">
             <div class="widget-head gradient-green">
                 <h3>Résumé</h3>
@@ -74,6 +77,9 @@ foreach ($this->pages as $idGabarit => $pagesGabarit) {
 
             </div>
         </li>
+    </ul>
+    <ul id="column2" class="column">
+
 
     </ul>
     <ul id="column3" class="column"></ul>

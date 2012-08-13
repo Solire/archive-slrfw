@@ -117,61 +117,70 @@ $config = array(
                                                                  
  */
 
-$config = array (
-  'additional_script' =>  array(
-      "back/autocompleteoldlinks.js"
-  ),
-  'table' => 
-  array (
-    'title' => 'Liste des redirections',
-    'title_item' => 'redirection',
-    'suffix_genre' => 'e',
-    'fixedheader' => false,
-    'name' => 'redirection',
-  ),
-  'extra' => 
-  array (
-    'copy' => false,
-    'print' => false,
-    'pdf' => false,
-    'creable'   =>  true,
-    'csv' => false,
-    'hide_columns' => false,
-    'highlightedSearch' => false,
-  ),
-  'columns' => 
-  array (
-    array (
-      'name' => 'id',
-      'index'   =>  true
+$config = array(
+    'additional_script' => array(
+        "back/autocompleteoldlinks.js"
     ),
-    array (
-      'name' => 'old',
-      'show' => true,
-      'editable'    =>  true,
-      'filter_field' => 'text',
-      'creable_field'   =>  array(
-          "type"    =>  "text",
-      ),
-      'title' => 'Old',
+    'table' =>
+    array(
+        'title' => 'Liste des redirections',
+        'title_item' => 'redirection',
+        'suffix_genre' => 'e',
+        'fixedheader' => false,
+        'name' => 'redirection',
     ),
-    array (
-      'name' => 'new',
-      'editable'    =>  true,
-      'show' => true,
-      'filter_field' => 'text',
-      'creable_field'   =>  array(
-          "type"    =>  "text",
-      ),
-      'title' => 'New',
+    'extra' =>
+    array(
+        'copy' => false,
+        'print' => false,
+        'pdf' => false,
+        'creable' => true,
+//        'deletable' => true,
+        'csv' => false,
+        'hide_columns' => false,
+        'highlightedSearch' => false,
     ),
-    array (
-      'name' => 'id_version',
-      'index'  =>  true,
-      'creable_field'   =>  array(
-          "value"    =>  BACK_ID_VERSION,
-      ),
-      'filter'  =>  BACK_ID_VERSION,
+    'columns' =>
+    array(
+        array(
+            'name' => 'id',
+            'index' => true
+        ),
+        array(
+            'name' => 'old',
+            'show' => true,
+            'editable' => true,
+            'filter_field' => 'text',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+            'title' => 'Old',
+        ),
+        array(
+            'name' => 'new',
+            'editable' => true,
+            'show' => true,
+            'filter_field' => 'text',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+            'title' => 'New',
+        ),
+        array(
+            'name' => 'id_version',
+            'index' => true,
+            'creable_field' => array(
+                "value" => BACK_ID_VERSION,
+            ),
+            'filter' => BACK_ID_VERSION,
+        ),
+        array(
+            'name' => 'id_api',
+            'index' => true,
+            'creable_field' => array(
+                "value" => BACK_ID_API,
+            ),
+            'filter' => BACK_ID_API,
+        ),
     ),
-  ),
 );

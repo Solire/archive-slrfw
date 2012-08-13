@@ -10,6 +10,8 @@ class gabarit
     
     private $_id_parent;
     
+    private $_api;
+    
     private $_table;
 
     private $_name;
@@ -70,6 +72,10 @@ class gabarit
         $this->_id_parent = $id_parent;
     }
     
+    public function setApi($api) {
+        $this->_api = $api;
+    }
+    
     public function setName($name) {
         $this->_name = $name;
     }
@@ -104,6 +110,10 @@ class gabarit
     
     public function getId() {
         return $this->_id;
+    }
+    
+    public function getApi() {
+        return $this->_api;
     }
     
     public function getIdParent() {

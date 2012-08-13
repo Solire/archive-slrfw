@@ -135,6 +135,11 @@ class FrontController {
             Registry::set("email", $emails);
         }
 
+        if(isset($_GET["application"])) {
+            $query = "SELECT * FROM `gab_api` WHERE `name` = " . $db->quote($_GET["application"]);
+            $api = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+        }
+        
 
         $query = "SELECT * FROM `version` WHERE `domaine` = '$serverUrl'";
         $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
@@ -148,6 +153,7 @@ class FrontController {
         Registry::set("analytics", $version['analytics']);
         define("ID_VERSION", $version['id']);
         define("SUF_VERSION", $version['suf']);
+        define("ID_API", isset($api['id']) ? $api['id'] : 1);
     }
 
     public static function run() {

@@ -86,15 +86,15 @@ class Tools {
     }
 
     //ENVOI DE MAIL EN UTF8
-    static function mail_utf8($to, $subject = '(No subject)', $message = '', $header = '') {
-        $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/plain; charset="UTF-8"' . "\r\n";
+    static function mail_utf8($to, $subject = '(No subject)', $message = '', $header = '', $type = "text/plain") {
+        $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: ' . $type . '; charset="UTF-8"' . "\r\n";
         mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $message, $header_ . $header);
     }
 
     static function RelativeTimeFromDate($date) {
         if (substr($date, 0, 10) == "0000-00-00")
             return "";
-        
+
         $timestamp = strtotime($date);
         return self::RelativeTime($timestamp);
     }
@@ -184,6 +184,31 @@ class Tools {
         return $tableConfig;
     }
 
+    /**
+     * Recherche dans un array multidim
+     * 
+     * @param array $parents
+     * @param array $searched
+     * @return boolean 
+     */
+    static function multidimensional_search($parents, $searched) {
+        if (empty($searched) || empty($parents)) {
+            return false;
+        }
+
+        foreach ($parents as $key => $value) {
+            $exists = true;
+            foreach ($searched as $skey => $svalue) {
+                $exists = ($exists && IsSet($parents[$key][$skey]) && $parents[$key][$skey] == $svalue);
+            }
+            if ($exists) {
+                return $key;
+            }
+        }
+
+        return false;
+    }
+
     static function might_serialize($val) {
         if (is_object($val)) {
             $obj_keys = array_keys(get_object_vars($val));
@@ -203,7 +228,7 @@ class Tools {
     }
 
     static function might_unserialized($val) {
-        //$pattern = "/.*\{(.*)\}/";
+//$pattern = "/.*\{(.*)\}/";
         if (self::is_serialized($val)) {
             $ret = unserialize($val);
             foreach ($ret as &$r) {
@@ -223,7 +248,7 @@ class Tools {
         if (trim($val) == "") {
             return false;
         }
-        //if (preg_match("/^(i|s|a|o|d)(.*);/si",$val)) { return true; }
+//if (preg_match("/^(i|s|a|o|d)(.*);/si",$val)) { return true; }
         if (preg_match("/^(i|s|a|o|d):(.*);/si", $val) !== false) {
             return true;
         }
@@ -309,9 +334,9 @@ class Tools {
     }
 
     static function removeExtension($fileName) {
-        // cherche la postion du '.'
+// cherche la postion du '.'
         $position = strpos($fileName, ".");
-        // enleve l'extention, tout ce qui se trouve apres le '.'
+// enleve l'extention, tout ce qui se trouve apres le '.'
         $fileNameWithoutExtension = substr($fileName, 0, $position);
         return $fileNameWithoutExtension;
     }
@@ -354,9 +379,8 @@ class Tools {
     static function formate_date_nombre($dateUS, $glueBefore = '-', $glueAfter = '-') {
         return implode($glueAfter, array_reverse(explode($glueBefore, $dateUS)));
     }
-    
-    static function regexAccents($chaine)
-    {
+
+    static function regexAccents($chaine) {
         mb_internal_encoding("UTF-8");
         mb_regex_encoding('UTF-8');
         $accent = array('a', 'à', 'á', 'â', 'ã', 'ä', 'å', 'c', 'ç', 'e', 'è', 'é', 'ê', 'ë', 'i', 'ì', 'í', 'î', 'ï', 'o', 'ð', 'ò', 'ó', 'ô', 'õ', 'ö', 'u', 'ù', 'ú', 'û', 'ü', 'y', 'ý', 'ý', 'ÿ');
@@ -373,9 +397,8 @@ class Tools {
         $chaine = str_replace($inter, $regex, $chaine);
         return $chaine;
     }
-    
-    static function highlightedSearch($chaine, $keywords)
-    {
+
+    static function highlightedSearch($chaine, $keywords) {
 
         mb_internal_encoding("UTF-8");
         mb_regex_encoding('UTF-8');
@@ -393,8 +416,6 @@ class Tools {
         }
         return $chaine;
     }
-    
-        
 
 }
 

@@ -154,13 +154,15 @@ class ActionController {
         $this->_log = Registry::get('log');
         $this->_css = new Css();
         $this->_javascript = new Javascript();
-        $this->_translate = new TranslateMysql(ID_VERSION, $this->_db);
+        $this->_translate = new TranslateMysql(ID_VERSION, ID_API, $this->_db);
+        $this->_translate->addTranslation();
         $this->_seo = new Seo();
         $this->_project = new Project($this->_mainConfig->get('name', 'project'));
         $this->_view = new View($this->_translate);
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
         $this->_view->envConfig = Registry::get('envconfig');
+        $this->_view->ajax = $this->_ajax;
 
         $this->_view->seo = $this->_seo;
 
@@ -244,7 +246,8 @@ class ActionController {
         foreach ($urlsToTest as $key => $urlToTest) {
             $query = "SELECT `new`"
                     . " FROM `redirection`"
-                    . " WHERE id_version = " . ID_VERSION . ""
+                    . " WHERE id_version = " . ID_VERSION
+                    . " AND `id_api` = " . ID_API
                     . " AND `old` LIKE " . $this->_db->quote($urlToTest)
                     . " LIMIT 1";
             $redirection301 = $this->_db->query($query)->fetch(PDO::FETCH_COLUMN);

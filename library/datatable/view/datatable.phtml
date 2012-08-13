@@ -105,6 +105,64 @@
         cursor: pointer;
     }
 
+    .loading-overlay {
+        background: rgba(0,0,0,0.6);
+        position:absolute;
+        width:100%;
+        height:100%;
+        z-index:100
+    }
+
+    /* LOADING SPINNER*/
+    .circle {
+        background-color: rgba(0,0,0,0);
+        border:5px solid rgba(0,183,229,0.9);
+        opacity:.9;
+        border-right:5px solid rgba(0,0,0,0);
+        border-left:5px solid rgba(0,0,0,0);
+        border-radius:50px;
+        box-shadow: 0 0 35px #2187e7;
+        width:50px;
+        height:50px;
+        margin:0 auto;
+        -moz-animation:spinPulse 1s infinite ease-in-out;
+        -webkit-animation:spinPulse 1s infinite linear;
+    }
+    .circle1 {
+        background-color: rgba(0,0,0,0);
+        border:5px solid rgba(0,183,229,0.9);
+        opacity:.9;
+        border-left:5px solid rgba(0,0,0,0);
+        border-right:5px solid rgba(0,0,0,0);
+        border-radius:50px;
+        box-shadow: 0 0 15px #2187e7; 
+        width:30px;
+        height:30px;
+        margin:0 auto;
+        position:relative;
+        top:-50px;
+        -moz-animation:spinoffPulse 1s infinite linear;
+        -webkit-animation:spinoffPulse 1s infinite linear;
+    }
+    @-moz-keyframes spinPulse {
+        0% { -moz-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7;}
+    50% { -moz-transform:rotate(145deg); opacity:1; }
+    100% { -moz-transform:rotate(-320deg); opacity:0; }
+    }
+    @-moz-keyframes spinoffPulse {
+        0% { -moz-transform:rotate(0deg); }
+    100% { -moz-transform:rotate(360deg);  }
+    }
+    @-webkit-keyframes spinPulse {
+        0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
+    50% { -webkit-transform:rotate(145deg); opacity:1;}
+    100% { -webkit-transform:rotate(-320deg); opacity:0; }
+    }
+    @-webkit-keyframes spinoffPulse {
+        0% { -webkit-transform:rotate(0deg); }
+    100% { -webkit-transform:rotate(360deg); }
+    }
+
 
 
     .ColVis_Button {
@@ -206,8 +264,14 @@
                     $filterIndividualColumn .= '</td>';
                 }
             }
+            if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
+                $filterIndividualColumn .= '<td></td>';
+                ?>
+                <th></th>
+                <?php
+            }
             ?>
-
+            
         </tr>
 
         <?php
@@ -239,7 +303,14 @@
                     <?php
                 }
             }
+            
+            if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
+                ?>
+                <th></th>
+                <?php
+            }
             ?>
+
         </tr>
 
 
@@ -258,6 +329,11 @@
                     <th style="background-color:#fff; height:30px; font-size:14px; text-align:center; padding:3px 0; "></th>
                     <?php
                 }
+            }
+            if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
+                ?>
+                <th></th>
+                <?php
             }
             ?>
         </tr>
@@ -324,15 +400,15 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                     if(aData[<?php echo $detailId; ?>] != '')
                                     sOut += '<tr><td><?php echo $detailName; ?></td><td>'+aData[<?php echo $detailId; ?>]+'</td></tr>';
 
-                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                            
             <?php
         }
     ?>
                     sOut += '</table>';
-                                                                                                                                                                             
+                                                                                                                                                                                             
                     return sOut;
                 }
-                            
+                                            
                 $('#tableau-<?php echo $this->name ?> tbody td img.detail').live( 'click', function () {
                     var nTr = $(this).parents('tr')[0];
                     var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
@@ -426,7 +502,7 @@ if (isset($this->config["table"]["info"]) && !$this->config["table"]["info"]) {
                 'bFilter': false,
 <?php } ?>
             'oLanguage': {
-                "sProcessing": '<img src="<?php echo $this->_imgPath; ?>ajax-loader.gif" />',
+                "sProcessing": '',
                 "sLengthMenu": "Montrer _MENU_ <?php echo $this->config["table"]["title_item"] ?><?php echo isset($this->config["table"]["suffix_plural"]) ? $this->config["table"]["suffix_plural"] : "s" ?> par page",
                 "sZeroRecords": "Aucun<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?> trouvé<?php echo $this->config["table"]["suffix_genre"] ?>",
                 "sEmptyTable": "Pas de <?php echo $this->config["table"]["title_item"] ?>",
@@ -489,50 +565,63 @@ foreach ($this->config["columns"] as $column) {
         $numCol++;
     }
 }
+
+if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])
+    echo '{ "bSortable": false},';
+
 ?>
             ],
-<?php
-if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
-    
-    ?>
-                'fnDrawCallback': function(a, b, c) {
-                    /* Save state open detail */
-                    if(anOpen_<?php echo $this->name ?>Id) {
-                        anOpen_<?php echo $this->name ?>Id2 = anOpen_<?php echo $this->name ?>Id;
-                        anOpen_<?php echo $this->name ?>Id = []
 
-                        for(id in anOpen_<?php echo $this->name ?>Id2) {
-                            item = anOpen_<?php echo $this->name ?>Id2[id]
-                            if($('#' + item + ' td:first img').length > 0) {
-                                $('#' + item + ' td:first img').click();
+            "fnPreDrawCallback": function() {
+                var $overlay = $('<div class="loading-overlay"><div class="circle"></div><div class="circle1"></div></div>').hide()
+                $("#tableau-<?php echo $this->name ?>_wrapper").prepend($overlay)
+                var marginTop = $("#tableau-<?php echo $this->name ?>_wrapper").outerHeight() / 2 - 25
+                $overlay.find(".circle").css({'margin-top' : marginTop + "px"})
+                $overlay.fadeIn(500);
+                return true;
+            },
+            'fnDrawCallback': function(a, b, c) {
+                    $('div.loading-overlay').remove()
+<?php
+if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
+    ?>
+                        if(anOpen_<?php echo $this->name ?>Id) {
+                            anOpen_<?php echo $this->name ?>Id2 = anOpen_<?php echo $this->name ?>Id;
+                            anOpen_<?php echo $this->name ?>Id = []
+
+                            for(id in anOpen_<?php echo $this->name ?>Id2) {
+                                item = anOpen_<?php echo $this->name ?>Id2[id]
+                                if($('#' + item + ' td:first img').length > 0) {
+                                    $('#' + item + ' td:first img').click();
+                                }
                             }
                         }
+<?php } ?>
+            },
+            "fnServerData": function ( sSource, aoData, fnCallback ) {
+                $.ajax( {
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": function(data){
+                    
+                        for (i in data.bottomsValue) {
+                            $('tfoot tr:last th', oTable).eq(i).html(data.bottomsValue[i])
+                        }
+                    
+                        fnCallback(data);                    
                     }
-                },
-                "fnServerData": function ( sSource, aoData, fnCallback ) {
-                    $.ajax( {
-                        "dataType": 'json',
-                        "type": "POST",
-                        "url": sSource,
-                        "data": aoData,
-                        "success": function(data){
-                    
-                            for (i in data.bottomsValue) {
-                                $('tfoot tr:last th', oTable).eq(i).html(data.bottomsValue[i])
-                            }
-                    
-                            fnCallback(data);                    
-                        }
-                    } );
-                },
-                'sDom': '<"H"TClfr>t<"F"ip>',
-                'bJQueryUI': true,
-                'bSortCellsTop': true,
-                'bProcessing': true,
-                'bServerSide': true,
-                'oTableTools': {
-                    'sSwfPath': "/back/swf/datatable/copy_cvs_xls_pdf.swf",
-                    'aButtons': [
+                } );
+            },
+            'sDom': '<"H"TClfr>t<"F"ip>',
+            'bJQueryUI': true,
+            'bSortCellsTop': true,
+            'bProcessing': true,
+            'bServerSide': true,
+            'oTableTools': {
+                'sSwfPath': "/back/swf/datatable/copy_cvs_xls_pdf.swf",
+                'aButtons': [
 <?php
 if (isset($this->config["extra"]) && isset($this->config["extra"]["copy"]) && $this->config["extra"]["copy"]) {
     ?>
@@ -753,11 +842,11 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
     }
 
             
-            // Convert HTML breaks to newline
-            String.prototype.br2nl =
-                function() {
-                return this.replace(/<br\s*\/?>/mg,"\n");
-            };
+    // Convert HTML breaks to newline
+    String.prototype.br2nl =
+        function() {
+        return this.replace(/<br\s*\/?>/mg,"\n");
+    };
     
 </script>
 
