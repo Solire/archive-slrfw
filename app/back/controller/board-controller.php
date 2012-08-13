@@ -32,7 +32,7 @@ class BoardController extends MainController {
         $this->_boardDatatable();
 
         $idUtilisateur = $this->_utilisateur->get("id");
-        $query = "SELECT board_state.cookie FROM `board_state` WHERE `board_state`.id_utilisateur = $idUtilisateur";
+        $query = "SELECT board_state.cookie FROM `board_state` WHERE `board_state`.id_utilisateur = $idUtilisateur AND `id_api` = " . $this->_api["id"];
         $boardStateCookie = $this->_db->query($query)->fetchColumn();
 
         if ($boardStateCookie) {
@@ -41,7 +41,12 @@ class BoardController extends MainController {
 
 
 
-        $query = "SELECT `gab_gabarit`.id, count(DISTINCT gab_page.id) nbpages, `gab_gabarit`.* FROM `gab_gabarit` LEFT JOIN gab_page ON gab_page.id_gabarit = gab_gabarit.id AND gab_page.suppr = 0 WHERE `gab_gabarit`.id NOT IN (1,2) GROUP BY gab_gabarit.id ORDER BY gab_gabarit.id";
+        $query = "
+            SELECT `gab_gabarit`.id, count(DISTINCT gab_page.id) nbpages, `gab_gabarit`.* 
+            FROM `gab_gabarit` LEFT JOIN gab_page ON gab_page.id_gabarit = gab_gabarit.id AND gab_page.suppr = 0 
+            WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"] . " AND `gab_gabarit`.id NOT IN (1,2) 
+            GROUP BY gab_gabarit.id 
+            ORDER BY gab_gabarit.id";
         $this->_gabarits2 = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
         $pages = array();
 
@@ -57,17 +62,15 @@ class BoardController extends MainController {
         $lastGabaritId = -1;
 
         foreach ($this->_gabarits2 as $gabarit) {
-
-
-            $pagesMeta = $this->_gabaritManager->getList(BACK_ID_VERSION, false, $gabarit["id"], false, "date_crea", "desc", 0, 3);
+            $pagesMeta = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], false, $gabarit["id"], false, "date_crea", "desc", 0, 3);
             if (count($pagesMeta) == 0)
                 continue;
             $pages[$gabarit["id"]]["gabarit"] = $gabarit;
             foreach ($pagesMeta as $pageMeta) {
-                $pages[$gabarit["id"]]["pages"][] = $page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $pageMeta->getMeta("id"));
+                $pages[$gabarit["id"]]["pages"][] = $page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $pageMeta->getMeta("id"));
             }
 
-            $pagesMeta = $this->_gabaritManager->getList(BACK_ID_VERSION, false, $gabarit["id"], false, "date_modif", "desc", 0, 3);
+            $pagesMeta = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], false, $gabarit["id"], false, "date_modif", "desc", 0, 3);
             if (count($pagesMeta) == 0)
                 continue;
 
@@ -82,7 +85,7 @@ class BoardController extends MainController {
 
             $indexColor++;
             foreach ($pagesMeta as $pageMeta) {
-                $pages[$gabarit["id"]]["pages_mod"][] = $page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $pageMeta->getMeta("id"));
+                $pages[$gabarit["id"]]["pages_mod"][] = $page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $pageMeta->getMeta("id"));
             }
         }
         $this->_view->pages = $pages;
@@ -101,9 +104,19 @@ class BoardController extends MainController {
         } else {
             $datatableClassName = "Datatable";
         }
+        
+        //On cré notre object datatable
         $datatable = new $datatableClassName($_GET, $nameConfig, $this->_db, "./datatable/", "./datatable/", "img/datatable/");
+        
         $datatable->setUtilisateur($this->_utilisateur);
         $datatable->setGabarits($this->_gabarits);
+        
+        //On cré un filtre pour les gabarits de l'api courante
+        $idsGabarit = array();
+        foreach ($this->_gabarits as $gabarit) {
+            $idsGabarit[] = $gabarit["id"];
+        }
+        $datatable->additionalWhereQuery("id_gabarit IN (" . implode(",", $idsGabarit) . ")");
         
         $datatable->start();
 
@@ -119,7 +132,7 @@ class BoardController extends MainController {
         $idUtilisateur = $this->_utilisateur->get("id");
         $cookieString = $this->_db->quote(urldecode($_POST["cookie"]));
 
-        $this->_db->exec("REPLACE INTO board_state SET id_utilisateur=$idUtilisateur, cookie=$cookieString");
+        $this->_db->exec("REPLACE INTO board_state SET id_utilisateur=$idUtilisateur, cookie=$cookieString, `id_api` = " . $this->_api["id"]);
     }
 
     public function deleteStateAction() {

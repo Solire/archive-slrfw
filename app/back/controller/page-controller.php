@@ -62,17 +62,18 @@ class PageController extends MainController {
                         . " CONCAT(`a`.`name`, '_', `g`.`name`)"
                         . " FROM `gab_gabarit` `g`"
                         . " JOIN `gab_api` `a` ON `a`.`id` = `g`.`id_api`"
-                        . " WHERE `g`.`id` = " . $champ['id_parent'];
+                        . " WHERE `g`.`id` = " . $champ['id_parent']
+                        . " AND `g`.`id_api` = " . $this->_api["id"];
                 $results = $this->_db->query($query)->fetch(PDO::FETCH_NUM);
 
                 $id_gabarit = $results[0];
                 $tableOrigin = $results[1];
             }
 
-            $liste = $this->_gabaritManager->getList(BACK_ID_VERSION, FALSE, $id_gabarit);
+            $liste = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], FALSE, $id_gabarit);
 
             foreach ($liste as $ii => $page) {
-                $fullPage = $this->_gabaritManager->getPage(BACK_ID_VERSION, $page->getMeta("id"), 0, TRUE);
+                $fullPage = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $page->getMeta("id"), 0, TRUE);
 
                 $liste[$ii] = $fullPage;
             }
@@ -93,9 +94,9 @@ class PageController extends MainController {
         $gabaritsList = array();
 
         if ($this->_utilisateur->get("niveau") == "solire")
-            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
         else
-            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
 
 
         //Si on a un fichier de conf
@@ -111,14 +112,14 @@ class PageController extends MainController {
             if (isset($_GET["gabaritByGroup"])) {
                 $this->_view->gabaritByGroup = true;
                 foreach ($gabaritsList as $gabariId) {
-                    $this->_view->pagesGroup[$gabariId] = $this->_gabaritManager->getList(BACK_ID_VERSION, 0, $gabariId);
+                    $this->_view->pagesGroup[$gabariId] = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], 0, $gabariId);
                 }
             } else {
-                $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0, $gabaritsList);
+                $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], 0, $gabaritsList);
                 $this->_view->pagesGroup[0] = 1;
             }
         } else {
-            $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, 0);
+            $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], 0);
             $this->_view->pagesGroup[0] = 1;
         }
 
@@ -195,20 +196,20 @@ class PageController extends MainController {
      */
     public function childrenAction() {
         if ($this->_utilisateur->get("niveau") == "solire")
-            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
         else
-            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+            $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
 
         $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
         $this->_view->gabarits = $this->_gabarits;
 
         $this->_view->main(FALSE);
-        $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $_REQUEST['id_parent']);
+        $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], $_REQUEST['id_parent']);
         if (count($this->_pages) == 0)
             exit();
         $this->_view->pages = $this->_pages;
 
-        $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit`";
+        $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
 
         $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
         $this->_view->gabarits = $this->_gabarits;
@@ -251,12 +252,12 @@ class PageController extends MainController {
         $this->_form = '';
 
         if ($id_gab_page) {
-            $versions = $this->_db->query("SELECT * FROM `version`")->fetchAll(PDO::FETCH_ASSOC);
+            $versions = $this->_db->query("SELECT * FROM `version` WHERE `version`.`id_api` = " . $this->_api["id"])->fetchAll(PDO::FETCH_ASSOC);
 
             $form = '';
             $devant = '';
             foreach ($versions as $version) {
-                $page = $this->_gabaritManager->getPage($version['id'], $id_gab_page);
+                $page = $this->_gabaritManager->getPage($version['id'], BACK_ID_API, $id_gab_page);
 
                 $urlParent = "";
                 foreach ($this->_gabaritManager->getParents($page->getMeta("id_parent"), $page->getMeta("id_version")) as $parent) {
@@ -269,6 +270,7 @@ class PageController extends MainController {
                     SELECT old 
                     FROM `redirection` 
                     WHERE  new = " . $this->_db->quote($url) . "
+                        AND id_api = " . BACK_ID_API . "
                         AND id_version = " . $version['id'] . "
                 ")->fetchAll(PDO::FETCH_COLUMN);
 
@@ -299,11 +301,11 @@ class PageController extends MainController {
                         . '</div>';
             }
 
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $id_gab_page);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
 
             $this->_form .= '<div>' . $devant . '</div>' . $form;
         } else {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, 0, $id_gabarit);
+            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
 
             $form = $this->_page->getForm("page/save.html", "page/liste.html", $upload_path, FALSE, $this->_page->getGabarit()->getMeta(), $this->_page->getGabarit()->get301_editable(), $this->_page->getGabarit()->getMeta_titre(), $this->_page->getGabarit()->getExtension(), 1);
             $this->_form = $form;
@@ -368,13 +370,28 @@ class PageController extends MainController {
                 . "Bcc: contact@solire.fr \r\n"
                 . "X-Mailer: PHP/" . phpversion();
 
-        Tools::mail_utf8("Modif site <modif@solire.fr>", "Modification de contenu sur " . $this->_mainConfig->get("name", "project"), $contenu, $headers);
+        $typeSave = $_POST["id_gab_page"] == 0 ? "Création" : "Modification";
+        
+        Tools::mail_utf8("Modif site <modif@solire.fr>", "$typeSave de contenu sur " . $this->_mainConfig->get("name", "project"), $contenu, $headers, "text/html");
 
         $json = array(
             "status" => $this->_page ? "success" : "error",
             "search" => "?id_gab_page=" . $this->_page->getMeta("id"),
             "id_gab_page" => $this->_page->getMeta("id"),
         );
+        
+        
+        if($json["status"] == "error") {
+            $this->_log->logThis(   "$typeSave de page échouée", 
+                                    $this->_utilisateur->get("id"), 
+                                    "<b>Id</b> : " . $this->_page->getMeta("id") . '<br /><img src="img/flags/png/' . strtolower($this->_versions[$_POST["id_version"]]['suf']) . '.png" alt="'
+                                    . $this->_versions[$_POST["id_version"]]['nom'] . '" /></a><br /><span style="color:red;">Error</span>');
+        } else {
+            $this->_log->logThis(   "$typeSave de page réussie", 
+                                    $this->_utilisateur->get("id"), 
+                                    "<b>Id</b> : " . $this->_page->getMeta("id") . '<br /><img src="img/flags/png/' . strtolower($this->_versions[$_POST["id_version"]]['suf']) . '.png" alt="'
+                                    . $this->_versions[$_POST["id_version"]]['nom'] . '" /></a>');
+        }
 
         exit(json_encode($json));
     }
@@ -555,6 +572,7 @@ class PageController extends MainController {
                 . "     ON `gab_page`.id_gabarit = `gab_gabarit`.id"
                 . "     AND `gab_gabarit`.editable = 1"
                 . " WHERE `gab_page`.`id_version` = " . BACK_ID_VERSION
+                . " AND `gab_gabarit`.`id_api` = " . $this->_api["id"]
                 . " AND `gab_page`.`suppr` = 0 "
                 . (isset($filterWords) ? " AND (" . implode(" OR ", $filterWords) . ")" : '')
                 . " ORDER BY " . implode(",", $orderBy) . " LIMIT 10";

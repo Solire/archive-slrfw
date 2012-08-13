@@ -108,7 +108,7 @@ class Log {
      * 	 Active ou Desactive le syst?me de rotation par archivage.
      */
     //+	 --------------------------------------------------------------------------------
-    public function __construct($strToFileOrDbConnect, $strToLog='', $strTable='logs', $booArch=true) {
+    public function __construct($strToFileOrDbConnect, $strToLog='', $idUser = 0, $strTable='logs', $booArch=true) {
         //test si on a une IP (en php-cli par exemple on a pas l'ip)
         if (!empty($_SERVER['REMOTE_ADDR'])) {
             $this->strIp = $_SERVER['REMOTE_ADDR'];
@@ -133,7 +133,7 @@ class Log {
         //test si la chaine ?logguer est pr?sente
         if ($strToLog != '') {
             //On log
-            $this->logThis($strToLog);
+            $this->logThis($strToLog, $idUser);
         }
     }
 
@@ -169,7 +169,9 @@ class Log {
 				`logDate` DATE NOT NULL ,
 				`logTime` TIME NOT NULL ,
 				`logIp` VARCHAR( 100 ) NOT NULL ,
-				`logString` VARCHAR( 1000 ) NOT NULL 
+				`logString` VARCHAR( 1000 ) NOT NULL,
+				`logStrOpt` VARCHAR( 1000 ) NOT NULL,
+				`logIdUser` INT(100 ) NOT NULL 
 			)';
         
         $objResult = $this->mysqlQuery($reqTable);
@@ -239,10 +241,10 @@ class Log {
      * 
      * @param string $strToLog : cha?ne a ajouter dans le log
      */
-    public function logThis($strToLog) {
+    public function logThis($strToLog, $idUser = 0, $logStrOpt = "") {
         switch ($this->strLogMode) {
             case 'mysql':
-                $this->logThisInTable($strToLog);
+                $this->logThisInTable($strToLog, $idUser, $logStrOpt);
                 break;
             case 'file':
                 $strToLog = str_replace(array("\n", "\r"), array(' ', ' '), $strToLog);
@@ -271,14 +273,16 @@ class Log {
      * 
      * @param string $strToLog : cha?ne a ajouter dans le log
      */
-    private function logThisInTable($strToLog) {
+    private function logThisInTable($strToLog, $idUser, $strOpt) {
         $reqLog = 'INSERT INTO `' . $this->strLogTable . '` ';
-        $reqLog.= '(`logDate`,`logTime`,`logIp`,`logString`) ';
+        $reqLog.= '(`logDate`,`logTime`,`logIp`,`logString`,`logStrOpt`, `logIdUser`) ';
         $reqLog.= 'VALUES(';
         $reqLog.= '\'' . date('Y-m-d') . '\',';
         $reqLog.= '\'' . date('H:i:s') . '\',';
         $reqLog.= '\'' . $this->strIp . '\',';
-        $reqLog.= '\'' . $strToLog . '\'';
+        $reqLog.= '' . $this->db->quote($strToLog) . ',';
+        $reqLog.= '' . $this->db->quote($strOpt) . ',';
+        $reqLog.= '' . $idUser . '';
         $reqLog.= '); ';
         $objResult = $this->mysqlQuery($reqLog);
     }

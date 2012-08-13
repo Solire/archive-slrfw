@@ -8,6 +8,7 @@ class TranslateMysql
 
     private $_translate = array();
     private $_locale = false;
+    private $_api = 1;
 
     /**
      *
@@ -22,15 +23,16 @@ class TranslateMysql
     const DEFAULT_LANG = 1;
     const DEBUG = true;
 
-    public function __construct($locale, $db)
+    public function __construct($locale, $idApi, $db)
     {
         $this->setLocale($locale);
+        $this->setApi($idApi);
         $this->_db = $db;
     }
 
     /**
      *
-     * @param string $string mot � traduire
+     * @param string $string mot à traduire
      * @return string mot traduit
      */
     public function _($string)
@@ -40,19 +42,29 @@ class TranslateMysql
 
         if (!self::DEBUG)
             return $string;
-        $this->_db->exec('INSERT INTO traduction SET cle = ' . $this->_db->quote($string) . ', valeur = ' . $this->_db->quote($string) . ', id_version =  ' . intval($this->_locale));
+        $this->_db->exec('INSERT INTO traduction SET id_api =  ' . intval($this->_api) . ', cle = ' . $this->_db->quote($string) . ', valeur = ' . $this->_db->quote($string) . ', id_version =  ' . intval($this->_locale));
         $this->_translate[$this->_locale][$string] = $string;
         return $string;
     }
 
     /**
-     * Choix de la langue utilis�.
+     * Choix de la langue utilisée.
      *
      * @param string $locale
      */
     public function setLocale($locale)
     {
         $this->_locale = $locale;
+    }
+    
+    /**
+     * Choix de l'api utilisée.
+     *
+     * @param string $idApi
+     */
+    public function setApi($idApi)
+    {
+        $this->_api = $idApi;
     }
 
     /**
@@ -78,7 +90,7 @@ class TranslateMysql
 
     private function _loadTranslationData($locale)
     {
-        $translateData = $this->_db->query("SELECT cle, valeur FROM traduction WHERE id_version = " . intval($locale))->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN);
+        $translateData = $this->_db->query("SELECT cle, valeur FROM traduction WHERE id_api = " . intval($this->_api) . " AND id_version = " . intval($locale))->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN);
         foreach ($translateData as $key => $value) {
             $this->_translate[$locale][$key] = $value;
         }

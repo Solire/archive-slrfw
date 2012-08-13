@@ -9,7 +9,7 @@ $config = array(
         "hide_columns" => false,
     ),
     "table" => array(
-        "detail"    =>  true,
+        "detail"    =>  false,
         "name" => "traduction",
         "title" => "Edition des traductions",
         "title_item" => "traduction",
@@ -27,7 +27,7 @@ $config = array(
         array(
             "name" => "valeur",
             "editable" => true,
-            "show_detail" => true,
+            "show" => true,
             "filter_field" => "text",
             "title" => "Traduction",
         ),
@@ -35,6 +35,11 @@ $config = array(
             "name" => "id_version",
             "index" => true,
             "filter" => BACK_ID_VERSION,
+        ),
+        array(
+            "name" => "id_api",
+            "index" => true,
+            "filter" => BACK_ID_API,
         ),
     ),
 );

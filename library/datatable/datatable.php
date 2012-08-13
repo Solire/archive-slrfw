@@ -139,6 +139,14 @@ class Datatable {
     protected $_afterTableHTML;
 
     /**
+     * 
+     *
+     * @var string
+     * @access protected
+     */
+    protected $_additionalWhereQuery;
+
+    /**
      * Constructeur
      *
      * Défini les chemins des ressources, la connexion à la base de données
@@ -215,6 +223,18 @@ class Datatable {
     // --------------------------------------------------------------------
 
     /**
+     * Permet d'ajouter un filtre sur les requêtes
+     * 
+     * @param string $whereString chaine sql de filtre
+     * @return void
+     */
+    public function additionalWhereQuery($whereString) {
+        $this->_additionalWhereQuery = $whereString;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
      * TODO à commenter
      *
      * @return 	void
@@ -283,13 +303,16 @@ class Datatable {
                 $sFilterColumn[] = $column["name"] . ' = ' . $this->_db->quote($column["filter"]);
         }
 
+        if ($this->_additionalWhereQuery != "")
+            $sFilterColumn[] = $this->_additionalWhereQuery;
+
         $generalWhere = implode(" AND ", $sFilterColumn);
+
 
         /* DB table to use */
         $sTable = $this->config["table"]["name"];
 
         foreach ($this->config["columns"] as $iKeyJoin => &$column) {
-
             if (isset($column["filter_field"]) && $column["filter_field"] == "select") {
                 /* Jointure sur autre table */
                 if (isset($column["from"]) && $column["from"]) {
@@ -319,7 +342,10 @@ class Datatable {
                     $columnAdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
                     $column["name"] = $columnAdvancedName . " `" . $column["name"] . "`";
 //                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`  ORDER BY " . $columnAdvancedName . " ASC")->fetchAll(PDO::FETCH_COLUMN);
-                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`")->fetchAll(PDO::FETCH_COLUMN);
+                    $column["values"] = $this->_db->query(
+                                    "SELECT DISTINCT " . $column["name"]
+                                    . " FROM `" . $column["from"]["table"] . "`"
+                                    . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : ""))->fetchAll(PDO::FETCH_COLUMN);
                 } elseif (isset($column["sql"])) {
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["sql"] . ""
                                     . " FROM `" . $this->config["table"]["name"] . "` WHERE `" . $column["name"] . "` <> '' "
@@ -362,7 +388,7 @@ class Datatable {
         /* DB table to use */
         $sTable = $this->config["table"]["name"];
 
-        
+
 
         $r = $this->_db->insert($sTable, $values);
 
@@ -710,7 +736,7 @@ class Datatable {
                 if (isset($aColumnsFull[$realIndex]["filter_field"]) && $aColumnsFull[$realIndex]["filter_field"] == "date-range") {
                     $dateRange = explode("~", $_POST['sSearch_' . $realIndex]);
                     $dateRange[0] = Tools::formate_date_nombre($dateRange[0], "/", "-");
-                    $sWhere2 .= "" . $aColumnsAdvanced[$realIndex] . " >= " . $this->_db->quote('' . $dateRange[0] . ' 00:00:00') . "";
+                    $sWhere2 .= ($sWhere2 != '' ? " AND " : " " ) . $aColumnsAdvanced[$realIndex] . " >= " . $this->_db->quote('' . $dateRange[0] . ' 00:00:00') . "";
                     if ($dateRange[1] != "") {
                         $dateRange[1] = Tools::formate_date_nombre($dateRange[1], "/", "-");
                         $sWhere2 .= " AND " . $aColumnsAdvanced[$realIndex] . " <= " . $this->_db->quote('' . $dateRange[1] . ' 23:59:59') . "";
@@ -718,7 +744,7 @@ class Datatable {
                 }
                 /* = Autres Filtres
                   `-------------------------------------------------------- */ else {
-                    $sWhere2 .= "" . $aColumnsAdvanced[$realIndex] . " LIKE " . $this->_db->quote('%' . $_POST['sSearch_' . $realIndex] . '%') . "";
+                    $sWhere2 .= ($sWhere2 != '' ? " AND " : " " ) . $aColumnsAdvanced[$realIndex] . " LIKE " . $this->_db->quote('%' . $_POST['sSearch_' . $realIndex] . '%') . "";
                 }
             }
         }
@@ -732,6 +758,9 @@ class Datatable {
 
         if (isset($this->config['where']) && count($this->config['where']))
             $sFilterColumn[] .= implode(" AND ", $this->config['where']);
+
+        if ($this->_additionalWhereQuery != "")
+            $sFilterColumn[] = $this->_additionalWhereQuery;
 
         if (!isset($sWhere))
             $sWhere = "";
@@ -866,7 +895,9 @@ class Datatable {
                     }
                 }
             }
-
+            if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
+                $row[] = '<div class="btn gradient-blue"><a href="#" class="supprimer" style="float:right; display:block;" title="Supprimer"><img src="img/back/white/trash_stroke_16x16.png" alt="Supprimer"></a></div>';
+            }
 
 
             for ($i = 0; $i < count($sIndexColumnRaw); $i++) {

@@ -33,6 +33,7 @@ RewriteRule ^private/											- [L]
 
 
 RewriteRule ^sitemap.xml$											index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
+RewriteRule ^mobile/sitemap.xml$											index.php?controller=sitemap&action=start&application=mobile&%{QUERY_STRING} [L]
 
 
 RewriteRule ^locale/(.{5})/LC_MESSAGES_JS/(.*).js$                          locale/$1/LC_MESSAGES_JS/$2.js [L]
@@ -43,19 +44,35 @@ RewriteRule ^(mobile/|back/)?css/(.+)$                                          
 RewriteRule ^(mobile/|back/)?img/(.*)$                                                      public_html/medias/img/$2 [L]
 RewriteRule ^(mobile/|back/)?js/(.+)$                                                       public_html/medias/js/$2 [L]
 RewriteRule ^(mobile/|back/)?swf/(.*)$                                                      public_html/medias/swf/$2 [L]
+RewriteRule ^(mobile/|back/)?font/(.*)$                                                      public_html/medias/font/$2 [L]
+
+RewriteRule ^back/([a-z0-9\-]+)/css/(.+)$                                                      public_html/medias/css/$2 [L]
+RewriteRule ^back/([a-z0-9\-]+)/img/(.*)$                                                      public_html/medias/img/$2 [L]
+RewriteRule ^back/([a-z0-9\-]+)/js/(.+)$                                                       public_html/medias/js/$2 [L]
+RewriteRule ^back/([a-z0-9\-]+)/swf/(.*)$                                                      public_html/medias/swf/$2 [L]
+RewriteRule ^back/([a-z0-9\-]+)/font/(.*)$                                                      public_html/medias/font/$2 [L]
 
 RewriteRule ^([0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$                         public_html/medias/upload/$1/$2 [L]
 
 
 
-RewriteRule ^mobile/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=mobile&%{QUERY_STRING} [L]
-RewriteRule ^mobile/$                                                       public_html/index.php?application=mobile&%{QUERY_STRING} [L]
+#RewriteRule ^mobile/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=mobile&%{QUERY_STRING} [L]
+#RewriteRule ^mobile/$                                                       public_html/index.php?application=mobile&%{QUERY_STRING} [L]
+RewriteRule ^back/([a-z0-9\-]+)/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$         public_html/index.php?controller=$2&action=$4&application=back&api=$1&%{QUERY_STRING} [L]
 RewriteRule ^back/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                      public_html/index.php?controller=$1&action=$3&application=back&%{QUERY_STRING} [L]
+RewriteRule ^back/([a-z0-9\-]+)/$                                         public_html/index.php?application=back&api=$1&%{QUERY_STRING} [L]
 RewriteRule ^back/$                                                       public_html/index.php?application=back&%{QUERY_STRING} [L]
 
 #RewriteRule ^([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=$1&action=$3&%{QUERY_STRING} [L]
 
+# Mobile
+RewriteRule ^mobile/$                                                public_html/index.php?controller=page&action=start&rew=accueil&application=mobile&%{QUERY_STRING} [L]
+RewriteRule ^mobile/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=page&action=start&rub=$2&application=mobile&%{QUERY_STRING} [L]
+RewriteRule ^mobile/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=page&action=start&prub=$1&rub=$3&application=mobile&%{QUERY_STRING} [L]
+RewriteRule ^mobile/([a-z0-9\-]+)/([a-z0-9\-]+)/(([a-z0-9\-]+).html)$       public_html/index.php?controller=page&action=start&prub=$1&rub=$2&rew=$4&application=mobile&%{QUERY_STRING} [L]
 
+
+# Desktop
 RewriteRule ^$                                                public_html/index.php?controller=page&action=start&rew=accueil&%{QUERY_STRING} [L]
 RewriteRule ^(([a-z0-9\-]+).html)$                            public_html/index.php?controller=page&action=start&rub=$2&%{QUERY_STRING} [L]
 RewriteRule ^([a-z0-9\-]+)/(([a-z0-9\-]+).html)$                            public_html/index.php?controller=page&action=start&prub=$1&rub=$3&%{QUERY_STRING} [L]

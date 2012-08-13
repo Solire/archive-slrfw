@@ -14,10 +14,10 @@ class gabaritManager extends manager {
      * @param int $id_version
      * @return int 
      */
-    public function getIdByRewriting($id_version, $rewriting, $id_parent = 0) {
+    public function getIdByRewriting($id_version, $id_api, $rewriting, $id_parent = 0) {
         $query = "SELECT `id` FROM `gab_page`"
                 . " WHERE `suppr` = 0 AND `visible` = 1 AND `id_parent` = $id_parent"
-                . " AND `id_version` = $id_version AND `rewriting` = " . $this->_db->quote($rewriting);
+                . " AND `id_version` = $id_version AND `id_api` = $id_api AND `rewriting` = " . $this->_db->quote($rewriting);
 
         return $this->_db->query($query)->fetchColumn();
     }
@@ -41,11 +41,11 @@ class gabaritManager extends manager {
      * @param int $id_gabarit
      * @param int $version 
      */
-    public function getPage($id_version, $id_gab_page, $id_gabarit = 0, $join = false, $visible = FALSE) {
+    public function getPage($id_version, $id_api, $id_gab_page, $id_gabarit = 0, $join = false, $visible = FALSE) {
         $page = new gabaritPage();
 
         if ($id_gab_page) {
-            $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id` = $id_gab_page AND `suppr` = 0";
+            $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id_api` = $id_api AND `id` = $id_gab_page AND `suppr` = 0";
             $meta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
 
             if (!$meta)
@@ -119,13 +119,16 @@ class gabaritManager extends manager {
 
         $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'], $row['label'], $row['main'], $row['creable'], $row['deletable'], $row['sortable'], $row['make_hidden'], $row['editable'], $row['meta'], $row['301_editable'], $row['meta_titre'], $row['extension']);
         if ($row['id_api'] > 0) {
-            $query = "SELECT `name` FROM `gab_api` WHERE `id` = " . $row['id_api'];
-            $api = $this->_db->query($query)->fetchColumn();
-            $table = $api . "_" . $row['name'];
+            $query = "SELECT * FROM `gab_api` WHERE `id` = " . $row['id_api'];
+            $api = $this->_db->query($query)->fetch();
+            $gabarit->setApi($api);
+            $table = $api["name"] . "_" . $row['name'];
         } else {
             $table = $row['name'];
         }
         $gabarit->setTable($table);
+        
+        
 
         $query = "SELECT IF (`g`.`label` IS NULL, 'general', `g`.`label`), `c`.*"
                 . " FROM `gab_champ` `c`"
@@ -469,12 +472,12 @@ class gabaritManager extends manager {
      * @param int $id_version
      * @return array 
      */
-    public function getList($id_version, $id_parent = FALSE, $id_gabarit = 0, $visible = FALSE, $orderby = "ordre", $sens = "ASC", $debut = 0, $nbre = 0, $main = FALSE) {
+    public function getList($id_version, $id_api = 1, $id_parent = FALSE, $id_gabarit = 0, $visible = FALSE, $orderby = "ordre", $sens = "ASC", $debut = 0, $nbre = 0, $main = FALSE) {
         $query = "SELECT `p`.*, COUNT(`e`.`id`) `nbre_enfants`"
                 . " FROM `gab_page` `p` LEFT JOIN `gab_page` `e` ON `e`.`id_parent` = `p`.`id` AND `e`.`suppr` = 0 AND `e`.`id_version` = $id_version"
                 . ($visible ? " AND `e`.`visible` = 1" : "")
                 . ($main ? " INNER JOIN `gab_gabarit` `g` ON `p`.`id_gabarit` = `g`.`id` AND `g`.`main` = 1" : "")
-                . " WHERE `p`.`suppr` = 0 AND `p`.`id_version` = $id_version"
+                . " WHERE `p`.`suppr` = 0 AND `p`.`id_version` = $id_version AND `p`.`id_api` = $id_api" 
                 . ($visible ? " AND `p`.`visible` = 1" : "");
 
         if ($id_parent !== FALSE)
@@ -602,23 +605,26 @@ class gabaritManager extends manager {
      * @return gabaritPage 
      */
     public function save($donnees) {
-        $this->_versions = $this->_db->query("SELECT `id` FROM `version`")->fetchAll(PDO::FETCH_COLUMN);
+        $gabarit = $this->getGabarit($donnees['id_gabarit']);
+        $api = $gabarit->getApi();
+        
+        $this->_versions = $this->_db->query("SELECT `id` FROM `version` WHERE id_api = " . $api["id"])->fetchAll(PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
         $version = isset($donnees['id_version']) ? $donnees['id_version'] : 1;
 
         if ($updating)
-            $page = $this->getPage($version, $donnees['id_gab_page'], 0);
+            $page = $this->getPage($version, $api["id"], $donnees['id_gab_page'], 0);
         else
-            $page = $this->getPage($version, 0, $donnees['id_gabarit']);
+            $page = $this->getPage($version, $api["id"], 0, $donnees['id_gabarit']);
 
         $id_gab_page = $this->_saveMeta($page, $donnees);
 
         if (!$id_gab_page)
             return NULL;
 
-        $page = $this->getPage($version, $id_gab_page, 0);
+        $page = $this->getPage($version, $api["id"], $id_gab_page, 0);
 
         $this->_savePage($page, $donnees);
 
@@ -627,7 +633,7 @@ class gabaritManager extends manager {
             $this->_saveBloc($bloc, $id_gab_page, $page->getMeta("id_version"), $donnees);
         }
 
-        $page = $this->getPage($version, $page->getMeta("id"), 0);
+        $page = $this->getPage($version, $api["id"], $page->getMeta("id"), 0);
         return $page;
     }
 
@@ -639,6 +645,11 @@ class gabaritManager extends manager {
      */
     private function _saveMeta($page, $donnees) {
         $updating = $donnees['id_gab_page'] > 0;
+        
+        //On recupere les ids de gabarits pour l'api courante
+        $api =  $page->getGabarit()->getApi();
+        $query = "SELECT `gab_gabarit`.id FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $api["id"];
+        $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(PDO::FETCH_COLUMN);
 
         // Insertion dans la table `gab_page`.
         if ($updating) {
@@ -649,7 +660,7 @@ class gabaritManager extends manager {
                 $titre_rew = $donnees['rewriting'] == "" ? $page->getMeta("rewriting") : $donnees['rewriting'];
             }
 
-            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
+            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_gabarit` IN (" . implode(", ", $gabaritsFromCurrentApi) . ") AND `id_parent` = " . $page->getMeta("id_parent") . " AND `id_version` = " . $page->getMeta("id_version") . " AND `id` != " . $page->getMeta("id"));
 
             $query = "UPDATE `gab_page` SET"
                     . " `titre`      = " . $this->_db->quote($donnees['titre']) . ","
@@ -687,7 +698,7 @@ class gabaritManager extends manager {
               ------------------------------- */
             $query2Del = "DELETE FROM `redirection`"
                     . " WHERE new = " . $this->_db->quote($urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension())
-                    . " AND id_version = " . $page->getMeta("id_version") . ";";
+                    . " AND id_version = " . $page->getMeta("id_version") . " AND id_api = " . $api["id"] . ";";
             $this->_db->query($query2Del);
 
             /* = On insert toutes les urls dans le bloc redirection 301
@@ -699,6 +710,7 @@ class gabaritManager extends manager {
                     $queries2[] = "INSERT INTO `redirection` SET"
                             . " old = " . $this->_db->quote($oldUrl) . ", "
                             . " new = " . $this->_db->quote($newUrl) . ", "
+                            . " id_api = " . $api["id"] . ", "
                             . " id_version = " . $page->getMeta("id_version") . ";";
             }
 
@@ -711,9 +723,9 @@ class gabaritManager extends manager {
         } else {
             $id_parent = isset($donnees['id_parent']) && $donnees['id_parent'] ? $donnees['id_parent'] : 0;
             $titre_rew = $donnees['rewriting'] != "" ? $donnees['rewriting'] : $donnees['titre'];
-            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_parent` = $id_parent AND `id_version` = 1");
+            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', "AND `suppr` = 0 AND `id_gabarit` IN (" . implode(", ", $gabaritsFromCurrentApi) . ") AND `id_parent` = $id_parent AND `id_version` = 1");
 
-            $ordre = $this->_db->query("SELECT MAX(`ordre`) FROM `gab_page` WHERE id_parent = $id_parent")->fetchColumn();
+            $ordre = $this->_db->query("SELECT MAX(`ordre`) FROM `gab_page` WHERE id_api = " . $api["id"] . " AND id_parent = $id_parent")->fetchColumn();
             $ordre = $ordre ? $ordre + 1 : 1;
 
             $id_gab_page = 0;
@@ -733,6 +745,7 @@ class gabaritManager extends manager {
                         . "`date_crea` = NOW(),"
                         . "`date_modif` = NOW(),"
                         . "`visible` = 0,"
+                        . "`id_api` = " . $api["id"] . ","
                         . "`id_version` = " . $version['id'];
 
 //                echo "$query<br />";
@@ -766,6 +779,7 @@ class gabaritManager extends manager {
                     $queries2[] = "INSERT INTO `redirection` SET"
                             . " old = " . $this->_db->quote($oldUrl) . ", "
                             . " new = " . $this->_db->quote($newUrl) . ", "
+                            . " id_api = " . $api["id"] . ", "
                             . " id_version = 1;";
             }
 

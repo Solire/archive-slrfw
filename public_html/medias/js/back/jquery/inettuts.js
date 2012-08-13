@@ -24,8 +24,8 @@ var iNettuts = {
             colorClasses : ['color-yellow', 'color-red', 'color-blue', 'color-white', 'color-orange', 'color-green']
         },
         widgetIndividual : {
-            intro : {
-                movable: false,
+            resume : {
+                movable: true,
                 removable: false,
                 collapsible: true,
                 editable: false
@@ -179,6 +179,8 @@ var iNettuts = {
                     notSortable += '#' + this.id + ',';
                 }
             });
+            if(notSortable == "")
+                return $('> li', settings.columns);
             return $('> li:not(' + notSortable + ')', settings.columns);
         })();
         

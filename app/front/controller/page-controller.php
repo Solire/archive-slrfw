@@ -38,31 +38,31 @@ class PageController extends MainController
         if (isset($_GET['rub'])) {
 
             if (isset($_GET['prub'])) {
-                $prubid = $this->_gabaritManager->getIdByRewriting(ID_VERSION, $_GET['prub']);
+                $prubid = $this->_gabaritManager->getIdByRewriting(ID_VERSION, ID_API, $_GET['prub']);
                 if (!$prubid)
                     $this->pageNotFound();
 
-                $this->_rubriqueParent = $this->_gabaritManager->getPage(ID_VERSION, $prubid);
+                $this->_rubriqueParent = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $prubid);
                 $this->_view->rubriqueParent = $this->_rubriqueParent;
             }
             else
                 $prubid = 0;
 
-            $this->_rubriqueId = $this->_gabaritManager->getIdByRewriting(ID_VERSION, $_GET['rub'], $prubid);
+            $this->_rubriqueId = $this->_gabaritManager->getIdByRewriting(ID_VERSION, ID_API, $_GET['rub'], $prubid);
 
             if (!$this->_rubriqueId)
                 $this->pageNotFound();
 
-            $this->_rubrique = $this->_gabaritManager->getPage(ID_VERSION, $this->_rubriqueId);
+            $this->_rubrique = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $this->_rubriqueId);
             $this->_view->rubrique = $this->_rubrique;
 
             if (isset($_GET['rew'])) {
-                $this->_pageId = $this->_gabaritManager->getIdByRewriting(ID_VERSION, $_GET['rew'], $this->_rubriqueId);
+                $this->_pageId = $this->_gabaritManager->getIdByRewriting(ID_VERSION, ID_API, $_GET['rew'], $this->_rubriqueId);
 
                 if (!$this->_pageId)
                     $this->pageNotFound();
 
-                $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_pageId, 0, TRUE);
+                $this->_page = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $this->_pageId, 0, TRUE);
 
                 if (isset($this->_rubriqueParent)) {
                     $firstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $this->_rubriqueParent->getMeta("id"));
@@ -113,10 +113,10 @@ class PageController extends MainController
                 $this->_view->page = $this->_page;
                 $view = $this->_page->getGabarit()->getName();
             } else {
-                $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_rubriqueId, 0, false);
+                $this->_page = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $this->_rubriqueId, 0, false);
 
                 if ($this->_rubrique->getGabarit()->getName() != "sous_rub_scenario") {
-                    $this->_pages = $this->_gabaritManager->getList(ID_VERSION, $this->_rubriqueId, FALSE, TRUE, "ordre", "asc");
+                    $this->_pages = $this->_gabaritManager->getList(ID_VERSION, ID_API, $this->_rubriqueId, FALSE, TRUE, "ordre", "asc");
                     foreach ($this->_pages as &$page) {
                         $gabarit = $this->_gabaritManager->getGabarit($page->getMeta("id_gabarit"));
                         $page->setGabarit($gabarit);
@@ -158,7 +158,7 @@ class PageController extends MainController
             $this->_pageId = 1;
 
 
-            $this->_page = $this->_gabaritManager->getPage(ID_VERSION, $this->_pageId, 0, true, true);
+            $this->_page = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $this->_pageId, 0, true, true);
 
             $this->_seo->setTitle($this->_page->getMeta("bal_title"));
             $this->_seo->setDescription($this->_page->getMeta("bal_descr"));

@@ -39,7 +39,7 @@
         </style>
 
         <?php echo $this->javascript; ?>
-        
+
     </head>
     <body>
         <header>
@@ -47,6 +47,7 @@
                 <div class="navbar-inner">
                     <div class="container-fluid">
                         <a href="" class="brand"><img src="img/back/gray_dark/home_16x16.png"> <?php echo $this->site; ?></a>
+
                         <ul class="nav user_menu pull-right">
                             <li class="hidden-phone hidden-tablet">
                                 <ul class="new_items">
@@ -112,57 +113,88 @@
                         <div class="nav-collapse">
                             <nav>
                                 <ul class="nav">
-
                                     <?php
-                                    //Si le tableau de board est activé
-                                    if ($this->appConfig->get("active", "board")) {
+                                    if (count($this->apis) > 1) {
                                         ?>
-                                        <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
-                                        
-                                        <?php
-                                    }
-                                    ?>
-                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
-                                    <?php
-                                    if (count($this->menuPage) > 1) {
-                                        ?>
-                                        <li class="dropdown<?php echo $this->controller == "page" ? ' gradient-blue text-light-white' : ''; ?>">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Pages <b class="caret"></b></a>
+                                        <li class="dropdown">
+                                            <a data-toggle="dropdown" class="dropdown-toggle" style="font-weight:bold;padding:0" href="#"><img style="float:left;margin-top: 9px;margin-left: 4px;" width="26" src="img/back/api/<?php echo $this->api["name"]; ?>.png" /><span class="api-selected" style="padding: 12px 10px 11px 3px;display:inline-block"><?php echo $this->api["label"]; ?> <b class="caret"></b></span></a>
                                             <ul class="dropdown-menu">
                                                 <?php
-                                                foreach ($this->menuPage as $indexMenuPage => $mPage) {
-                                                    $active = ""; 
-                                                    if(isset($_GET["c"]) && $_GET["c"] == $indexMenuPage)
-                                                        $active = "active";
+                                                $prefix = "../";
+                                                if($this->api["id"] == 1) 
+                                                        $prefix = "./";
+                                                foreach ($this->apis as $idApi => $api) {
+                                                    
                                                     ?>
-                                                    <li class="<?php echo $active; ?>"><a href="page/liste.html?c=<?php echo $indexMenuPage ?>"> <?php echo $mPage["label"] ?></a></li>
+                                                <li><a href="<?php echo $prefix; ?><?php echo $idApi == 1 ? '' : $api["name"] . "/"; ?>" style="font-weight:bold;" href="#"><img style="float:left;margin-top: 5px;" width="28" src="img/back/api/<?php echo $api["name"]; ?>.png" /><span class="api-selected" style="padding: 10px 10px 11px 14px;display:inline-block"><?php echo $api["label"]; ?></span></a></li>
                                                     <?php
                                                 }
                                                 ?>
-                                            </ul>
                                         </li>
-                                        <?php
-                                    } else {
-                                        ?>
-                                        <li<?php echo $this->controller == "page" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="page/liste.html">Pages</a></li>
-                                        <?php
-                                    }
-                                    ?>
-
-
-                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
-                                    <li<?php echo $this->controller == "media" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="media/start.html">Fichiers</a></li>
-                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
-                                    <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "translate" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=translate" class="bis">Traduction</a></li>
+                                    </ul>
+                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet">&nbsp;</li>
                                     <?php
-                                    if($this->utilisateur->get("niveau") == "solire") {
-                                        ?>
-                                        <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
-                                        <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=redirection" class="bis">Redirection</a></li>
-
-                                        <?php
-                                    }
+                                }
+                                ?>
+                                <?php
+                                //Si le tableau de board est activé
+                                if ($this->appConfig->get("active", "board")) {
                                     ?>
+                                    <li<?php echo $this->controller == "board" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="board/start.html">Tableau de bord</a></li>
+
+                                    <?php
+                                }
+                                ?>
+                                <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                <?php
+                                if (count($this->menuPage) > 1) {
+                                    ?>
+                                    <li class="dropdown<?php echo $this->controller == "page" ? ' gradient-blue text-light-white' : ''; ?>">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Pages <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <?php
+                                            foreach ($this->menuPage as $indexMenuPage => $mPage) {
+                                                $active = "";
+                                                if (isset($_GET["c"]) && $_GET["c"] == $indexMenuPage)
+                                                    $active = "active";
+                                                ?>
+                                                <li class="<?php echo $active; ?>"><a href="page/liste.html?c=<?php echo $indexMenuPage ?>"> <?php echo $mPage["label"] ?></a></li>
+                                                <?php
+                                            }
+                                            ?>
+                                        </ul>
+                                    </li>
+                                    <?php
+                                } else {
+                                    ?>
+                                    <li<?php echo $this->controller == "page" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="page/liste.html">Pages</a></li>
+                                    <?php
+                                }
+                                ?>
+
+
+                                <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                <li<?php echo $this->controller == "media" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="media/start.html">Fichiers</a></li>
+                                <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "translate" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=translate" class="bis">Traduction</a></li>
+                                <?php
+                                if ($this->utilisateur->get("niveau") == "solire") {
+                                    ?>
+                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                    <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=redirection" class="bis">Redirection</a></li>
+
+                                    <?php
+                                }
+                                ?>
+                                <?php
+                                if ($this->utilisateur->get("niveau") == "solire") {
+                                    ?>
+                                    <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
+                                    <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "back_log" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=back_log" class="bis">Logs</a></li>
+
+                                    <?php
+                                }
+                                ?>
 
 
 

@@ -4,8 +4,8 @@
  * Extention de PDO
  * @version 1
  */
-class MyPDO extends PDO
-{
+class MyPDO extends PDO {
+
     const BINDMODE_VALUE = 'bindValue';
     const BINDMODE_PARAM = 'bindParam';
 
@@ -25,8 +25,7 @@ class MyPDO extends PDO
      * @param <string> $String
      * @return <string>
      */
-    public function no_accent($String)
-    {
+    public function no_accent($String) {
         $String = preg_replace($this->Pattern, $this->RepPat, $String);
         return $String;
     }
@@ -41,8 +40,7 @@ class MyPDO extends PDO
      *  à pour valeur par défaut : rewrit
      * @return <string>
      */
-    public function rewrit($String, $Table = false, $Name = "rewrit", $Param = "")
-    {
+    public function rewrit($String, $Table = false, $Name = "rewrit", $Param = "") {
         if ($Table) {
 //Controle de l'existence du rewrit contenu dans le champ $Name
 // de la table $Table.
@@ -61,29 +59,25 @@ class MyPDO extends PDO
         return $Rewrit;
     }
 
-    public function listTable($table_name)
-    {
+    public function listTable($table_name) {
         $query = $this->query("Select * from $table_name");
         $result = $query->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
-    public function getRowFromTable($table_name, $id, $fieldId = "id")
-    {
+    public function getRowFromTable($table_name, $id, $fieldId = "id") {
         $query = $this->query("Select * from $table_name WHERE $fieldId=$id");
         $result = $query->fetch(PDO::FETCH_ASSOC);
         return $result;
     }
 
-    public function getRowsFromTable($table_name, $id, $fieldId = "id")
-    {
+    public function getRowsFromTable($table_name, $id, $fieldId = "id") {
         $query = $this->query("Select * from $table_name WHERE $fieldId=$id");
         $result = $query->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
 
-    private function make_rew($String)
-    {
+    private function make_rew($String) {
         $String = $this->no_accent($String);
 // On retire tout ce qu'il y a entre chevrons, crochets, parenthèses.
         $String = preg_replace('#\[(.+)]#isU', '', $String);
@@ -103,8 +97,10 @@ class MyPDO extends PDO
         return $String;
     }
 
-    public function query($query, $params = array())
-    {
+    public function query($query, $params = array()) {
+
+        $start = microtime(true);
+
         if (!is_array($params))
             $params = array($params);
         foreach ($params as &$p) {
@@ -114,15 +110,19 @@ class MyPDO extends PDO
         unset($p);
         if ($params == NULL) {
             $funcQuery = parent::query($query);
-            return $funcQuery;
         } else {
             $funcQuery = parent::query(vsprintf($query, $params));
-            return $funcQuery;
         }
+
+        $end = microtime(true);
+        $time = $end - $start;
+        $this->log($time, $query, "query");
+
+        return $funcQuery;
     }
 
-    public function exec($query, $params = array())
-    {
+    public function exec($query, $params = array()) {
+        $start = microtime(true);
         if (!is_array($params))
             $params = array($params);
         foreach ($params as &$p) {
@@ -131,91 +131,107 @@ class MyPDO extends PDO
         }
         unset($p);
         if ($params == NULL) {
-            return parent::exec($query);
+            $ok = parent::exec($query);
         } else {
-            return parent::exec(vsprintf($query, $params));
+            $ok = parent::exec(vsprintf($query, $params));
+        }
+        $end = microtime(true);
+        $time = $end - $start;
+        $this->log($time, $query, "exec");
+        return $ok;
+    }
+
+    public function log($time, $Query, $pref = '') {
+        return false;
+        $value = Registry::get("somme") + $time;
+        Registry::set("somme", $value);
+
+        $nb = Registry::get("nbresql") + 1;
+        Registry::set("nbresql", $nb);
+
+        
+        $dir = "../logs/sql";
+        if (is_dir($dir) && $Query != "SET NAMES UTF8") {
+            $content = '<div><u>' . date("H:i:s") . ' </u>&nbsp;<i>' . $_SERVER['REQUEST_URI'] . '</i><br /> ' . $Query . '</div>'
+                    . '<div style="color : #' . ($time > 0.2 ? 'CC0000' : ($time > 0.01 ? 'ED7F10' : '009900' )) . ';">'
+                    . round($time, 4) . '</div><div style="color:pink;">total (' . $nb . ') : ' . round($value, 4) . '</div><hr />';
+            file_put_contents($dir . "/" . date("Y-m-d") . "_$pref.html", $content, FILE_APPEND);
         }
     }
-    
+
     // insertion de données dans MySQL
-	public function insert($table, $values) {
-		$values = array_map(array($this, 'quote'), (array)$values);
-		$fieldNames = array_keys($values);
-		return $this->exec("INSERT INTO `".$table."` (`".implode("`,`", $fieldNames)."`) VALUES(".implode(",", $values).")");
-	}
- 
-	// sélection de données depuis MySQL
-	public function select($table, $small_size = FALSE, $fields, $where = '', $order = '') {
- 
-		$result_size = !empty($small_size) ? 'SQL_SMALL_RESULT' : '';
-		$where = !empty($where) ? ' WHERE '.$where : '';
- 
-		return $this->query("SELECT ".$result_size." ".implode(", ", (array)$fields)." FROM ".
-		$this->quote($table).$where.$order);
-	}
- 
-	// tri des résultat d'une requête SELECT
-	public function order($fields, $order = 'ASC') {
- 
-		$order = array_map(array($this, 'quote'), (array)$order);
-		if (count($fields) == count($order)) {
- 
-			$set = array();
-			$fields = (array)$fields;
-			for ($i = 0; $i < count($fields); $i++) {
- 
-				$set[] = $fields[$i].' '.$order[$i];
-			}
- 
-			return " ORDER BY ".implode(", ", $set);
-		}
- 
-		else {
- 
-			return FALSE;
-		}
-	}
- 
-	// limitation des résultats d'une requête SELECT
-	public function limit($offset, $number) {
- 
-		if (is_numeric($offset) && is_numeric($number)) {
- 
-			return " LIMIT ".intval($offset).", ".intval($number);
-		}
- 
-		else {
- 
-			return FALSE;
-		}
-	}
- 
-	// mis à jour de données de MySQL
-	public function update($table, $values, $where = FALSE) {
-		$set = array();
-		foreach ((array)$values as $field => $value) {
- 
-			$set[] = "`" . $field."` = ".$this->quote($value);
-		}
- 
-		return $this->exec("UPDATE `".$table."` SET ".implode(", ", $set).(!empty($where) ? " WHERE ".$where : ''));
-	}
- 
-	// suppression de données de MySQL
-	public function delete($table, $where) {
- 
-		return $this->exec("DELETE FROM ".$table." WHERE ".$where);
-	}
+    public function insert($table, $values) {
+        $values = array_map(array($this, 'quote'), (array) $values);
+        $fieldNames = array_keys($values);
+        return $this->exec("INSERT INTO `" . $table . "` (`" . implode("`,`", $fieldNames) . "`) VALUES(" . implode(",", $values) . ")");
+    }
+
+    // sélection de données depuis MySQL
+    public function select($table, $small_size = FALSE, $fields, $where = '', $order = '') {
+
+        $result_size = !empty($small_size) ? 'SQL_SMALL_RESULT' : '';
+        $where = !empty($where) ? ' WHERE ' . $where : '';
+
+        return $this->query("SELECT " . $result_size . " " . implode(", ", (array) $fields) . " FROM " .
+                        $this->quote($table) . $where . $order);
+    }
+
+    // tri des résultat d'une requête SELECT
+    public function order($fields, $order = 'ASC') {
+
+        $order = array_map(array($this, 'quote'), (array) $order);
+        if (count($fields) == count($order)) {
+
+            $set = array();
+            $fields = (array) $fields;
+            for ($i = 0; $i < count($fields); $i++) {
+
+                $set[] = $fields[$i] . ' ' . $order[$i];
+            }
+
+            return " ORDER BY " . implode(", ", $set);
+        } else {
+
+            return FALSE;
+        }
+    }
+
+    // limitation des résultats d'une requête SELECT
+    public function limit($offset, $number) {
+
+        if (is_numeric($offset) && is_numeric($number)) {
+
+            return " LIMIT " . intval($offset) . ", " . intval($number);
+        } else {
+
+            return FALSE;
+        }
+    }
+
+    // mis à jour de données de MySQL
+    public function update($table, $values, $where = FALSE) {
+        $set = array();
+        foreach ((array) $values as $field => $value) {
+
+            $set[] = "`" . $field . "` = " . $this->quote($value);
+        }
+
+        return $this->exec("UPDATE `" . $table . "` SET " . implode(", ", $set) . (!empty($where) ? " WHERE " . $where : ''));
+    }
+
+    // suppression de données de MySQL
+    public function delete($table, $where) {
+
+        return $this->exec("DELETE FROM " . $table . " WHERE " . $where);
+    }
 
 }
 
-class MyPDOStatement extends PDOStatement
-{
+class MyPDOStatement extends PDOStatement {
 
     protected $bound_params;
 
-    public function execute($allParams = array(), $bindMode = MyPDO::BINDMODE_PARAM)
-    {
+    public function execute($allParams = array(), $bindMode = MyPDO::BINDMODE_PARAM) {
         if (!in_array($bindMode, array(MyPDO::BINDMODE_VALUE, MyPDO::BINDMODE_PARAM))) {
             $this->throwError('Unknow bind mode "<b>' . $bindMode . '</b>".');
             return FALSE;
@@ -233,32 +249,28 @@ class MyPDOStatement extends PDOStatement
         }
     }
 
-    protected function throwError($error_message, $code = NULL)
-    {
+    protected function throwError($error_message, $code = NULL) {
         if ($this->getAttribute(MyPDO::ATTR_ERRMODE) == MyPDO::ERRMODE_EXCEPTION)
             throw new MyPDOException($error_message, $code);
         elseif ($this->getAttribute(MyPDO::ATTR_ERRMODE) == MyPDO::ERRMODE_WARNING)
             trigger_error($error_message, E_WARNING);
     }
 
-    public function bindValue($parameter, $value, $data_type = MyPDO::PARAM_STR)
-    {
+    public function bindValue($parameter, $value, $data_type = MyPDO::PARAM_STR) {
         if ($data_type == MyPDO::PARAM_INT)
             $value = (int) $value;
         $this->setBoundParams($parameter, $value, $data_type);
         return parent::bindValue($parameter, $value, $data_type);
     }
 
-    public function bindParam($parameter, &$variable, $data_type = null, $length = null, $driver_options = null)
-    {
+    public function bindParam($parameter, &$variable, $data_type = null, $length = null, $driver_options = null) {
         if ($data_type == MyPDO::PARAM_INT)
             $variable = (int) $variable;
         $this->setBoundParams($parameter, $variable, $data_type);
         return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
     }
 
-    protected function setBoundParams($name, $value, $data_type = MyPDO::PARAM_STR)
-    {
+    protected function setBoundParams($name, $value, $data_type = MyPDO::PARAM_STR) {
         if ($data_type == MyPDO::PARAM_STR)
             $value = "'$value'";
         if (is_string($name) AND $name[0] != ':')
@@ -266,8 +278,7 @@ class MyPDOStatement extends PDOStatement
         $this->bound_params[$name] = $value;
     }
 
-    public function getBuiltQuery()
-    {
+    public function getBuiltQuery() {
         $res = $this->queryString;
         if (count($this->bound_params)) {
             if (is_int(key($this->bound_params))) {
@@ -287,6 +298,5 @@ class MyPDOStatement extends PDOStatement
     }
 
 }
-
 
 ?>
