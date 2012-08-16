@@ -107,7 +107,7 @@ class PageController extends MainController {
 
         //Si on liste que certains gabarits
         if ($gabaritsList != "*" && count($gabaritsList) > 0) {
-            $query .= " WHERE id IN ( " . implode(", ", $gabaritsList) . ")";
+            $query .= " AND id IN ( " . implode(", ", $gabaritsList) . ")";
             //Permet de séparer les différents gabarits
             if (isset($_GET["gabaritByGroup"])) {
                 $this->_view->gabaritByGroup = true;
