@@ -1,17 +1,11 @@
 <?php
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of shinform
  *
  * @author shinbuntu
  */
-class ShinForm
-{
+class ShinForm {
 
     const VALIDATE_FLOAT = 'number';
     const VALIDATE_INT = 'digits';
@@ -29,8 +23,7 @@ class ShinForm
     private $_dataNotValidated = null;
     private $_queries = null;
 
-    public function __construct($configName, $db)
-    {
+    public function __construct($configName, $db) {
         if ($configName != null) {
             $config = Registry::get('mainconfig');
             include($config->get('formulaire', 'dirs') . $configName);
@@ -42,6 +35,39 @@ class ShinForm
         $this->_db = $db;
     }
 
+    public function __toString() {
+        require_once 'dbug.php';
+        ob_start();
+
+        if ($this->_config != null) {
+            new dBug($this->_config, "", true);
+        }
+
+        if ($this->_validateRules != null) {
+            new dBug($this->_validateRules, "", true);
+        }
+
+        if ($this->_dataNotValidated != null) {
+            new dBug($this->_dataNotValidated, "", true);
+        }
+
+        if ($this->_dataValidated != null) {
+            new dBug($this->_dataValidated, "", true);
+        }
+
+        if ($this->_errors != null) {
+            new dBug($this->_errors, "", true);
+        }
+
+        if ($this->_queries != null) {
+            new dBug($this->_queries, "", true);
+        }
+
+
+        $output = ob_get_clean();
+        return $output;
+    }
+
     /**
      * Permet de tester les données d'un formulaire ou autre source de donnée
      * selon le fichier de configuration passé en paramètre de l'objet.
@@ -50,8 +76,7 @@ class ShinForm
      * @param type $data Valeurs à tester
      * @return boolean true en cas de succès (données validées)
      */
-    public function validatePHP($data)
-    {
+    public function validatePHP($data) {
         $dataC = array();
         $this->_dataNotValidated["form"] = $data;
 
@@ -66,7 +91,8 @@ class ShinForm
 
                 if (isset($form["information"][$fieldName]["type"]) && $form["information"][$fieldName]["type"] == "file") {
                     //cas fichier
-                    $dataC[$formName][$fieldName]["value"] = isset($data[$fieldName]) && isset($data[$fieldName]["name"]) ? $data[$fieldName]["name"] : "";
+                    //Test si une erreur
+                    $dataC[$formName][$fieldName]["value"] = isset($data[$fieldName]) && isset($data[$fieldName]["name"]) && $data[$fieldName]["error"] == 0 ? $data[$fieldName]["name"] : "";
                 } else {
                     $dataC[$formName][$fieldName]["value"] = isset($data[$fieldName]) ? $data[$fieldName] : "";
                 }
@@ -145,8 +171,51 @@ class ShinForm
                         continue;
                     }
 
+                    if (isset($field["required"])) {
+                        if (is_array($field["required"])) {
+
+                            foreach ($field["required"] as $keyRuleParam => $ruleParam) {
+                                switch ((string) $keyRuleParam) {
+                                    case "depends":
+                                        //Gestion de dependance avec d'autre champs
+                                        list($type, $formNameDep, $fieldDep) = explode(".", key($ruleParam));
+                                        $fieldDepVal = current($ruleParam);
+                                        if (is_array($fieldDepVal)) {
+                                            $typeDependsTest = key($fieldDepVal);
+                                            switch ($typeDependsTest) {
+                                                case "ISNOT":
+                                                    $fieldDepVal = current($fieldDepVal);
+                                                    if ($this->_dataNotValidated[$type][$fieldDep] == $fieldDepVal)
+                                                        $field["required"] = false;
+                                                    else {
+                                                        $field["required"] = true;
+                                                    }
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        } else {
+                                            if ($this->_dataNotValidated[$type][$fieldDep] != $fieldDepVal)
+                                                $field["required"] = false;
+                                            else {
+                                                $field["required"] = true;
+                                            }
+                                        }
+
+                                        break;
+
+
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
                     //Si le champs n'est pas requis et la valeur est vide, on ne procede pas au controle
-                    if (!isset($field["required"]) && $dataC[$formName][$fieldName]["value"] == "") {
+                    if ((!isset($field["required"]) || $field["required"] == false) && $dataC[$formName][$fieldName]["value"] == "") {
+
                         continue;
                     }
                     /* On demande à la fonction _validate de valider notre champ avec la règle courante
@@ -174,7 +243,7 @@ class ShinForm
         }
 
         //Puis on met tous les champs (valide ou non) dans un array
-        
+
         $this->_dataValidated["form"] = $dataC;
         return !$errorExist;
     }
@@ -185,8 +254,7 @@ class ShinForm
      * @param boolean $execute Permet d'executer les requetes directement
      * @return boolean Succes ou non de l'execution 
      */
-    public function buildQueries($execute = true, $add = true)
-    {
+    public function buildQueries($execute = true, $add = true) {
         $r = true;
 
 
@@ -247,7 +315,55 @@ class ShinForm
             $query .= "SET ";
             $querySetters = array();
             $queryWhere = array();
-            
+
+            //Tous les champs du formulaire sont sauvé
+            if (is_string($tableConfig["columns"]) && $tableConfig["columns"] == "all") {
+                $tableConfig["columns"] = array();
+                foreach ($this->_dataValidated["form"][$keyConfig] as $columnName => $columnValue) {
+                    $tableConfig["columns"][] = array(
+                        "name" => $columnName,
+                        "value" => $columnValue["value"],
+                    );
+                }
+
+
+                /* TODO à extternaliser */
+                /*
+                  $this->_db->createTable($tableConfig["table"]["name"], array_keys($this->_dataValidated["form"][$keyConfig]));
+                  $configDatatable = array(
+                  "extra" => array(
+                  "copy" => false,
+                  "print" => false,
+                  "pdf" => false,
+                  "csv" => false,
+                  "hide_columns" => false,
+                  "highlightedSearch" => true,
+                  ),
+                  "table" => array(
+                  "name" => $tableConfig["table"]["name"],
+                  "title" => "Liste des " . $tableConfig["table"]["name"] . "s",
+                  "title_item" => $tableConfig["table"]["name"],
+                  "suffix_genre" => "",
+                  "fixedheader" => false,
+                  ),
+                  "columns" => array(),
+                  );
+
+                  foreach (array_keys($this->_dataValidated["form"][$keyConfig]) as $columnName) {
+                  $configDatatable["columns"][] = array(
+                  "name" => $columnName,
+                  "show" => true,
+                  "filter_field" => "text",
+                  "title" => ucfirst($columnName),
+                  );
+                  }
+                  echo '$config = ';
+                  var_export($configDatatable);
+                 */
+            }
+
+
+
             foreach ($tableConfig["columns"] as $column) {
                 $continue = false;
                 if (isset($column["depends"])) {
@@ -262,22 +378,22 @@ class ShinForm
                             switch ($typeDependsTest) {
                                 case "ISNOT":
                                     $fieldDepVal = current($fieldDepVal);
-                                    
+
                                     //Cas des fichier
-                                    if(is_array($this->_dataNotValidated[$type][$fieldDep])) {
+                                    if (is_array($this->_dataNotValidated[$type][$fieldDep])) {
                                         if ($this->_dataValidated[$type][$formNameDep][$fieldDep]["value"] == $fieldDepVal)
                                             $continue = true;
                                     } else {
                                         if ($this->_dataNotValidated[$type][$fieldDep] == $fieldDepVal)
                                             $continue = true;
                                     }
-                                    
+
 
                                     break;
                                 case "IS":
                                     $fieldDepVal = current($fieldDepVal);
                                     //Cas des fichier
-                                    if(is_array($this->_dataNotValidated[$type][$fieldDep])) {
+                                    if (is_array($this->_dataNotValidated[$type][$fieldDep])) {
                                         if ($this->_dataValidated[$type][$formNameDep][$fieldDep]["value"] != $fieldDepVal)
                                             $continue = true;
                                     } else {
@@ -335,11 +451,28 @@ class ShinForm
                     } else if (is_string($column["value"]) || is_int($column["value"]) || is_float($column["value"])) {
                         $varValue = $column["value"];
                     }
-                    $value = $this->_db->quote($varValue);
+
+
+
+
+                    $value = $varValue;
                 } else {
                     $value = "";
                 }
 
+                //Si c'est un rewriting
+                if (isset($column["rewriting"])) {
+                    $where = $column["rewriting"]["where"];
+                    //Si modification, on ajoute une condition pour exclure le rewriting de lelement que l'on edite
+                    if (!$add) {
+//                        $where = " AND ";
+                    }
+
+                    $varValue = $this->_db->rewrit($varValue, $column["rewriting"]["from"], $column["rewriting"]["field"], $where);
+                    $value = $varValue;
+                }
+
+                $value = $this->_db->quote($value);
 
                 if (!$add && isset($column["index"]) && $column["index"] == true) {
                     $queryWhere [] = "`" . $column["name"] . "` = " . $value;
@@ -358,7 +491,7 @@ class ShinForm
             if ($execute && $r !== false) {
                 $r = $this->_db->exec($query);
                 $lastId = $this->_db->lastInsertId();
-                if(intval($lastId) > 0)
+                if (intval($lastId) > 0)
                     $this->_dataValidated["mysql"][$keyConfig]["id"] = $lastId;
             }
             if ($r === false)
@@ -371,8 +504,7 @@ class ShinForm
         return $r !== false;
     }
 
-    public function getValidateJS()
-    {
+    public function getValidateJS() {
         $js = "";
         $js .= "<script>";
         $js .= '$().ready(function() {';
@@ -410,8 +542,17 @@ class ShinForm
                             $listRestrictedString .= " ou " . $lastValue;
                             $form["validate"]["messages"][$fieldName][$key] = str_replace("[%restricted.value%]", $listRestrictedString, $form["validate"]["messages"][$fieldName][$key]);
                             break;
-                        case "max_size":
                         case "restricted_extension":
+                            $lastValue = array_pop($rule);
+                            $listRestrictedString = implode(", ", $rule);
+                            $rule[] = $lastValue;
+                            $listRestrictedString .= " ou " . $lastValue;
+                            $form["validate"]["messages"][$fieldName]["accept"] = str_replace("[%restricted_extension.value%]", $listRestrictedString, $form["validate"]["messages"][$fieldName][$key]);
+                            $form["validate"]["rules"][$fieldName]["accept"] = implode("|", $rule);
+                            unset($form["validate"]["rules"][$fieldName][$key]);
+                            unset($form["validate"]["messages"][$fieldName][$key]);
+                            break;
+                        case "max_size":
                             unset($form["validate"]["rules"][$fieldName][$key]);
                             unset($form["validate"]["messages"][$fieldName][$key]);
                             break;
@@ -426,13 +567,16 @@ class ShinForm
 
                             list($type, $formNameDep, $fieldNameDep) = explode(".", key($rule));
                             $fieldDepSelector = "form[name='$formNameDep'] input[name='$fieldNameDep'], form[name='$formNameDep'] select[name='$fieldNameDep']";
+                            $fieldDepSelectorCheckbox = "form[name='$formNameDep'] input[name='$fieldNameDep']:checked, form[name='$formNameDep'] select[name='$fieldNameDep']";
                             $fieldDepVal = current($rule);
                             if (is_array($fieldDepVal)) {
                                 $typeDependsTest = key($fieldDepVal);
                                 switch ($typeDependsTest) {
                                     case "ISNOT":
                                         $fieldDepVal = current($fieldDepVal);
-                                        $functions[] = "function(){ return $(\"$fieldDepSelector\").val() != '$fieldDepVal'; }";
+//                                        $functions[] = "function(){ return $(\"$fieldDepSelector\").val() != '$fieldDepVal'; }";
+                                        //Ajout du cas des checkbox
+                                        $functions[] = "function(){ if($(\"$fieldDepSelector\").is('[type=checkbox]')) return $(\"$fieldDepSelectorCheckbox\").val() != '$fieldDepVal'; else return $(\"$fieldDepSelector\").val() != '$fieldDepVal'; }";
                                         $functionsKeys[] = '"[%function' . $fieldName . $key . '%]"';
                                         break;
 
@@ -440,7 +584,10 @@ class ShinForm
                                         break;
                                 }
                             } else {
-                                $functions[] = "function(){ return $(\"$fieldDepSelector\").val() == '$fieldDepVal'; }";
+//                                $functions[] = "function(){ return $(\"$fieldDepSelector\").val() == '$fieldDepVal'; }";
+                                //Ajout du cas des checkbox
+                                $functions[] = "function(){ if($(\"$fieldDepSelector\").is('[type=checkbox]')) return $(\"$fieldDepSelectorCheckbox\").length == 0 ? true : false ; else return $(\"$fieldDepSelector\").val() == '$fieldDepVal'; }";
+
                                 $functionsKeys[] = '"[%function' . $fieldName . $key . '%]"';
                             }
 
@@ -449,7 +596,7 @@ class ShinForm
                             foreach ($form["validate"]["rules"][$fieldName] as $key2 => $rule2) {
                                 if (is_array($form["validate"]["rules"][$fieldName][$key2])) {
                                     $form["validate"]["rules"][$fieldName][$key2]["depends"] = $rule["depends"];
-                                    if($key2 == "remote") {
+                                    if ($key2 == "remote") {
                                         $form["validate"]["rules"][$fieldName]["xremote"] = $form["validate"]["rules"][$fieldName][$key2];
                                         $form["validate"]["messages"][$fieldName]["xremote"] = $form["validate"]["messages"][$fieldName][$key2];
                                         unset($form["validate"]["rules"][$fieldName][$key2]);
@@ -486,13 +633,15 @@ class ShinForm
                                     //Gestion de dependance avec d'autre champs
                                     list($type, $formNameDep, $fieldNameDep) = explode(".", key($ruleParam));
                                     $fieldDepSelector = "form[name='$formNameDep'] input[name='$fieldNameDep'], form[name='$formNameDep'] select[name='$fieldNameDep']";
+                                    $fieldDepSelectorCheckbox = "form[name='$formNameDep'] input[name='$fieldNameDep']:checked, form[name='$formNameDep'] select[name='$fieldNameDep']";
                                     $fieldDepVal = current($ruleParam);
                                     if (is_array($fieldDepVal)) {
                                         $typeDependsTest = key($fieldDepVal);
                                         switch ($typeDependsTest) {
                                             case "ISNOT":
                                                 $fieldDepVal = current($fieldDepVal);
-                                                $functions[] = "function(){ return $(\"$fieldDepSelector\").val() != '$fieldDepVal'; }";
+//                                                $functions[] = "function(){ return $(\"$fieldDepSelector\").val() != '$fieldDepVal'; }";
+                                                $functions[] = "function(){ if($(\"$fieldDepSelector\").is('[type=checkbox]')) return $(\"$fieldDepSelectorCheckbox\").val() != '$fieldDepVal'; else return $(\"$fieldDepSelector\").val() != '$fieldDepVal'; }";
                                                 $functionsKeys[] = '"[%function' . $fieldName . $key . $keyRuleParam . '%]"';
                                                 break;
 
@@ -500,7 +649,8 @@ class ShinForm
                                                 break;
                                         }
                                     } else {
-                                        $functions[] = "function(){ return $(\"$fieldDepSelector\").val() == '$fieldDepVal'; }";
+//                                        $functions[] = "function(){ return $(\"$fieldDepSelector\").val() == '$fieldDepVal'; }";
+                                        $functions[] = "function(){ if($(\"$fieldDepSelector\").is('[type=checkbox]')) return $(\"$fieldDepSelectorCheckbox\").length == 0 ? true : false ; else return $(\"$fieldDepSelector\").val() == '$fieldDepVal'; }";
                                         $functionsKeys[] = '"[%function' . $fieldName . $key . $keyRuleParam . '%]"';
                                     }
                                     $form["validate"]["rules"][$fieldName][$key][$keyRuleParam] = "[%function$fieldName$key$keyRuleParam%]";
@@ -519,9 +669,9 @@ class ShinForm
 
             $json = json_encode($form["validate"]);
 
-            
+
             $json = str_replace($functionsKeys, $functions, $json);
-            
+
 
 //            $js .= 'console.log(' . $json . ');';
             $js .= '$("form[name=\'' . $formName . '\']").validate(' . $json . ');';
@@ -535,45 +685,37 @@ class ShinForm
         return $js;
     }
 
-    public function addCustomData($key, $value)
-    {
+    public function addCustomData($key, $value) {
         $this->_dataValidated["custom"][$key] = $value;
     }
-    
-    public function addCustomDataForm($formName, $fieldName, $value)
-    {
-        $this->_dataValidated["form"][$formName][$fieldName]  = array(
+
+    public function addCustomDataForm($formName, $fieldName, $value) {
+        $this->_dataValidated["form"][$formName][$fieldName] = array(
             "value" => $value
         );
     }
-    
-    public function injectData($key, $value)
-    {
+
+    public function injectData($key, $value) {
         $this->_dataValidated[$key] = $value;
     }
 
-    public function getErrors()
-    {
+    public function getErrors() {
         return $this->_errors;
     }
 
-    public function getDataValidated()
-    {
+    public function getDataValidated() {
         return $this->_dataValidated;
     }
 
-    public function getQueries()
-    {
+    public function getQueries() {
         return $this->_queries;
     }
 
-    public function validate($stringToValidate, $validateType)
-    {
+    public function validate($stringToValidate, $validateType) {
         return $this->_validate($stringToValidate, $validateType);
     }
 
-    private function _buildValidate()
-    {
+    private function _buildValidate() {
         foreach ($this->_config["form"] as $formName => $form) {
             foreach ($form["fields"] as $field) {
                 uksort($field["validate"]["rules"], array($this, "_sortRules"));
@@ -585,9 +727,7 @@ class ShinForm
         }
     }
 
-    private function _validate($stringToValidate, $validateType, $file = null)
-    {
-
+    private function _validate($stringToValidate, $validateType, $file = null) {
 
         if (is_array(current($validateType))) {
             foreach (current($validateType) as $keyRuleParam => $ruleParam) {
@@ -672,13 +812,11 @@ class ShinForm
         return $stringToValidate;
     }
 
-    private function _validateFile()
-    {
+    private function _validateFile() {
         
     }
 
-    private function _validateType($stringToValidate, $secureType, $params = null)
-    {
+    private function _validateType($stringToValidate, $secureType, $params = null) {
         switch ($secureType) {
             case "digits":
                 $stringToValidate = str_replace(CHR(32), "", $stringToValidate);
@@ -734,8 +872,7 @@ class ShinForm
         return $filteredString;
     }
 
-    private function _validateUnique($stringToValidate, $params)
-    {
+    private function _validateUnique($stringToValidate, $params) {
 
         $stringToValidate2 = $this->_db->quote($stringToValidate);
         $query = "SELECT count(`" . $params["column"] . "`) FROM `" . $params["table"] . "` WHERE `" . $params["column"] . "` = $stringToValidate2";
@@ -743,21 +880,18 @@ class ShinForm
         return $stringToValidate;
     }
 
-    private function _validateRestricted($stringToValidate, $params)
-    {
+    private function _validateRestricted($stringToValidate, $params) {
         $filteredString = in_array($stringToValidate, $params["value"]) ? $stringToValidate : false;
         return $filteredString;
     }
 
-    private function _validateRequired($stringToValidate)
-    {
+    private function _validateRequired($stringToValidate) {
         $filteredString = !isset($stringToValidate) || $stringToValidate == "" || $stringToValidate === 0 ? false : $stringToValidate;
 
         return $filteredString;
     }
 
-    private function _validateMaxLength($stringToValidate, $len)
-    {
+    private function _validateMaxLength($stringToValidate, $len) {
         if (strlen($stringToValidate) > $len)
             $filteredString = false;
         else
@@ -765,8 +899,7 @@ class ShinForm
         return $filteredString;
     }
 
-    private function _validateMinLength($stringToValidate, $len)
-    {
+    private function _validateMinLength($stringToValidate, $len) {
         if (strlen($stringToValidate) != 0 && strlen($stringToValidate) < $len)
             $filteredString = false;
         else
@@ -774,8 +907,7 @@ class ShinForm
         return $filteredString;
     }
 
-    private function _validateFileSize($stringToValidate, $sizeMax, $sizeToValidate)
-    {
+    private function _validateFileSize($stringToValidate, $sizeMax, $sizeToValidate) {
         $sizeMax = $sizeMax * 1024;
         if ($sizeToValidate > $sizeMax) {
             return false;
@@ -783,8 +915,7 @@ class ShinForm
         return $stringToValidate;
     }
 
-    private function _validateFileExtension($fileName, $fileExtensionAllow)
-    {
+    private function _validateFileExtension($fileName, $fileExtensionAllow) {
         $extension = strrchr($fileName, '.');
         if ($fileName != "" && $fileExtensionAllow != null && in_array(substr($extension, 1), $fileExtensionAllow) === false) { //Si l'extension n'est pas dans le tableau
             return false;
@@ -792,8 +923,7 @@ class ShinForm
         return $fileName;
     }
 
-    private function _sortRules($a, $b)
-    {
+    private function _sortRules($a, $b) {
         $priority = array('depends' => 0, 'required' => 1, 'minlength' => 2, 'maxlength' => 3);
         // company logic dictates a week begins on a Tuesday.
         if ((isset($priority[$a]) && !isset($priority[$b])) || (isset($priority[$b]) && isset($priority[$a]) && $priority[$a] < $priority[$b])) {
@@ -803,8 +933,7 @@ class ShinForm
         }
     }
 
-    private function _sortRulesJs($a, $b)
-    {
+    private function _sortRulesJs($a, $b) {
         $priority = array('depends' => 0, 'required' => 1, 'minlength' => 2, 'maxlength' => 3);
         // company logic dictates a week begins on a Tuesday.
         if ((isset($priority[$a]) && !isset($priority[$b])) || (isset($priority[$b]) && isset($priority[$a]) && $priority[$a] < $priority[$b])) {
@@ -814,8 +943,7 @@ class ShinForm
         }
     }
 
-    private function _removeHtml($string)
-    {
+    private function _removeHtml($string) {
         return strip_tags($string);
     }
 
