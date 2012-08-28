@@ -167,10 +167,32 @@ class Datatable {
             $this->_action = "editable";
         }
 
+        if (isset($this->_get["editRender"])) {
+            $this->_view = "";
+            $this->_action = "editFormRender";
+        }
+
         if (isset($this->_get["add"])) {
-            $this->_view = "add";
+            $this->_view = "";
             $this->_action = "add";
         }
+
+        if (isset($this->_get["edit"])) {
+            $this->_view = "";
+            $this->_action = "edit";
+        }
+
+        if (isset($this->_get["select_load"])) {
+            $this->_view = "";
+            $this->_action = "selectLoad";
+        }
+        
+        if (isset($this->_get["dt_action"]) && $this->_get["dt_action"] != "") {
+            $this->_view = "";
+            $this->_action = $this->_get["dt_action"];
+        }
+
+
 
         //Paramètrage du chemin des ressources
         $this->_cssPath = $cssPath;
@@ -203,15 +225,53 @@ class Datatable {
             $this->_aFilterColumnAdditional = array();
             $this->additionalParams = "";
 
-            if (isset($_POST["filter"])) {
-                foreach ($_POST["filter"] as $filter) {
+            if (isset($_GET["filter"])) {
+                foreach ($_GET["filter"] as $filter) {
                     list($filterColumn, $filterValue) = explode("|", $filter);
-                    $this->aFilterColumnAdditional[] = $filterColumn . ' = ' . $this->_db->quote($filterValue);
+                    $this->_aFilterColumnAdditional[] = $filterColumn . ' = ' . $this->_db->quote($filterValue);
                 }
-                $params["filter"] = $_POST["filter"];
-                $this->additionalParams = http_build_query($params);
+                $params["filter"] = $_GET["filter"];
+//                $this->additionalParams = http_build_query($params);
             }
         }
+
+        $columnAction = array();
+
+        if ((isset($this->config["extra"])
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
+                || (isset($this->config["extra"])
+                && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])) {
+            $columnAction[0] = array(
+                "content" => '<div class="btn-group">',
+                "show" => true,
+                "title" => "Action",
+            );
+        }
+
+        if (isset($this->config["extra"])
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]) {
+            $columnAction[0]["content"] .= '<button class="btn btn-primary edit-item">
+                                                <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier">
+                                            </button>';
+        }
+
+        if (isset($this->config["extra"])
+                && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
+            $columnAction[0]["content"] .= '
+                <button class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="img/back/white/trash_stroke_16x16.png"></button>';
+        }
+        
+        if ((isset($this->config["extra"])
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
+                || (isset($this->config["extra"])
+                && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])) {
+            $columnAction[0]["content"] .= '</div>';
+        }
+
+        if (count($columnAction) > 0) {
+            $this->config["columns"] = array_merge($this->config["columns"], $columnAction);
+        }
+
 
         $this->url = self::_selfURL();
 
@@ -278,7 +338,18 @@ class Datatable {
 
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]) {
-            $this->_beforeTableHTML .= $this->addRender();
+            $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
+            $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
+            $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
+            $this->_javascript->addLibrary($this->_jsPath . "jquery/plupload_custom.js");
+            $this->addRenderAction();
+            if (isset($this->config["style"])
+                    && isset($this->config["style"]["form"])) {
+                $path = isset($this->config["style"]["formpath"]) ? $this->config["style"]["formpath"] : null;
+                $this->_beforeTableHTML .= $this->addRender($this->config["style"]["form"], $path);
+            } else {
+                $this->_beforeTableHTML .= $this->addRender();
+            }
         }
 
         $this->_javascript->addLibrary($this->_jsPath . "jquery/ZeroClipboard.js");
@@ -295,6 +366,23 @@ class Datatable {
                 $this->_javascript->addLibrary($script);
             }
         }
+
+        if (isset($this->config["additional_stylesheet"]) && count($this->config["additional_stylesheet"]) > 0) {
+            foreach ($this->config["additional_stylesheet"] as $stylesheet) {
+                $this->_css->addLibrary($stylesheet);
+            }
+        }
+
+        //Configuration de l'entete et pied du tableau
+        $this->sDom = '<"H"'
+                . 'TC'
+                . (isset($this->config["extra"]["desactiveLengthChanging"]) && $this->config["extra"]["desactiveLengthChanging"] ? '' : 'l' )
+                . (isset($this->config["extra"]["desactiveFilteringInput"]) && $this->config["extra"]["desactiveFilteringInput"] ? '' : 'f' )
+                . 'r>t'
+                . '<"F"'
+                . (isset($this->config["extra"]["desactiveInformation"]) && $this->config["extra"]["desactiveInformation"] ? '' : 'i' )
+                . (isset($this->config["extra"]["desactivePagination"]) && $this->config["extra"]["desactivePagination"] ? '' : 'p' )
+                . '>';
 
         $sFilterColumn = array();
 
@@ -348,7 +436,7 @@ class Datatable {
                                     . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : ""))->fetchAll(PDO::FETCH_COLUMN);
                 } elseif (isset($column["sql"])) {
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["sql"] . ""
-                                    . " FROM `" . $this->config["table"]["name"] . "` WHERE `" . $column["name"] . "` <> '' "
+                                    . " FROM `" . $this->config["table"]["name"] . "` WHERE " . $column["sql"] . " <> '' "
                                     . ($generalWhere == "" ? "" : "AND $generalWhere" )
                                     . " ORDER BY `" . $column["name"] . "` ASC")->fetchAll(PDO::FETCH_COLUMN);
                 } else {
@@ -391,9 +479,185 @@ class Datatable {
 
 
         $r = $this->_db->insert($sTable, $values);
+        $insertId = $this->_db->lastInsertId();
+
+        $this->afterAddAction($insertId);
+
+        exit(1);
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée pour modifier un item
+     *
+     * @return 	void
+     */
+    public function editAction() {
+
+        $filter = explode('|', $_GET["index"]);
+        $i = 0;
+        $j = 0;
+        $where = array();
+
+
+        $values = array();
+        foreach ($this->config["columns"] as $column) {
+            if (isset($column["index"]) && $column["index"]) {
+                $where[] = $column["name"] . " = " . $this->_db->quote($filter[$i]);
+                if ($column["name"] == "cle")
+                    $where[] = $column["name"] . " LIKE BINARY " . $this->_db->quote($filter[$i]);
+                $i++;
+            }
+            if (isset($column["creable_field"])) {
+                if (isset($column["creable_field"]["value"]))
+                    $values[$column["name"]] = $column["creable_field"]["value"];
+                else {
+                    if (isset($_POST[$column["name"]]))
+                        $values[$column["name"]] = $_POST[$column["name"]];
+                }
+            }
+        }
+
+
+
+
+        /* DB table to use */
+        $sTable = $this->config["table"]["name"];
+
+
+        if (count($where) != 0) {
+            $r = $this->_db->update($sTable, $values, implode(" AND ", $where));
+            $this->afterEditAction($_GET["index"]);
+        }
+
+
 
 
         exit(1);
+    }
+    
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée pour supprimer un élément
+     *
+     * @return 	void
+     */
+    public function deleteAction() {
+
+
+        $filter = explode('|', $_POST["row_id"]);
+        $i = 0;
+        $j = 0;
+        $where = array();
+        foreach ($this->config["columns"] as $column) {
+            if (isset($column["index"]) && $column["index"]) {
+                $where[] = $column["name"] . " = " . $this->_db->quote($filter[$i]);
+                if ($column["name"] == "cle")
+                    $where[] = $column["name"] . " LIKE BINARY " . $this->_db->quote($filter[$i]);
+                $i++;
+            }
+        }
+
+
+
+
+        /* DB table to use */
+        $sTable = $this->config["table"]["name"];
+
+        $row = $this->_db->select($sTable, FALSE, "*", implode(" AND ", $where));
+        $r = $this->_db->delete($sTable, implode(" AND ", $where));
+
+        $this->afterDeleteAction(current($row));
+        
+        if ($r)
+            exit(1);
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée après l'ajout de l'item
+     *
+     * @return 	void
+     */
+    public function afterAddAction($insertId) {
+        
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée après la modification de l'item
+     *
+     * @return 	void
+     */
+    public function afterEditAction($insertId) {
+        
+    }
+    
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée après la suppressiob de l'item
+     *
+     * @return 	void
+     */
+    public function afterDeleteAction($row) {
+        
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée pour charger les listes déroulantes
+     *
+     * @return 	void
+     */
+    public function selectLoadAction() {
+
+        $values = array();
+        $keyCol = $_REQUEST['load'];
+
+        $column = $this->config["columns"][$keyCol];
+        $aVal = array();
+        foreach ($column["from"]["columns"] as $sCol) {
+            $sColVal = current($sCol);
+            $sColKey = key($sCol);
+
+            if ($sColKey == "name") {
+                $sColVal2 = next($sCol);
+                $sColKey2 = key($sCol);
+                if ($sColKey2 == "sql") {
+                    $aVal[] = "$sColVal2";
+                } else
+                    $aVal[] = "`" . $column["from"]["table"] . "`.`$sColVal`";
+            } else {
+                $aVal[] = $this->_db->quote($sColVal);
+            }
+        }
+
+        $selectSqlArray = array();
+
+        foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
+            if ($sColIndexVal == "THIS") {
+                $selectSqlArray[] = $sColIndex . " id";
+            }
+        }
+
+
+
+        $selectSqlArray[] = "CONCAT(" . implode(",", $aVal) . ") name ";
+
+
+
+        $response = array();
+        $response = $this->_db->query('
+            SELECT ' . implode(",", $selectSqlArray) . '
+            FROM ' . $column["from"]["table"] . ';')->fetchAll(PDO::FETCH_UNIQUE);
+
+        $this->_response = json_encode($response, JSON_FORCE_OBJECT);
     }
 
     // --------------------------------------------------------------------
@@ -895,9 +1159,7 @@ class Datatable {
                     }
                 }
             }
-            if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
-                $row[] = '<div class="btn-a gradient-blue"><a href="#" class="supprimer" style="float:right; display:block;" title="Supprimer"><img src="img/back/white/trash_stroke_16x16.png" alt="Supprimer"></a></div>';
-            }
+
 
 
             for ($i = 0; $i < count($sIndexColumnRaw); $i++) {
@@ -923,9 +1185,10 @@ class Datatable {
         $view = $this->_view;
         if ($this->_view == "" && $this->_response != "")
             return $this->_response;
-        else {
+        else if ($this->_view != "")
             return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . $this->_viewPath . $view . ".phtml");
-        }
+        else
+            return "";
     }
 
     // --------------------------------------------------------------------
@@ -950,9 +1213,92 @@ class Datatable {
      * 
      * @return string Html du formulaire
      */
-    protected function addRender() {
+    protected function addRender($view = "default", $path = null) {
         $rc = new ReflectionClass(__CLASS__);
-        return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . $this->_viewPath . "add.phtml");
+        if ($path == null) {
+            return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . $this->_viewPath . "form/$view.phtml");
+        } else {
+            return $this->output($path . "$view.phtml");
+        }
+    }
+
+    /**
+     * Renvoi le HTML relatif à la modification d'un item
+     * 
+     * @return string Html du formulaire
+     */
+    protected function editFormRenderAction() {
+        if (isset($this->config["extra"])
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]) {
+            $this->data = $this->getData($_GET["index"]);
+            $this->modeEdit = true;
+            $this->editRenderAction();
+            if (isset($this->config["style"])
+                    && isset($this->config["style"]["form"])) {
+                $path = isset($this->config["style"]["formpath"]) ? $this->config["style"]["formpath"] : null;
+                echo $this->addRender($this->config["style"]["form"], $path);
+            } else {
+                echo $this->addRender();
+            }
+        }
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Executer avant le rendu du formulaire d'ajout d'un item
+     * 
+     * @return void
+     */
+    protected function addRenderAction() {
+        
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Executer avant le rendu du formulaire de modification d'un item
+     * 
+     * @return void
+     */
+    protected function editRenderAction() {
+        
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Récupere les valeurs d'une entrée
+     * 
+     * @return void
+     */
+    protected function getData($index) {
+
+        $filter = explode('|', $index);
+        $i = 0;
+        $j = 0;
+        $where = array();
+        foreach ($this->config["columns"] as $column) {
+            if (isset($column["index"]) && $column["index"]) {
+                $where[] = $column["name"] . " = " . $this->_db->quote($filter[$i]);
+                if ($column["name"] == "cle")
+                    $where[] = $column["name"] . " LIKE BINARY " . $this->_db->quote($filter[$i]);
+                $i++;
+            }
+        }
+
+
+
+
+        /* DB table to use */
+        $sTable = $this->config["table"]["name"];
+
+        $query = "
+            SELECT * FROM $sTable WHERE " . implode(" AND ", $where) . ";
+        ";
+
+        $data = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        return $data;
     }
 
     // --------------------------------------------------------------------
