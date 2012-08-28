@@ -620,8 +620,14 @@ class PageController extends MainController {
         if (is_numeric($_POST['id_gab_page']) && is_numeric($_POST['visible'])) {
             $query = "UPDATE `gab_page` SET `visible` = " . $_POST['visible'] . " WHERE id_version =  " . $idVersion . " AND `id` = " . $_POST['id_gab_page'];
             if ($this->_db->query($query)) {
+                $type = $_POST['visible'] == 1 ? "Page rendu visible" : "Page rendu invisible";
+                $this->_log->logThis("$type avec succès", $this->_utilisateur->get("id"), "<b>Id</b> : " . $_POST['id_gab_page'] . '<br /><img src="img/flags/png/' . strtolower($this->_versions[$idVersion]['suf']) . '.png" alt="'
+                        . $this->_versions[$idVersion]['nom'] . '" />');
                 $json['status'] = "success";
                 $json['debug'] = $query;
+            } else {
+                $this->_log->logThis("$type échouée", $this->_utilisateur->get("id"), "<b>Id</b> : " . $_POST['id_gab_page'] . '<br /><img src="img/flags/png/' . strtolower($this->_versions[$idVersion]['suf']) . '.png" alt="'
+                        . $this->_versions[$idVersion]['nom'] . '" /><br /><span style="color:red;">Error</span>');
             }
         }
 
@@ -642,7 +648,10 @@ class PageController extends MainController {
             $query = "UPDATE `gab_page` SET `suppr` = 1, `date_modif` = NOW() WHERE `id` = " . $_POST['id_gab_page'];
             $json['query'] = $query;
             if ($this->_db->exec($query)) {
+                $this->_log->logThis("Suppression de page réussie", $this->_utilisateur->get("id"), "<b>Id</b> : " . $_POST['id_gab_page']);
                 $json['status'] = "success";
+            } else {
+                $this->_log->logThis("Suppression de page échouée", $this->_utilisateur->get("id"), "<b>Id</b> : " . $_POST['id_gab_page'] . '<br /><span style="color:red;">Error</span>');
             }
         }
 
@@ -664,8 +673,15 @@ class PageController extends MainController {
             $prepStmt->bindValue(":ordre", $ordre, PDO::PARAM_INT);
             $prepStmt->bindValue(":id", $id, PDO::PARAM_INT);
             $tmp = $prepStmt->execute();
-            if ($ok)
+            if ($ok) {
                 $ok = $tmp;
+                $this->_log->logThis("Changement d'ordre réalisé avec succès", $this->_utilisateur->get("id"), "<b>Id</b> : " . $id . '<br />'
+                        . "<b>Ordre</b> : " . $ordre . '<br />');
+            } else {
+                $this->_log->logThis("Changement d'ordre échoué", $this->_utilisateur->get("id"), "<b>Id</b> : " . $id
+                        . "<b>Ordre</b> : " . $ordre . '<br />'
+                        . '<br /><span style="color:red;">Error</span>');
+            }
         }
 
         echo $ok ? 'Succès' : 'Echec';
