@@ -283,9 +283,9 @@ class PageController extends MainController {
                             || $this->_utilisateur->get("niveau") == "solire"
                             || !$page->getMeta("visible")
                     ) {
-                        $devant .= '<div style="margin-left: 6px;margin-top: -7px;"><label style="color:#A1A1A1;text-shadow:none;margin-left:10px;" for="visible-'
+                        $devant .= '<div style="margin-left: 6px;margin-top: -7px;"><label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-'
                                 . $version['id'] . '">Visible : </label><input class="visible-lang" value="'
-                                . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" style="" '
+                                . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" style="margin:0;" '
                                 . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /></div>';
                     }
                 } else {
