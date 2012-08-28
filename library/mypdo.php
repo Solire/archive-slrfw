@@ -149,7 +149,7 @@ class MyPDO extends PDO {
         $nb = Registry::get("nbresql") + 1;
         Registry::set("nbresql", $nb);
 
-        
+
         $dir = "../logs/sql";
         if (is_dir($dir) && $Query != "SET NAMES UTF8") {
             $content = '<div><u>' . date("H:i:s") . ' </u>&nbsp;<i>' . $_SERVER['REQUEST_URI'] . '</i><br /> ' . $Query . '</div>'
@@ -166,6 +166,13 @@ class MyPDO extends PDO {
         return $this->exec("INSERT INTO `" . $table . "` (`" . implode("`,`", $fieldNames) . "`) VALUES(" . implode(",", $values) . ")");
     }
 
+    // replace de données dans MySQL
+    public function replace($table, $values) {
+        $values = array_map(array($this, 'quote'), (array) $values);
+        $fieldNames = array_keys($values);
+        return $this->exec("REPLACE INTO " . $table . " (`" . implode("`,`", $fieldNames) . "`) VALUES(" . implode(",", $values) . ")");
+    }
+
     // sélection de données depuis MySQL
     public function select($table, $small_size = FALSE, $fields, $where = '', $order = '') {
 
@@ -173,7 +180,7 @@ class MyPDO extends PDO {
         $where = !empty($where) ? ' WHERE ' . $where : '';
 
         return $this->query("SELECT " . $result_size . " " . implode(", ", (array) $fields) . " FROM " .
-                        $this->quote($table) . $where . $order);
+                        "`" . $table . "`" . $where . $order)->fetchAll();
     }
 
     // tri des résultat d'une requête SELECT
@@ -221,7 +228,6 @@ class MyPDO extends PDO {
 
     // suppression de données de MySQL
     public function delete($table, $where) {
-
         return $this->exec("DELETE FROM " . $table . " WHERE " . $where);
     }
 
