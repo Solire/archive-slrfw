@@ -53,8 +53,8 @@ class MainController extends ActionController {
         }
         define("BACK_ID_API", $this->_api["id"]);
 
-        $this->_javascript->addLibrary("back/jquery/jquery-1.4.4.min.js");
-        $this->_javascript->addLibrary("back/jquery/jquery-ui-1.8.9.custom.min.js");
+        $this->_javascript->addLibrary("back/jquery/jquery-1.8.0.min.js");
+        $this->_javascript->addLibrary("back/jquery/jquery-ui-1.8.23.custom.min.js");
         $this->_javascript->addLibrary("back/main.js");
         $this->_javascript->addLibrary("back/jquery/jquery.cookie.js");
         $this->_javascript->addLibrary("back/jquery/sticky.js");
@@ -66,9 +66,11 @@ class MainController extends ActionController {
 
         $this->_css->addLibrary("jquery-ui/custom-theme/jquery-ui-1.8.22.custom.css");
 
+        //Inclusion Bootstrap twitter
+        $this->_javascript->addLibrary("back/bootstrap/bootstrap.min.js");
+        $this->_css->addLibrary("back/bootstrap/bootstrap.min.css");
 
-
-        $this->_css->addLibrary("http://www.solire.fr/style_solire_fw/css/back/newstyle.css");
+        $this->_css->addLibrary("http://www.solire.fr/style_solire_fw/css/back/newstyle-1.1.css");
         $this->_css->addLibrary("back/sticky.css");
 
         $this->_view->site = Registry::get("project-name");
