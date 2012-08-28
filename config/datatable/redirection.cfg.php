@@ -134,11 +134,16 @@ $config = array(
         'copy' => false,
         'print' => false,
         'pdf' => false,
-        'creable' => true,
-//        'deletable' => true,
+        'creable'           =>  true,
+        'editable'          =>  true,
+        'deletable'         =>  true,
         'csv' => false,
         'hide_columns' => false,
         'highlightedSearch' => false,
+    ),
+    'style'     =>  array(
+        'form'      =>  'bootstrap',
+//        'formpath'  =>  '../app/datatable/view/form/',
     ),
     'columns' =>
     array(
