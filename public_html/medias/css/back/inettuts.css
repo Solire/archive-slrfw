@@ -69,6 +69,7 @@ hr {
 #columns .widget .widget-head h3 {
     padding: 0 5px;
     float: left;
+    line-height: 28px;
 }
 
 .widget h4 {
