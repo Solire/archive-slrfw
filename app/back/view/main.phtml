@@ -3,7 +3,33 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; text/css; charset=utf-8" />
 
-        <title>Module de gestion du site <?php echo $this->site; ?></title>
+        <title>Module de gestion du site <?php echo $this->site; ?>
+            <?php
+            if (isset($this->breadCrumbs) && count($this->breadCrumbs) > 1) {
+                ?>
+                |
+                <?php
+                foreach ($this->breadCrumbs as $iLink => $link) {
+                    if ($iLink == 0)
+                        continue
+                        ?>
+                    <?php
+                    if ($iLink == count($this->breadCrumbs) - 1) {
+                        ?>
+                        <?php echo $link["label"]; ?>
+                        <?php
+                    } else {
+                        ?>
+                        <?php echo $link["label"]; ?> > 
+                        <?php
+                    }
+                    ?>
+
+                    <?php
+                }
+            }
+            ?>
+        </title>
         <meta name="AUTHOR" content="SOLIRE" />
         <meta name="ROBOTS" content="noindex, nofollow" />
         <meta name="GOOGLEBOT" content="noindex, nofollow" />
