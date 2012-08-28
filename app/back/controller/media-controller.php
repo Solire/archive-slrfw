@@ -272,7 +272,8 @@ class MediaController extends MainController {
                         $json[] = array(
                             "path" => $path,
                             "vignette" => $vignette,
-                            "label" => $file['rewriting'] . ($size ? " ($size)" : ""),
+                            "label" => $file['rewriting'],
+                            "size" => ($size ? "$size" : ""),
                             "value" => $file['rewriting'],
                         );
                     }
