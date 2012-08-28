@@ -163,7 +163,7 @@ class MediaController extends MainController {
                 $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_vignette;
                 $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
-                $json = $this->_fileManager->upload($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
+                $json = $this->_fileManager->uploadGabPage($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
             } else {
                 $json = array(
                     "jsonrpc" => "2.0",

@@ -121,7 +121,7 @@ class fileManager extends manager {
         return $files;
     }
     
-    public function upload($id_gab_page, $targetTmp, $targetDir, $vignetteDir, $apercuDir) {
+    public function upload($targetTmp, $targetDir, $vignetteDir, $apercuDir) {
         // HTTP headers for no cache etc.
         header('Content-type: text/plain; charset=UTF-8');
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -258,12 +258,7 @@ class fileManager extends manager {
                 $jsonrpc['taille'] = "";
             }
             
-            // On insert en base.
-            $query = "INSERT INTO `media_fichier` (`rewriting`, `id_gab_page`, `taille`, `width`, `height`, `vignette`, `date_crea`) VALUES ('$fileNameNew', $id_gab_page, '$size', $width, $height, '$fileNameNew', NOW())";
-            $this->_db->query($query);
-
-            $jsonrpc['id'] = $this->_db->lastInsertId();
-
+            
             // Ajout d'informations utiles (ou pas)		
             $jsonrpc['filename']	= $fileNameNew;
             $jsonrpc['size']		= tools::format_taille($size);
@@ -274,6 +269,21 @@ class fileManager extends manager {
         }
 
         return $jsonrpc;
+    }
+    
+    public function uploadGabPage($id_gab_page, $targetTmp, $targetDir, $vignetteDir, $apercuDir) {
+        $json = $this->upload($targetTmp, $targetDir, $vignetteDir, $apercuDir);
+        $this->_insertToMediaFile($json['filename'], $id_gab_page, $json['size'], $json['width'], $json['height']);
+        return $json;
+    }
+
+    /**
+     *
+     */
+    private function _insertToMediaFile($fileNameNew, $id_gab_page, $size, $width, $height) {
+        $query = "INSERT INTO `media_fichier` (`rewriting`, `id_gab_page`, `taille`, `width`, `height`, `vignette`, `date_crea`) VALUES ('$fileNameNew', $id_gab_page, '$size', $width, $height, '$fileNameNew', NOW())";
+        $this->_db->query($query);
+        return $this->_db->lastInsertId();
     }
 
     /**
