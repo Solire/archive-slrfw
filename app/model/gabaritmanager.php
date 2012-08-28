@@ -846,7 +846,7 @@ class gabaritManager extends manager {
                 }
 
                 if ($queryT != "")
-                    $queryTmp = "UPDATE `$table` SET " . substr($query, 0, -1) . " " . $whereT;
+                    $queryTmp = "UPDATE `$table` SET " . substr($queryT, 0, -1) . " " . $whereT;
 
                 if (!$this->_db->query($queryTmp)) {
                     echo "echec de l'update d'un " . $gabarit->getLabel() . "<br /><textarea>$queryTmp</textarea>";
