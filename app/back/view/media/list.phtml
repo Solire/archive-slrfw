@@ -9,6 +9,6 @@
                     <td><?php if (isset($file['width'])) echo $file['width']; ?></td>
                     <td><?php if (isset($file['height'])) echo $file['height']; ?></td>
                     <td><?php echo Tools::formate_date_nombre(substr($file['date_crea'], 0, 10), '-', '/'); ?><br /><?php echo substr($file['date_crea'], 11); ?></td>
-                    <td><div class="btn gradient-blue"><a href="<?php echo $file['path']; ?>" class="previsu"><img alt="Gérer" src="img/back/voir.png" /></a></div></td>
+                    <td><div class="btn-a gradient-blue"><a href="<?php echo $file['path']; ?>" class="previsu"><img alt="Gérer" src="img/back/voir.png" /></a></div></td>
                 </tr>
 <?php } ?>

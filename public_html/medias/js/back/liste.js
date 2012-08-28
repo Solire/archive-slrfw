@@ -14,8 +14,8 @@ $(function(){
     .dialog({
         open: function(){
             $('.ui-widget-overlay').hide().fadeIn();
-            if(!$('.ui-dialog-buttonset button').hasClass("btn"))
-                $('.ui-dialog-buttonset button').attr("class", "").addClass("btn gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
+            if(!$('.ui-dialog-buttonset button').hasClass("btn-a"))
+                $('.ui-dialog-buttonset button').attr("class", "").addClass("btn-a gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
         },
         beforeClose: function(){
             $('.ui-widget-overlay').remove();

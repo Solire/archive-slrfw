@@ -275,7 +275,7 @@ class PageController extends MainController {
                 ")->fetchAll(PDO::FETCH_COLUMN);
 
                 $devant .= '<div style="height: 54px;float: left;">'
-                        . '<div class="btn gradient-blue" style="margin-bottom: 5px;display:block;"><a title="' . $version['nom'] . '" class="openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
+                        . '<div class="btn-a gradient-blue" style="margin-bottom: 5px;display:block;"><a title="' . $version['nom'] . '" class="openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
                         . $version['nom'] . '" /></a></div>';
 
                 if ($page->getMeta("rewriting") != "") {

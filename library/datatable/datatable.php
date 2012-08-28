@@ -896,7 +896,7 @@ class Datatable {
                 }
             }
             if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
-                $row[] = '<div class="btn gradient-blue"><a href="#" class="supprimer" style="float:right; display:block;" title="Supprimer"><img src="img/back/white/trash_stroke_16x16.png" alt="Supprimer"></a></div>';
+                $row[] = '<div class="btn-a gradient-blue"><a href="#" class="supprimer" style="float:right; display:block;" title="Supprimer"><img src="img/back/white/trash_stroke_16x16.png" alt="Supprimer"></a></div>';
             }
 
 

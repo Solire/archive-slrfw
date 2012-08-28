@@ -284,11 +284,11 @@ class gabaritPage extends gabaritBloc {
                    $form .= '<div class="line">'
                           . '<label for="301-' . $metaLang . '">Url</label>'
                           . '<input type="text" name="301[]" id="301-' . $metaLang . '" value="' . $redirection . '" class=""  />'
-                          . '<div class="btn gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 230px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
+                          . '<div class="btn-a gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 230px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
                           . '</div>';
                }
                
-               $form .= '<div class="btn gradient-blue fr 301-add" style="margin-right: -33px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
+               $form .= '<div class="btn-a gradient-blue fr 301-add" style="margin-right: -33px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
                       . '</div>';
 
                
@@ -297,11 +297,11 @@ class gabaritPage extends gabaritBloc {
 		$form .= $this->buildForm($upload_path, $versionId);
 		
 		$form .= '<div class="buttonfixed">'
-               . ($mobile ? '<div class="btn gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
-               . '<div class="btn gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
-               . '<div class="btn gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>'
-               . '<!--a href="#" class="btn gradient-green formprev fl">Prévisualiser</a-->'
-               . '<div class="btn gradient-green cb fl"><a href="' . $retour
+               . ($mobile ? '<div class="btn-a gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
+               . '<div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
+               . '<div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>'
+               . '<!--a href="#" class="btn-a gradient-green formprev fl">Prévisualiser</a-->'
+               . '<div class="btn-a gradient-green cb fl"><a href="' . $retour
                . ($metaId ? '?id_gab_page=' . $metaId : '')
                . '">Retour</a></div>'
                . '</div>'
