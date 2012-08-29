@@ -261,7 +261,7 @@ class fileManager extends manager {
             
             // Ajout d'informations utiles (ou pas)		
             $jsonrpc['filename']	= $fileNameNew;
-            $jsonrpc['size']		= tools::format_taille($size);
+            $jsonrpc['size']		= $size;
             $jsonrpc['width']		= $width;
             $jsonrpc['height']		= $height;
             $jsonrpc['path']		= $targetDir . DIRECTORY_SEPARATOR . $fileNameNew;

@@ -29,14 +29,13 @@ class MediaController extends MainController {
         $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
         $this->_javascript->addLibrary("back/listefichiers.js");
-        
+
         $this->_css->addLibrary("back/demo_table_jui.css");
-        
+
         $this->_view->breadCrumbs[] = array(
             "label" => "Gestion des fichiers",
             "url" => "",
         );
-        
     }
 
     public function listAction() {
@@ -156,7 +155,7 @@ class MediaController extends MainController {
 
         if ($id_gab_page) {
             $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
-
+            $prefixPath = $this->_api["id"] == 1 ? "" : ".." . DIRECTORY_SEPARATOR;
             if ($this->_page) {
                 $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
                 $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id");
@@ -164,6 +163,11 @@ class MediaController extends MainController {
                 $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
                 $json = $this->_fileManager->uploadGabPage($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
+                if (isset($json["minipath"]))
+                    $json["minipath"] = $prefixPath . $json["minipath"];
+                $json["path"] = $prefixPath . $json["path"];
+                $json["size"] = tools::format_taille($json["size"]);
+                
             } else {
                 $json = array(
                     "jsonrpc" => "2.0",
@@ -186,12 +190,12 @@ class MediaController extends MainController {
                 "id" => "id",
             );
         }
-        if($json["status"] == "error") {
+        if ($json["status"] == "error") {
             $this->_log->logThis("Upload échoué", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $this->_page->getMeta("id") . '<br /><span style="color:red;">Error ' . $json["error"]["code"] . " : " . $json["error"]["message"] . '</span>');
         } else {
             $this->_log->logThis("Upload réussi", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $this->_page->getMeta("id"));
         }
-        
+
         exit(json_encode($json));
     }
 
@@ -203,7 +207,7 @@ class MediaController extends MainController {
         $query = "UPDATE `media_fichier` SET `suppr` = NOW() WHERE `id` = " . $id_media_fichier;
         $status = $this->_db->query($query) ? "success" : "error";
         $json = array("status" => $status);
-        if(!$json["status"]) {
+        if (!$json["status"]) {
             $this->_log->logThis("Suppression de fichier échouée", $this->_utilisateur->get("id"), "<b>Id</b> : " . $id_media_fichier . '<br /><span style="color:red;">Error</span>');
         } else {
             $this->_log->logThis("Suppression de fichier réussie", $this->_utilisateur->get("id"), "<b>Id</b> : " . $id_media_fichier);
@@ -216,14 +220,13 @@ class MediaController extends MainController {
         $this->_view->main(FALSE);
 
         $id_gab_page = isset($_REQUEST['id_gab_page']) && $_REQUEST['id_gab_page'] ? $_REQUEST['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
-        
+
         if (isset($_REQUEST['extensions']) && $_REQUEST['extensions'] != "") {
             $extensions = explode(";", $_REQUEST['extensions']);
-        }
-        else {
+        } else {
             $extensions = FALSE;
         }
-        
+
 //        $extensionsImage = array("jpeg", "jpg", "png", "gif");
 
 
@@ -237,7 +240,7 @@ class MediaController extends MainController {
 
             $files = $this->_fileManager->getSearch($term, $this->_page->getMeta("id"), $extensions);
 
-           
+
 
             foreach ($files as $file) {
                 if (!$tinyMCE || fileManager::isImage($file['rewriting'])) {
@@ -288,6 +291,5 @@ class MediaController extends MainController {
 
         exit(json_encode($json));
     }
-    
 
 }
