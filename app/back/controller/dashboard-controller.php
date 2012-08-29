@@ -15,7 +15,6 @@ class DashboardController extends MainController {
      */
     public function start() {
         parent::start();
-
     }
 
 //end start()
@@ -25,28 +24,40 @@ class DashboardController extends MainController {
      * @return void
      */
     public function startAction() {
-        if(file_exists("../app/datatable/" . ucfirst($_GET["name"]) . "Datatable.php")) {
-            require_once "../app/datatable/" . ucfirst($_GET["name"]) . "Datatable.php";
-            $datatableClassName = ucfirst($_GET["name"]) . "Datatable";
-        } else {
-            $datatableClassName = "Datatable";
-        }
-        $datatable = new $datatableClassName($_GET, $_GET["name"], $this->_db, "./datatable/", "./datatable/", "img/datatable/");
-        
-        $datatable->start();
-        $datatableString = $datatable;
-        $data = $datatableString;
+        if (isset($_GET["name"])) {
+            if (!is_array($_GET["name"])) {
+                $configsName[] = $_GET["name"];
+            } else {
+                $configsName = $_GET["name"];
+            }
+            
+            $this->_view->datatableRender = "";
 
-        if (isset($_GET["json"]) || (isset($_GET["nomain"]) && $_GET["nomain"] == 1)) {
-            echo $data;
-            exit();
+            foreach ($configsName as $configName) {
+                if (file_exists("../app/datatable/" . ucfirst($configName) . "Datatable.php")) {
+                    require_once "../app/datatable/" . ucfirst($configName) . "Datatable.php";
+                    $datatableClassName = ucfirst($configName) . "Datatable";
+                } else {
+                    $datatableClassName = "Datatable";
+                }
+                $datatable = new $datatableClassName($_GET, $configName, $this->_db, "./datatable/", "./datatable/", "img/datatable/");
+
+                $datatable->start();
+                $datatableString = $datatable;
+                $data = $datatableString;
+
+                if (isset($_GET["json"]) || (isset($_GET["nomain"]) && $_GET["nomain"] == 1)) {
+                    echo $data;
+                    exit();
+                }
+                $datatable = $data;
+                $this->_view->datatableRender .= $datatable;
+                if (count($configsName) > 1) {
+                    $this->_view->datatableRender .= '<hr />';
+                }
+            }
         }
-        $datatable = $data;
-        $this->_view->datatableRender = $datatable;
-        
     }
-
-    
 
 }
 

@@ -218,8 +218,8 @@ class Datatable {
     public function start() {
 
         if ($this->_configName != "") {
-            require_once($this->_configPath . $this->_configName . ".cfg.php");
-            $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . time();
+            require($this->_configPath . $this->_configName . ".cfg.php");
+            $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->config = $config;
 
             $this->_aFilterColumnAdditional = array();
@@ -274,7 +274,7 @@ class Datatable {
 
 
         $this->url = self::_selfURL();
-
+                
         if (method_exists($this, $this->_action . "Action")) {
             call_user_func(array($this, $this->_action . "Action"));
         }
@@ -1312,8 +1312,37 @@ class Datatable {
         $s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
         $protocol = self::_strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/") . $s;
         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":" . $_SERVER["SERVER_PORT"]);
-        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
+        $requestUri = $_SERVER['REQUEST_URI'];
+        
+        $params = $this->_convertUrlQuery(str_replace($_SERVER['REDIRECT_URL'] . "?", "", $requestUri));
+        
+        foreach ($params as $paramsKey => $param) {
+            if($paramsKey == "name[]")
+                unset($params[$paramsKey]);
+        }
+        
+        $requestUri = $_SERVER['REDIRECT_URL'] . "?" . implode("&", $params);
+        $requestUri .= (count($params) == 0 ? "" : "&") . "name=" . $this->_configName;
+
+        
+        
+        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $requestUri;
     }
+    
+    private function _convertUrlQuery($query) {
+    $queryParts = explode('&', $query);
+   
+    $params = array();
+    foreach ($queryParts as $param) {
+        $item = explode('=', $param);
+        if (!isset($item[1])) {
+            $item[1] = null;
+        }
+        $params[$item[0]] = $item[1];
+    }
+   
+    return $params;
+} 
 
     // --------------------------------------------------------------------
 

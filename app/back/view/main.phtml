@@ -147,10 +147,13 @@
                                             <ul class="dropdown-menu">
                                                 <?php
                                                 $prefix = "../";
+                                                $mobile = false;
                                                 if($this->api["id"] == 1) 
                                                         $prefix = "./";
                                                 foreach ($this->apis as $idApi => $api) {
-                                                    
+                                                    if ($api["name"] == "mobile") {
+                                                        $mobile = true;
+                                                    }
                                                     ?>
                                                 <li><a href="<?php echo $prefix; ?><?php echo $idApi == 1 ? '' : $api["name"] . "/"; ?>" style="font-weight:bold;" href="#"><img style="float:left;margin-top: 5px;" width="28" src="img/back/api/<?php echo $api["name"]; ?>.png" /><span class="api-selected" style="padding: 10px 10px 11px 14px;display:inline-block"><?php echo $api["label"]; ?></span></a></li>
                                                     <?php
@@ -207,7 +210,7 @@
                                 if ($this->utilisateur->get("niveau") == "solire") {
                                     ?>
                                     <li class="divider-vertical divider-simple hidden-phone hidden-tablet"></li>
-                                    <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=redirection" class="bis">Redirection</a></li>
+                                    <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?<?php echo $mobile ? 'name[]=redirection&name[]=redirection_mobile' : 'name=redirection'; ?>" class="bis">Redirection</a></li>
 
                                     <?php
                                 }

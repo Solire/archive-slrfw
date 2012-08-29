@@ -123,11 +123,11 @@ $config = array(
     ),
     'table' =>
     array(
-        'title' => 'Liste des redirections 301 permanente',
-        'title_item' => 'redirection  301 permanente',
+        'title' => 'Liste des correspondance Desktop / Mobile',
+        'title_item' => 'correspondance Desktop / Mobile',
         'suffix_genre' => 'e',
         'fixedheader' => false,
-        'name' => 'redirection',
+        'name' => 'redirection_mobile',
     ),
     'extra' =>
     array(
@@ -159,7 +159,7 @@ $config = array(
             'creable_field' => array(
                 "type" => "text",
             ),
-            'title' => 'Old',
+            'title' => 'Url desktop',
         ),
         array(
             'name' => 'new',
@@ -169,7 +169,7 @@ $config = array(
             'creable_field' => array(
                 "type" => "text",
             ),
-            'title' => 'New',
+            'title' => 'Url mobile',
         ),
         array(
             'name' => 'id_version',
@@ -178,14 +178,6 @@ $config = array(
                 "value" => BACK_ID_VERSION,
             ),
             'filter' => BACK_ID_VERSION,
-        ),
-        array(
-            'name' => 'id_api',
-            'index' => true,
-            'creable_field' => array(
-                "value" => BACK_ID_API,
-            ),
-            'filter' => BACK_ID_API,
         ),
     ),
 );
