@@ -276,7 +276,7 @@ class gabaritPage extends gabaritBloc {
 
                . '<div class="line">'
                . '<label for="no_index' . $metaLang . '">No-index</label>'
-               . '<input type="checkbox" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
+               . '<input type="checkbox" value="1" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
                . '</div>';
         
                $form .= '<fieldset  style="margin-left: 15px' . $noRedirections301 . '"><legend>Redirection 301 permanent</legend><div style="display:none;">';
