@@ -140,6 +140,7 @@
                             <nav>
                                 <ul class="nav">
                                     <?php
+                                    $mobile = false;
                                     if (count($this->apis) > 1) {
                                         ?>
                                         <li class="dropdown">
@@ -147,7 +148,6 @@
                                             <ul class="dropdown-menu">
                                                 <?php
                                                 $prefix = "../";
-                                                $mobile = false;
                                                 if($this->api["id"] == 1) 
                                                         $prefix = "./";
                                                 foreach ($this->apis as $idApi => $api) {
