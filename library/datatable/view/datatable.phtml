@@ -1,4 +1,7 @@
 
+<div id="myDatatable-<?php echo $this->name ?>">
+
+
 <?php echo $this->_css; ?>
 <style>
 
@@ -841,7 +844,7 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
     
     
 <?php if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) { ?>
-        $(".delete-item").live("click", function(e) {
+        $("#tableau-<?php echo $this->name ?> .delete-item").live("click", function(e) {
             e.preventDefault()
             // On recupere l'id de la row'
             var id = $(this).parents("tr:first").attr('id');
@@ -964,3 +967,6 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             ' . $this->_javascript;
 }
 ?>
+
+
+</div>

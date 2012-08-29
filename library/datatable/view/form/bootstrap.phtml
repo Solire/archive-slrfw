@@ -144,7 +144,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                 })
                                                                                 
                                                     
-                $(".datatable-form .btn-primary").live("click", function(e) {
+                $("#myDatatable-<?php echo $this->name ?> .datatable-form .btn-primary").live("click", function(e) {
                     var $myForm = $(this).parents("form");
                     var $modal = $myForm.parents(".modal")
                     e.preventDefault()
@@ -154,7 +154,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                             var responseType = "add"
                             if($myForm.hasClass("edit"))
                                 responseType = "edit";
-                            var $modalResponse = $("#modal-response-" + responseType + "-<?php echo $this->name ?>")
+                            var $modalResponse = $("#myDatatable-<?php echo $this->name ?> #modal-response-" + responseType + "-<?php echo $this->name ?>")
                             $modalResponse.modal("show")
                             $modalResponse.on('hidden', function () {
                                 $modal.off('hidden')
@@ -174,13 +174,13 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                                                                                                                 
                 })
                                                     
-                $(".edit-item").live("click", function(e) {
+                $("#myDatatable-<?php echo $this->name ?> .edit-item").live("click", function(e) {
                     e.preventDefault();
                     var index = $(this).parents("tr:first").attr("id")
                     $.post(
                     "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>&nomain=1&nojs=1&editRender&index=" + index + "&<?php echo $this->additionalParams ?>", 
                     function(dataHtml) {
-                        var $modalForm = $('<div class="modal fade" >' + $(".modal:first", dataHtml).html() + '</div>').modal();
+                        var $modalForm = $('<div class="modal fade" >' + $(".modal:first", dataHtml).html() + '</div>').appendTo("#myDatatable-<?php echo $this->name ?>").modal();
                         var position = null
                         $modalForm.on('shown', function () {
                             position = $modalForm.offset();
@@ -194,15 +194,15 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 
                 })
                         
-                $(window).resize(function() {
-                    $(".modal").each(function() {
-                        var $modalForm = $(this);
-                        var position = null
-                        position = $modalForm.offset();
-                        var maxHeight = $(window).height() - 30 - position.top - $modalForm.find(".modal-header").outerHeight() - $modalForm.find(".modal-footer").outerHeight()
-                        $modalForm.find(".modal-body").css({maxHeight : maxHeight})
-                    })
-                })
+//                $(window).resize(function() {
+//                    $(".modal").each(function() {
+//                        var $modalForm = $(this);
+//                        var position = null
+//                        position = $modalForm.offset();
+//                        var maxHeight = $(window).height() - 30 - position.top - $modalForm.find(".modal-header").outerHeight() - $modalForm.find(".modal-footer").outerHeight()
+//                        $modalForm.find(".modal-body").css({maxHeight : maxHeight})
+//                    })
+//                })
                                                     
                                                                                                             
                                                                                                             
