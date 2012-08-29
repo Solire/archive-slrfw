@@ -458,7 +458,7 @@ $(function(){
                 });
             };
             
-            tthis.data("autocomplete")._response = function( content ) {
+            tthis.data("autocomplete").__response = function( content ) {
                 var contentlength = typeof uploader == "undefined" ? content.length : content.length + uploader.files.length;
                 
                 if ( !this.options.disabled && content && contentlength ) {
