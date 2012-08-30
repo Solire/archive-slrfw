@@ -262,6 +262,8 @@
                 
             });
             th.append(from);
+            th.append('<br>');
+
             th.append(_fnRangeLabelPart(1));
             
             
