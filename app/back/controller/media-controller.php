@@ -78,7 +78,7 @@ class MediaController extends MainController {
                 $file['height'] = $sizes[1];
             } else {
                 $file['class'] = 'vignette';
-                $file['path_mini'] = "img/back/$ext.png";
+                $file['path_mini'] = "img/back/filetype/$ext.png";
             }
 
 //            $file['poids'] = (round((100 * $file['taille']) / (8 * 1024)) / 100) . " Ko";
@@ -163,11 +163,11 @@ class MediaController extends MainController {
                 $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
                 $json = $this->_fileManager->uploadGabPage($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
-                if (isset($json["minipath"]))
+                if (isset($json["minipath"])) {
                     $json["minipath"] = $prefixPath . $json["minipath"];
-                $json["path"] = $prefixPath . $json["path"];
-                $json["size"] = tools::format_taille($json["size"]);
-                
+                    $json["path"] = $prefixPath . $json["path"];
+                    $json["size"] = tools::format_taille($json["size"]);
+                }
             } else {
                 $json = array(
                     "jsonrpc" => "2.0",

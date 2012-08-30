@@ -23,7 +23,7 @@ var initTinyMCE = function () {
         //      force_p_newlines : false,
 
         // Theme options
-        theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,formatselect,|,bullist,numlist,|,undo,redo,|,link,unlink,image",
+        theme_advanced_buttons1 : "bold,italic,underline,strikethrough,styleselect,|,formatselect,|,bullist,numlist,|,undo,redo,|,link,unlink,image",
         theme_advanced_buttons2 : "",
         theme_advanced_buttons3 : "",
 
@@ -40,7 +40,7 @@ var initTinyMCE = function () {
         //        remove_script_host : false,
         convert_urls : true,
         document_base_url : "../../../../",
-        //        content_css : "css/back/style-tinymce.css",
+        content_css : "css/back/style-tinymce.css",
         external_image_list_url : "back/media/autocomplete.html?tinyMCE",
         external_link_list_url : "back/page/autocomplete-link.html"
     });    
@@ -76,7 +76,7 @@ $(function(){
     $.fn.clearForm = function(){
         var idnew;
         this.find(".token-input-list").remove();
-        this.find('input, textarea, select').not('[name="visible[]"]').not(".join-param").each(function(){
+        this.find('input, textarea, select').not('[name="visible[]"]').not(".join-param").not(".extensions").each(function(){
             idnew = $(this).attr('id')+'a';
             $(this).attr('id', idnew);
             $(this).prev('label').attr('for', idnew);
@@ -529,7 +529,7 @@ $(function(){
         runtimes : 'gears,html5,silverlight,flash,html4',
         browse_button : 'pickfiles',
         max_file_size : '1000mb',
-        chunk_size : '7mb',
+        chunk_size : '3mb',
         url : basehref + 'media/upload.html?id_gab_page=' + $('[name=id_gab_page]').val(),
         flash_swf_url : basehref + 'js/admin/plupload/plupload.flash.swf',
         silverlight_xap_url : basehref + 'js/admin/plupload/plupload.silverlight.xap',
@@ -547,6 +547,10 @@ $(function(){
         {
             title : "Adobe", 
             extensions : "pdf,eps,psd,ai,indd"
+        },
+        {
+            title : "Fichiers vidéos", 
+            extensions : "mp4"
         }
         ],
         drop_element : 'colright',
@@ -624,7 +628,7 @@ $(function(){
                     if (extensionsImage.indexOf(ext) != -1)
                         ligne += '<img class="vignette" src="' + response.minipath + '" alt="' + ext + '" /></a></td>';
                     else
-                        ligne += '<img class="vignette" src="img/back/' + ext + '.png" alt="' + ext + '" /></a></td>';
+                        ligne += '<img class="vignette" src="img/back/filetype/' + ext + '.png" alt="' + ext + '" /></a></td>';
 
                     ligne += '<td>' + response.size + '</td>';
                     ligne += '<td>' + response.date.substr(0, 10) + '<br />' + response.date.substr(11) + '</td>';
