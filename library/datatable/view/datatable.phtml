@@ -16,7 +16,7 @@
 
     }
 
-    #tableau-<?php echo $this->name ?>_wrapper select {
+    #tableau-<?php echo $this->name ?>_length select {
         width: auto;
         margin-bottom: 0px;
     }
@@ -210,7 +210,13 @@
         width: auto;
     }
 
-    tfoot th input { width: 90% }
+    tfoot th input, tfoot th select { width: 75%;margin-bottom: 0px; }
+    tfoot th select { margin-top: 7px; width: 90%;}
+    
+    table.display tfoot tr th {
+        padding: 0;
+        padding-bottom: 3px;
+    }
 
 
 </style>
@@ -827,7 +833,7 @@ foreach ($this->config["columns"] as $column) {
 <?php
 if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixedheader"]) {
     ?>
-                new FixedHeader( oTable_<?php echo $this->name ?>, { "bottom": false } );
+                new FixedHeader( oTable_<?php echo $this->name ?>, { "offsetTop": 40, "bottom": false } );
     <?php
 }
 ?>
