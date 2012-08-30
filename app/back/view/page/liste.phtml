@@ -111,11 +111,7 @@ foreach ($this->pagesGroup as $keyGroup => $group) {
                                     <i>Type : <?php echo $this->gabarits[$page->getMeta("id_gabarit")]["label"] ?></i>
                                 <?php } ?>
                                 <?php if ($page->getMeta('nbre_enfants') > 0) { ?> 
-                                    <?php if ($page->getMeta("date_modif") != "0000-00-00 00:00:00" && $page->getMeta("rewriting") != "") { ?>
-                                        |
-                                        <?php
-                                    }
-                                    ?>
+                                    |
                                     <i><span class="page-nbre-enfants"><?php echo $page->getMeta('nbre_enfants'); ?></span> page(s)</i>
                                 <?php } ?>
                             </span>
