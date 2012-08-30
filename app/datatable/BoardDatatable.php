@@ -67,7 +67,7 @@ class BoardDatatable extends Datatable {
      * @return string Html des actions
      */
     public function buildAction($data) {
-        $actionHtml = '<div style="width:94px">';
+        $actionHtml = '<div style="width:110px">';
 
         if (($this->_utilisateur != null && $this->_utilisateur->get("niveau") == "solire") || ($this->_gabarits != null && $this->_gabarits[$data["id_gabarit"]]["editable"])) {
             $actionHtml .= '<div class="btn-a btn-mini gradient-blue fl" ><a title="Modifier" href="page/display.html?id_gab_page=' . $data["id"] . '"><img alt="Modifier" src="img/back/white/pen_alt_stroke_12x12.png" /></a></div>';
@@ -89,7 +89,7 @@ class BoardDatatable extends Datatable {
      * @return string Html de traduction
      */
     public function buildTraduit($data) {
-        $actionHtml = '<div style="width:98px">';
+        $actionHtml = '<div style="width:110px">';
 
 
         if ($data["rewriting"] == "") {
