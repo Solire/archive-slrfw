@@ -7,11 +7,11 @@ if (stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml") && !$this->ajax) {
 }
 ?> 
 <!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo strtolower(SUF_VERSION); ?>" lang="<?php echo strtolower(SUF_VERSION); ?>">
     <head>
         <title><?php echo $this->seo->getTitle(); ?></title>
         <meta name="description" content="<?php echo $this->seo->getDescription(); ?>" />
-        <meta name="keywords" lang="fr" content="<?php echo $this->seo->showKeywords(); ?>" />
+        <meta name="keywords" lang="<?php echo strtolower(SUF_VERSION); ?>" content="<?php echo $this->seo->showKeywords(); ?>" />
         <meta name="robots" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
         <meta name="googlebot" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
         <meta name="msvalidate.01" content="" />
@@ -19,7 +19,7 @@ if (stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml") && !$this->ajax) {
         <meta name="google-site-verification" content="" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta http-equiv="Content-Type" content="<?php echo $contentType; ?>"/>
-        <meta name="language" content="fr" />
+        <meta name="language" content="<?php echo strtolower(SUF_VERSION); ?>" />
         <meta name="author" content="Solire" />
         <link rel="apple-touch-icon" href="http://www.solire.fr/apple-touch-icon.png" />
         <link type="text/css" media="" rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.0/jquery.mobile-1.1.0.min.css" />

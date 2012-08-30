@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo strtolower(SUF_VERSION); ?>" lang="<?php echo strtolower(SUF_VERSION); ?>">
     <head>
         <title><?php echo $this->seo->getTitle(); ?></title>
         <meta name="description" content="<?php echo $this->seo->getDescription(); ?>" />
-        <meta name="keywords" lang="fr" content="<?php echo $this->seo->showKeywords(); ?>" />
+        <meta name="keywords" lang="<?php echo strtolower(SUF_VERSION); ?>" content="<?php echo $this->seo->showKeywords(); ?>" />
 
 
         <meta charset="UTF-8" />
-        <meta name="language" content="fr" />
+        <meta name="language" content="<?php echo strtolower(SUF_VERSION); ?>" />
         <meta name="robots" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
         <meta name="googlebot" content="<?php echo $this->seo->getIndex(); ?>index, <?php echo $this->seo->getFollow(); ?>follow, all" />
 
