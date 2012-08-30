@@ -421,7 +421,7 @@ $(function(){
             
             tthis.data("autocomplete")._renderItem = function(ul, item){
                 var ext = item.value.split('.').pop();
-                var prev = (extensionsImage.indexOf(ext)!=-1) ? '<img class="img-polaroid" src="'+item.vignette+'" height="25" />' : '';
+                var prev = (extensionsImage.indexOf(ext)!=-1) ? '<img class="img-polaroid" src="'+item.vignette+'" height="25" />' : '<img style="width:auto" class="" src="img/back/filetype/'+ext+'.png" height="25" />';
                 return $( "<li></li>" )
                 .data( "item.autocomplete", item )
                 .append(  '<a><span class="row">'
