@@ -279,6 +279,10 @@ class gabaritPage extends gabaritBloc {
                . '<input type="checkbox" value="1" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
                . '</div>';
         
+        $form .= '<div class="line">'
+               . '<label for="canonical-' . $metaLang . '">Url canonical</label>'
+               . '<input type="text" name="canonical" id="canonical-' . $metaLang . '" value="' . (isset($this->_meta['canonical']) ? $this->_meta['canonical'] : '') . '" class=""  />'
+               . '</div>';
                $form .= '<fieldset  style="margin-left: 15px' . $noRedirections301 . '"><legend>Redirection 301 permanent</legend><div style="display:none;">';
                foreach ($redirections as $keyRedirection => $redirection) {
                    $form .= '<div class="line">'

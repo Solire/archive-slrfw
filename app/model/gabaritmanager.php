@@ -670,8 +670,9 @@ class gabaritManager extends manager {
                     . " `bal_descr`	= " . $this->_db->quote($donnees['bal_descr']) . ","
                     . " `importance`	= " . $donnees['importance'] . ","
                     . " `date_modif`	= NOW(),"
-                    . " `no_index`   = " . (isset($donnees['no_index']) && $page->getMeta("id") != 1 ? $donnees['no_index'] : 0)
-                    . ", `rewriting`		= " . $this->_db->quote($rewriting)
+                    . " `no_index`   = " . (isset($donnees['no_index']) && $page->getMeta("id") != 1 ? $donnees['no_index'] : 0) . ","
+                    . " `canonical`	= " . $this->_db->quote($donnees['canonical']) . ","
+                    . " `rewriting`		= " . $this->_db->quote($rewriting)
 //                   . ($page->getMeta("rewriting") == "" ? ", `rewriting`		= " . $this->_db->quote($rewriting) : "")
                     . " WHERE `id` = " . $page->getMeta("id")
                     . " AND `id_version` = " . $page->getMeta("id_version");
@@ -739,6 +740,7 @@ class gabaritManager extends manager {
                         . "`bal_key` = " . $this->_db->quote($donnees['bal_key']) . ","
                         . "`bal_descr` = " . $this->_db->quote($donnees['bal_descr']) . ","
                         . "`no_index` = " . (isset($donnees['no_index']) ? $donnees['no_index'] : 0) . ","
+                        . "`canonical` = " . $this->_db->quote($donnees['canonical']) . ","
                         . "`importance` = " . $donnees['importance'] . ","
                         . "`id_parent` = " . $id_parent . ", "
                         . "`ordre` = " . $ordre . ","
