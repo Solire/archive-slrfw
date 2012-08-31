@@ -123,7 +123,7 @@ $config = array(
     ),
     'table' =>
     array(
-        'title' => 'Liste des redirections 301 permanente',
+        'title' => 'Liste des redirections 301 permanentes',
         'title_item' => 'redirection  301 permanente',
         'suffix_genre' => 'e',
         'fixedheader' => false,
@@ -159,7 +159,7 @@ $config = array(
             'creable_field' => array(
                 "type" => "text",
             ),
-            'title' => 'Old',
+            'title' => 'Ancienne url',
         ),
         array(
             'name' => 'new',
@@ -169,7 +169,7 @@ $config = array(
             'creable_field' => array(
                 "type" => "text",
             ),
-            'title' => 'New',
+            'title' => 'Nouvelle url',
         ),
         array(
             'name' => 'id_version',
