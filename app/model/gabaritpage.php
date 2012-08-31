@@ -266,7 +266,7 @@ class gabaritPage extends gabaritBloc {
 
               . '<div class="line">'
               . '<label for="importance-' . $metaLang . '">Importance (<i>de 0,1 à 0,9</i>)</label>'
-              . '<select name="importance" id="importance-' . $metaLang . '">';
+              . '<select name="importance" class="span1" id="importance-' . $metaLang . '">';
 
         for ($ii = 1 ; $ii < 10 ; $ii++)
             $form .= '<option value="' . $ii . '"' . (isset($this->_meta['importance']) && $ii == $this->_meta['importance'] ? ' selected="selected"' : '') . '>' . $ii . '</option>';
