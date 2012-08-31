@@ -266,7 +266,7 @@ class gabaritPage extends gabaritBloc {
 
               . '<div class="line">'
               . '<label for="importance-' . $metaLang . '">Importance (<i>de 0,1 à 0,9</i>)</label>'
-              . '<select name="importance" id="importance-' . $metaLang . '">';
+              . '<select name="importance" class="span1" id="importance-' . $metaLang . '">';
 
         for ($ii = 1 ; $ii < 10 ; $ii++)
             $form .= '<option value="' . $ii . '"' . (isset($this->_meta['importance']) && $ii == $this->_meta['importance'] ? ' selected="selected"' : '') . '>' . $ii . '</option>';
@@ -284,11 +284,11 @@ class gabaritPage extends gabaritBloc {
                    $form .= '<div class="line">'
                           . '<label for="301-' . $metaLang . '">Url</label>'
                           . '<input type="text" name="301[]" id="301-' . $metaLang . '" value="' . $redirection . '" class=""  />'
-                          . '<div class="btn-a gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 230px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
+                          . '<div class="btn-a gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 220px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
                           . '</div>';
                }
                
-               $form .= '<div class="btn-a gradient-blue fr 301-add" style="margin-right: -33px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
+               $form .= '<div class="btn-a gradient-blue fr 301-add" style="margin-right: 223px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
                       . '</div>';
 
                
