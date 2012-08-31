@@ -65,6 +65,9 @@ $(function() {
             open: function() {
             $(this).data("autocomplete").menu.element.hide().slideDown(150);
             },  
+            focus: function() {
+            return false
+            },
             minLength: 2,
             appendTo: ".navbar-fixed-top",
             select: function(e, ui) {
