@@ -74,6 +74,7 @@ class MediaController extends MainController {
                         . $file['rewriting'];
 
                 $sizes = getimagesize($serverpath);
+                $file['class'] .= '  img-polaroid';
                 $file['width'] = $sizes[0];
                 $file['height'] = $sizes[1];
             } else {
