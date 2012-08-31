@@ -124,7 +124,7 @@ $config = array(
     'table' =>
     array(
         'title' => 'Liste des redirections 301 permanentes',
-        'title_item' => 'redirection  301 permanente',
+        'title_item' => 'redirection',
         'suffix_genre' => 'e',
         'fixedheader' => false,
         'name' => 'redirection',
