@@ -426,7 +426,7 @@ $(function(){
                 .data( "item.autocomplete", item )
                 .append(  '<a><span class="row">'
                         + (prev != '' ?  '<span class="span1" style="margin-left:0px;">' + prev + '</span>': '' )
-                        + '<span class="span" style="margin-left:0px;width:329px">'
+                        + '<span class="span" style="margin-left:0px;width:325px">'
                         + '<dl class="dl-horizontal"><dt>Nom de fichier</dt><dd><span>'+item.label+'<span></dd>' + (prev != "" ? '<dt>Taille</dt><dd><span>'+item.size+'<span></dd>' : '' ) + '</dl>'
                         + '</span>'
                         + '</span></a>')
