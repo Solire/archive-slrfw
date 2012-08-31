@@ -379,7 +379,7 @@ class gabaritManager extends manager {
                 foreach ($parentsMeta as $parentMeta) {
 //                    if (!isset($meta[$value[$joinName]]))
 //                        continue;
-                    if ($meta[$value[$joinName]]["id_parent"] != 0)
+                    if ($parentsMeta[$value[$joinName]]["id_parent"] != 0)
                         $parents[] = $parentMeta["id_parent"];
                     $parentsPage[$parentMeta["id"]] = new gabaritPage();
                     $parentsPage[$parentMeta["id"]]->setMeta($parentMeta);
