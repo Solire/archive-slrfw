@@ -123,8 +123,8 @@ $config = array(
     ),
     'table' =>
     array(
-        'title' => 'Liste des correspondance Desktop / Mobile',
-        'title_item' => 'correspondance Desktop / Mobile',
+        'title' => 'Liste des correspondances Desktop / Mobile',
+        'title_item' => 'correspondance',
         'suffix_genre' => 'e',
         'fixedheader' => false,
         'name' => 'redirection_mobile',
