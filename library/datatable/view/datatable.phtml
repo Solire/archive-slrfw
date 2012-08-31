@@ -244,7 +244,7 @@ if (!isset($_GET["nomain"]) || !$_GET["nomain"]) {
             if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
                 $filterIndividualColumn .= '<td></td>';
                 ?>
-                                <th width="25%"></th>
+                                <th></th>
                 <?php
             }
 
@@ -276,7 +276,9 @@ if (!isset($_GET["nomain"]) || !$_GET["nomain"]) {
                     <?php echo isset($column["editable"]) && $column["editable"] ? "editable" : ""; ?>
                     <?php echo isset($column["editable_field"]) ? "editable-" . $column["editable_field"] : ""; ?>
                     <?php echo isset($column["nl2br"]) ? "editable-br2nl" : ""; ?>
-                         " width="25%"><?php echo $column["title"]; ?></th>
+                    " 
+                    <?php echo isset($column["width"]) ?  'style="width:' . $column["width"] .  '"' : ''; ?>
+                         ><?php echo $column["title"]; ?></th>
 
                     <?php
                     if (isset($column["filter_field"]) && $column["filter_field"]) {
@@ -320,7 +322,7 @@ if (!isset($_GET["nomain"]) || !$_GET["nomain"]) {
             foreach ($this->config["columns"] as $column) {
                 if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
                     ?>
-                    <th width="25%"><?php echo $column["title"]; ?></th>
+                    <th <?php echo isset($column["width"]) ?  'style="width:' . $column["width"] .  '"' : ''; ?>><?php echo $column["title"]; ?></th>
                     <?php
                 }
             }
@@ -495,6 +497,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
 ?>
         
         oTable_<?php echo $this->name ?> = $('#tableau-<?php echo $this->name ?>').dataTable({
+            "bAutoWidth": false,
 <?php
 if (isset($this->config["table"]["pagination"]) && !$this->config["table"]["pagination"]) {
     ?>
