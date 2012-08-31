@@ -325,6 +325,24 @@ $(function(){
         return false;
     });
 	
+        
+    $(".expand").live("click", function(e) {
+        e.preventDefault()
+        $(this).parent().nextAll("fieldset").each(function() {
+            if($(this).find("div:first").is(":hidden")) {
+                $(this).find("legend:first").click()
+            }
+        })
+    })
+    
+    $(".collapse").live("click", function(e) {
+        e.preventDefault()
+        $(this).parent().nextAll("fieldset").each(function() {
+            if($(this).find("div:first").is(":visible")) {
+                $(this).find("legend:first").click()
+            }
+        })
+    })
     
     
     $('.previsu').live('click', function(){
@@ -357,8 +375,11 @@ $(function(){
     });
 	
     $('legend').live('click', function(){
-        //		$(this).siblings('.line').toggle(500);
-        $(this).next().slideToggle(500);
+        $(this).next().slideToggle(500, function() {
+            if ($(this).parent(".sort-elmt").parents("fieldset:first").find(".expand-collapse").length) {
+                disabledExpandCollaspse($(this).parent(".sort-elmt").parents("fieldset:first"))
+            }
+        });
         return false;
     });
 
@@ -839,6 +860,31 @@ $(function(){
 });
 
 var oTable = null;
+
+
+function disabledExpandCollaspse($fieldset) {
+    var expand = false
+    var collapse = false
+    $fieldset.find(".sort-box > fieldset").each(function() {
+        if ($(" > div:first", this).is(":visible")) {
+            collapse = true
+        } else {
+            expand = true
+        }
+    })
+        
+    if (expand) {
+        $fieldset.find(" > .sort-box > .expand-collapse .expand").removeClass("disabled")
+    } else {
+        $fieldset.find(" > .sort-box > .expand-collapse .expand").addClass("disabled")
+    }
+    
+    if (collapse) {
+        $fieldset.find(" > .sort-box > .expand-collapse .collapse").removeClass("disabled")
+    } else {
+        $fieldset.find(" > .sort-box > .expand-collapse .collapse").addClass("disabled")
+    }
+}
 
 function reloadDatatable() {
     if(oTable != null) {
