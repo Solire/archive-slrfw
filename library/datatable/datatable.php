@@ -242,6 +242,7 @@ class Datatable {
                 || (isset($this->config["extra"])
                 && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])) {
             $columnAction[0] = array(
+                "width" =>  "93px",
                 "content" => '<div class="btn-group">',
                 "show" => true,
                 "title" => "Action",
