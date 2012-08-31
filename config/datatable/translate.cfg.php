@@ -11,9 +11,9 @@ $config = array(
     "table" => array(
         "detail"    =>  false,
         "name" => "traduction",
-        "title" => "Edition des traductions",
-        "title_item" => "traduction",
-        "suffix_genre" => "e",
+        "title" => "Edition des textes statiques",
+        "title_item" => "texte",
+        "suffix_genre" => "",
         "fixedheader" => true,
     ),
     "columns" => array(
@@ -29,7 +29,7 @@ $config = array(
             "editable" => true,
             "show" => true,
             "filter_field" => "text",
-            "title" => "Traduction",
+            "title" => "Correspondance",
         ),
         array(
             "name" => "id_version",
