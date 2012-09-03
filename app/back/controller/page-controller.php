@@ -21,69 +21,7 @@ class PageController extends MainController {
         parent::start();
     }
 
-//end start()
-
-
-    public function matriceAction() {
-        $this->_view->enable(FALSE);
-        //TODO
-        $query = "SELECT `c`.*,"
-                . " `table_field_id`.`value` `table_field_id_value`,"
-                . " `table_name`.`value` `table_name_value`,"
-                . " `table_field_label`.`value` `table_field_label_value`"
-                . " FROM `gab_champ` `c`"
-                . " JOIN `gab_champ_param_value` `table_field_id`"
-                . " ON `table_field_id`.`id_champ` = `c`.`id` AND `table_field_id`.`code_champ_param` LIKE 'TABLE.FIELD.ID'"
-                . " JOIN `gab_champ_param_value` `table_name`"
-                . " ON `table_name`.`id_champ` = `c`.`id` AND `table_name`.`code_champ_param` LIKE 'TABLE.NAME'"
-                . " JOIN `gab_champ_param_value` `table_field_label`"
-                . " ON `table_field_label`.`id_champ` = `c`.`id` AND `table_field_label`.`code_champ_param` LIKE 'TABLE.FIELD.LABEL'"
-                . " WHERE `c`.`type` LIKE 'JOIN'";
-        $champs = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($champs as $champ) {
-            if ($champ['type_parent'] == "bloc") {
-                $query = "SELECT"
-                        . " `g`.`id`,"
-                        . " CONCAT(`a`.`name`, '_', `g`.`name`, '_', `b`.`name`),"
-                        . " CONCAT(`a`.`name`, '_', `g`.`name`)"
-                        . " FROM `gab_bloc` `b`"
-                        . " JOIN `gab_gabarit` `g` ON `g`.`id` = `b`.`id_gabarit`"
-                        . " JOIN `gab_api` `a` ON `a`.`id` = `g`.`id_api`"
-                        . " WHERE `b`.`id` = " . $champ['id_parent'];
-                $results = $this->_db->query($query)->fetch(PDO::FETCH_NUM);
-
-                $id_gabarit = $results[0];
-                $blocOrigin = $results[1];
-                $tableOrigin = $results[2];
-            } else {
-                $query = "SELECT"
-                        . " `g`.`id`,"
-                        . " CONCAT(`a`.`name`, '_', `g`.`name`)"
-                        . " FROM `gab_gabarit` `g`"
-                        . " JOIN `gab_api` `a` ON `a`.`id` = `g`.`id_api`"
-                        . " WHERE `g`.`id` = " . $champ['id_parent']
-                        . " AND `g`.`id_api` = " . $this->_api["id"];
-                $results = $this->_db->query($query)->fetch(PDO::FETCH_NUM);
-
-                $id_gabarit = $results[0];
-                $tableOrigin = $results[1];
-            }
-
-            $liste = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], FALSE, $id_gabarit);
-
-            foreach ($liste as $ii => $page) {
-                $fullPage = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $page->getMeta("id"), 0, TRUE);
-
-                $liste[$ii] = $fullPage;
-            }
-
-            echo $tableOrigin . '<br />' . $champ['table_name_value']
-            . '<pre>' . print_r($liste, true) . '</pre>'
-            . '<hr />';
-        }
-    }
-
+    
     /**
      * 
      * @return void
@@ -380,6 +318,21 @@ class PageController extends MainController {
             "id_gab_page" => $this->_page->getMeta("id"),
         );
         
+        if (isset($_POST['id_temp']) && $_POST['id_temp']) {
+            $upload_path = $this->_mainConfig->get("path", "upload");
+            
+            $tempDir    = "../" . $upload_path . DIRECTORY_SEPARATOR . "temp-" . $_POST['id_temp'];
+            $targetDir  = "../" . $upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id");
+        
+            $succes = rename($tempDir, $targetDir);
+            
+            $query  = "UPDATE `media_fichier` SET"
+                    . " `id_gab_page` = " . $this->_page->getMeta("id") . ","
+                    . " `id_temp` = 0"
+                    . " WHERE `id_temp` = " . $_POST['id_temp'];
+            $this->_db->exec($query);
+        }
+
         
         if($json["status"] == "error") {
             $this->_log->logThis(   "$typeSave de page échouée", 

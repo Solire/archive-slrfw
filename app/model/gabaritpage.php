@@ -228,6 +228,7 @@ class gabaritPage extends gabaritBloc {
 		      . '<input type="hidden" name="id_gabarit" value="' . $this->_gabarit->getId() . '" />'
 			  . '<input type="hidden" name="id_gab_page" value="' . $metaId . '" />'
 			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
+			  . '<input type="hidden" name="id_temp" />'
               
               . $parentSelect
               . '<div ' . $noMetaTitre . ' class="line">'

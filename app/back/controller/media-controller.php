@@ -153,48 +153,71 @@ class MediaController extends MainController {
         $this->_view->main(FALSE);
 
         $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
-
+        
+        $prefixPath = $this->_api["id"] == 1 ? "" : ".." . DIRECTORY_SEPARATOR;
+        
         if ($id_gab_page) {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
-            $prefixPath = $this->_api["id"] == 1 ? "" : ".." . DIRECTORY_SEPARATOR;
-            if ($this->_page) {
+//            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
+            
+//            if ($this->_page) {
                 $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
-                $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id");
-                $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_vignette;
-                $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id") . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+                $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page;
+                $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+                $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
-                $json = $this->_fileManager->uploadGabPage($this->_page->getMeta("id"), $targetTmp, $targetDir, $vignetteDir, $apercuDir);
+                $json = $this->_fileManager->uploadGabPage($id_gab_page, 0, $targetTmp, $targetDir, $vignetteDir, $apercuDir);
                 if (isset($json["minipath"])) {
-                    $json["minipath"] = $prefixPath . $json["minipath"];
-                    $json["path"] = $prefixPath . $json["path"];
-                    $json["size"] = tools::format_taille($json["size"]);
+                    $json["minipath"]   = $prefixPath . $json["minipath"];
+                    $json["path"]       = $prefixPath . $json["path"];
+                    $json["size"]       = tools::format_taille($json["size"]);
                 }
-            } else {
-                $json = array(
-                    "jsonrpc" => "2.0",
-                    "status" => "error",
-                    "error" => array(
-                        "code" => 110,
-                        "message" => "Pas de page parente",
-                    ),
-                    "id" => "id",
-                );
-            }
-        } else {
-            $json = array(
-                "jsonrpc" => "2.0",
-                "status" => "error",
-                "error" => array(
-                    "code" => 110,
-                    "message" => "Failed to receive folder's id.",
-                ),
-                "id" => "id",
-            );
+//            }
+//            else {
+//                $json = array(
+//                    "jsonrpc" => "2.0",
+//                    "status" => "error",
+//                    "error" => array(
+//                        "code" => 110,
+//                        "message" => "Pas de page parente",
+//                    ),
+//                    "id" => "id",
+//                );
+//            }
         }
+        
+        else {
+            if (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] && is_numeric($_COOKIE['id_temp'])) {
+                $id_temp    = (int) $_COOKIE['id_temp'];
+                $target     = "temp-$id_temp";
+            }
+            else {
+                $id_temp    = 1;
+                $target     = "temp-$id_temp";
+                while (file_exists("../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target)) {
+                    $id_temp ++;
+                    $target = "temp-$id_temp";
+                }
+            }
+            
+            $targetTmp      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
+            $targetDir      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target;
+            $vignetteDir    = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+            $apercuDir      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+            
+            $json = $this->_fileManager->uploadGabPage(0, $id_temp, $targetTmp, $targetDir, $vignetteDir, $apercuDir);
+            if (isset($json["minipath"])) {
+                $json["minipath"]   = $prefixPath . $json["minipath"];
+                $json["path"]       = $prefixPath . $json["path"];
+                $json["size"]       = tools::format_taille($json["size"]);
+                $json["id_temp"]    = $id_temp;
+            }
+        }
+
+        
         if ($json["status"] == "error") {
-            $this->_log->logThis("Upload échoué", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $this->_page->getMeta("id") . '<br /><span style="color:red;">Error ' . $json["error"]["code"] . " : " . $json["error"]["message"] . '</span>');
+            $this->_log->logThis("Upload échoué", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $id_gab_page . '<br /><span style="color:red;">Error ' . $json["error"]["code"] . " : " . $json["error"]["message"] . '</span>');
         } else {
-            $this->_log->logThis("Upload réussi", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $this->_page->getMeta("id"));
+            $this->_log->logThis("Upload réussi", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $id_gab_page);
         }
 
         exit(json_encode($json));
@@ -220,7 +243,13 @@ class MediaController extends MainController {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
-        $id_gab_page = isset($_REQUEST['id_gab_page']) && $_REQUEST['id_gab_page'] ? $_REQUEST['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
+        $id_gab_page    = isset($_GET['id_gab_page']) && $_GET['id_gab_page']
+                        ? $_GET['id_gab_page']
+                        : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
+        
+        $id_temp        = isset($_GET['id_temp']) && $_GET['id_temp']
+                        ? $_GET['id_temp']
+                        : (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] ? $_COOKIE['id_temp'] : 0);
 
         if (isset($_REQUEST['extensions']) && $_REQUEST['extensions'] != "") {
             $extensions = explode(";", $_REQUEST['extensions']);
@@ -236,28 +265,28 @@ class MediaController extends MainController {
         $term = isset($_GET['term']) ? $_GET['term'] : '';
         $tinyMCE = isset($_GET['tinyMCE']);
 
-        if ($id_gab_page) {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page, 0);
+        if ($id_gab_page || $id_temp) {
+//            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page, 0);
 
-            $files = $this->_fileManager->getSearch($term, $this->_page->getMeta("id"), $extensions);
+            $files = $this->_fileManager->getSearch($term, $id_gab_page, $id_temp, $extensions);
 
-
+            $dir = $id_gab_page ? $id_gab_page : "temp-$id_temp";
 
             foreach ($files as $file) {
                 if (!$tinyMCE || fileManager::isImage($file['rewriting'])) {
                     $path = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
-                            . $file['id_gab_page'] . DIRECTORY_SEPARATOR
+                            . $dir . DIRECTORY_SEPARATOR
                             . $file['rewriting'];
                     $vignette = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
-                            . $file['id_gab_page'] . DIRECTORY_SEPARATOR
+                            . $dir . DIRECTORY_SEPARATOR
                             . $this->_upload_vignette . DIRECTORY_SEPARATOR
                             . $file['rewriting'];
                     $serverpath = ".." . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
-                            . $file['id_gab_page'] . DIRECTORY_SEPARATOR
+                            . $dir . DIRECTORY_SEPARATOR
                             . $file['rewriting'];
 
 //                    $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, $file['id_gab_page']);
-                    $realpath = Registry::get("base") . $file['id_gab_page'] . '/' . $file['rewriting'];
+                    $realpath = Registry::get("base") . $dir . '/' . $file['rewriting'];
 
 //                    $ext = array_pop(explode(".", $file['rewriting']));
                     if (fileManager::isImage($file['rewriting'])) {
