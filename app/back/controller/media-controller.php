@@ -51,7 +51,7 @@ class MediaController extends MainController {
 
             $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
 
-            $this->_files = $this->_fileManager->getList($this->_page->getMeta("id"), $search, $orderby, $sens);
+            $this->_files = $this->_fileManager->getList($this->_page->getMeta("id"), 0, $search, $orderby, $sens);
         }
 
         foreach ($this->_files as &$file) {
