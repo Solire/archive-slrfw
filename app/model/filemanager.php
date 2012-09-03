@@ -67,11 +67,14 @@ class fileManager extends manager {
         return mkdir($chemin, 0777);
     }
 
-    public function getList($id_gab_page = 0, $search = null, $orderby = null, $sens = null) {
+    public function getList($id_gab_page = 0, $id_temp = 0, $search = null, $orderby = null, $sens = null) {
         $query = "SELECT * FROM `media_fichier` WHERE `suppr` = 0";
 
         if ($id_gab_page)
             $query .= " AND `id_gab_page` = $id_gab_page";
+
+        if ($id_temp)
+            $query .= " AND `id_temp` = $id_temp";
 
         if ($search) {
             $search = "%" . $search . "%";
@@ -91,11 +94,14 @@ class fileManager extends manager {
         return $files;
     }
 
-    public function getSearch($term, $id_gab_page = 0, $extensions = FALSE) {
+    public function getSearch($term, $id_gab_page = 0, $id_temp = 0, $extensions = FALSE) {
         $query = "SELECT * FROM `media_fichier` WHERE `suppr` = 0";
 
         if ($id_gab_page)
             $query .= " AND `id_gab_page` = $id_gab_page";
+        
+        if ($id_temp)
+            $query .= " AND `id_temp` = $id_temp";
 
 //        $term = "%" . array_pop(explode("/", $term)) . "%";
         $term = "%" . $term . "%";
@@ -269,10 +275,10 @@ class fileManager extends manager {
         return $jsonrpc;
     }
 
-    public function uploadGabPage($id_gab_page, $targetTmp, $targetDir, $vignetteDir, $apercuDir) {
+    public function uploadGabPage($id_gab_page, $id_temp, $targetTmp, $targetDir, $vignetteDir, $apercuDir) {
         $json = $this->upload($targetTmp, $targetDir, $vignetteDir, $apercuDir);
         if (isset($json['filename'])) {
-            $this->_insertToMediaFile($json['filename'], $id_gab_page, $json['size'], $json['width'], $json['height']);
+            $this->_insertToMediaFile($json['filename'], $id_gab_page, $id_temp, $json['size'], $json['width'], $json['height']);
         }
 
         return $json;
@@ -281,8 +287,8 @@ class fileManager extends manager {
     /**
      *
      */
-    private function _insertToMediaFile($fileNameNew, $id_gab_page, $size, $width, $height) {
-        $query = "INSERT INTO `media_fichier` (`rewriting`, `id_gab_page`, `taille`, `width`, `height`, `vignette`, `date_crea`) VALUES ('$fileNameNew', $id_gab_page, '$size', $width, $height, '$fileNameNew', NOW())";
+    private function _insertToMediaFile($fileNameNew, $id_gab_page, $id_temp, $size, $width, $height) {
+        $query = "INSERT INTO `media_fichier` (`rewriting`, `id_gab_page`, `id_temp`, `taille`, `width`, `height`, `vignette`, `date_crea`) VALUES ('$fileNameNew', $id_gab_page, $id_temp, '$size', $width, $height, '$fileNameNew', NOW())";
         $this->_db->query($query);
         return $this->_db->lastInsertId();
     }
