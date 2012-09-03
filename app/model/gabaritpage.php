@@ -281,7 +281,7 @@ class gabaritPage extends gabaritBloc {
         
         $form .= '<div class="line">'
                . '<label for="canonical-' . $metaLang . '">Url canonical</label>'
-               . '<input type="text" name="canonical" id="canonical-' . $metaLang . '" value="' . (isset($this->_meta['canonical']) ? $this->_meta['canonical'] : '') . '" class=""  />'
+               . '<input type="text" name="canonical" id="canonical-' . $metaLang . '" value="' . (isset($this->_meta['canonical']) ? $this->_meta['canonical'] : '') . '" class="autocomplete-link"  />'
                . '</div>';
                $form .= '<fieldset  style="margin-left: 15px' . $noRedirections301 . '"><legend>Redirection 301 permanent</legend><div style="display:none;">';
                foreach ($redirections as $keyRedirection => $redirection) {
