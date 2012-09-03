@@ -26,6 +26,12 @@ class Seo
     
     /**
      *
+     * @var string  url canonical of the page
+     */
+    private $_urlCanonical = '';
+    
+    /**
+     *
      * @var bool  indexation of the page
      */
     private $_index = true;
@@ -179,6 +185,18 @@ class Seo
         return $this->_description;
 
     }//end getDescription()
+    
+    
+    /**
+     * Get url canonical of the page
+     *
+     * @return string
+     */
+    public function getUrlCanonical()
+    {
+        return $this->_urlCanonical;
+
+    }//end getDescription()
 
 
     /**
@@ -191,6 +209,20 @@ class Seo
     public function setDescription($_description)
     {
         $this->_description = $_description;
+
+    }//end setDescription()
+    
+    
+    /**
+     * Set url canonical of the page
+     *
+     * @param string $_urlCanonical url canonical of the page
+     *
+     * @return void
+     */
+    public function setUrlCanonical($_urlCanonical)
+    {
+        $this->_urlCanonical = $_urlCanonical;
 
     }//end setDescription()
 
