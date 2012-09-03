@@ -154,7 +154,6 @@ $config = array(
         array(
             'name' => 'old',
             'show' => true,
-            'editable' => true,
             'filter_field' => 'text',
             'creable_field' => array(
                 "type" => "text",
@@ -163,7 +162,6 @@ $config = array(
         ),
         array(
             'name' => 'new',
-            'editable' => true,
             'show' => true,
             'filter_field' => 'text',
             'creable_field' => array(
