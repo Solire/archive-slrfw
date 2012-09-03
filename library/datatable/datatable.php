@@ -464,6 +464,8 @@ class Datatable {
             if (isset($column["creable_field"])) {
                 if (isset($column["creable_field"]["value"]))
                     $values[$column["name"]] = $column["creable_field"]["value"];
+                else if (isset($column["creable_field"]["encryption"]))
+                    $values[$column["name"]] = hash ($column["creable_field"]["encryption"], $_POST[$column["name"]]);
                 else {
                     if (isset($_POST[$column["name"]]))
                         $values[$column["name"]] = $_POST[$column["name"]];
@@ -513,6 +515,9 @@ class Datatable {
             if (isset($column["creable_field"])) {
                 if (isset($column["creable_field"]["value"]))
                     $values[$column["name"]] = $column["creable_field"]["value"];
+                else if (isset($column["creable_field"]["encryption"]))
+                    if($column["creable_field"]["type"] != "password" || $_POST[$column["name"]] != "")
+                        $values[$column["name"]] = hash ($column["creable_field"]["encryption"], $_POST[$column["name"]]);
                 else {
                     if (isset($_POST[$column["name"]]))
                         $values[$column["name"]] = $_POST[$column["name"]];

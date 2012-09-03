@@ -34,24 +34,52 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                                 switch ($column["creable_field"]["type"]) {
                                     case "text":
                                         ?>
+                                        <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+                                        <input type="text" class="input-xlarge" value="<?php echo $value; ?>" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>" />
+                                        <?php
+                                        break;
+                                    case "password":
+                                        ?>
+                                        <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+                                        <input type="password" class="input-xlarge" value="" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>" />
+                                        <?php
+                                        break;
+                                    case "file":
+                                        ?>
                                         <label for="<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
-                                        <input type="text" class="input-xlarge" value="<?php echo $value; ?>" id="<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>" />
+                                        <div id="btn-file-upload-<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="btn-a gradient-green btn-file-upload">
+                                            <a>Parcourir ...</a>
+                                        </div>
+                                        <a target="_blank" href="<?php echo $column["creable_field"]["http_link"] . $value; ?>"><?php echo $value; ?></a>
+                                        <input type="hidden" value="<?php echo $value; ?>" id="<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>" />
                                         <?php
                                         break;
                                     case "checkbox":
                                         ?>
-                                        <label for="<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
-                                        <input type="checkbox" class="input-xlarge" id="<?php echo $column["name"]; ?>" <?php echo $value == 1 ? 'checked' : ''; ?> value="1" name="<?php echo $column["name"]; ?>" />
+                                        <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+                                        <input type="checkbox" class="input-xlarge" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" <?php echo $value == 1 ? 'checked' : ''; ?> value="1" name="<?php echo $column["name"]; ?>" />
                                         <?php
                                         break;
                                     case "select":
                                         ?>
-                                        <label for="<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+                                        <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
                                         <?php
                                         if (isset($column["creable_field"]["load"]) && $column["creable_field"]["load"] == true) {
                                             ?>
 
-                                            <select data-value="<?php echo $value; ?>" data-column-key="<?php echo $key; ?>" data-url="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>select_load&nomain=1" class="ui-select ui-select-load" id="<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>">
+                                            <select data-value="<?php echo $value; ?>" data-column-key="<?php echo $key; ?>" data-url="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>select_load&nomain=1" class="ui-select ui-select-load" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>">
+                                            </select>
+                                            <?php
+                                        } else if (isset($column["creable_field"]["options"]) && is_array($column["creable_field"]["options"])) {
+                                            ?>
+                                            <select class="ui-select" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>">
+                                                <?php
+                                                foreach ($column["creable_field"]["options"] as $option) {
+                                                    ?>
+                                                    <option value="<?php echo $option["value"]; ?>"><?php echo $option["text"]; ?></option>
+                                                    <?php
+                                                }
+                                                ?>
                                             </select>
                                             <?php
                                         }
@@ -70,7 +98,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                     }
                 }
                 ?>
-                
+
 
 
 
@@ -138,12 +166,12 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
         </div>
         <script type="text/javascript">
             $().ready(function() {
-                                        
+                                                
                 $(".ui-select-load").livequery(function() {
                     $(this).selectLoad();
                 })
-                                                                                
-                                                    
+                                                                                        
+                                                            
                 $("#myDatatable-<?php echo $this->name ?> .datatable-form .btn-primary").live("click", function(e) {
                     var $myForm = $(this).parents("form");
                     var $modal = $myForm.parents(".modal")
@@ -166,14 +194,14 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                                     nxt(); // continue the queue
                                 })
                             }
-                                                                                                
-                                                                                                
+                                                                                                        
+                                                                                                        
                         })
-                                                                                                    
+                                                                                                            
                     })
-                                                                                                                
+                                                                                                                        
                 })
-                                                    
+                                                            
                 $("#myDatatable-<?php echo $this->name ?> .edit-item").live("click", function(e) {
                     e.preventDefault();
                     var index = $(this).parents("tr:first").attr("id")
@@ -182,32 +210,28 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                     function(dataHtml) {
                         var $modalForm = $('<div class="modal fade" >' + $(".modal:first", dataHtml).html() + '</div>').appendTo("#myDatatable-<?php echo $this->name ?>").modal();
                         var position = null
-                        $modalForm.on('shown', function () {
-                            position = $modalForm.offset();
-                            var maxHeight = $(window).height() - 30 - position.top - $modalForm.find(".modal-header").outerHeight() - $modalForm.find(".modal-footer").outerHeight()
-                            $modalForm.find(".modal-body").css({maxHeight : maxHeight})
-                        })
-                                        
+                                
+                                                
                     }
                 );
-                                                                        
+                                                                                
 
                 })
-                        
-//                $(window).resize(function() {
-//                    $(".modal").each(function() {
-//                        var $modalForm = $(this);
-//                        var position = null
-//                        position = $modalForm.offset();
-//                        var maxHeight = $(window).height() - 30 - position.top - $modalForm.find(".modal-header").outerHeight() - $modalForm.find(".modal-footer").outerHeight()
-//                        $modalForm.find(".modal-body").css({maxHeight : maxHeight})
-//                    })
-//                })
-                                                    
-                                                                                                            
-                                                                                                            
-        });
-                                                                                                               
+                                
+                //                $(window).resize(function() {
+                //                    $(".modal").each(function() {
+                //                        var $modalForm = $(this);
+                //                        var position = null
+                //                        position = $modalForm.offset();
+                //                        var maxHeight = $(window).height() - 30 - position.top - $modalForm.find(".modal-header").outerHeight() - $modalForm.find(".modal-footer").outerHeight()
+                //                        $modalForm.find(".modal-body").css({maxHeight : maxHeight})
+                //                    })
+                //                })
+                                                            
+                                                                                                                    
+                                                                                                                    
+            });
+                                                                                                                       
         </script>
         <?php
     }

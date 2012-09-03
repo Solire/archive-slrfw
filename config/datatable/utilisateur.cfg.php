@@ -113,77 +113,243 @@ $config = array(
     \_|  |_/\_| |_/  \____/\___/\_| \_/\_|    \___/ \____/\___/\_| \_\_| |_/\_/  \___/ \___/\_| \_/
 
         |\ | _  _   . 
-        | \|(_)|||  . redirection
+        | \|(_)|||  . utilisateur
                                                                  
  */
 
 $config = array(
-    'additional_script' => array(
-        "back/autocompleteoldlinks.js"
+    'table' => array(
+        'title' => 'Liste des utilisateurs',
+        'title_item' => 'utilisateur',
+        'suffix_genre' => '',
+        'fixedheader' => true,
+        'detail' => true,
+        'name' => 'utilisateur',
     ),
-    'table' =>
-    array(
-        'title' => 'Liste des redirections 301 permanentes',
-        'title_item' => 'redirection',
-        'suffix_genre' => 'e',
-        'fixedheader' => false,
-        'name' => 'redirection',
-    ),
-    'extra' =>
-    array(
+    'extra' => array(
         'copy' => false,
         'print' => false,
         'pdf' => false,
-        'creable'           =>  true,
-        'editable'          =>  true,
-        'deletable'         =>  true,
         'csv' => false,
         'hide_columns' => false,
         'highlightedSearch' => false,
+        'creable' => true,
+        'editable' => true,
+        'deletable' => true,
     ),
-    'style'     =>  array(
-        'form'      =>  'bootstrap',
-//        'formpath'  =>  '../app/datatable/view/form/',
+    'style' => array(
+        'form' => 'bootstrap',
     ),
-    'columns' =>
-    array(
+    'columns' => array(
         array(
             'name' => 'id',
-            'index' => true
-        ),
-        array(
-            'name' => 'old',
             'show' => true,
             'filter_field' => 'text',
+            'title' => 'Id',
+            'index' => true,
+        ),
+        array(
+            'name' => 'civilite',
+            'show' => true,
+            'filter_field' => 'text',
+            'title' => 'Civilite',
+            'creable_field' => array(
+                "type" => "select",
+                "options" => array(
+                    array(
+                        "value" => "M.",
+                        "text"  => "M.",
+                    ),
+                    array(
+                        "value" => "Mme",
+                        "text"  => "Mme",
+                    ),
+                )
+            ),
+        ),
+        array(
+            'name' => 'nom',
+            'show' => true,
+            'filter_field' => 'text',
+            'title' => 'Nom',
             'creable_field' => array(
                 "type" => "text",
             ),
-            'title' => 'Ancienne url',
         ),
         array(
-            'name' => 'new',
+            'name' => 'prenom',
             'show' => true,
             'filter_field' => 'text',
+            'title' => 'Prenom',
             'creable_field' => array(
                 "type" => "text",
             ),
-            'title' => 'Nouvelle url',
         ),
         array(
-            'name' => 'id_version',
-            'index' => true,
+            'name' => 'societe',
+            'show' => true,
+            'filter_field' => 'text',
+            'title' => 'Societe',
             'creable_field' => array(
-                "value" => BACK_ID_VERSION,
+                "type" => "text",
             ),
-            'filter' => BACK_ID_VERSION,
         ),
         array(
-            'name' => 'id_api',
-            'index' => true,
+            'name' => 'fonction',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Fonction',
             'creable_field' => array(
-                "value" => BACK_ID_API,
+                "type" => "text",
             ),
-            'filter' => BACK_ID_API,
+        ),
+        array(
+            'name' => 'email',
+            'show' => true,
+            'filter_field' => 'text',
+            'title' => 'Email',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'pass',
+            'show' => false,
+            'filter_field' => 'text',
+            'title' => 'Pass',
+            'creable_field' => array(
+                "type"       => "password",
+                "encryption" => "SHA1",
+            ),
+        ),
+        array(
+            'name' => 'adresse',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Adresse',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'cp',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Cp',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'ville',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Ville',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'pays',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Pays',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'tel',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Tel',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'fax',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Fax',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'site',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Site',
+        ),
+        array(
+            'name' => 'description',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Description',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'photo',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Photo',
+        ),
+        array(
+            'name' => 'niveau',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Niveau',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'actif',
+            'show' => true,
+            'filter_field' => 'text',
+            'title' => 'Actif',
+            'creable_field' => array(
+                "type" => "checkbox",
+            ),
+        ),
+        array(
+            'name' => 'lat',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Lat',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'lng',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Lng',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'date_crea',
+            'show' => true,
+            'filter_field' => 'text',
+            'title' => 'Date_crea',
+            'creable_field' => array(
+                "type" => "text",
+            ),
+        ),
+        array(
+            'name' => 'suppr',
+            'show_detail' => true,
+            'filter_field' => 'text',
+            'title' => 'Suppr',
+            'creable_field' => array(
+                "type" => "checkbox",
+            ),
         ),
     ),
 );
