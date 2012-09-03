@@ -21,7 +21,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
             <h3><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?> un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></h3>
         </div>
 
-        <form class="form-horizontal datatable-form <?php echo (isset($this->modeEdit) && $this->modeEdit ? 'edit' : 'add') ?>" method="post" action="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'edit' : 'add') ?>&<?php echo $this->additionalParams ?>" name="form_<?php echo $this->name ?>" id="form_<?php echo $this->name ?>">
+        <form data-response="<?php echo (isset($this->modeEdit) && $this->modeEdit ? 'edit' : 'add') ?>" class="form-horizontal datatable-form <?php echo (isset($this->modeEdit) && $this->modeEdit ? 'edit' : 'add') ?>" method="post" action="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'edit' : 'add') ?>&<?php echo $this->additionalParams ?>" name="form_<?php echo $this->name ?>" id="form_<?php echo $this->name ?>">
             <div class="modal-body">
                 <?php
                 foreach ($this->config["columns"] as $key => $column) {
@@ -170,36 +170,50 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                 $(".ui-select-load").livequery(function() {
                     $(this).selectLoad();
                 })
+                
+                $(".btn-file-upload").livequery(function() {
+                    var idBtn = $(this).attr("id")
+                    createUploader(idBtn)
+                    uploader[idBtn].bind('FileUploaded', function(up, file, info) {
+                        nbPlupload--
+                                                        
+                        $(file.div, '.progressbar').progressbar("destroy");
+                        var response = $.parseJSON(info.response);
+                        if(response.status != "error") {
+                            var infoField = uploader[idBtn].name.split("-")
+                            var $myForm = $("#btn-file-upload-" + uploader[idBtn].name).parents("form");
+                            $("#" + infoField[1], $myForm).val(response.filename)
+                            if(nbPlupload == 0)
+                                saveForm($myForm)
+                        }                
+                                                                            
+                        uploader[idBtn].splice(0, 1);
+                                                                            
+                    });
+                })
                                                                                         
                                                             
                 $("#myDatatable-<?php echo $this->name ?> .datatable-form .btn-primary").live("click", function(e) {
-                    var $myForm = $(this).parents("form");
-                    var $modal = $myForm.parents(".modal")
-                    e.preventDefault()
-                    $.post($myForm.attr("action"), $myForm.serialize(), function() {
-                        $modal.modal("hide")
-                        $modal.on('hidden', function () {
-                            var responseType = "add"
-                            if($myForm.hasClass("edit"))
-                                responseType = "edit";
-                            var $modalResponse = $("#myDatatable-<?php echo $this->name ?> #modal-response-" + responseType + "-<?php echo $this->name ?>")
-                            $modalResponse.modal("show")
-                            $modalResponse.on('hidden', function () {
-                                $modal.off('hidden')
-                            })
-                            if($modalResponse.find("form").length == 0) {
-                                oTable_<?php echo $this->name ?>.fnDraw();
-                                $modalResponse.delay(2500).queue(function(nxt) {
-                                    $modalResponse.modal("hide")
-                                    nxt(); // continue the queue
-                                })
-                            }
-                                                                                                        
-                                                                                                        
-                        })
-                                                                                                            
+                    e.preventDefault();
+                    nbPlupload =  0 
+                    $(".btn-file-upload").each(function() {
+                        var idBtn = $(this).attr("id")
+                        if (uploader[idBtn].files.length != 0) {
+                            nbPlupload++
+                        }
                     })
-                                                                                                                        
+                                                    
+                    if (nbPlupload == 0) {
+                        var $myForm = $(this).parents("form");
+                        saveForm($myForm)
+                    } else {
+                        $(".btn-file-upload").each(function() {
+                            var idBtn = $(this).attr("id")
+                            if (uploader[idBtn].files.length != 0) {
+                                uploader[idBtn].start();           
+                            }
+                        })
+                    }
                 })
                                                             
                 $("#myDatatable-<?php echo $this->name ?> .edit-item").live("click", function(e) {
@@ -218,19 +232,39 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 
                 })
                                 
-                //                $(window).resize(function() {
-                //                    $(".modal").each(function() {
-                //                        var $modalForm = $(this);
-                //                        var position = null
-                //                        position = $modalForm.offset();
-                //                        var maxHeight = $(window).height() - 30 - position.top - $modalForm.find(".modal-header").outerHeight() - $modalForm.find(".modal-footer").outerHeight()
-                //                        $modalForm.find(".modal-body").css({maxHeight : maxHeight})
-                //                    })
-                //                })
-                                                            
-                                                                                                                    
+                                                                       
                                                                                                                     
             });
+            
+            function saveForm ($myForm, callback) {
+                var $modal = $myForm.parents(".modal")
+                $.post($myForm.attr("action"), $myForm.serialize(), function() {
+                    $modal.modal("hide")
+                    $modal.on('hidden', function () {
+                        var $modalResponse = $("#modal-response-" + $myForm.attr("data-response") + "-<?php echo $this->name ?>")
+                        $modalResponse.modal("show")
+                        $modalResponse.on('hidden', function () {
+                            $modal.off('hidden')
+                        })
+                        if (callback && typeof(callback) === "function") {
+                            // execute the callback, passing parameters as necessary
+                            callback();
+                        }
+
+                        if($modalResponse.find("form").length == 0) {
+                            oTable_<?php echo $this->name ?>.fnDraw();
+                            $modalResponse.delay(2500).queue(function(nxt) {
+                                $modalResponse.modal("hide")
+                                nxt(); // continue the queue
+                            })
+                        }
+                           
+                                                                                                                                                                    
+                                                                                                                                                                    
+                    })
+                                                                                                                                                                        
+                })
+            }
                                                                                                                        
         </script>
         <?php

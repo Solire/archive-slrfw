@@ -513,12 +513,12 @@ class Datatable {
                 $i++;
             }
             if (isset($column["creable_field"])) {
-                if (isset($column["creable_field"]["value"]))
+                if (isset($column["creable_field"]["value"])) {
                     $values[$column["name"]] = $column["creable_field"]["value"];
-                else if (isset($column["creable_field"]["encryption"]))
+                } else if (isset($column["creable_field"]["encryption"])) {
                     if($column["creable_field"]["type"] != "password" || $_POST[$column["name"]] != "")
                         $values[$column["name"]] = hash ($column["creable_field"]["encryption"], $_POST[$column["name"]]);
-                else {
+                } else {
                     if (isset($_POST[$column["name"]]))
                         $values[$column["name"]] = $_POST[$column["name"]];
                 }
@@ -1321,25 +1321,28 @@ class Datatable {
         $requestUri = $_SERVER['REQUEST_URI'];
         
         $params = $this->_convertUrlQuery(str_replace($_SERVER['REDIRECT_URL'] . "?", "", $requestUri));
-        
+        $paramsString = "";
         foreach ($params as $paramsKey => $param) {
             if($paramsKey == "name[]")
                 unset($params[$paramsKey]);
+            else {
+                $paramsString[] = "$paramsKey=$param";
+            }
         }
         
-        $requestUri = $_SERVER['REDIRECT_URL'] . "?" . implode("&", $params);
+        $requestUri = $_SERVER['REDIRECT_URL'] . "?" . implode("&", $paramsString);
         $requestUri .= (count($params) == 0 ? "" : "&") . "name=" . $this->_configName;
 
-        
-        
         return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $requestUri;
     }
     
     private function _convertUrlQuery($query) {
     $queryParts = explode('&', $query);
-   
     $params = array();
     foreach ($queryParts as $param) {
+        if ($param == "") {
+            continue;
+        }
         $item = explode('=', $param);
         if (!isset($item[1])) {
             $item[1] = null;
