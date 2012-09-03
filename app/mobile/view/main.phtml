@@ -28,6 +28,13 @@ if (stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml") && !$this->ajax) {
         <script type="text/javascript">$(document).bind("mobileinit",function(){$.mobile.loadingMessage="Chargement ...";$.mobile.loadingMessageTextVisible=true})</script>
         <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
         <?php echo $this->jsComponents; ?>
+<?php
+if ($this->seo->getUrlCanonical() != "") {
+    ?>
+        <link rel="canonical" href="<?php echo $this->seo->getUrlCanonical(); ?>"/>
+    <?php
+}
+?>
     </head>
     <body>
         <div data-role="page">

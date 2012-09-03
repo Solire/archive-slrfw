@@ -110,6 +110,7 @@ class PageController extends MainController
                 $this->_seo->setTitle($this->_page->getMeta("bal_title"));
                 $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
                 $this->_seo->setKeywords(explode(" ", $this->_page->getMeta("bal_key")));
+                $this->_seo->setUrlCanonical($this->_page->getMeta("canonical"));
                 $this->_view->page = $this->_page;
                 $view = $this->_page->getGabarit()->getName();
             } else {
