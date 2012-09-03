@@ -122,7 +122,7 @@ $config = array(
         'title' => 'Liste des utilisateurs',
         'title_item' => 'utilisateur',
         'suffix_genre' => '',
-        'fixedheader' => true,
+        'fixedheader' => false,
         'detail' => true,
         'name' => 'utilisateur',
     ),
