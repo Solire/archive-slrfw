@@ -17,11 +17,21 @@
         <meta name="author" content="Solire" />
         <base href="<?php echo $this->Url; ?>" />
 
-        <?php echo $this->cssComponents; ?>
+<?php
+if ($this->seo->getUrlCanonical() != "") {
+    ?>
+        <link rel="canonical" href="<?php echo $this->seo->getUrlCanonical(); ?>"/>
+    <?php
+}
+?>
 
-        
+
+
+<?php echo $this->cssComponents; ?>
+
+
         <script src="js/jquery/jquery-1.7.min.js"></script>
-        <?php echo $this->jsComponents; ?>
+<?php echo $this->jsComponents; ?>
 
 
 

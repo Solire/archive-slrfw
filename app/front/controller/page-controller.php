@@ -176,6 +176,7 @@ class PageController extends MainController
         $this->_seo->setTitle($this->_page->getMeta("bal_title"));
         $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
         $this->_seo->addKeyword($this->_page->getMeta("bal_key"));
+        $this->_seo->setUrlCanonical($this->_page->getMeta("canonical"));
         if ($this->_page->getMeta("no_index"))
             $this->_seo->disableIndex();
 
