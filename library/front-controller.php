@@ -116,10 +116,10 @@ class FrontController {
             $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
             Registry::set("url", "http://www." . $serverUrl . '/');
             Registry::set("basehref", "http://www." . $serverUrl . '/');
-            
-            
+
+
             Registry::set("email", $emails);
-            
+
         } else {
             $serverUrl = str_replace("solire-02", $_SERVER['SERVER_NAME'] . ":" . $_SERVER['SERVER_PORT'], Registry::get("basehref"));
             Registry::set("url", $serverUrl);
@@ -139,7 +139,7 @@ class FrontController {
             $query = "SELECT * FROM `gab_api` WHERE `name` = " . $db->quote($_GET["application"]);
             $api = $db->query($query)->fetch(PDO::FETCH_ASSOC);
         }
-        
+
 
         $query = "SELECT * FROM `version` WHERE `domaine` = '$serverUrl'";
         $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
@@ -234,7 +234,7 @@ class FrontController {
             $message = $errors[$idx];
             throw new MarvinException(new Exception($message));
         } else {
-            $error = new HttpException('');
+            $error = new HttpErrorException('');
             $error->http(404);
             throw $error;
         }

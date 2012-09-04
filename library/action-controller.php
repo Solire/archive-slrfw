@@ -103,7 +103,7 @@ class ActionController {
     protected $_log = null;
 
     public function start() {
-        
+
     }
 
 //end start()
@@ -219,7 +219,7 @@ class ActionController {
 
         exit();
     }
-    
+
     /**
      * Detect les redirection 301 et renvoi l'url si une existe
      */
@@ -257,13 +257,13 @@ class ActionController {
                 break;
             }
         }
-        
+
         if ($redirection301) {
             $samePart = array_slice($urlPartsReverse, 0, $keyChange);
             $redirection301 .= implode("/", $samePart);
             $redirection301 = $this->_url . $redirection301;
         }
-        
+
         return $redirection301;
     }
 
@@ -285,10 +285,10 @@ class ActionController {
     /**
      * Transforme la page en une erreur HTTP
      * @param string $codeError code erreur HTTP
-     * @uses HttpException
+     * @uses HttpErrorException
      */
     final public function redirectError($codeError = null, $url = null) {
-        $exc = new HttpException('Erreur HTTP');
+        $exc = new HttpErrorException('Erreur HTTP');
         if (!empty($codeError))
             $exc->http($codeError, $url);
 

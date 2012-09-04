@@ -109,21 +109,21 @@ class UserException extends Exception
 /**
  * Erreur HTTP
  *
- * Les HTTPexceptions entraineront un blocage de la page et la modification du
+ * Les HttpErrorExceptions entraineront un blocage de la page et la modification du
  * header http pour afficher son code d'erreur
  *
  * @author Adrien <aimbert@solire.fr>
  * @package Library
  * @subpackage Error
  */
-class HttpException extends Exception
+class HttpErrorException extends Exception
 {
     /**
      * Code HTTP
      * @var int
      */
     private $_code = 500;
-    
+
     /**
      * Url de redirection
      * @var string

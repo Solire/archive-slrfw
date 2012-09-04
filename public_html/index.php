@@ -53,11 +53,11 @@ try {
     Error::report($exc);
 } catch (UserException $exc) {
     Error::message($exc);
-} catch (HttpException $exc) {
+} catch (HttpErrorException $exc) {
     Error::http($exc->getHttp());
 } catch (Exception $exc) {
     $marv = new Marvin('debug', $exc);
     $marv->display();
-    
+
     Error::run();
 }
