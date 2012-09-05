@@ -280,6 +280,19 @@ class Datatable {
             call_user_func(array($this, $this->_action . "Action"));
         }
     }
+    
+    // --------------------------------------------------------------------
+
+    /**
+     * Permet de modifier le nombre d'item affiché par defaut
+     * 
+     * @param string $nbItems nombre d'items 
+     * @return void
+     */
+    public function setDefaultNbItems($nbItems) {
+        $this->config["table"]["default_nb_items"] = $nbItems;
+    }
+
 
     // --------------------------------------------------------------------
 
