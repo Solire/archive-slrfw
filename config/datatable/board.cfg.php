@@ -11,7 +11,7 @@ $config = array(
     ),
     "table" => array(
         "name" => "gab_page",
-        "title" => "Liste des contenus",
+        "title" => "",
         "title_item" => "contenu",
         "suffix_genre" => "",
         "fixedheader" => false,
