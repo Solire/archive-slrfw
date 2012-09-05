@@ -217,14 +217,14 @@
                                         <li class="dropdown<?php echo $this->controller == "dashboard" && ($_GET["name"] == "redirection" || $_GET["name"] == "redirection_mobile") ? ' gradient-blue text-light-white' : ''; ?>">
                                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Redirections <b class="caret"></b></a>
                                             <ul class="dropdown-menu">
-                                                <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="active"' : ''; ?>><a href="dashboard/start.html?name=redirection">Redirection</a></li>
+                                                <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="active"' : ''; ?>><a href="dashboard/start.html?name=redirection">Redirections 301 permanentes</a></li>
                                                 <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection_mobile" ? ' class="active"' : ''; ?>><a href="dashboard/start.html?name=redirection_mobile">Correspondances Desktop/Mobile</a></li>
                                             </ul>
                                         </li>
                                         <?php
                                     } else {
                                         ?>
-                                        <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=redirection" class="bis">Redirections</a></li>
+                                        <li<?php echo $this->controller == "dashboard" && $_GET["name"] == "redirection" ? ' class="gradient-blue text-light-white"' : ''; ?>><a href="dashboard/start.html?name=redirection" class="bis">Redirections 301 permanentes</a></li>
                                         <?php
                                     }
                                     ?>
