@@ -104,7 +104,7 @@ class BoardController extends MainController {
         } else {
             $datatableClassName = "Datatable";
         }
-        
+                
         //On cré notre object datatable
         $datatable = new $datatableClassName($_GET, $nameConfig, $this->_db, "./datatable/", "./datatable/", "img/datatable/");
         
@@ -119,7 +119,8 @@ class BoardController extends MainController {
         $datatable->additionalWhereQuery("id_gabarit IN (" . implode(",", $idsGabarit) . ")");
         
         $datatable->start();
-
+        $datatable->setDefaultNbItems($this->_appConfig->get("nb-content-default", "board"));
+        
         if (isset($_GET["json"]) || (isset($_GET["nomain"]) && $_GET["nomain"] == 1)) {
             echo $datatable;
             exit();
