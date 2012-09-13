@@ -210,7 +210,7 @@ class Zend_Validate implements Zend_Validate_Interface
                 }
             }
 
-            $class = new ReflectionClass($className);
+            $class = new \ReflectionClass($className);
             if ($class->implementsInterface('Zend_Validate_Interface')) {
                 if ($class->hasMethod('__construct')) {
                     $keys    = array_keys($args);
