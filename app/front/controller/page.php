@@ -1,8 +1,11 @@
 <?php
 
-require_once 'main-controller.php';
+namespace Slrfw\App\Front\Controller;
 
-class PageController extends MainController
+use Slrfw\Library\Registry;
+
+
+class Page extends Main
 {
 
     private $_cache = null;
@@ -110,7 +113,6 @@ class PageController extends MainController
                 $this->_seo->setTitle($this->_page->getMeta("bal_title"));
                 $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
                 $this->_seo->setKeywords(explode(" ", $this->_page->getMeta("bal_key")));
-                $this->_seo->setUrlCanonical($this->_page->getMeta("canonical"));
                 $this->_view->page = $this->_page;
                 $view = $this->_page->getGabarit()->getName();
             } else {
@@ -177,6 +179,7 @@ class PageController extends MainController
         $this->_seo->setTitle($this->_page->getMeta("bal_title"));
         $this->_seo->setDescription($this->_page->getMeta("bal_descr"));
         $this->_seo->addKeyword($this->_page->getMeta("bal_key"));
+        $this->_seo->setUrlCanonical($this->_page->getMeta("canonical"));
         if ($this->_page->getMeta("no_index"))
             $this->_seo->disableIndex();
 
@@ -187,7 +190,7 @@ class PageController extends MainController
         $this->_view->display("page", $view);
     }
 
-    
+
 
 }
 

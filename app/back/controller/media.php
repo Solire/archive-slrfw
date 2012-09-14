@@ -1,8 +1,8 @@
 <?php
 
-require_once 'main-controller.php';
+namespace Slrfw\App\Back\Controller;
 
-class MediaController extends MainController {
+class Media extends Main {
 
     /**
      *
@@ -153,12 +153,12 @@ class MediaController extends MainController {
         $this->_view->main(FALSE);
 
         $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
-        
+
         $prefixPath = $this->_api["id"] == 1 ? "" : ".." . DIRECTORY_SEPARATOR;
-        
+
         if ($id_gab_page) {
 //            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
-            
+
 //            if ($this->_page) {
                 $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
                 $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page;
@@ -184,7 +184,7 @@ class MediaController extends MainController {
 //                );
 //            }
         }
-        
+
         else {
             if (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] && is_numeric($_COOKIE['id_temp'])) {
                 $id_temp    = (int) $_COOKIE['id_temp'];
@@ -198,12 +198,12 @@ class MediaController extends MainController {
                     $target = "temp-$id_temp";
                 }
             }
-            
+
             $targetTmp      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
             $targetDir      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target;
             $vignetteDir    = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_vignette;
             $apercuDir      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_apercu;
-            
+
             $json = $this->_fileManager->uploadGabPage(0, $id_temp, $targetTmp, $targetDir, $vignetteDir, $apercuDir);
             if (isset($json["minipath"])) {
                 $json["minipath"]   = $prefixPath . $json["minipath"];
@@ -213,7 +213,7 @@ class MediaController extends MainController {
             }
         }
 
-        
+
         if ($json["status"] == "error") {
             $this->_log->logThis("Upload échoué", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $id_gab_page . '<br /><span style="color:red;">Error ' . $json["error"]["code"] . " : " . $json["error"]["message"] . '</span>');
         } else {
@@ -246,7 +246,7 @@ class MediaController extends MainController {
         $id_gab_page    = isset($_GET['id_gab_page']) && $_GET['id_gab_page']
                         ? $_GET['id_gab_page']
                         : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
-        
+
         $id_temp        = isset($_GET['id_temp']) && $_GET['id_temp']
                         ? $_GET['id_temp']
                         : (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] ? $_COOKIE['id_temp'] : 0);

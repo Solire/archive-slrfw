@@ -1,9 +1,9 @@
 <?php
 
-require_once 'main-controller.php';
-require_once 'datatable/datatable.php';
+namespace Slrfw\App\Back\Controller;
 
-class DashboardController extends MainController {
+class Dashboard extends Main
+{
 
     private $_cache = null;
     private $_config = null;
@@ -20,7 +20,7 @@ class DashboardController extends MainController {
 //end start()
 
     /**
-     * 
+     *
      * @return void
      */
     public function startAction() {
@@ -30,17 +30,23 @@ class DashboardController extends MainController {
             } else {
                 $configsName = $_GET["name"];
             }
-            
+
             $this->_view->datatableRender = "";
 
             foreach ($configsName as $configName) {
-                if (file_exists("../app/datatable/" . ucfirst($configName) . "Datatable.php")) {
-                    require_once "../app/datatable/" . ucfirst($configName) . "Datatable.php";
-                    $datatableClassName = ucfirst($configName) . "Datatable";
-                } else {
-                    $datatableClassName = "Datatable";
+                $datatableClassName = '\\Slrfw\\Datatable\\' . $configName;
+
+                try {
+                    $datatable = new $datatableClassName(
+                        $_GET, $configName, $this->_db, "./datatable/",
+                        "./datatable/", "img/datatable/"
+                    );
+                } catch (\Exception $exc) {
+                    $datatable = new \Slrfw\Library\Datatable\Datatable(
+                        $_GET, $configName, $this->_db, "./datatable/",
+                        "./datatable/", "img/datatable/"
+                    );
                 }
-                $datatable = new $datatableClassName($_GET, $configName, $this->_db, "./datatable/", "./datatable/", "img/datatable/");
 
                 $datatable->start();
                 $datatableString = $datatable;

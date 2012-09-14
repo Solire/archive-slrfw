@@ -1,8 +1,11 @@
 <?php
 
-require_once 'main-controller.php';
+namespace Slrfw\App\Back\Controller;
 
-class BoardController extends MainController {
+use Slrfw\Library\Registry;
+
+class Board extends Main
+{
 
     private $_cache = null;
     private $_config = null;
@@ -21,14 +24,14 @@ class BoardController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function startAction() {
         $this->_javascript->addLibrary("back/jquery/inettuts.js");
         $this->_css->addLibrary("back/inettuts.css");
         $this->_view->action = "board";
-        
+
         $this->_boardDatatable();
 
         $idUtilisateur = $this->_utilisateur->get("id");
@@ -42,12 +45,12 @@ class BoardController extends MainController {
 
 
         $query = "
-            SELECT `gab_gabarit`.id, count(DISTINCT gab_page.id) nbpages, `gab_gabarit`.* 
-            FROM `gab_gabarit` LEFT JOIN gab_page ON gab_page.id_gabarit = gab_gabarit.id AND gab_page.suppr = 0 
-            WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"] . " AND `gab_gabarit`.id NOT IN (1,2) 
-            GROUP BY gab_gabarit.id 
+            SELECT `gab_gabarit`.id, count(DISTINCT gab_page.id) nbpages, `gab_gabarit`.*
+            FROM `gab_gabarit` LEFT JOIN gab_page ON gab_page.id_gabarit = gab_gabarit.id AND gab_page.suppr = 0
+            WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"] . " AND `gab_gabarit`.id NOT IN (1,2)
+            GROUP BY gab_gabarit.id
             ORDER BY gab_gabarit.id";
-        $this->_gabarits2 = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        $this->_gabarits2 = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
         $pages = array();
 
         $colorWidget = array(
@@ -98,29 +101,37 @@ class BoardController extends MainController {
 
     private function _boardDatatable() {
         $nameConfig = "board";
-        if (file_exists("../app/datatable/" . ucfirst($nameConfig) . "Datatable.php")) {
-            require_once "../app/datatable/" . ucfirst($nameConfig) . "Datatable.php";
-            $datatableClassName = ucfirst($nameConfig) . "Datatable";
-        } else {
-            $datatableClassName = "Datatable";
+
+        $datatableClassName = '\\Slrfw\\Datatable\\' . $nameConfig;
+
+        try {
+            $datatable = new $datatableClassName(
+                $_GET, $nameConfig, $this->_db, "./datatable/",
+                "./datatable/", "img/datatable/"
+            );
+        } catch (\Exception $exc) {
+            $datatable = new \Slrfw\Library\Datatable\Datatable(
+                $_GET, $nameConfig, $this->_db, "./datatable/",
+                "./datatable/", "img/datatable/"
+            );
         }
-                
+
         //On cré notre object datatable
         $datatable = new $datatableClassName($_GET, $nameConfig, $this->_db, "./datatable/", "./datatable/", "img/datatable/");
-        
+
         $datatable->setUtilisateur($this->_utilisateur);
         $datatable->setGabarits($this->_gabarits);
-        
+
         //On cré un filtre pour les gabarits de l'api courante
         $idsGabarit = array();
         foreach ($this->_gabarits as $gabarit) {
             $idsGabarit[] = $gabarit["id"];
         }
         $datatable->additionalWhereQuery("id_gabarit IN (" . implode(",", $idsGabarit) . ")");
-        
+
         $datatable->start();
         $datatable->setDefaultNbItems($this->_appConfig->get("nb-content-default", "board"));
-        
+
         if (isset($_GET["json"]) || (isset($_GET["nomain"]) && $_GET["nomain"] == 1)) {
             echo $datatable;
             exit();

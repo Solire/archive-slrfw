@@ -1,14 +1,14 @@
 <?php
 
-require_once 'main-controller.php';
+namespace Slrfw\App\Front\Controller;
 
 
-class ErrorController extends MainController
+class Error extends Main
 {
 
     public function start()
     {
-        
+
     }
 
     public function startAction()

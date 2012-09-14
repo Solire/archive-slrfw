@@ -1,8 +1,12 @@
 <?php
 
-require "main-controller.php";
 
-class SitemapController extends MainController {
+namespace Slrfw\App\Mobile\Controller;
+
+use Slrfw\Library\Registry;
+
+
+class Sitemap extends Main {
 
     private $_cache = null;
 

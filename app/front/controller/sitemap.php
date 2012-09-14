@@ -1,8 +1,10 @@
 <?php
 
-require "main-controller.php";
+namespace Slrfw\App\Front\Controller;
 
-class SitemapController extends MainController {
+use Slrfw\Library\Registry;
+
+class Sitemap extends Main {
 
     private $_cache = null;
 

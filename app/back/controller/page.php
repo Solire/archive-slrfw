@@ -1,8 +1,9 @@
 <?php
 
-require_once 'main-controller.php';
+namespace Slrfw\App\Back\Controller;
 
-class PageController extends MainController {
+class Page extends Main
+{
 
     private $_cache = null;
 
@@ -21,9 +22,9 @@ class PageController extends MainController {
         parent::start();
     }
 
-    
+
     /**
-     * 
+     *
      * @return void
      */
     public function listeAction() {
@@ -63,7 +64,7 @@ class PageController extends MainController {
 
 
 
-        $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        $this->_gabarits = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
 
         //Liste des début de label à regrouper pour les boutons de création
         $groupIdentifications = array("Rubrique ", "Sous rubrique ", "Page ");
@@ -119,7 +120,7 @@ class PageController extends MainController {
         }
 
 
-        $this->_view->gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        $this->_view->gabarits = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
         $this->_view->pages = $this->_pages;
 
         $this->_view->breadCrumbs[] = array(
@@ -129,7 +130,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function childrenAction() {
@@ -138,7 +139,7 @@ class PageController extends MainController {
         else
             $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
 
-        $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        $this->_gabarits = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
         $this->_view->gabarits = $this->_gabarits;
 
         $this->_view->main(FALSE);
@@ -149,12 +150,12 @@ class PageController extends MainController {
 
         $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
 
-        $this->_gabarits = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+        $this->_gabarits = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
         $this->_view->gabarits = $this->_gabarits;
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function displayAction() {
@@ -190,7 +191,7 @@ class PageController extends MainController {
         $this->_form = '';
 
         if ($id_gab_page) {
-            $versions = $this->_db->query("SELECT * FROM `version` WHERE `version`.`id_api` = " . $this->_api["id"])->fetchAll(PDO::FETCH_ASSOC);
+            $versions = $this->_db->query("SELECT * FROM `version` WHERE `version`.`id_api` = " . $this->_api["id"])->fetchAll(\PDO::FETCH_ASSOC);
 
             $form = '';
             $devant = '';
@@ -205,12 +206,12 @@ class PageController extends MainController {
                 $url = $urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension();
 
                 $redirections = $this->_db->query("
-                    SELECT old 
-                    FROM `redirection` 
+                    SELECT old
+                    FROM `redirection`
                     WHERE  new = " . $this->_db->quote($url) . "
                         AND id_api = " . BACK_ID_API . "
                         AND id_version = " . $version['id'] . "
-                ")->fetchAll(PDO::FETCH_COLUMN);
+                ")->fetchAll(\PDO::FETCH_COLUMN);
 
                 $devant .= '<div style="height: 54px;float: left;">'
                         . '<div class="btn-a gradient-blue" style="margin-bottom: 5px;display:block;"><a title="' . $version['nom'] . '" class="openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
@@ -290,7 +291,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function saveAction() {
@@ -309,7 +310,7 @@ class PageController extends MainController {
                 . "X-Mailer: PHP/" . phpversion();
 
         $typeSave = $_POST["id_gab_page"] == 0 ? "Création" : "Modification";
-        
+
         Tools::mail_utf8("Modif site <modif@solire.fr>", "$typeSave de contenu sur " . $this->_mainConfig->get("name", "project"), $contenu, $headers, "text/html");
 
         $json = array(
@@ -317,15 +318,15 @@ class PageController extends MainController {
             "search" => "?id_gab_page=" . $this->_page->getMeta("id"),
             "id_gab_page" => $this->_page->getMeta("id"),
         );
-        
+
         if (isset($_POST['id_temp']) && $_POST['id_temp']) {
             $upload_path = $this->_mainConfig->get("path", "upload");
-            
+
             $tempDir    = "../" . $upload_path . DIRECTORY_SEPARATOR . "temp-" . $_POST['id_temp'];
             $targetDir  = "../" . $upload_path . DIRECTORY_SEPARATOR . $this->_page->getMeta("id");
-        
+
             $succes = rename($tempDir, $targetDir);
-            
+
             $query  = "UPDATE `media_fichier` SET"
                     . " `id_gab_page` = " . $this->_page->getMeta("id") . ","
                     . " `id_temp` = 0"
@@ -333,15 +334,15 @@ class PageController extends MainController {
             $this->_db->exec($query);
         }
 
-        
+
         if($json["status"] == "error") {
-            $this->_log->logThis(   "$typeSave de page échouée", 
-                                    $this->_utilisateur->get("id"), 
+            $this->_log->logThis(   "$typeSave de page échouée",
+                                    $this->_utilisateur->get("id"),
                                     "<b>Id</b> : " . $this->_page->getMeta("id") . '<br /><img src="img/flags/png/' . strtolower($this->_versions[$_POST["id_version"]]['suf']) . '.png" alt="'
                                     . $this->_versions[$_POST["id_version"]]['nom'] . '" /></a><br /><span style="color:red;">Error</span>');
         } else {
-            $this->_log->logThis(   "$typeSave de page réussie", 
-                                    $this->_utilisateur->get("id"), 
+            $this->_log->logThis(   "$typeSave de page réussie",
+                                    $this->_utilisateur->get("id"),
                                     "<b>Id</b> : " . $this->_page->getMeta("id") . '<br /><img src="img/flags/png/' . strtolower($this->_versions[$_POST["id_version"]]['suf']) . '.png" alt="'
                                     . $this->_versions[$_POST["id_version"]]['nom'] . '" /></a>');
         }
@@ -350,7 +351,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function autocompleteAction() {
@@ -373,7 +374,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function autocompleteJoinAction() {
@@ -413,13 +414,13 @@ class PageController extends MainController {
                 . ($queryFilter != "" ? "AND (" . $queryFilter . ")" : "")
                 . " AND $labelField  LIKE '%$term%'";
 
-        $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $json = $this->_db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
 
         exit(json_encode($json));
     }
-    
+
     /**
-     * 
+     *
      * @return void
      */
     public function autocompleteOldLinksAction() {
@@ -436,13 +437,13 @@ class PageController extends MainController {
                 . " FROM `$table`"
                 . " WHERE $labelField  LIKE '%$term%'";
 
-        $json = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $json = $this->_db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
 
         exit(json_encode($json));
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function liveSearchAction() {
@@ -530,7 +531,7 @@ class PageController extends MainController {
                 . (isset($filterWords) ? " AND (" . implode(" OR ", $filterWords) . ")" : '')
                 . " ORDER BY " . implode(",", $orderBy) . " LIMIT 10";
 
-        $pagesFound = $this->_db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $pagesFound = $this->_db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($pagesFound as $page) {
             $pages[] = array(
@@ -546,7 +547,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function autocompleteLinkAction() {
@@ -556,7 +557,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function visibleAction() {
@@ -589,7 +590,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function deleteAction() {
@@ -612,7 +613,7 @@ class PageController extends MainController {
     }
 
     /**
-     * 
+     *
      * @return void
      */
     public function orderAction() {
@@ -623,8 +624,8 @@ class PageController extends MainController {
 
         $prepStmt = $this->_db->prepare("UPDATE `gab_page` SET `ordre` = :ordre WHERE `id` = :id");
         foreach ($_POST['positions'] as $id => $ordre) {
-            $prepStmt->bindValue(":ordre", $ordre, PDO::PARAM_INT);
-            $prepStmt->bindValue(":id", $id, PDO::PARAM_INT);
+            $prepStmt->bindValue(":ordre", $ordre, \PDO::PARAM_INT);
+            $prepStmt->bindValue(":id", $id, \PDO::PARAM_INT);
             $tmp = $prepStmt->execute();
             if ($ok) {
                 $ok = $tmp;

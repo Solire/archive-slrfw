@@ -1,6 +1,5 @@
 <?php
 
-require_once 'main-controller.php';
 
 
 class ErrorController extends MainController
@@ -8,7 +7,7 @@ class ErrorController extends MainController
 
     public function start()
     {
-        
+
     }
 
     public function startAction()
