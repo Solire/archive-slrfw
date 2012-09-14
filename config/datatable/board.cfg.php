@@ -60,22 +60,22 @@ $config = array(
         ), array(
             "name" => "date_crea",
             "php_function" => array(
-                "Tools::RelativeTimeFromDate"
+                "\Slrfw\Library\Tools::RelativeTimeFromDate"
             ),
             "index" => true,
             "show" => true,
-            "filter_field" => "date-range",            
+            "filter_field" => "date-range",
             "filter_field_date_past" => true,
             "title" => "Créé",
         ),
         array(
             "name" => "date_modif",
             "php_function" => array(
-                "Tools::RelativeTimeFromDate"
+                "\Slrfw\Library\Tools::RelativeTimeFromDate"
             ),
             "index" => true,
             "show" => true,
-            "filter_field" => "date-range",            
+            "filter_field" => "date-range",
             "filter_field_date_past" => true,
             "title" => "Édité",
             "default_sorting" => true,

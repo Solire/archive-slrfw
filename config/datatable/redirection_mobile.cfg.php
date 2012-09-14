@@ -2,35 +2,35 @@
 <?php
 
 /*
----  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---  
+---  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---
 
-oooooooooo.         .o.       ooooooooooooo       .o.       ooooooooooooo       .o.       oooooooooo.  ooooo        oooooooooooo 
-`888'   `Y8b       .888.      8'   888   `8      .888.      8'   888   `8      .888.      `888'   `Y8b `888'        `888'     `8 
- 888      888     .8"888.          888          .8"888.          888          .8"888.      888     888  888          888         
- 888      888    .8' `888.         888         .8' `888.         888         .8' `888.     888oooo888'  888          888oooo8    
- 888      888   .88ooo8888.        888        .88ooo8888.        888        .88ooo8888.    888    `88b  888          888    "    
- 888     d88'  .8'     `888.       888       .8'     `888.       888       .8'     `888.   888    .88P  888       o  888       o 
-o888bood8P'   o88o     o8888o     o888o     o88o     o8888o     o888o     o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8 
- 
- 
----  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---  
+oooooooooo.         .o.       ooooooooooooo       .o.       ooooooooooooo       .o.       oooooooooo.  ooooo        oooooooooooo
+`888'   `Y8b       .888.      8'   888   `8      .888.      8'   888   `8      .888.      `888'   `Y8b `888'        `888'     `8
+ 888      888     .8"888.          888          .8"888.          888          .8"888.      888     888  888          888
+ 888      888    .8' `888.         888         .8' `888.         888         .8' `888.     888oooo888'  888          888oooo8
+ 888      888   .88ooo8888.        888        .88ooo8888.        888        .88ooo8888.    888    `88b  888          888    "
+ 888     d88'  .8'     `888.       888       .8'     `888.       888       .8'     `888.   888    .88P  888       o  888       o
+o888bood8P'   o88o     o8888o     o888o     o88o     o8888o     o888o     o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8
+
+
+---  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---  ---  ---  ---  ---  ---  ---  --- ---  ---  ---  ---
  */
-        
-        
-        
-        
+
+
+
+
 /**
-    _______   __ ________  _________ _      _____ 
+    _______   __ ________  _________ _      _____
     |  ___\ \ / /|  ___|  \/  || ___ \ |    |  ___|
-    | |__  \ V / | |__ | .  . || |_/ / |    | |__  
-    |  __| /   \ |  __|| |\/| ||  __/| |    |  __| 
-    | |___/ /^\ \| |___| |  | || |   | |____| |___ 
-    \____/\/   \/\____/\_|  |_/\_|   \_____/\____/ 
-        
+    | |__  \ V / | |__ | .  . || |_/ / |    | |__
+    |  __| /   \ |  __|| |\/| ||  __/| |    |  __|
+    | |___/ /^\ \| |___| |  | || |   | |____| |___
+    \____/\/   \/\____/\_|  |_/\_|   \_____/\____/
+
  */
 
 $config = array(
-    "extra" => array( 
+    "extra" => array(
         "copy"              => false, //bool Activer la fonctionnalité de copie des données
         "print"             => false, //bool Activer la fonctionnalité de copie des données'impression
         "pdf"               => false, //bool Activer la fonctionnalité d'export pdf
@@ -57,7 +57,7 @@ $config = array(
         //Colonne 1..1 sur autre table
         array(
             "name"  => "id_client",         //string Nom de la colonne
-            "from"  => array( 
+            "from"  => array(
                 "table"   => "gab_gabarit", //string Nom de la table jointe
                 "columns" => array(
                     array(
@@ -76,11 +76,11 @@ $config = array(
         array(
             "name" => "date_crea",
             "php_function" => array(
-                "Tools::RelativeTimeFromDate" //string Fonction statique php à appeler pour chaque valeur
+                "\Slrfw\Library\Tools::RelativeTimeFromDate" //string Fonction statique php à appeler pour chaque valeur
             ),
             "show" => true,
             "filter_field" => "date-range",   //string Type champs de filtre (text/select/date-range)
-            "filter_field_date_past" => true, //bool date seulement passé pour le filtre sur la date 
+            "filter_field_date_past" => true, //bool date seulement passé pour le filtre sur la date
             "title" => "Créé",
         ),
         //Colonne simple (non affichée) avec filtre général
@@ -91,7 +91,7 @@ $config = array(
         ),
         //Colonne avancée générée par une fonction + SQL avancé (Permet le filtre dans ce cas de figure)
         array(
-            "special" => "buildAction", 
+            "special" => "buildAction",
             "sql" => "IF(`gab_page`.`visible` = 0, '&#10005; Non visible', '&#10003; Visible')",
             "filter_field" => "select",
             "show" => true,
@@ -102,19 +102,19 @@ $config = array(
 );
 
 
- 
+
 /**
- *  
-    ___  ___  ___    _____ _____ _   _ ______ _____ _____ _   _______  ___ _____ _____ _____ _   _ 
+ *
+    ___  ___  ___    _____ _____ _   _ ______ _____ _____ _   _______  ___ _____ _____ _____ _   _
     |  \/  | / _ \  /  __ \  _  | \ | ||  ___|_   _|  __ \ | | | ___ \/ _ \_   _|_   _|  _  | \ | |
     | .  . |/ /_\ \ | /  \/ | | |  \| || |_    | | | |  \/ | | | |_/ / /_\ \| |   | | | | | |  \| |
     | |\/| ||  _  | | |   | | | | . ` ||  _|   | | | | __| | | |    /|  _  || |   | | | | | | . ` |
     | |  | || | | | | \__/\ \_/ / |\  || |    _| |_| |_\ \ |_| | |\ \| | | || |  _| |_\ \_/ / |\  |
     \_|  |_/\_| |_/  \____/\___/\_| \_/\_|    \___/ \____/\___/\_| \_\_| |_/\_/  \___/ \___/\_| \_/
 
-        |\ | _  _   . 
+        |\ | _  _   .
         | \|(_)|||  . redirection
-                                                                 
+
  */
 
 $config = array(
