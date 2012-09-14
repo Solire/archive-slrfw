@@ -1,4 +1,7 @@
 <?php
+
+namespace Slrfw\Model;
+
 /**
  * Description of page
  *
@@ -10,10 +13,10 @@ class gabaritPage extends gabaritBloc {
      * @var array
      */
     private $_meta = array();
-    
+
     /**
      *
-     * @var array 
+     * @var array
      */
     private $_version = array();
 
@@ -26,191 +29,191 @@ class gabaritPage extends gabaritBloc {
 
     /**
      *
-     * @var array 
+     * @var array
      */
     private $_parents = array();
-    
+
     /**
      *
-     * @param array $meta 
+     * @param array $meta
      */
-    public function __construct() {   
+    public function __construct() {
         $this->_values = array();
     }
-    
-    
+
+
     // SETTERS
-    
+
     /**
      *
-     * @param array $meta 
+     * @param array $meta
      */
     public function setMeta($meta) {
         $this->_meta = $meta;
         $this->_id = $meta['id'];
     }
-    
+
     public function setVersion($data) {
         $this->_version = $data;
     }
-    
+
     /**
      *
-     * @param array $values 
+     * @param array $values
      */
     public function setValues($values) {
         $this->_values = $values;
     }
-    
+
     /**
      *
-     * @param array $values 
+     * @param array $values
      */
     public function setValue($key, $value) {
         $this->_values[$key] = $value;
     }
-    
+
     /**
      *
-     * @param array $blocs tableau de page 
+     * @param array $blocs tableau de page
      */
     public function setBlocs($blocs) {
         $this->_blocs = $blocs;
     }
-    
+
     /**
      *
-     * @param array $parents 
+     * @param array $parents
      */
     public function setParents($parents) {
         $this->_parents = $parents;
     }
-    
+
     /**
      *
-     * @param gabaritPage $child 
+     * @param gabaritPage $child
      */
     public function setChildren($children) {
         $this->_children= $children;
     }
-    
+
     /**
      *
-     * @param gabaritPage $child 
+     * @param gabaritPage $child
      */
     public function getChildren() {
         return $this->_children;
     }
-    
+
     /**
      *
-     * @param gabaritPage $firstChild 
+     * @param gabaritPage $firstChild
      */
     public function setFirstChild($firstChild) {
         $this->_firstChild = $firstChild;
     }
-    
+
     // GETTERS
-    
+
     /**
      *
      * @param string $key
-     * @return mixed 
+     * @return mixed
      */
     public function getMeta($key = NULL) {
         if ($key != NULL) {
             if (is_array($this->_meta) && array_key_exists($key, $this->_meta))
                 return $this->_meta[$key];
-            
+
             return NULL;
         }
-        
+
         return $this->_meta;
     }
-    
+
     /**
      *
      * @param string $key
-     * @return mixed 
+     * @return mixed
      */
     public function getVersion($key = NULL) {
         if ($key != NULL) {
             if (is_array($this->_version) && array_key_exists($key, $this->_version))
                 return $this->_version[$key];
-            
+
             return NULL;
         }
-        
+
         return $this->_version;
     }
-    
+
     /**
      *
      * @param string $key
-     * @return mixed 
+     * @return mixed
      */
     public function getValues($key = NULL) {
         if ($key == NULL)
             return $this->_values;
-        
+
         if (is_array($this->_values) && array_key_exists($key, $this->_values))
             return $this->_values[$key];
-        
+
         return '';
     }
-    
+
     /**
      *
-     * @return type 
+     * @return type
      */
     public function getBlocs($name = NULL) {
         if ($name == NULL || !isset ($this->_blocs[$name]))
             return $this->_blocs;
-        
+
         return $this->_blocs[$name];
-    }  
+    }
 
     /**
      *
      * @param int $id_gabarit
-     * @return gabaritPage 
+     * @return gabaritPage
      */
     public function getParent($i) {
         if (array_key_exists($i, $this->_parents))
             return $this->_parents[$i];
-        
+
         return FALSE;
     }
-    
+
     /**
      *
      * @param int $id_gabarit
-     * @return gabaritPage 
+     * @return gabaritPage
      */
     public function getParents() {
         return $this->_parents;
     }
-    
+
     public function getFirstChild(){
         return $this->_firstChild;
     }
-    
+
     /**
      *
      * @param type $mobile
-     * @return string 
+     * @return string
      */
-    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $_301_editable = TRUE, $meta_titre = TRUE, $extension = "/", $versionId, $redirections = array()) {        
+    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $_301_editable = TRUE, $meta_titre = TRUE, $extension = "/", $versionId, $redirections = array()) {
         $metaId = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
         $metaLang = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : 1;
         $noMeta = !$meta ? ' style="display: none;" ' : '';
         $noMetaTitre = !$meta_titre ? ' style="display: none;" ' : '';
         $noRedirections301 = !$_301_editable ? ';display: none' : '';
         $parentSelect = '';
-        
+
         $redirections = count($redirections) == 0 ? array("") : $redirections;
-        
-        if ($metaId && $this->_meta['id_parent'] > 0) {            
+
+        if ($metaId && $this->_meta['id_parent'] > 0) {
             $parentSelect = '<div class="line">'
                           . '<label for="id_parent">' . $this->_gabarit->getGabaritParent("label") . '</label>'
                           . '<select disabled="disabled"><option>' . $this->getParent(0)->getMeta("titre") . '</option></select>'
@@ -223,19 +226,19 @@ class gabaritPage extends gabaritBloc {
                           . $this->_gabarit->getParentsSelect()
                           . '</div>';
         }
-        
+
         $form = '<form action="' . $action . '" method="post" enctype="multipart/form-data">'
 		      . '<input type="hidden" name="id_gabarit" value="' . $this->_gabarit->getId() . '" />'
 			  . '<input type="hidden" name="id_gab_page" value="' . $metaId . '" />'
 			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
 			  . '<input type="hidden" name="id_temp" />'
-              
+
               . $parentSelect
               . '<div ' . $noMetaTitre . ' class="line">'
               . '<label for="titre-' . $metaLang . '">Titre <span class="required">*</span> </label>'
               . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
               . '</div>';
-        
+
         if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
             $form .= '<div ' . $noMetaTitre . ' class="line">'
                    . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting <span class="required">*</span> </label>'
@@ -279,7 +282,7 @@ class gabaritPage extends gabaritBloc {
                . '<label for="no_index' . $metaLang . '">No-index</label>'
                . '<input type="checkbox" value="1" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
                . '</div>';
-        
+
         $form .= '<div class="line">'
                . '<label for="canonical-' . $metaLang . '">Url canonical</label>'
                . '<input type="text" name="canonical" id="canonical-' . $metaLang . '" value="' . (isset($this->_meta['canonical']) ? $this->_meta['canonical'] : '') . '" class="autocomplete-link"  />'
@@ -292,15 +295,15 @@ class gabaritPage extends gabaritBloc {
                           . '<div class="btn-a gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 220px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
                           . '</div>';
                }
-               
+
                $form .= '<div class="btn-a gradient-blue fr 301-add" style="margin-right: 223px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
                       . '</div>';
 
-               
+
                 $form .= '</div>'
                        . '</fieldset>';
 		$form .= $this->buildForm($upload_path, $versionId);
-		
+
 		$form .= '<div class="buttonfixed">'
                . ($mobile ? '<div class="btn-a gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
                . '<div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
@@ -311,21 +314,21 @@ class gabaritPage extends gabaritBloc {
                . '">Retour</a></div>'
                . '</div>'
                . '</form>';
-		
+
 		return $form;
 	}
-	
+
     /**
      *
-     * @return type 
+     * @return type
      */
-	public function buildForm($upload_path, $versionId) {      
+	public function buildForm($upload_path, $versionId) {
         $form = '<input type="hidden" name="id_' . $this->_gabarit->getTable() . '" value="' . (isset($this->_values['id']) ? $this->_values['id'] : '') . '" />';
-        
+
         $allchamps = $this->_gabarit->getChamps();
-        
+
         $id_gab_page = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
-        
+
         foreach ($allchamps as $name_group => $champs) {
             $form .= '<fieldset><legend>' . $name_group . '</legend><div ' . ($id_gab_page ? 'style="display:none;"' : '') . '>';
             foreach ($champs as $champ) {
@@ -335,11 +338,11 @@ class gabaritPage extends gabaritBloc {
             }
             $form .= '</div></fieldset>';
         }
-        
+
         foreach ($this->_blocs as $blocName => $bloc)
             $form .=  $bloc->buildForm($upload_path, $id_gab_page, $versionId);
-        
+
 		return $form;
 	}
-    
+
 }

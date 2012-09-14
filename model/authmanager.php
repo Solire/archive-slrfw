@@ -1,35 +1,41 @@
 <?php
+
+namespace Slrfw\Model;
+
+use Slrfw\Library\Registry;
+
+
 class authManager extends manager {
 	/**
 	 *
-	 * @var string 
+	 * @var string
 	 */
 	protected $_cookieName;
-	
+
 	/**
 	 *
 	 * @var string
 	 */
 	protected $_query;
-        
+
         /**
 	 *
 	 * @var MyPDO
 	 */
 	protected $_db;
-	
+
 	/**
 	 *
 	 * @var string
 	 */
 	protected $_colonneLogin;
-	
+
 	/**
 	 *
 	 * @var string
 	 */
 	protected $_colonnePassword;
-	
+
 	/**
 	 *
 	 * @param MyPDO $_db
@@ -42,42 +48,42 @@ class authManager extends manager {
 		$this->_colonneLogin = $colonneLogin;
 		$this->_colonnePassword = $colonnePassword;
 		$this->_query = $query;
-		
+
 		if (isset($_COOKIE[$this->_cookieName]) && $_COOKIE[$this->_cookieName] != '') {
 			$Foo = explode("_", $_COOKIE[$this->_cookieName]);
-			
+
 			if (count($Foo) == 2) {
 				$stmt = $this->_db->prepare($this->_query);// . $Foo[1];
-				$stmt->bindValue(':id', $Foo[1], PDO::PARAM_INT);
+				$stmt->bindValue(':id', $Foo[1], \PDO::PARAM_INT);
 				$stmt->execute();
-				$user = $stmt->fetch(PDO::FETCH_ASSOC);
-				
+				$user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
 				$Token = md5($user[$this->_colonneLogin] . date("Y-m-d") . $user[$this->_colonnePassword]);
-				
+
 				if ($Token == $Foo[0])
 					return $user;
 			}
 		}
-		
+
 		return FALSE;
 	}
-		
+
 	/**
 	 *
 	 * @param string $query
 	 * @param string $login
 	 * @param string $password
 	 * @param bool $hash
-	 * @return bool 
+	 * @return bool
 	 */
 	public function connect($query, $login, $password, $hash = TRUE) {
 		if (!is_string($login) || !is_string($password))
 			return FALSE;
 
 		$query = $this->_db->prepare($query);// . $Foo[1];
-		$query->bindValue(':login', $login, PDO::PARAM_STR);
+		$query->bindValue(':login', $login, \PDO::PARAM_STR);
 		$query->execute();
-		$user = $query->fetch(PDO::FETCH_ASSOC);
+		$user = $query->fetch(\PDO::FETCH_ASSOC);
 
 		if ($hash) {
 			if($user[$this->_colonnePassword] != sha1($password))
@@ -92,12 +98,12 @@ class authManager extends manager {
 		$Cookie = $Token . "_" . $user["id"];
 
 		setcookie($this->_cookieName, $Cookie, time() + 60 * 60 * 24, '/');
-		
+
 		return $user;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function disconnect() {
 		setcookie($this->_cookieName, "", time() - 60 * 60 * 24, '/');

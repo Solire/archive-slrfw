@@ -1,13 +1,16 @@
-
 <?php
+
+
+namespace Slrfw\Model;
+
 /*
  * Author: MONNOT Stéphane
- * 
+ *
  * Create Date: 03-02-2011
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  */
 
 Class Search {
@@ -29,7 +32,7 @@ Class Search {
     private $_budgetSlice;
 
     public function __construct() {
-        
+
     }
 
     public function get_location() {
@@ -108,7 +111,7 @@ Class Search {
         else
             $this->_nature[] = filter_var($_nature, FILTER_SANITIZE_NUMBER_INT);
     }
-    
+
     public function set_sort($fieldName) {
             $this->_sort = array($fieldName);
     }
@@ -153,7 +156,7 @@ Class Search {
     public function get_budgetSlice() {
         return $this->_budgetSlice;
     }
-    
+
     public function set_limit($first, $nb) {
             $this->_limit = array($first, $nb);
     }
@@ -161,13 +164,13 @@ Class Search {
     public function getItemsForm($dataTable, $fieldNameLabel, $fieldNameValue, $prefixField = true, $otherFieldsSelect = null, $groupBy = null) {
         $this->_buildElemQuery();
         $this->_from2String = "";
-        
+
         $this->_whereArray = array_slice($this->_buildWhere(), 1);
         $noWhere = false;
-        
+
         $this->_whereString = "";
         foreach ($this->_fromArray as $key => $value) {
-                
+
             if($key > 0) {
                 if($value["table"] == $dataTable) {
                     $noWhere = true;
@@ -180,23 +183,23 @@ Class Search {
                 if(isset($this->_whereArray[$value["table"]])) {
                     if(!$noWhere)
                         $this->_from2String .= " AND " . $this->_whereArray[$value["table"]];
-                    unset($this->_whereArray[$value["table"]]); 
-                    
+                    unset($this->_whereArray[$value["table"]]);
+
                 }
             }
-                
+
             else {
                 $this->_from1String = $value["table"];
             }
         }
-        
+
         $this->_whereArray[] = "1=1";
         $this->_from2String = "empty RIGHT JOIN " . $this->_from1String . $this->_from2String . " ON 1=1";
 //        $this->_from2String = "empty RIGHT JOIN " . $this->_from1String . (count($this->_whereArray)>0 ? " ON " . implode(" AND ", $this->_whereArray) : "" ) . $this->_from2String;
-        
-                
+
+
         $this->_whereString = implode(' AND ', $this->_whereArray);
-        
+
         $query = "SELECT DISTINCT "
                 . (!is_null($otherFieldsSelect) ? implode(", ", $otherFieldsSelect) . "," : "")
                 . "$dataTable.$fieldNameValue AS value, "
@@ -218,14 +221,14 @@ Class Search {
 
 
 
-        $items = $results->fetchAll(PDO::FETCH_ASSOC);
+        $items = $results->fetchAll(\PDO::FETCH_ASSOC);
         return $items;
     }
 
     private function _buildElemQuery() {
 
-        $this->_selectString = "DISTINCT floor(prix_cc+prix_hc/100)*100 as minslice, 
-            logement.*, 
+        $this->_selectString = "DISTINCT floor(prix_cc+prix_hc/100)*100 as minslice,
+            logement.*,
             etage_logement.libelle as etage_libelle,
             nature_logement.libelle as nature_libelle,
             secteur_logement.libelle as secteur_libelle,
@@ -242,10 +245,10 @@ Class Search {
                 . " LEFT JOIN type_logement ON type_logement.id = type_id"
                 . " LEFT JOIN type_social_logement ON type_social_logement.id = type_social_id"
                 . " LEFT JOIN type_vente_logement ON type_vente_logement.id = type_vente_id";
-        
+
         $this->_fromArray = Array(
             Array("table" => "logement"),
-            
+
             Array("table" => "nature_logement", "on" => "ON nature_logement.id = nature_id"),
             Array("table" => "type_social_logement", "on" => "ON type_social_logement.id = type_social_id"),
             Array("table" => "type_vente_logement", "on" => "ON type_vente_logement.id = type_vente_id"),
@@ -253,12 +256,12 @@ Class Search {
             Array("table" => "commune", "on" => "ON commune.id = commune_id"),
             Array("table" => "etage_logement", "on" => "ON etage_logement.id = etage_id"),
             Array("table" => "type_logement", "on" => "ON type_logement.id = type_id"),
-            
+
 
         );
 
         $this->_whereString = implode(' AND ', $this->_buildWhere());
-        
+
         $this->_orderByString = implode(', ', $this->_sort);
     }
 
@@ -275,13 +278,13 @@ Class Search {
                 . " ORDER BY "
                 . $this->_orderByString
                 . (is_array($this->_limit) ?  " LIMIT " . implode(", ", $this->_limit) : "");
-        
+
 
 
 
 
         $results = Registry::get("db")->query($query);
-        $this->_results = $results->fetchall(PDO::FETCH_ASSOC);
+        $this->_results = $results->fetchall(\PDO::FETCH_ASSOC);
 
 
         $this->_minMaxBudget();
@@ -309,7 +312,7 @@ Class Search {
 
 
         $results = Registry::get("db")->query($query);
-        $this->_nbResults = $results->fetch(PDO::FETCH_COLUMN);
+        $this->_nbResults = $results->fetch(\PDO::FETCH_COLUMN);
 
         return $this->_nbResults;
     }
@@ -335,7 +338,7 @@ Class Search {
                 if($word != "")
                     $temp []= "commune.libelle LIKE \"%$word%\" OR commune.code_postal LIKE \"%$word%\"";
             }
-            
+
             $where[] = implode(" OR ", $temp);
         }
 
@@ -399,8 +402,8 @@ Class Search {
 
         return $where;
     }
-    
-    
+
+
     public function getResults() {
         return $this->_results;
     }

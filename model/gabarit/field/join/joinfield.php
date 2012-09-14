@@ -51,7 +51,7 @@ class JoinField extends GabaritField {
                     FROM `$table` 
                     $gabPageJoin
                     WHERE $filterVersion  AND `$table`.`$idField` = $id";
-            $this->valueLabel = $this->db->query($sql)->fetch(PDO::FETCH_COLUMN);
+            $this->valueLabel = $this->db->query($sql)->fetch(\PDO::FETCH_COLUMN);
         }
     }
 
@@ -89,7 +89,7 @@ class JoinField extends GabaritField {
 
 
         $this->values = $values;
-        $this->allValues = $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $this->allValues = $this->db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getValueLabel() {

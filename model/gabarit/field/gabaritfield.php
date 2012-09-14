@@ -10,7 +10,7 @@ abstract class GabaritField
 
     protected $view = "default";
     protected $champ;
-    
+
     protected $params;
     protected $label;
     protected $value;
@@ -29,7 +29,7 @@ abstract class GabaritField
         }
         if ($db)	$this->db = $db;
         else		$this->db = Registry::get("db");
-        
+
         ;
         ;
         $this->idGabPage = $id_gab_page;
@@ -44,12 +44,12 @@ abstract class GabaritField
 
     public function start()
     {
-        
+
     }
 
     public function __toString()
     {
-        $rc = new ReflectionClass(get_class($this));
+        $rc = new \ReflectionClass(get_class($this));
         $view = $this->view;
         return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . "view/$view.phtml");
     }
@@ -57,7 +57,7 @@ abstract class GabaritField
     /**
      *
      * @param type $file chemin de la vue à inclure
-     * @return string Rendu de la vue après traitement 
+     * @return string Rendu de la vue après traitement
      */
     public function output($file)
     {
@@ -66,7 +66,7 @@ abstract class GabaritField
         $output = ob_get_clean();
         if($this->champ["aide"]!= "")
             $output .= '<div class"aide" id="aide-champ' . $this->champ['id'] . '" style="display: none">'
-                    . $this->champ["aide"] 
+                    . $this->champ["aide"]
                     . '</div>';
         return $output;
     }

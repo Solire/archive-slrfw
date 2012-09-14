@@ -26,7 +26,7 @@ class Autocomplete_multiField extends GabaritField
                     WHERE  `$table`.`$idField` IN (" . $this->value . ")
                     ORDER BY FIND_IN_SET(id, '" . $this->value . "')";
             
-            $this->valuesUnique = $this->db->query($sql)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+            $this->valuesUnique = $this->db->query($sql)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
             $valuesArray = explode(",", $this->value);
             $this->values = array();
             foreach ($valuesArray as $v) {

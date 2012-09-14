@@ -9,7 +9,7 @@ abstract class GabaritFieldSet
 {
 
     protected $view = "default";
-    
+
     protected $gabarit;
     protected $values;
     protected $valueLabel;
@@ -36,12 +36,12 @@ abstract class GabaritFieldSet
 
     public function start()
     {
-        
+
     }
 
     public function __toString()
     {
-        $rc = new ReflectionClass(get_class($this));
+        $rc = new \ReflectionClass(get_class($this));
         $view = $this->view;
         return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . "view/$view.phtml");
     }
@@ -49,7 +49,7 @@ abstract class GabaritFieldSet
     /**
      *
      * @param type $file chemin de la vue à inclure
-     * @return string Rendu de la vue après traitement 
+     * @return string Rendu de la vue après traitement
      */
     public function output($file)
     {
@@ -58,9 +58,9 @@ abstract class GabaritFieldSet
         $output = ob_get_clean();
         return $output;
     }
-    
-    
-    
+
+
+
     /**
      *
      * @param array $champ
@@ -68,11 +68,11 @@ abstract class GabaritFieldSet
      * @param string $idpage
      * @param string $upload_path nom du dossier où sont uploadés les images.
      * @param int $id_gab_page nom du dossier dans lequel sont les images.
-     * @return string 
+     * @return string
      */
     protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page, $gabarit = null)
     {
-        
+
         $form = '';
         if($champ["visible"] == 0)
             return $form;
@@ -82,7 +82,7 @@ abstract class GabaritFieldSet
 
         if ($champ['typedonnee'] == 'DATE')
             $value = Tools::formate_date_nombre($value, '-', '/');
-        
+
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";
@@ -94,7 +94,7 @@ abstract class GabaritFieldSet
         } else {
             $field->start();
         }
-        
+
         $form .= $field;
         if ($type == "join")
             $valueLabel = $field->getValueLabel();
@@ -105,14 +105,14 @@ abstract class GabaritFieldSet
                 $valueLabel =  "Nouvel élément";
             }
         }
-            
-        
+
+
         return array(
             'html'  => $form,
             'label' => $valueLabel,
         );
     }
-    
+
     protected function _buildChamps($value)
     {
         $champHTML = '';
@@ -122,17 +122,17 @@ abstract class GabaritFieldSet
             $id_champ = (isset($value['id_version']) ? $value['id_version'] : '') . (isset($value['id']) ? $value['id'] : 0);
             $champArray = $this->_buildChamp($champ, $value_champ, $id_champ, $this->uploadPath, $this->idGabPage);
             $champHTML .= $champArray['html'];
-            
+
             if ($first) {
                 $first = FALSE;
                 $this->valueLabel = $champArray['label'];
-            } 
+            }
         }
-        
+
         $this->champsHTML = $champHTML;
     }
-    
-    
+
+
 
 }
 

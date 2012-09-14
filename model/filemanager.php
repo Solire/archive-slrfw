@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Model;
+
 class fileManager extends manager {
 
 //    static $_dirs = array(
@@ -51,7 +53,7 @@ class fileManager extends manager {
 //                FROM `res_categorie` `r`
 //                    LEFT JOIN `res_categorie` `p` ON `r`.`id_parent` = `p`.`id`
 //                WHERE `r`.`id` = " . ($_REQUEST['id'] ? $_REQUEST['id'] : "0");
-//            $categorie = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+//            $categorie = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
 //            $rewriting = $db->rewrit($_REQUEST['title'], "res_categorie", "rewriting", "AND `id_parent` = " . $_REQUEST['id']);
                 //	$json['rewriting'] = $rewriting;
             }
@@ -89,7 +91,7 @@ class fileManager extends manager {
 
 //        echo "<!--$query-->";
 
-        $files = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $files = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         return $files;
     }
@@ -99,7 +101,7 @@ class fileManager extends manager {
 
         if ($id_gab_page)
             $query .= " AND `id_gab_page` = $id_gab_page";
-        
+
         if ($id_temp)
             $query .= " AND `id_temp` = $id_temp";
 
@@ -107,7 +109,7 @@ class fileManager extends manager {
         $term = "%" . $term . "%";
         $query .= " AND `rewriting` LIKE " . $this->_db->quote($term);
 
-        $files = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $files = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         if (is_array($extensions)) {
             $files2 = array();
@@ -263,7 +265,7 @@ class fileManager extends manager {
             }
 
 
-            // Ajout d'informations utiles (ou pas)		
+            // Ajout d'informations utiles (ou pas)
             $jsonrpc['filename'] = $fileNameNew;
             $jsonrpc['size'] = $size;
             $jsonrpc['width'] = $width;
@@ -299,7 +301,7 @@ class fileManager extends manager {
      * @param string $ext
      * @param string $destinationName
      * @param int $largeurmax
-     * @param int $hauteurmax 
+     * @param int $hauteurmax
      */
     private function _vignette($fileSource, $ext, $destinationName, $largeurmax, $hauteurmax) {
         if (!array_key_exists($ext, self::$_extensions['image']))

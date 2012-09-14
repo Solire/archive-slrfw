@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Model;
+
 /**
  * Description of gabaritmanager
  *
@@ -12,7 +14,7 @@ class gabaritManager extends manager {
      * @param string $rewriting
      * @param int $id_parent
      * @param int $id_version
-     * @return int 
+     * @return int
      */
     public function getIdByRewriting($id_version, $id_api, $rewriting, $id_parent = 0) {
         $query = "SELECT `id` FROM `gab_page`"
@@ -25,11 +27,11 @@ class gabaritManager extends manager {
     /**
      *
      * @param int $id_version
-     * @return array 
+     * @return array
      */
     public function getVersion($id_version) {
         $query = "SELECT * FROM `version` WHERE `id` = " . $id_version;
-        $data = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $data = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
         return $data;
     }
@@ -39,14 +41,14 @@ class gabaritManager extends manager {
      * ou un objet page vide à partir de l'idenfiant du gabarit</p>
      * @param int $id_gab_page
      * @param int $id_gabarit
-     * @param int $version 
+     * @param int $version
      */
     public function getPage($id_version, $id_api, $id_gab_page, $id_gabarit = 0, $join = false, $visible = FALSE) {
         $page = new gabaritPage();
 
         if ($id_gab_page) {
             $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id_api` = $id_api AND `id` = $id_gab_page AND `suppr` = 0";
-            $meta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+            $meta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
             if (!$meta)
                 return FALSE;
@@ -63,7 +65,7 @@ class gabaritManager extends manager {
         $gabarit = $this->getGabarit($id_gabarit);
 
         $query = "SELECT * FROM `gab_gabarit` WHERE `id` = " . $gabarit->getIdParent();
-        $parentData = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $parentData = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
         $gabarit->setGabaritParent($parentData);
 
         if (!$id_gab_page && $gabarit->getIdParent() > 0) {
@@ -75,7 +77,7 @@ class gabaritManager extends manager {
                     . " LEFT JOIN `gab_page` `r` ON `r`.`id` = `q`.`id_parent` AND `r`.`suppr` = 0 AND `r`.`id_version` = $id_version"
                     . " WHERE `p`.`id_gabarit` = " . $gabarit->getIdParent() . " AND `p`.`suppr` = 0 AND `p`.`id_version` = $id_version";
 
-            $parents = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+            $parents = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
             $gabarit->setParents($parents);
         }
 
@@ -111,11 +113,11 @@ class gabaritManager extends manager {
     /**
      * <p>Retourne un objet gabarit à partir de l'identifiant du gabarit</p>
      * @param int $id_gabarit
-     * @return gabarit 
+     * @return gabarit
      */
     public function getGabarit($id_gabarit) {
         $query = "SELECT * FROM `gab_gabarit` WHERE `id` = $id_gabarit";
-        $row = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $row = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
         $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'], $row['label'], $row['main'], $row['creable'], $row['deletable'], $row['sortable'], $row['make_hidden'], $row['editable'], $row['meta'], $row['301_editable'], $row['meta_titre'], $row['extension']);
         if ($row['id_api'] > 0) {
@@ -127,30 +129,30 @@ class gabaritManager extends manager {
             $table = $row['name'];
         }
         $gabarit->setTable($table);
-        
-        
+
+
 
         $query = "SELECT IF (`g`.`label` IS NULL, 'general', `g`.`label`), `c`.*"
                 . " FROM `gab_champ` `c`"
                 . " LEFT JOIN `gab_champ_group` `g` ON `g`.`id` = `c`.`id_group`"
                 . " WHERE `id_parent` = $id_gabarit AND `type_parent` = 'gabarit'"
                 . " ORDER BY `g`.`ordre`, `c`.`ordre`";
-        $champs = $this->_db->query($query)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+        $champs = $this->_db->query($query)->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
         //Parametre
         //TODO a optimiser (1 requete pour champ dyn et champ normaux, filtrer par id champ + type, voir faire des jointure sur gab_champ)
         $gabChampTypeParams = $this->_db->query('
-            SELECT gc.id, gcpv.* 
+            SELECT gc.id, gcpv.*
             FROM gab_champ gc
-            INNER JOIN gab_champ_param_value gcpv 
+            INNER JOIN gab_champ_param_value gcpv
                 ON gcpv.id_champ = gc.id
-            ORDER BY id_group, ordre')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+            ORDER BY id_group, ordre')->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
         $gabChampTypeParamsDefault = $this->_db->query('
             SELECT gct.code, gcp.*, gcp.default_value value
             FROM gab_champ_type gct
-            INNER JOIN gab_champ_param gcp 
+            INNER JOIN gab_champ_param gcp
                 ON gct.code = gcp.code_champ_type
-            ORDER BY  gct.ordre, gct.code')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+            ORDER BY  gct.ordre, gct.code')->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
         foreach ($gabChampTypeParamsDefault as $type => $params) {
             $paramsDefault[$type] = array();
             foreach ($params as $param) {
@@ -188,12 +190,12 @@ class gabaritManager extends manager {
 
     /**
      *
-     * @param gabarit $gabarit 
+     * @param gabarit $gabarit
      * @return array
      */
     public function getBlocs($gabarit, $id_gab_page = 0) {
         $query = "SELECT * FROM `gab_bloc` WHERE `id_gabarit` = " . $gabarit->getId();
-        $rows = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         $query = "SELECT * FROM `gab_champ` WHERE `id_parent` = :id_bloc AND `type_parent` = 'bloc' ORDER BY `gab_champ`.`ordre`";
         $stmt = $this->_db->prepare($query);
@@ -201,18 +203,18 @@ class gabaritManager extends manager {
         //Parametre
         //TODO a optimiser (1 requete pour champ dyn et champ normaux, filtrer par id champ + type, voir faire des jointure sur gab_champ)
         $gabChampTypeParams = $this->_db->query('
-            SELECT gc.id, gcpv.* 
+            SELECT gc.id, gcpv.*
             FROM gab_champ gc
-            INNER JOIN gab_champ_param_value gcpv 
+            INNER JOIN gab_champ_param_value gcpv
                 ON gcpv.id_champ = gc.id
-            ORDER BY id_group, ordre')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+            ORDER BY id_group, ordre')->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
         $gabChampTypeParamsDefault = $this->_db->query('
             SELECT gct.code, gcp.*, gcp.default_value value
             FROM gab_champ_type gct
-            INNER JOIN gab_champ_param gcp 
+            INNER JOIN gab_champ_param gcp
                 ON gct.code = gcp.code_champ_type
-            ORDER BY  gct.ordre, gct.code')->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+            ORDER BY  gct.ordre, gct.code')->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
         foreach ($gabChampTypeParamsDefault as $type => $params) {
             $paramsDefault[$type] = array();
@@ -231,10 +233,10 @@ class gabaritManager extends manager {
             $table = $gabarit->getTable() . "_" . $row['name'];
             $gabarit_bloc->setTable($table);
 
-            $stmt->bindValue(":id_bloc", $row['id'], PDO::PARAM_INT);
+            $stmt->bindValue(":id_bloc", $row['id'], \PDO::PARAM_INT);
             $stmt->execute();
             $joins = array();
-            $champs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $champs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             //Parametre
             foreach ($gabChampTypeParams as $idField => $params) {
                 $params2 = array();
@@ -278,7 +280,7 @@ class gabaritManager extends manager {
 
     /**
      * Retourne la ligne des infos de la table générée à partir d'une page.
-     * @param gabaritPage $page 
+     * @param gabaritPage $page
      * @return array
      */
     public function getValues($page) {
@@ -286,7 +288,7 @@ class gabaritManager extends manager {
                 . " WHERE `id_gab_page` = " . $page->getMeta("id")
                 . " AND `id_version` = " . $page->getMeta("id_version");
 
-        return $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        return $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -297,7 +299,7 @@ class gabaritManager extends manager {
      * @param int $id_version identifiant de la version.
      * @param bool $visible <p>si faux on récupère les blocs visibles ou non,<br />
      * si vrai on récupère uniquement les blocs visibles.</p>
-     * @return type 
+     * @return type
      */
     public function getBlocValues($bloc, $id_gab_page, $id_version, $visible = FALSE) {
         $query = "SELECT * FROM `" . $bloc->getGabarit()->getTable() . "`"
@@ -305,7 +307,7 @@ class gabaritManager extends manager {
                 . " AND `id_version` = $id_version"
                 . ($visible ? " AND `visible` = 1" : "")
                 . " ORDER BY `ordre`";
-        return $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -314,7 +316,7 @@ class gabaritManager extends manager {
      * @param type $id_gab_page
      * @param type $id_version
      * @param type $visible
-     * @return type 
+     * @return type
      */
     public function getBlocJoinsValues($page, $name_bloc, $id_gab_page, $id_version, $visible = FALSE) {
         $joinFields = array();
@@ -343,7 +345,7 @@ class gabaritManager extends manager {
                     . ($visible ? " AND `visible` = 1" : "")
                     . " AND  `id`  IN (" . implode(",", $joinField['values']) . ")"
                     . " AND `suppr` = 0";
-            $meta = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+            $meta = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
             if (!$meta)
                 continue;
 
@@ -352,7 +354,7 @@ class gabaritManager extends manager {
                     . " WHERE `id_gab_page` IN (" . implode(",", array_keys($meta)) . ")"
                     . " AND `" . $joinField["table"] . "`.`id_version` = $id_version";
 
-            $values = $this->_db->query($query)->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_ASSOC);
+            $values = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
 
             //On recupere les pages jointes
             //On recupere les pages jointes
@@ -375,7 +377,7 @@ class gabaritManager extends manager {
                 $parents = array();
                 $query = "SELECT * FROM `gab_page`"
                         . " WHERE `id_version` = $id_version AND `id` IN (" . implode(", ", $parentsUnique) . ") AND `suppr` = 0";
-                $parentsMeta = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+                $parentsMeta = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
                 foreach ($parentsMeta as $parentMeta) {
 //                    if (!isset($meta[$value[$joinName]]))
 //                        continue;
@@ -391,7 +393,7 @@ class gabaritManager extends manager {
                 if (count($parentsUnique2) > count($parentsUnique)) {
                     $query = "SELECT * FROM `gab_page`"
                             . " WHERE `id_version` = $id_version AND `id` IN (" . implode(", ", $parentsUnique2) . ") AND `suppr` = 0";
-                    $parentsMeta2 = array_merge($parentsMeta, $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC));
+                    $parentsMeta2 = array_merge($parentsMeta, $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC));
                     foreach ($parentsMeta2 as $parentMeta2) {
                         $parentsPage[$parentMeta2["id"]] = new gabaritPage();
                         $parentsPage[$parentMeta2["id"]]->setMeta($parentMeta2);
@@ -435,7 +437,7 @@ class gabaritManager extends manager {
      * dans un tableau associatif `nom du gabarit` => `objet page correspondant`</p>
      * @param int $id_gab_page_parent
      * @param int $id_version
-     * @return array 
+     * @return array
      */
     public function getParents($id_gab_page_parent, $id_version) {
         $parents = array();
@@ -444,7 +446,7 @@ class gabaritManager extends manager {
         while ($id_gab_page_parent > 0) {
             $query = "SELECT * FROM `gab_page`"
                     . " WHERE `id_version` = $id_version AND `id` = $id_gab_page_parent AND `suppr` = 0";
-            $parentMeta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+            $parentMeta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
             $parentPage = new gabaritPage();
             $parentPage->setMeta($parentMeta);
@@ -470,18 +472,18 @@ class gabaritManager extends manager {
      * @param int $id_gabarit soit un int soit un array d'int
      * @param bool $visible
      * @param int $id_version
-     * @return array 
+     * @return array
      */
     public function getList($id_version, $id_api = 1, $id_parent = FALSE, $id_gabarit = 0, $visible = FALSE, $orderby = "ordre", $sens = "ASC", $debut = 0, $nbre = 0, $main = FALSE) {
         $query = "SELECT `p`.*, COUNT(`e`.`id`) `nbre_enfants`"
                 . " FROM `gab_page` `p` LEFT JOIN `gab_page` `e` ON `e`.`id_parent` = `p`.`id` AND `e`.`suppr` = 0 AND `e`.`id_version` = $id_version"
                 . ($visible ? " AND `e`.`visible` = 1" : "")
                 . ($main ? " INNER JOIN `gab_gabarit` `g` ON `p`.`id_gabarit` = `g`.`id` AND `g`.`main` = 1" : "")
-                . " WHERE `p`.`suppr` = 0 AND `p`.`id_version` = $id_version AND `p`.`id_api` = $id_api" 
+                . " WHERE `p`.`suppr` = 0 AND `p`.`id_version` = $id_version AND `p`.`id_api` = $id_api"
                 . ($visible ? " AND `p`.`visible` = 1" : "");
 
         if ($id_parent !== FALSE)
-            $query .= " AND `p`.`id_parent` = $id_parent"; //`p`.`id_parent` = $id_parent AND 
+            $query .= " AND `p`.`id_parent` = $id_parent"; //`p`.`id_parent` = $id_parent AND
         if ($id_gabarit) {
             if (is_array($id_gabarit)) {
                 if (count($id_gabarit) > 0)
@@ -498,7 +500,7 @@ class gabaritManager extends manager {
         if ($nbre)
             $query .= " LIMIT $debut, $nbre";
 
-        $metas = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $metas = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
         $version = $this->getVersion($id_version);
 
         $pages = array();
@@ -515,7 +517,7 @@ class gabaritManager extends manager {
     /**
      * <p>Retourne les gabarits et leurs pages qui sont checkés comme main</p>
      * @param int $id_version
-     * @return array 
+     * @return array
      */
     public function getMain($id_version, $id_api) {
         $query = "SELECT `g`.`name`, `p`.*"
@@ -523,7 +525,7 @@ class gabaritManager extends manager {
                 . " INNER JOIN `gab_gabarit` `g` ON `p`.`id_gabarit` = `g`.`id` AND `g`.`main` = 1 AND  `g`.`id_api` = $id_api"
                 . " WHERE `p`.`suppr` = 0 AND `p`.`id_version` = $id_version";
         $query .= " ORDER BY `p`.`ordre` ASC";
-        $metas = $this->_db->query($query)->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
+        $metas = $this->_db->query($query)->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
         $pages = array();
         foreach ($metas as $gabaritName => $metasGabarit) {
@@ -560,7 +562,7 @@ class gabaritManager extends manager {
         if ($id_parent != FALSE)
             $query .= " AND `id_parent` = $id_parent";
 
-        $metas = $this->_db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $metas = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
         $version = $this->getVersion($id_version);
 
         $pages = array();
@@ -580,7 +582,7 @@ class gabaritManager extends manager {
      * (exemple : pour les rubriques qui n'ont pas de `view`)</p>
      * @param int $id_parent
      * @param int $id_version
-     * @return array 
+     * @return array
      */
     public function getFirstChild($id_version, $id_parent = 0) {
         $query = "SELECT *"
@@ -589,7 +591,7 @@ class gabaritManager extends manager {
                 . " AND `visible` = 1"
                 . " ORDER BY `ordre`"
                 . " LIMIT 0, 1";
-        $meta = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $meta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
         if ($meta) {
             $page = new gabaritPage();
             $page->setMeta($meta);
@@ -602,13 +604,13 @@ class gabaritManager extends manager {
     /**
      * <p>Sauve une page et ses blocs dynamique.</p>
      * @param array $donnees
-     * @return gabaritPage 
+     * @return gabaritPage
      */
     public function save($donnees) {
         $gabarit = $this->getGabarit($donnees['id_gabarit']);
         $api = $gabarit->getApi();
-        
-        $this->_versions = $this->_db->query("SELECT `id` FROM `version` WHERE id_api = " . $api["id"])->fetchAll(PDO::FETCH_COLUMN);
+
+        $this->_versions = $this->_db->query("SELECT `id` FROM `version` WHERE id_api = " . $api["id"])->fetchAll(\PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
@@ -641,15 +643,15 @@ class gabaritManager extends manager {
      *
      * @param gabaritPage $page
      * @param array $donnees
-     * @return type 
+     * @return type
      */
     private function _saveMeta($page, $donnees) {
         $updating = $donnees['id_gab_page'] > 0;
-        
+
         //On recupere les ids de gabarits pour l'api courante
         $api =  $page->getGabarit()->getApi();
         $query = "SELECT `gab_gabarit`.id FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $api["id"];
-        $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(PDO::FETCH_COLUMN);
+        $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
 
         // Insertion dans la table `gab_page`.
         if ($updating) {
@@ -797,7 +799,7 @@ class gabaritManager extends manager {
      *
      * @param gabaritPage $page
      * @param array $donnees
-     * @return type 
+     * @return type
      */
     private function _savePage($page, $donnees) {
         $updating = $donnees['id_gab_page'] > 0;
@@ -875,7 +877,7 @@ class gabaritManager extends manager {
      * @param int $id_gab_page
      * @param int $id_version
      * @param array $donnees
-     * @return boolean 
+     * @return boolean
      */
     private function _saveBloc($bloc, $id_gab_page, $id_version, &$donnees) {
         $gabarit = $bloc->getGabarit();
@@ -979,10 +981,10 @@ class gabaritManager extends manager {
     /**
      * <p>Sauve une page et ses blocs dynamique.</p>
      * @param array $donnees
-     * @return gabaritPage 
+     * @return gabaritPage
      */
     public function previsu($donnees) {
-        $this->_versions = $this->_db->query("SELECT `id` FROM `version`")->fetchAll(PDO::FETCH_COLUMN);
+        $this->_versions = $this->_db->query("SELECT `id` FROM `version`")->fetchAll(\PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
@@ -1015,7 +1017,7 @@ class gabaritManager extends manager {
      *
      * @param gabaritPage $page
      * @param array $donnees
-     * @return type 
+     * @return type
      */
     private function _previsuMeta($page, $donnees) {
         $updating = $donnees['id_gab_page'] > 0;
@@ -1104,7 +1106,7 @@ class gabaritManager extends manager {
      *
      * @param gabaritPage $page
      * @param array $donnees
-     * @return type 
+     * @return type
      */
     private function _previsuPage($page, $donnees) {
 //        $updating = $donnees['id_gab_page'] > 0;
@@ -1188,7 +1190,7 @@ class gabaritManager extends manager {
      * @param int $id_gab_page
      * @param int $id_version
      * @param array $donnees
-     * @return boolean 
+     * @return boolean
      */
     private function _previsuBloc($bloc, $id_gab_page, $id_version, &$donnees) {
         $gabarit = $bloc->getGabarit();

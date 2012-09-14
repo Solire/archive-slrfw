@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Model;
+
 /**
  * Description of gabaritManagerOptimized
  *
@@ -12,9 +14,9 @@ class gabaritManagerOptimized extends gabaritManager {
     /**
      * Récupère les informations de la version selon son id
      *  Avec mise en cache
-     * 
+     *
      * @param int $id_version
-     * @return array 
+     * @return array
      */
     public function getVersion($id_version) {
         if (!isset($this->_versions[$id_version])) {

@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Model;
+
 /**
  * Description of bloc
  *
@@ -10,24 +12,24 @@ class gabaritBloc
 
     /**
      *
-     * @var gabarit 
+     * @var gabarit
      */
     protected $_gabarit;
 
     /**
      *
-     * @var array 
+     * @var array
      */
     protected $_values = array();
 
     public function __construct()
     {
-        
+
     }
 
     /**
      *
-     * @param gabarit $gabarit 
+     * @param gabarit $gabarit
      */
     public function setGabarit($gabarit)
     {
@@ -36,17 +38,17 @@ class gabaritBloc
 
     /**
      *
-     * @param array $values 
+     * @param array $values
      */
     public function setValues($values)
     {
         $this->_values = $values;
     }
-    
+
     /**
      *
      * @param string $key
-     * @return mixed 
+     * @return mixed
      */
     public function setValue($i, $value, $key = NULL)
     {
@@ -66,7 +68,7 @@ class gabaritBloc
 
     /**
      *
-     * @return gabarit 
+     * @return gabarit
      */
     public function getGabarit()
     {
@@ -76,7 +78,7 @@ class gabaritBloc
     /**
      *
      * @param string $key
-     * @return mixed 
+     * @return mixed
      */
     public function getValues()
     {
@@ -86,7 +88,7 @@ class gabaritBloc
     /**
      *
      * @param string $key
-     * @return mixed 
+     * @return mixed
      */
     public function getValue($i, $key = NULL)
     {
@@ -106,32 +108,32 @@ class gabaritBloc
 
     /**
      *
-     * @return type 
+     * @return type
      */
     public function buildForm($upload_path, $id_gab_page, $versionId)
     {
-        
+
         $form = '';
-        
+
         $champs = $this->_gabarit->getChamps();
-        
+
         $type = strtolower("default");
-        
+
         if(count($champs) == 1 && $champs[0]["type"] == "JOIN" && $champs[0]["params"]["VIEW"] == "simple") {
             $type = strtolower("simple");
         }
-        
+
         $classNameType = $type . "fieldset";
-        
+
         require_once "gabarit/fieldset/$type/$classNameType.php";
         $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values, $upload_path, $id_gab_page,   isset($this->_meta) ? $this->_meta : null , $versionId);
         $fieldset->start();
         $form .= $fieldset;
 
         return $form;
-        
-        
-        
+
+
+
     }
 
     /**
@@ -141,11 +143,11 @@ class gabaritBloc
      * @param string $idpage
      * @param string $upload_path nom du dossier où sont uploadés les images.
      * @param int $id_gab_page nom du dossier dans lequel sont les images.
-     * @return string 
+     * @return string
      */
     protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page)
     {
-        
+
         $form = '';
         if($champ["visible"] == 0)
             return $form;
@@ -155,7 +157,7 @@ class gabaritBloc
 
         if ($champ['typedonnee'] == 'DATE')
             $value = Tools::formate_date_nombre($value, '-', '/');
-        
+
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";
