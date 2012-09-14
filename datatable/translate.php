@@ -1,14 +1,14 @@
 <?php
 
-require_once 'datatable/datatable.php';
+namespace Slrfw\Datatable;
 
 /**
  * Description of BoardDatatable
  *
  * @author shin
  */
-class TranslateDatatable extends Datatable {
-    
+class Translate extends \Slrfw\Library\Datatable\Datatable {
+
     public function start() {
         parent::start();
         $api = $this->_db->query("SELECT name FROM gab_api WHERE id = " . BACK_ID_API)->fetchColumn();

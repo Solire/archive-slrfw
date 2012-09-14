@@ -1,15 +1,15 @@
 <?php
 
-require_once 'datatable/datatable.php';
-require_once 'tools.php';
+namespace Slrfw\Datatable;
+
 
 /**
  * Description of BoardDatatable
  *
  * @author shin
  */
-class BoardDatatable extends Datatable {
-    
+class Board extends \Slrfw\Library\Datatable\Datatable {
+
     /**
      * Liste des gabarits
      *
@@ -17,7 +17,7 @@ class BoardDatatable extends Datatable {
      * @access protected
      */
     protected $_gabarits;
-    
+
     /**
      * Utilisateur courant
      *
@@ -25,44 +25,44 @@ class BoardDatatable extends Datatable {
      * @access protected
      */
     protected $_utilisateur;
-    
+
     public function datatableAction() {
-        $fieldGabaritTypeKey = Tools::multidimensional_search($this->config["columns"], array("name" => "id_gabarit", "filter_field" => "select"));
+        $fieldGabaritTypeKey = \Slrfw\Library\Tools::multidimensional_search($this->config["columns"], array("name" => "id_gabarit", "filter_field" => "select"));
         foreach ($this->_gabarits as $gabarit) {
             $idsGabarit[] = $gabarit["id"];
         }
         $this->config["columns"][$fieldGabaritTypeKey]["filter_field_where"] = "id IN  (" . implode(",", $idsGabarit) . ")";
-        
+
         parent::datatableAction();
     }
-    
+
     /**
      * Défini l'utilisateur
-     * 
+     *
      * @param utilisateur $utilisateur Utilisateur courant
      * @return void
      */
     public function setUtilisateur($utilisateur) {
         $this->_utilisateur = $utilisateur;
     }
-    
+
     // --------------------------------------------------------------------
 
     /**
      * Défini l'utilisateur
-     * 
+     *
      * @param array $gabarits tableau des gabarits
      * @return void
      */
     public function setGabarits($gabarits) {
         $this->_gabarits = $gabarits;
     }
-    
+
     // --------------------------------------------------------------------
 
     /**
      * Construit la colonne d'action
-     * 
+     *
      * @param array $data Ligne courante de donnée
      * @return string Html des actions
      */
@@ -79,12 +79,12 @@ class BoardDatatable extends Datatable {
         $actionHtml .= '</div>';
         return $actionHtml;
     }
-    
+
     // --------------------------------------------------------------------
 
     /**
      * Construit la colonne de traduction
-     * 
+     *
      * @param array $data Ligne courante de donnée
      * @return string Html de traduction
      */
