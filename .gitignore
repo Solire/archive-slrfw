@@ -1,10 +1,9 @@
 # On ignore le dossier netbeans
-/nbproject/
+/nbproject/private/
+
 
 # dossiers de documentations
 ~*/
 # fichier de config
 /config/local.ini
 /config/online.ini
-/config/main.ini
-
