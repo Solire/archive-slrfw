@@ -1,5 +1,9 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 class View
 {
 
@@ -81,10 +85,11 @@ class View
         $this->_controller = $controller;
         $this->_action = $action;
 
-        if (($this->isEnabled() || $custom) && $this->isIncludeMain())
-            include($this->_dir . "main.phtml");
-        else
+        if (($this->isEnabled() || $custom) && $this->isIncludeMain()) {
+            include $this->_dir . 'main.phtml';
+        } else {
             $this->content();
+        }
     }
 
     public function setController($controller)

@@ -1,5 +1,8 @@
 <?php
 
+namespace Slrfw\Library\Loader;
+
+/** @todo faire la présentation du code */
 
 class Javascript {
 
@@ -24,7 +27,7 @@ class Javascript {
             $js .= '<script src="' . $lib["src"] . '" type="text/javascript"></script>' . "\n\t";
         return $js;
     }
-    
+
 
     public function addLibrary($path, $local = true)
     {

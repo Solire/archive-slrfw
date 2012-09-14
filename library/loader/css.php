@@ -1,5 +1,8 @@
 <?php
 
+namespace Slrfw\Library\Loader;
+
+/** @todo faire la présentation du code */
 
 class Css {
 
@@ -24,8 +27,8 @@ class Css {
             $css .= '<link rel="stylesheet" href="' . $lib["src"] . '" type="text/css" media="' . $lib["media"] . '" title="" charset="utf-8" />' . "\n\t";
         return $css;
     }
-    
-    
+
+
 
     public function addLibrary($path, $media = "screen")
     {

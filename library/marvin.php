@@ -9,7 +9,9 @@
  * @filesource
  */
 
-include 'geshi/geshi.php';
+namespace Slrfw\Library;
+
+require_once 'external/geshi/geshi.php';
 
 /**
  * Marvin est une methode de rapport d'erreur
@@ -142,7 +144,7 @@ class Marvin
      * @param int    $line     Ligne à lire
      *
      * @return string
-     * @uses GeSHi
+     * @uses \GeSHi
      */
     protected function readLines($fileName, $line)
     {
@@ -154,7 +156,7 @@ class Marvin
             }
             $strFile .= $file[$i];
         }
-        $geshi = new GeSHi($strFile, 'php');
+        $geshi = new \GeSHi($strFile, 'php');
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS, 2);
         $geshi->start_line_numbers_at($line - 6);
         $geshi->set_highlight_lines_extra_style('background: #497E7E;');

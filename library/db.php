@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-require_once 'mypdo.php';
+namespace Slrfw\Library;
 
 /**
  * Gestionnaire de connexion à la base de données
@@ -34,8 +34,8 @@ class DB
      * @var array
      */
     static private $_config = array(
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_STATEMENT_CLASS => array('MyPDOStatement')
+        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        \PDO::ATTR_STATEMENT_CLASS => array('Slrfw\Library\MyPDOStatement')
     );
 
     /**
@@ -67,7 +67,7 @@ class DB
      * @param string $otherDbName Nom de la base de données dans le cas où l'on
      * veut se connecter à une difference de celle présente dans $ini
      *
-     * @return PDO
+     * @return MyPDO
      */
     public static function factory($ini, $otherDbName = null)
     {
@@ -85,7 +85,9 @@ class DB
             $ini['dsn'], $ini['dbname'], $ini['host'], $ini['port']
         );
 
-        self::$_present[$ini['name']] = new MyPDO($dsn, $ini['user'], $ini['password'], self::$_config);
+        self::$_present[$ini['name']] = new MyPDO(
+            $dsn, $ini['user'], $ini['password'], self::$_config
+        );
 
 
         /* = Option d'affichage des erreurs
@@ -93,7 +95,7 @@ class DB
           `-------------------------------------------------------------------- */
         if (isset($ini['error']) && $ini['error'] == true) {
             self::$_present[$ini['name']]->setAttribute(
-                PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION
+                \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
             );
         }
 
@@ -135,7 +137,7 @@ class DB
             return self::$_present[$dbName];
         }
 
-        throw new LibException('Aucune connexion sous le nom ' . $dbName);
+        throw new Exception\Lib('Aucune connexion sous le nom ' . $dbName);
     }
 }
 

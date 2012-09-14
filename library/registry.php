@@ -8,6 +8,8 @@
  * @license    Solire http://www.solire.fr/
  */
 
+namespace Slrfw\Library;
+
 /**
  * Registre
  *

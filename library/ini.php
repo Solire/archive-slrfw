@@ -1,5 +1,9 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.

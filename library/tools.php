@@ -1,5 +1,9 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -161,7 +165,7 @@ class Tools {
         return $string;
     }
 
-    //GENERE TABLEAU ASSOCIATIF AVEC NOM DE COLONNE COMME INDICE (FICHIER DE CONFIG) 
+    //GENERE TABLEAU ASSOCIATIF AVEC NOM DE COLONNE COMME INDICE (FICHIER DE CONFIG)
     static function configAssign($arrayConf, $columnName, $columnValue, $columnLang = null, $lang = null) {
         $tableConfig = array();
 
@@ -186,10 +190,10 @@ class Tools {
 
     /**
      * Recherche dans un array multidim
-     * 
+     *
      * @param array $parents
      * @param array $searched
-     * @return boolean 
+     * @return boolean
      */
     static function multidimensional_search($parents, $searched) {
         if (empty($searched) || empty($parents)) {

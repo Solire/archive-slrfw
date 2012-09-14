@@ -1,5 +1,9 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 class Pagination
 {
 
@@ -23,7 +27,7 @@ class Pagination
      *
      * @param MyPDO $myPdo Connection MyPDO
      * @param string $queryWithoutSelect Query without SELECT clause
-     * @param string $queryGetField 
+     * @param string $queryGetField
      * @param int $nbElemsByPage number of elements by page
      * @param int $currentPage number of current page
      * @param array $binds binds for prepareQuery
@@ -154,7 +158,7 @@ class Pagination
 
         $prepareQuery->execute();
 //        echo  $prepareQuery->getBuiltQuery();
-        $this->_countResults = $prepareQuery->fetch(PDO::FETCH_COLUMN);
+        $this->_countResults = $prepareQuery->fetch(\PDO::FETCH_COLUMN);
     }
 
     private function _executeQuery()
@@ -172,7 +176,7 @@ class Pagination
         }
         $prepareQuery->execute();
 //        echo  $prepareQuery->getBuiltQuery();
-        $this->_results = $prepareQuery->fetchAll(PDO::FETCH_ASSOC);
+        $this->_results = $prepareQuery->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     private function _calculLimit()

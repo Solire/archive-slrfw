@@ -1,17 +1,21 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 //+	 --------------------------------------------------------------------------------
 /**
  * Log : Classe de log par fichier ou mysql
- * 
+ *
  * @version 2.02
  * @author Benoit Raux
  * Created : 2006/20/11 Benoit Raux (rauxbenoit@free.fr)
  * Updated : 2008/13/07 Benoit Raux	(rauxbenoit@free.fr)
- * 
+ *
  * Version PHP : 5.02
- * 
- * 
+ *
+ *
  * Par defaut et en mode fichier, la classe op?re une rotation sur les logs.
  * D?s que le fichier courant d?passe 5 Mo, il est compress? (gz).
  * La visualization des logs parcours ces archives.
@@ -50,7 +54,7 @@ class Log {
      * @var object
      */
     private $objFile;
-    
+
     /**
      * Pointeur vers la base de donnée
      *
@@ -96,7 +100,7 @@ class Log {
     //+	 --------------------------------------------------------------------------------
     /**
      * Constructeur de la classe log
-     * 
+     *
      * @param string $strToFileOrDbConnect :
      * 	Chemin vers le fichier de log ( ? cr?er ou ? suivre).
      * 	Si type db, on vas loguer dans la table $strTable
@@ -117,7 +121,7 @@ class Log {
         }
         //On test si on doit ouvrir un fichier en ?criture, sinon on test existance de la table)
        if (!is_string($strToFileOrDbConnect)) {
-            
+
                 $this->strLogMode = 'mysql';
                 $this->strLogTable = $strTable;
                 $this->db = $strToFileOrDbConnect;
@@ -138,7 +142,7 @@ class Log {
     }
 
     //+	 --------------------------------------------------------------------------------
-    /** 	 
+    /**
      * mysqlQuery : Execute une requette
      *
      * @param string $strFile : le ficher
@@ -149,7 +153,7 @@ class Log {
             if ($objResult == FALSE) {
                 $strError = $reqTable . ' : ' . mysql_error();
                 $strError.= "\n";
-                throw new LogException($strError);
+                throw new \Slrfw\Library\Exception\Log($strError);
             }
         } catch (Exception $objExpetion) {
             $objExpetion->makeLogExeption();
@@ -158,7 +162,7 @@ class Log {
     }
 
     //+	 --------------------------------------------------------------------------------
-    /** 	 
+    /**
      * createTable : Cr?? la table de log si elle existe pas
      *
      */
@@ -171,14 +175,14 @@ class Log {
 				`logIp` VARCHAR( 100 ) NOT NULL ,
 				`logString` VARCHAR( 1000 ) NOT NULL,
 				`logStrOpt` VARCHAR( 1000 ) NOT NULL,
-				`logIdUser` INT(100 ) NOT NULL 
+				`logIdUser` INT(100 ) NOT NULL
 			)';
-        
+
         $objResult = $this->mysqlQuery($reqTable);
     }
 
     //+	 --------------------------------------------------------------------------------
-    /** 	 
+    /**
      * openLogFile : Ouvre le fichier de Log
      */
     private function openLogFile() {
@@ -214,9 +218,9 @@ class Log {
     }
 
     //+	 --------------------------------------------------------------------------------
-    /** 	 
+    /**
      * openLogFile : Ouvre le fichier de Log
-     * 
+     *
      * @param string $strFile : le ficher
      * @param string $strMode : le mode d'ouverture
      */
@@ -227,7 +231,7 @@ class Log {
                 $strError = 'Erreur d\'ouverture du fichier ' . $strFile . ' en mode ' . $strMode . '!';
                 $strError.= "\n";
                 $strError.= 'V?rifiez l\'existance et les droits sur vos fichiers...';
-                throw new LogException($strError);
+                throw new \Slrfw\Library\Exception\Log($strError);
             }
         } catch (Exception $objExpetion) {
             $objExpetion->makeLogExeption();
@@ -236,9 +240,9 @@ class Log {
     }
 
     //+	 --------------------------------------------------------------------------------
-    /** 	 
+    /**
      * logThis : Ecrit la chaine $strToLog
-     * 
+     *
      * @param string $strToLog : cha?ne a ajouter dans le log
      */
     public function logThis($strToLog, $idUser = 0, $logStrOpt = "") {
@@ -256,9 +260,9 @@ class Log {
     }
 
     //+	 --------------------------------------------------------------------------------
-    /** 	 
+    /**
      * logThisInFile : Ecrit la chaine $strToLog dans le fichier
-     * 
+     *
      * @param string $strToLog : cha?ne a ajouter dans le log
      */
     private function logThisInFile($strToLog) {
@@ -270,7 +274,7 @@ class Log {
     //+	 --------------------------------------------------------------------------------
     /**
      * logThisInTable : Ecrit la chaine $strToLog dans la table mysql
-     * 
+     *
      * @param string $strToLog : cha?ne a ajouter dans le log
      */
     private function logThisInTable($strToLog, $idUser, $strOpt) {
@@ -297,18 +301,18 @@ class Log {
 
     //+	 --------------------------------------------------------------------------------
     /**
-     * purgeLog : Purge le log selon une date / heure 
+     * purgeLog : Purge le log selon une date / heure
      * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre)
-     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s) 
+     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppr?ssion des logs
-     * 
+     *
      */
     public function purgeLog($strDateTime='0000-00-00 00:00:00') {
         //Si par d?faut
         if ($strDateTime == '0000-00-00 00:00:00') {
             $strDateTime = date('Y-m-d H:i:s');
         }
-        //Controle datetime  
+        //Controle datetime
         if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTime)) {
             switch ($this->strLogMode) {
                 case 'mysql':
@@ -321,7 +325,7 @@ class Log {
             }
         } else {
             try {
-                throw new LogException($strDateTime . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log($strDateTime . ' N\'est pas au bon format');
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
@@ -332,9 +336,9 @@ class Log {
     /**
      * purgeLogTable : Purge la table de log selon une date / heure
      * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre dans la table mysql de log)
-     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s) 
+     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppression des logs
-     * 
+     *
      */
     private function purgeLogTable($strDateTime) {
         $strDate = substr($strDateTime, 0, 10);
@@ -349,7 +353,7 @@ class Log {
     /**
      * dateToTimestamp : Renvoit le timestamp d'une date MYSQL.
      * @param string $strDateTime : chaine au format datetime MYSQL
-     * 
+     *
      */
     private function dateToTimestamp($strDateTime) {
         return strtotime($strDateTime);
@@ -359,9 +363,9 @@ class Log {
     /**
      * purgeLogCurentFile : Purge le fichier log en cours selon une date / heure
      * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre dans le fichier de log)
-     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s) 
+     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppression des logs
-     * 
+     *
      */
     private function purgeLogCurentFile($strDateTime) {
         $intTimeStampeDate = $this->dateToTimestamp($strDateTime);
@@ -396,12 +400,12 @@ class Log {
 
     //+	 --------------------------------------------------------------------------------
     /**
-     * purgeLogFiles : Purge les fichier log archiv?s selon une date / heure 
+     * purgeLogFiles : Purge les fichier log archiv?s selon une date / heure
      * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre
      * dans les fichier de log archiv?s)
-     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s) 
+     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppression des logs
-     * 
+     *
      */
     public function purgeLogFiles($strDateTime) {
         $intTimeStampeDate = $this->dateToTimestamp($strDateTime);
@@ -427,30 +431,30 @@ class Log {
      * visuLog : Fonction pour afficher les logs dans la page
      *
      * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) de debut
-     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin optionel, 
+     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin optionel,
      * 	si = 0000-00-00 00:00:00 : pas de date de fin
      * @param string $strContentToSearch : un contenu recherch? (optionel)
      * @param bool $booDetail :affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)	
+     * @param string $strIp : une  ip recherch?e (optionel)
      */
     public function visuLog(
     $strDateTimeIni='0000-00-00 00:00:00', $strDateTimeEnd='0000-00-00 00:00:00', $strContentToSearch='', $booDetail=true, $strIp=''
     ) {
-        //Controle datetime  
+        //Controle datetime
         if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeIni)) {
-            
+
         } else {
             try {
-                throw new LogException('Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log('Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format');
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
         }
         if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeEnd)) {
-            
+
         } else {
             try {
-                throw new LogException('Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log('Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format');
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
@@ -478,21 +482,21 @@ class Log {
     private function returnLog(
     $strDateTimeIni='0000-00-00 00:00:00', $strDateTimeEnd='0000-00-00 00:00:00', $strContentToSearch='', $booDetail=true, $strIp=''
     ) {
-        //Controle datetime  
+        //Controle datetime
         if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeIni)) {
-            
+
         } else {
             try {
-                throw new LogException('Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log('Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format');
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
         }
         if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeEnd)) {
-            
+
         } else {
             try {
-                throw new LogException('Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log('Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format');
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
@@ -530,7 +534,7 @@ class Log {
      * si = 0000-00-00 00:00:00 : pas de date de fin
      * @param string $strContentToSearch : un contenu recherch? (optionel)
      * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)	
+     * @param string $strIp : une  ip recherch?e (optionel)
      * @return string : contenu des logs
      */
     private function returnLogArchFilesContent(
@@ -588,7 +592,7 @@ class Log {
                                 $booLineCheck = false;
                             }
                         }
-                        //Test crit?re d'ip 
+                        //Test crit?re d'ip
                         if ($strIp != '' && !strstr($arrArchColContent[2], $strIp)) {
                             $booLineCheck = false;
                         }
@@ -625,7 +629,7 @@ class Log {
      * si = 0000-00-00 00:00:00 : pas de date de fin
      * @param string $strContentToSearch : un contenu recherch? (optionel)
      * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)	
+     * @param string $strIp : une  ip recherch?e (optionel)
      * @return string : contenu des logs
      */
     private function returnLogFileContent(
@@ -659,7 +663,7 @@ class Log {
                             $booLineCheck = false;
                         }
                     }
-                    //Test crit?re d'ip 
+                    //Test crit?re d'ip
                     if ($strIp != '' && !strstr($arrLineContent[2], $strIp)) {
                         $booLineCheck = false;
                     }
@@ -695,9 +699,9 @@ class Log {
      * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) de debut
      * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin,
      * si = 0000-00-00 00:00:00 : pas de date de fin
-     * @param string $strContentToSearch : un contenu recherch? (optionel)	
+     * @param string $strContentToSearch : un contenu recherch? (optionel)
      * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)	
+     * @param string $strIp : une  ip recherch?e (optionel)
      * @return string contenu de la table de log
      */
     private function returnLogMysqlContent(
@@ -750,7 +754,7 @@ class Log {
     //+	 --------------------------------------------------------------------------------
     /**
      * newLog : Fonction qui retourne une instance de l'objet log
-     * 
+     *
      * @param string $strToFile :
      * 	Chemin vers le fichier de log ( ? cr?er ou ? suivre).
      * 	Si ?gal a mysql, on vas loguer dans la table $strTable
@@ -776,48 +780,3 @@ class Log {
     }
 
 }
-
-class LogException extends Exception {
-
-    //+	 --------------------------------------------------------------------------------
-    /**
-     * __construct : constructeur de mon expetion
-     *
-     * @param string $strErrorMsg :
-     * 	Tout simplement le message d'erreur ?  afficher.
-     */
-    public function __construct($strErrorMsg) {
-        parent::__construct($strErrorMsg);
-    }
-
-    //+	 --------------------------------------------------------------------------------
-    /**
-     * makeLogExeption : fonction qui affiche l'erreur et stop l'?xecution du script
-     *
-     */
-    public function makeLogExeption() {
-        echo '<pre>';
-        echo print_r(
-                utf8_decode(
-                        'Erreur fatal ! -> Ficher ' . $this->getFile() . ' ligne '
-                        . $this->getLine() . "\n"
-                        . 'Description de l\'erreur : ' . $this->getMessage() . "\n"
-                ), true
-        );
-        echo print_r(utf8_decode("\n" . $this->getTraceAsString()), true);
-        echo '<pre>';
-        exit;
-    }
-
-    //+	 --------------------------------------------------------------------------------
-    /**
-     * _toString : Fonction "magic" qui retourne l'objet sous forme de chaine
-     *
-     */
-    public function __toString() {
-        return '<pre>' . print_r($this, true) . '</pre>';
-    }
-
-}
-
-?>

@@ -1,5 +1,9 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 /**
  * @version 2
  */
@@ -26,19 +30,19 @@ class Translate
 
     /**
      * Chemin relatif vers le dossier de traduction.
-     * @var string 
+     * @var string
      */
     private $_dir = "";
 
     /**
      * Lites des fichiers de langue utilis�s.
-     * @var array 
+     * @var array
      */
     private $_langFiles = array();
 
     /**
      * Lites des fichiers de langue JS utilis�s.
-     * @var array 
+     * @var array
      */
     private $_langFilesJs = array();
 
@@ -109,7 +113,7 @@ class Translate
 
         /* = Chargement des mask de traduction
           `--------------------- */
-        
+
         foreach ($this->_translate[$this->_locale] as $Key => $Value) {
 //            echo 'INSERT INTO traduction SET cle = ' . Registry::get("db")->quote($Key) . ', valeur = ' . Registry::get("db")->quote($Key) . ', id_version = 1 ;';
             if (!preg_match("/^([0-9\,\.]+) (.+)/", $Key, $Foo))
@@ -132,10 +136,10 @@ class Translate
         if (!strpos($filename, $this->_dir))
             $this->_langFilesJs[] = 'locale' . DIRECTORY_SEPARATOR . $this->_locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES_JS' . DIRECTORY_SEPARATOR . $filename;
     }
-    
+
     /**
      * Renvoie les fichiers de traduction JS
-     * 
+     *
      * @return array Liste des traduction JS
      */
     public function getTranslationJs()
@@ -221,7 +225,7 @@ class Translate
     private static function error($Message)
     {
         if (self::DEBUG)
-            throw new Exception($Message, 0);
+            throw new \Exception($Message, 0);
     }
 
 }

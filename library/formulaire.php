@@ -8,7 +8,7 @@
  * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-require_once 'param.php';
+namespace Slrfw\Library;
 
 /**
  * Contrôle des formulaires
@@ -146,7 +146,7 @@ class Formulaire
             $this->_architecture = $iniPath;
         }
 
-        $this->_parseArchi();
+        $this->parseArchi();
     }
 
     /**
@@ -155,7 +155,7 @@ class Formulaire
      *
      * @return boolean
      */
-    private function _parseArchi()
+    private function parseArchi()
     {
         if (isset($this->_architecture['__config'])) {
             $this->_config = $this->_architecture['__config'];
@@ -218,16 +218,15 @@ class Formulaire
      *
      * @return array tableau des données du formulaire
      *
-     * @throws LibException En cas d'erreurs dans la configuration du formulaire
-     * @throws UserException Si le formulaire est mal remplis
+     * @throws Exception\Lib  En cas d'erreurs dans la configuration du formulaire
+     * @throws Exception\User Si le formulaire est mal remplis
      *
-     * @uses Formulaire::_parseArchi()
-     * @uses Formulaire::_catchData()
+     * @uses Formulaire::catchData()
      * @uses Formulaire::get()
      */
     public function run()
     {
-        $this->_fullData = $this->_catchData();
+        $this->_fullData = $this->catchData();
         $configuration = $this->_architecture;
 
         /* = On utilise cette formulation plutot que foreach parce que
@@ -253,7 +252,7 @@ class Formulaire
             `------------------------------------ */
             if ($temp == null) {
                 if ($regles['obligatoire'] == true) {
-                    $this->_throwError($regles);
+                    $this->throwError($regles);
                 }
 
                 continue;
@@ -264,7 +263,7 @@ class Formulaire
             /* = Test si le fichier de configuration est au bon format
             `--------------------------------------------------------- */
             if (!is_array($options)) {
-                throw new LibException("Config : Opt n'est pas un tableau");
+                throw new Exception\Lib("Config : Opt n'est pas un tableau");
             }
 
             /* = Si la variable ne passe pas les testes
@@ -273,7 +272,7 @@ class Formulaire
             `---------------------------------------- */
             if (!$temp->tests($options)) {
                 if ($regles['obligatoire'] == true) {
-                    $this->_throwError($regles);
+                    $this->throwError($regles);
                 }
 
                 continue;
@@ -300,7 +299,7 @@ class Formulaire
               ------------------------------- */
             if (isset($regles['egal'])) {
                 if ($this->_data[$name] != $this->_data[$regles['egal']]) {
-                    $this->_throwError($regles);
+                    $this->throwError($regles);
                 }
             }
         }
@@ -336,20 +335,20 @@ class Formulaire
      * la table est à préciser pendant l'appel de la fonction ou dans le fichier
      * de configuration
      *
-     * @param PDO    $db    Connection à la bdd
+     * @param \PDO   $db    Connection à la bdd
      * @param string $table Nom de la table dans lequel faire l'insertion
      *
      * @return string
      *
      * @deprecated
      */
-    public function makeQuery(PDO $db, $table = null)
+    public function makeQuery(\PDO $db, $table = null)
     {
         if (empty($table) && isset($this->_config['table'])) {
             $table = $this->_config['table'];
         }
         $query = 'DESC ' . $table;
-        $archi = $db->query($query)->fetchAll(PDO::FETCH_COLUMN, 0);
+        $archi = $db->query($query)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
         $values = array();
         foreach ($archi as $col) {
@@ -368,18 +367,17 @@ class Formulaire
      *
      * Le type d'exception envoyé peut être paramétré à deux endroits, (voir le
      * fichier de configuration) au niveau du champ, ou au niveau du formulaire.
-     * <br/>Par défaut une {@link UserException} est envoyée.
+     * <br/>Par défaut une {@link Exception\User} est envoyée.
      *
      * @param array $regles Tableau associatif de règles pour la gestion d'erreurs
      *
      * @return void
-     *
      * @throws mixed
-     * @throws UserException
+     * @throws Exception\User Si il y a une erreur dans le formulaire
      *
      * @todo faire un tutorial expliquant le paramétrage des champs d'un formulaire
      */
-    private function _throwError($regles)
+    private function throwError($regles)
     {
         $error = null;
 
@@ -396,7 +394,7 @@ class Formulaire
             ------------------------------- */
             $error = new $this->_config['exception']($regles['erreur']);
         } else {
-            $error = new UserException($regles['erreur']);
+            $error = new Exception\User($regles['erreur']);
 
             /* = Par défaut on redirige vers la page précédente
               ------------------------------- */
@@ -419,10 +417,10 @@ class Formulaire
     /**
      * Récupère les données GET POST COOKIE
      *
-     * @uses Formulaire::$_ordre
      * @return array
+     * @uses Formulaire::$_ordre
      */
-    private function _catchData()
+    private function catchData()
     {
         $datas = array(
             'g' => $_GET,

@@ -1,14 +1,9 @@
 <?php
 
-/**
- * @package Controller
- */
+namespace Slrfw\Library;
 
-/**
- * @package Controller
- * @api
- */
-class FrontController {
+class FrontController
+{
 
     /**
      * Configuration principale du site
@@ -35,6 +30,7 @@ class FrontController {
 
     private function __construct($application) {
         $this->_dirs = self::$mainConfig->get("dirs");
+        $application = strtolower($application);
         $this->_applicationConfig = self::$mainConfig->get('app_' . $application);
         $this->_format = self::$mainConfig->get("format");
         $this->_debug = self::$mainConfig->get("debug");
@@ -58,7 +54,6 @@ class FrontController {
         /* = Chargement de la configuration
           ------------------------------- */
         self::$mainConfig = new Config('../config/main.ini');
-
         /* = Detection de l'environnement
           ------------------------------- */
         $localHostnames = explode(',', self::$mainConfig->get('detect', 'development'));
@@ -137,16 +132,16 @@ class FrontController {
 
         if(isset($_GET["application"])) {
             $query = "SELECT * FROM `gab_api` WHERE `name` = " . $db->quote($_GET["application"]);
-            $api = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+            $api = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
         }
 
 
         $query = "SELECT * FROM `version` WHERE `domaine` = '$serverUrl'";
-        $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
         if (!isset($version["id"])) {
             $query = "SELECT * FROM `version` WHERE `suf` LIKE " . $db->quote($sufVersion);
-            $version = $db->query($query)->fetch(PDO::FETCH_ASSOC);
+            $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
         }
 
 
@@ -158,25 +153,19 @@ class FrontController {
 
     public static function run() {
         if (isset($_REQUEST['application']) && !empty($_REQUEST['application'])) {
-            $application = $_REQUEST['application'];
+            $application = ucfirst($_REQUEST['application']);
         } else {
-            $application = 'front';
+            $application = 'Front';
         }
         $front = self::getInstance($application);
         $applicationPath = '../' . $front->_applicationConfig['path'];
 
         $controller = str_replace("-", "", strtolower(isset($_GET["controller"]) ? $_GET["controller"] : $front->getDefault("controller")));
         $action = str_replace("-", "", strtolower(isset($_GET["action"]) ? $_GET["action"] : $front->getDefault("action")));
-        $file = sprintf($front->getDir("controllers"), $applicationPath) . sprintf($front->getFormat("controller-file"), $controller);
-        $class = sprintf($front->getFormat("controller-class"), $controller);
+
+        $class = 'Slrfw\App\\' . $application . '\\Controller\\' . ucfirst($controller);
         $method = sprintf($front->getFormat("controller-action"), $action);
 
-        if (!file_exists($file)) {
-            $front->debug(self::CONTROLLER_FILE_NOT_EXISTS, array($file));
-            return false;
-        }
-
-        require_once ($file);
 
         if (!class_exists($class)) {
             $front->debug(self::CONTROLLER_CLASS_NOT_EXISTS, array($class));
@@ -184,14 +173,14 @@ class FrontController {
         }
 
         if (!method_exists($class, $method)) {
-            $front->debug(self::CONTROLLER_ACTION_NOT_EXISTS, array($action, $controller, $file));
+            $front->debug(self::CONTROLLER_ACTION_NOT_EXISTS, array($action, $controller));
             return false;
         }
 
         $instance = new $class();
 
         $view = $instance->getView();
-        $view->setDir(sprintf($front->getDir("views"), $applicationPath));
+        $view->setDir(sprintf($front->getDir("views"), 'app/' . strtolower($application)));
         $view->setTemplate("main");
         $view->setFormat($front->getFormat("view-file"));
         $view->base = $front->getDir("base");
@@ -200,12 +189,12 @@ class FrontController {
         $instance->shutdown();
 
         if ($view->isEnabled()) {
-            if (!$view->exists($controller, $action)) {
+            try {
+                $view->display($controller, $action, false);
+            } catch (\Exception $exc) {
                 $front->debug(self::VIEW_FILE_NOT_EXISTS, array($view));
                 return false;
             }
-
-            $view->display($controller, $action, false);
         }
 
         return true;
@@ -232,9 +221,9 @@ class FrontController {
                 self::VIEW_FILE_NOT_EXISTS => "Le fichier de vue <strong>%s</strong> n'existe pas.",
             );
             $message = $errors[$idx];
-            throw new MarvinException(new Exception($message));
+            throw new Exception\Marvin(new \Exception($message));
         } else {
-            $error = new HttpErrorException('');
+            $error = new Exception\HttpError('');
             $error->http(404);
             throw $error;
         }

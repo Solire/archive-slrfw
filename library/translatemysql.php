@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Library;
+
 /**
  * @version 2
  */
@@ -56,7 +58,7 @@ class TranslateMysql
     {
         $this->_locale = $locale;
     }
-    
+
     /**
      * Choix de l'api utilisée.
      *
@@ -90,7 +92,7 @@ class TranslateMysql
 
     private function _loadTranslationData($locale)
     {
-        $translateData = $this->_db->query("SELECT cle, valeur FROM traduction WHERE id_api = " . intval($this->_api) . " AND id_version = " . intval($locale))->fetchAll(PDO::FETCH_UNIQUE | PDO::FETCH_COLUMN);
+        $translateData = $this->_db->query("SELECT cle, valeur FROM traduction WHERE id_api = " . intval($this->_api) . " AND id_version = " . intval($locale))->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_COLUMN);
         foreach ($translateData as $key => $value) {
             $this->_translate[$locale][$key] = $value;
         }
@@ -103,7 +105,7 @@ class TranslateMysql
     private static function error($Message)
     {
         if (self::DEBUG)
-            throw new Exception($Message, 0);
+            throw new \Exception($Message, 0);
     }
 
 }

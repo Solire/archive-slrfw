@@ -1,20 +1,30 @@
 <?php
 /**
- * @package Library
+ * Gestionnaire des erreurs
+ *
+ * @package    Library
  * @subpackage Error
+ * @author     Siwaÿll <sanath.labs@gmail.com>
+ * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @filesource
  */
+
+namespace Slrfw\Library;
 
 /**
  * Gestionnaire des erreurs
  *
- * @author Adrien <aimbert@solire.fr>
- * @package Library
+ * @package    Library
  * @subpackage Error
+ * @author     Siwaÿll <sanath.labs@gmail.com>
+ * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @filesource
  */
 final class Error
 {
     /**
      * Code HTTP de l'erreur
+     *
      * @var int
      */
     static protected $_code;
@@ -26,8 +36,12 @@ final class Error
      */
     static private $_headers = array(
         301 => '301	Moved Permanently',
-        401 => '401	Unauthorized', // Une authentification est nécessaire pour accéder à la ressource
-        403 => '403	Forbidden', // L’authentification est refusée. Contrairement à l’erreur 401, aucune demande d’authentification ne sera faite
+        /** Une authentification est nécessaire pour accéder à la ressource */
+        401 => '401	Unauthorized',
+        /** L’authentification est refusée. Contrairement à l’erreur 401, aucune
+         * demande d’authentification ne sera faite
+         */
+        403 => '403	Forbidden',
         404 => '404 Not Found',
         405	=> '405 Method Not Allowed',
         418 => '418	I’m a teapot',
@@ -37,6 +51,8 @@ final class Error
 
     /**
      * Fonctionnement par défaut, fait passer la page en erreur 500
+     *
+     * @return void
      * @uses Error::http()
      */
     public static function run()
@@ -46,7 +62,10 @@ final class Error
 
     /**
      * Affiche une erreur HTTP
-     * @param int $code Code HTTP de l'erreur
+     *
+     * @param int|array $code Code HTTP de l'erreur
+     *
+     * @return void
      * @uses Error::setHeader()
      */
     public static function http($code)
@@ -56,24 +75,28 @@ final class Error
             $url = $code[1];
             $code = $code[0];
         }
-        
+
         self::$_code = $code;
 
         self::setHeader($url);
 
         $fileName = 'error/' . $code . '.phtml';
-        if (file_exists($fileName))
+        if (file_exists($fileName)) {
             include $fileName;
-        else
+        } else {
             include 'error/500.phtml';
+        }
     }
 
     /**
      * Affiche le message d'erreur demandé pour l'utilisateur
+     *
+     * @param Exception\User $exc Exception utilisateur
+     *
+     * @return void
      * @uses Message
-     * @param UserException $exc
      */
-    public static function message(UserException $exc)
+    public static function message(Exception\User $exc)
     {
         $message = new Message($exc->getMessage());
         $message->setEtat('error');
@@ -81,42 +104,50 @@ final class Error
         $message->addRedirect($link, $auto);
         try {
             $message->display();
-        } catch (Exception $exc) {
+        } catch (\Exception $exc) {
             self::http(500);
         }
     }
 
     /**
      * Envois un rapport Marvin et affiche une erreur 500
+     *
+     * @param Exception\Marvin $exc Exception à marquer d'un rapport
+     *
+     * @return void
      * @uses Marvin
-     * @uses MarvinException::getTitle()
-     * @param MarvinException $exc
+     * @uses Exception\Marvin::getTitle()
      */
-    public static function report(MarvinException $exc)
+    public static function report(Exception\Marvin $exc)
     {
         $marvin = new Marvin($exc->getTitle(), $exc);
         $marvin->display();
-
-//        self::http(500);
     }
 
 
 
     /**
      * Affiche le header correspondant à l'erreur
+     *
+     * @param string $url Ajoute une redirection au header
+     *
+     * @return void
      * @uses Error::$_headers
      */
     private static function setHeader($url = null)
     {
         header('HTTP/1.0 ' . self::$_headers[self::$_code]);
-        if($url !== null) {
+        if ($url !== null) {
             self::setHeaderRedirect($url);
         }
     }
-    
+
     /**
-     * Affiche le header correspondant à l'erreur
-     * @uses Error::$_headers
+     * Ajoute une redirection dans le header
+     *
+     * @param string $url Url vers laquelle on redirige l'utilisateur
+     *
+     * @return void
      */
     private static function setHeaderRedirect($url)
     {

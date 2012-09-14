@@ -1,5 +1,9 @@
 <?php
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 /**
  * FTP
  *
@@ -225,7 +229,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($dir))) {
                 if (!ftp_mkdir($this->_conn, $dir))
-                    throw new Exception('FTP :: Impossible de créer le répertoire "' . $dir . '" (existant ou erreur)');
+                    throw new \Exception('FTP :: Impossible de créer le répertoire "' . $dir . '" (existant ou erreur)');
             }
         }
         return $this;
@@ -239,7 +243,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($dir))) {
                 if (!ftp_rmdir($this->_conn, $dir))
-                    throw new Exception('FTP :: Impossible de supprimer le répertoire "' . $dir . '" (inexistant ou erreur)');
+                    throw new \Exception('FTP :: Impossible de supprimer le répertoire "' . $dir . '" (inexistant ou erreur)');
             }
         }
         return $this;
@@ -253,7 +257,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($dir))) {
                 if (!ftp_chdir($this->_conn, $dir))
-                    throw new Exception('FTP :: Impossible de changer de répertoire ("' . $dir . '")');
+                    throw new \Exception('FTP :: Impossible de changer de répertoire ("' . $dir . '")');
             }
         }
         return $this;
@@ -266,7 +270,7 @@ class FTP
     {
         if ($this->_conn != false) {
             if (!ftp_cdup($this->_conn))
-                throw new Exception('FTP :: Impossible de changer de répertoire ("' . $dir . '")');
+                throw new \Exception('FTP :: Impossible de changer de répertoire ("' . $dir . '")');
         }
         return $this;
     }
@@ -279,7 +283,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($oldname)) && trim(!empty($newname))) {
                 if (!ftp_rename($this->_conn, $oldname, $newname))
-                    throw new Exception('FTP :: Impossible de renommer "' . $oldname . '" en "' . $newname . '" (inexistant ou erreur)');
+                    throw new \Exception('FTP :: Impossible de renommer "' . $oldname . '" en "' . $newname . '" (inexistant ou erreur)');
             }
         }
         return $this;
@@ -293,7 +297,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($file))) {
                 if (!ftp_delete($this->_conn, $file))
-                    throw new Exception('FTP :: Impossible de supprimer le fichier "' . $file . '" (inexistant ou erreur)');
+                    throw new \Exception('FTP :: Impossible de supprimer le fichier "' . $file . '" (inexistant ou erreur)');
             }
         }
         return $this;
@@ -308,7 +312,7 @@ class FTP
             if (trim(!empty($file))) {
                 $size = ftp_size($this->_conn, $file);
                 if ($size == -1)
-                    throw new Exception('FTP :: Impossible de récupérer la taille du fichier "' . $file . '" (inexistant ou erreur)');
+                    throw new \Exception('FTP :: Impossible de récupérer la taille du fichier "' . $file . '" (inexistant ou erreur)');
                 else
                     return $size;
             }
@@ -324,7 +328,7 @@ class FTP
             if (trim(!empty($file)) && trim(!empty($mode))) {
                 $mode = str_pad($mode, 4, '0', STR_PAD_LEFT);
                 if (!ftp_chmod($this->_conn, $mode, $file))
-                    throw new Exception('FTP :: Impossible de modifier les droits du fichier/dossier "' . $file . '"');
+                    throw new \Exception('FTP :: Impossible de modifier les droits du fichier/dossier "' . $file . '"');
             }
         }
         return $this;
@@ -338,7 +342,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($local)) && trim(!empty($remote))) {
                 if (!ftp_put($this->_conn, $remote, $local, $mode))
-                    throw new Exception('FTP :: Impossible d\'uploader le fichier "' . $local . '"');
+                    throw new \Exception('FTP :: Impossible d\'uploader le fichier "' . $local . '"');
             }
         }
         return $this;
@@ -352,7 +356,7 @@ class FTP
         if ($this->_conn != false) {
             if (trim(!empty($local)) && trim(!empty($remote))) {
                 if (!ftp_get($this->_conn, $local, $remote, $mode))
-                    throw new Exception('FTP :: Impossible de récupérer le fichier "' . $local . '"');
+                    throw new \Exception('FTP :: Impossible de récupérer le fichier "' . $local . '"');
             }
         }
         return $this;

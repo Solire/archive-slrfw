@@ -8,6 +8,8 @@
  * @license    Solire http://www.solire.fr/
  */
 
+namespace Slrfw\Library;
+
 /**
  * Gestion du cache scripté
  * Ce cache se fait en enregistrant le contenu du chache dans un fichier

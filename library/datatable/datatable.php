@@ -1,10 +1,15 @@
 <?php
 
+namespace Slrfw\Library\Datatable;
+
+use slrfw\Library\Loader;
+use slrfw\Library\Tools;
+
 /**
  * Datatable Class
  *
- * Créer un tableau avancé 
- * 
+ * Créer un tableau avancé
+ *
  * @package Datatable
  * @author shin
  */
@@ -123,7 +128,7 @@ class Datatable {
     protected $_where;
 
     /**
-     * 
+     *
      *
      * @var string
      * @access protected
@@ -131,7 +136,7 @@ class Datatable {
     protected $_beforeTableHTML;
 
     /**
-     * 
+     *
      *
      * @var string
      * @access protected
@@ -139,7 +144,7 @@ class Datatable {
     protected $_afterTableHTML;
 
     /**
-     * 
+     *
      *
      * @var string
      * @access protected
@@ -186,7 +191,7 @@ class Datatable {
             $this->_view = "";
             $this->_action = "selectLoad";
         }
-        
+
         if (isset($this->_get["dt_action"]) && $this->_get["dt_action"] != "") {
             $this->_view = "";
             $this->_action = $this->_get["dt_action"];
@@ -200,8 +205,8 @@ class Datatable {
         $this->_imgPath = $imgPath;
 
         //Création d'un chargeur JS/CSS
-        $this->_javascript = new Javascript();
-        $this->_css = new Css();
+        $this->_javascript = new Loader\Javascript();
+        $this->_css = new Loader\Css();
     }
 
     // --------------------------------------------------------------------
@@ -261,7 +266,7 @@ class Datatable {
             $columnAction[0]["content"] .= '
                 <button class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="img/back/white/trash_stroke_16x16.png"></button>';
         }
-        
+
         if ((isset($this->config["extra"])
                 && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
                 || (isset($this->config["extra"])
@@ -275,18 +280,18 @@ class Datatable {
 
 
         $this->url = self::_selfURL();
-                
+
         if (method_exists($this, $this->_action . "Action")) {
             call_user_func(array($this, $this->_action . "Action"));
         }
     }
-    
+
     // --------------------------------------------------------------------
 
     /**
      * Permet de modifier le nombre d'item affiché par defaut
-     * 
-     * @param string $nbItems nombre d'items 
+     *
+     * @param string $nbItems nombre d'items
      * @return void
      */
     public function setDefaultNbItems($nbItems) {
@@ -298,7 +303,7 @@ class Datatable {
 
     /**
      * Permet d'ajouter un filtre sur les requêtes
-     * 
+     *
      * @param string $whereString chaine sql de filtre
      * @return void
      */
@@ -443,21 +448,21 @@ class Datatable {
 
                     $columnAdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
                     $column["name"] = $columnAdvancedName . " `" . $column["name"] . "`";
-//                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`  ORDER BY " . $columnAdvancedName . " ASC")->fetchAll(PDO::FETCH_COLUMN);
+//                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`  ORDER BY " . $columnAdvancedName . " ASC")->fetchAll(\PDO::FETCH_COLUMN);
                     $column["values"] = $this->_db->query(
                                     "SELECT DISTINCT " . $column["name"]
                                     . " FROM `" . $column["from"]["table"] . "`"
-                                    . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : ""))->fetchAll(PDO::FETCH_COLUMN);
+                                    . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : ""))->fetchAll(\PDO::FETCH_COLUMN);
                 } elseif (isset($column["sql"])) {
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["sql"] . ""
                                     . " FROM `" . $this->config["table"]["name"] . "` WHERE " . $column["sql"] . " <> '' "
                                     . ($generalWhere == "" ? "" : "AND $generalWhere" )
-                                    . " ORDER BY `" . $column["name"] . "` ASC")->fetchAll(PDO::FETCH_COLUMN);
+                                    . " ORDER BY `" . $column["name"] . "` ASC")->fetchAll(\PDO::FETCH_COLUMN);
                 } else {
                     $column["values"] = $this->_db->query("SELECT DISTINCT `" . $column["name"] . "`"
                                     . " FROM `" . $this->config["table"]["name"] . "` WHERE `" . $column["name"] . "` <> '' "
                                     . ($generalWhere == "" ? "" : "AND $generalWhere" )
-                                    . " ORDER BY `" . $column["name"] . "` ASC")->fetchAll(PDO::FETCH_COLUMN);
+                                    . " ORDER BY `" . $column["name"] . "` ASC")->fetchAll(\PDO::FETCH_COLUMN);
                 }
             }
         }
@@ -555,7 +560,7 @@ class Datatable {
 
         exit(1);
     }
-    
+
     // --------------------------------------------------------------------
 
     /**
@@ -589,7 +594,7 @@ class Datatable {
         $r = $this->_db->delete($sTable, implode(" AND ", $where));
 
         $this->afterDeleteAction(current($row));
-        
+
         if ($r)
             exit(1);
     }
@@ -602,7 +607,7 @@ class Datatable {
      * @return 	void
      */
     public function afterAddAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -613,9 +618,9 @@ class Datatable {
      * @return 	void
      */
     public function afterEditAction($insertId) {
-        
+
     }
-    
+
     // --------------------------------------------------------------------
 
     /**
@@ -624,7 +629,7 @@ class Datatable {
      * @return 	void
      */
     public function afterDeleteAction($row) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -674,7 +679,7 @@ class Datatable {
         $response = array();
         $response = $this->_db->query('
             SELECT ' . implode(",", $selectSqlArray) . '
-            FROM ' . $column["from"]["table"] . ';')->fetchAll(PDO::FETCH_UNIQUE);
+            FROM ' . $column["from"]["table"] . ';')->fetchAll(\PDO::FETCH_UNIQUE);
 
         $this->_response = json_encode($response, JSON_FORCE_OBJECT);
     }
@@ -1071,7 +1076,7 @@ class Datatable {
                     . " $sWhere"
                     . " $generalWhere";
 //            exit("$sWhere | $generalWhere | $sQuery");
-            $bottomsValue[$realIndexes[$keyCol]] = $this->_db->query($sQuery)->fetch(PDO::FETCH_COLUMN);
+            $bottomsValue[$realIndexes[$keyCol]] = $this->_db->query($sQuery)->fetch(\PDO::FETCH_COLUMN);
             $bottomsQuery[$realIndexes[$keyCol]] = $sQuery;
         }
 
@@ -1091,7 +1096,7 @@ class Datatable {
           `-------------------------------------------------------- */
         $sQuery2 = "SELECT FOUND_ROWS()";
         $rResultFilterTotal = $this->_db->query($sQuery2);
-        $aResultFilterTotal = $rResultFilterTotal->fetch(PDO::FETCH_NUM);
+        $aResultFilterTotal = $rResultFilterTotal->fetch(\PDO::FETCH_NUM);
         $iFilteredTotal = $aResultFilterTotal[0];
 
         /* = Total data set length.
@@ -1102,7 +1107,7 @@ class Datatable {
                 . " $generalWhere";
 
         $rResultTotal = $this->_db->query($sQuery2);
-        $aResultTotal = $rResultTotal->fetch(PDO::FETCH_NUM);
+        $aResultTotal = $rResultTotal->fetch(\PDO::FETCH_NUM);
         $iTotal = $aResultTotal[0];
 
 
@@ -1122,7 +1127,7 @@ class Datatable {
         $output['aColumnsAdvanced'] = $aColumnsAdvanced;
 //        $output['aColumnsFull']         = $aColumnsFull;
 
-        while ($aRow = $rResult->fetch(PDO::FETCH_ASSOC)) {
+        while ($aRow = $rResult->fetch(\PDO::FETCH_ASSOC)) {
             $row = array();
 
             $row["DT_RowId"] = "";
@@ -1200,7 +1205,7 @@ class Datatable {
      * @return 	string
      */
     public function __toString() {
-        $rc = new ReflectionClass(__CLASS__);
+        $rc = new \ReflectionClass(__CLASS__);
         $view = $this->_view;
         if ($this->_view == "" && $this->_response != "")
             return $this->_response;
@@ -1214,9 +1219,9 @@ class Datatable {
 
     /**
      * Génère la vue
-     * 
+     *
      * @param string $file chemin de la vue à inclure
-     * @return string Rendu de la vue après traitement 
+     * @return string Rendu de la vue après traitement
      */
     public function output($file) {
         ob_start();
@@ -1229,11 +1234,11 @@ class Datatable {
 
     /**
      * Renvoi le HTML relatif à l'ajout d'un item
-     * 
+     *
      * @return string Html du formulaire
      */
     protected function addRender($view = "default", $path = null) {
-        $rc = new ReflectionClass(__CLASS__);
+        $rc = new \ReflectionClass(__CLASS__);
         if ($path == null) {
             return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . $this->_viewPath . "form/$view.phtml");
         } else {
@@ -1243,7 +1248,7 @@ class Datatable {
 
     /**
      * Renvoi le HTML relatif à la modification d'un item
-     * 
+     *
      * @return string Html du formulaire
      */
     protected function editFormRenderAction() {
@@ -1266,29 +1271,29 @@ class Datatable {
 
     /**
      * Executer avant le rendu du formulaire d'ajout d'un item
-     * 
+     *
      * @return void
      */
     protected function addRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
 
     /**
      * Executer avant le rendu du formulaire de modification d'un item
-     * 
+     *
      * @return void
      */
     protected function editRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
 
     /**
      * Récupere les valeurs d'une entrée
-     * 
+     *
      * @return void
      */
     protected function getData($index) {
@@ -1316,7 +1321,7 @@ class Datatable {
             SELECT * FROM $sTable WHERE " . implode(" AND ", $where) . ";
         ";
 
-        $data = $this->_db->query($query)->fetch(PDO::FETCH_ASSOC);
+        $data = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
         return $data;
     }
 
@@ -1324,7 +1329,7 @@ class Datatable {
 
     /**
      * Renvoi l'url de la page
-     * 
+     *
      * @return string url complète
      */
     private function _selfURL() {
@@ -1332,7 +1337,7 @@ class Datatable {
         $protocol = self::_strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/") . $s;
         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":" . $_SERVER["SERVER_PORT"]);
         $requestUri = $_SERVER['REQUEST_URI'];
-        
+
         $params = $this->_convertUrlQuery(str_replace($_SERVER['REDIRECT_URL'] . "?", "", $requestUri));
         $paramsString = "";
         foreach ($params as $paramsKey => $param) {
@@ -1342,13 +1347,13 @@ class Datatable {
                 $paramsString[] = "$paramsKey=$param";
             }
         }
-        
+
         $requestUri = $_SERVER['REDIRECT_URL'] . "?" . implode("&", $paramsString);
         $requestUri .= (count($params) == 0 ? "" : "&") . "name=" . $this->_configName;
 
         return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $requestUri;
     }
-    
+
     private function _convertUrlQuery($query) {
     $queryParts = explode('&', $query);
     $params = array();
@@ -1362,16 +1367,16 @@ class Datatable {
         }
         $params[$item[0]] = $item[1];
     }
-   
+
     return $params;
-} 
+}
 
     // --------------------------------------------------------------------
 
     /**
-     * Récupérer la partie gauche d'une chaine à partir 
+     * Récupérer la partie gauche d'une chaine à partir
      * d'un caractère ou d'une chaine
-     * 
+     *
      * @param string $s1 Chaine à rechercher pour couper
      * @param string $s2 Chaine à couper
      * @return string chaine coupée

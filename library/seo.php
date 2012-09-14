@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Library;
+
 /**
  * Manage SEO
  */
@@ -23,19 +25,19 @@ class Seo
      * @var string  description of the page
      */
     private $_description = '';
-    
+
     /**
      *
      * @var string  url canonical of the page
      */
     private $_urlCanonical = '';
-    
+
     /**
      *
      * @var bool  indexation of the page
      */
     private $_index = true;
-    
+
     /**
      *
      * @var bool  follow of the page
@@ -151,7 +153,7 @@ class Seo
 
     /**
      * Get the array of keywords of the page
-     * 
+     *
      * @return array
      */
     public function getKeywords()
@@ -185,8 +187,8 @@ class Seo
         return $this->_description;
 
     }//end getDescription()
-    
-    
+
+
     /**
      * Get url canonical of the page
      *
@@ -211,8 +213,8 @@ class Seo
         $this->_description = $_description;
 
     }//end setDescription()
-    
-    
+
+
     /**
      * Set url canonical of the page
      *
@@ -255,4 +257,3 @@ class Seo
 
 }//end class
 
-?>

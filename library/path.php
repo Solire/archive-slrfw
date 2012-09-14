@@ -8,6 +8,8 @@
  * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+namespace Slrfw\Library;
+
 /**
  * Classe de contrôle des chemins de fichiers
  *
@@ -52,11 +54,11 @@ class Path
      */
     public function __construct($filePath, $option = 0)
     {
-        $this->_path = $this->_test($filePath);
+        $this->_path = $this->test($filePath);
 
         if ($this->_path == false) {
             if (!self::$_silentMode && !$option == self::SILENT) {
-                throw new Exception('Fichier introuvable : ' . $filePath);
+                throw new \Exception('Fichier introuvable : ' . $filePath);
             }
         }
     }
@@ -136,7 +138,7 @@ class Path
      *
      * @return mixed le chemin du fichier ou FALSE si il n'existe aucun fichier
      */
-    private function _test($filePath)
+    private function test($filePath)
     {
         $usePaths = explode(PATH_SEPARATOR, get_include_path());
         foreach ($usePaths as $usePath) {

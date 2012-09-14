@@ -8,6 +8,9 @@
  * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
 
 /**
  * Contrôle de variables
@@ -52,11 +55,11 @@ class Param
      * @param string $message Message d'erreur
      *
      * @return void
-     * @throws LibException
+     * @throws Exception\Lib
      */
     private function error($message)
     {
-        throw new LibException($message);
+        throw new Exception\Lib($message);
     }
 
     /**

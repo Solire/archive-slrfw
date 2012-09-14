@@ -1,4 +1,9 @@
 <?php
+
+namespace Slrfw\Library;
+
+/** @todo faire la présentation du code */
+
 /**
  * .htaccess
  * RewriteRule ^<$_dir>/$   index.php?<$_paramUrl>=1&%{QUERY_STRING}
@@ -24,7 +29,7 @@ class Mobile
         $this->_userAgent = $userAgent;
         $this->_paramUrl = $paramUrl;
         $this->_dir = $dir;
-        
+
         $this->redirectMobile();
     }
 
