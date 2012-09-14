@@ -1,4 +1,7 @@
 <?php
+
+namespace Slrfw;
+
 header('Content-Type: text/html; charset=utf-8');
 
 /* = Session PHP
@@ -13,15 +16,11 @@ ini_set('display_errors', 'On');
 
 set_include_path(
     get_include_path()
-    . PATH_SEPARATOR . realpath('../library/')
     . PATH_SEPARATOR . realpath('../')
-    . PATH_SEPARATOR . realpath('../library/shop/')
     . PATH_SEPARATOR . realpath('../config/')
-    . PATH_SEPARATOR . realpath('../include/')
-    . PATH_SEPARATOR . realpath('../app/model/')
 );
-require_once 'path.php';
-require_once 'front-controller.php';
+require_once 'library/path.php';
+require_once 'library/front-controller.php';
 
 /* = Autoload
   ------------------------------- */
@@ -32,32 +31,38 @@ require_once 'front-controller.php';
  */
 function autoload($name)
 {
-    $path = new Path(strtolower($name) . '.php');
+    if (strpos($name, 'Slrfw') !== false) {
+        $name = str_replace('Slrfw\\', '', $name);
+        $name = str_replace('\\', DIRECTORY_SEPARATOR, $name);
+        $name = strtolower($name) . '.php';
+    }
+
+    $path = new Library\Path($name);
     require_once $path->get();
 }
 
-spl_autoload_register('autoload');
+spl_autoload_register('Slrfw\autoload');
 
 
 /* = Gestion des erreurs HTTP
   ------------------------------- */
-include_once 'exception.php';
-include_once 'error.php';
+//include_once 'exception.php';
+//include_once 'error.php';
 
 /* = lancement du script
   ------------------------------- */
 try {
-    FrontController::init();
-    FrontController::run();
-} catch (MarvinException $exc) {
-    Error::report($exc);
-} catch (UserException $exc) {
-    Error::message($exc);
-} catch (HttpErrorException $exc) {
-    Error::http($exc->getHttp());
-} catch (Exception $exc) {
-    $marv = new Marvin('debug', $exc);
+    Library\FrontController::init();
+    Library\FrontController::run();
+} catch (Library\Exception\Marvin $exc) {
+    Library\Error::report($exc);
+} catch (Library\Exception\User $exc) {
+    Library\Error::message($exc);
+} catch (Library\Exception\HttpError $exc) {
+    Library\Error::http($exc->getHttp());
+} catch (\Exception $exc) {
+    $marv = new Library\Marvin('debug', $exc);
     $marv->display();
 
-    Error::run();
+    Library\Error::run();
 }
