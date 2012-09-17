@@ -96,7 +96,7 @@ foreach ($this->pagesGroup as $keyGroup => $group) {
                             <?php echo $page->getMeta('titre'); ?>
                             <br />
                             <?php if ($page->getMeta("date_modif") != "0000-00-00 00:00:00" && $page->getMeta("rewriting") != "") { ?>
-                                <span class="board-human-time" style="color: inherit">Dernière édition <?php echo $page->getMeta("date_modif") != "0000-00-00 00:00:00" ? Tools::RelativeTime(strtotime($page->getMeta("date_modif"))) : ''; ?></span>
+                                <span class="board-human-time" style="color: inherit">Dernière édition <?php echo $page->getMeta("date_modif") != "0000-00-00 00:00:00" ? Slrfw\Library\Tools::RelativeTime(strtotime($page->getMeta("date_modif"))) : ''; ?></span>
                                 <?php
                             }
                             ?>
