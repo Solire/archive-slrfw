@@ -32,6 +32,13 @@ $config = array(
             "title" => "Correspondance",
         ),
         array(
+            "name" => "aide",
+//            "editable" => true,
+            "show" => true,
+            "filter_field" => "text",
+            "title" => "Aide",
+        ),
+        array(
             "name" => "id_version",
             "index" => true,
             "filter" => BACK_ID_VERSION,
