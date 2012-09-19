@@ -300,18 +300,18 @@ class Page extends Main
 
         $this->_page = $this->_gabaritManager->save($_POST);
 
-        $contenu = '<a href="' . Registry::get("basehref") . 'page/display.html?id_gab_page='
+        $contenu = '<a href="' . \Slrfw\Library\Registry::get("basehref") . 'page/display.html?id_gab_page='
                 . $this->_page->getMeta("id") . '">'
                 . $this->_page->getMeta("titre") . '</a>';
 
-        $headers = "From: " . Registry::get("mail-contact") . "\r\n"
-                . "Reply-To: " . Registry::get("mail-contact") . "\r\n"
+        $headers = "From: " . \Slrfw\Library\Registry::get("mail-contact") . "\r\n"
+                . "Reply-To: " . \Slrfw\Library\Registry::get("mail-contact") . "\r\n"
                 . "Bcc: contact@solire.fr \r\n"
                 . "X-Mailer: PHP/" . phpversion();
 
         $typeSave = $_POST["id_gab_page"] == 0 ? "Création" : "Modification";
 
-        Tools::mail_utf8("Modif site <modif@solire.fr>", "$typeSave de contenu sur " . $this->_mainConfig->get("name", "project"), $contenu, $headers, "text/html");
+        \Slrfw\Library\Tools::mail_utf8("Modif site <modif@solire.fr>", "$typeSave de contenu sur " . $this->_mainConfig->get("name", "project"), $contenu, $headers, "text/html");
 
         $json = array(
             "status" => $this->_page ? "success" : "error",

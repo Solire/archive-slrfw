@@ -247,7 +247,7 @@ class Datatable {
                 || (isset($this->config["extra"])
                 && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])) {
             $columnAction[0] = array(
-                "width" =>  "93px",
+                "width" => "93px",
                 "content" => '<div class="btn-group">',
                 "show" => true,
                 "title" => "Action",
@@ -297,7 +297,6 @@ class Datatable {
     public function setDefaultNbItems($nbItems) {
         $this->config["table"]["default_nb_items"] = $nbItems;
     }
-
 
     // --------------------------------------------------------------------
 
@@ -483,7 +482,7 @@ class Datatable {
                 if (isset($column["creable_field"]["value"]))
                     $values[$column["name"]] = $column["creable_field"]["value"];
                 else if (isset($column["creable_field"]["encryption"]))
-                    $values[$column["name"]] = hash ($column["creable_field"]["encryption"], $_POST[$column["name"]]);
+                    $values[$column["name"]] = hash($column["creable_field"]["encryption"], $_POST[$column["name"]]);
                 else {
                     if (isset($_POST[$column["name"]]))
                         $values[$column["name"]] = $_POST[$column["name"]];
@@ -534,8 +533,8 @@ class Datatable {
                 if (isset($column["creable_field"]["value"])) {
                     $values[$column["name"]] = $column["creable_field"]["value"];
                 } else if (isset($column["creable_field"]["encryption"])) {
-                    if($column["creable_field"]["type"] != "password" || $_POST[$column["name"]] != "")
-                        $values[$column["name"]] = hash ($column["creable_field"]["encryption"], $_POST[$column["name"]]);
+                    if ($column["creable_field"]["type"] != "password" || $_POST[$column["name"]] != "")
+                        $values[$column["name"]] = hash($column["creable_field"]["encryption"], $_POST[$column["name"]]);
                 } else {
                     if (isset($_POST[$column["name"]]))
                         $values[$column["name"]] = $_POST[$column["name"]];
@@ -607,7 +606,7 @@ class Datatable {
      * @return 	void
      */
     public function afterAddAction($insertId) {
-
+        
     }
 
     // --------------------------------------------------------------------
@@ -618,7 +617,7 @@ class Datatable {
      * @return 	void
      */
     public function afterEditAction($insertId) {
-
+        
     }
 
     // --------------------------------------------------------------------
@@ -629,7 +628,7 @@ class Datatable {
      * @return 	void
      */
     public function afterDeleteAction($row) {
-
+        
     }
 
     // --------------------------------------------------------------------
@@ -1129,10 +1128,12 @@ class Datatable {
 
         while ($aRow = $rResult->fetch(\PDO::FETCH_ASSOC)) {
             $row = array();
+            $row2 = array();
 
             $row["DT_RowId"] = "";
             if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
                 $row[] = '';
+                $row2["detail"] = '';
             }
 
             foreach ($aColumnsRaw as $aColRawKey => $aColRaw) {
@@ -1164,6 +1165,7 @@ class Datatable {
                             }
                         }
                     }
+                    $row2[$aColumnsRaw[$aColRawKey]] = $row[count($row) - 2];
                 }
             }
 
@@ -1190,6 +1192,10 @@ class Datatable {
                 $row["DT_RowId"] .= $aRow[$sIndexColumnRaw[$i]] . "|";
             }
             $row["DT_RowId"] = substr($row["DT_RowId"], 0, -1);
+            if (isset($this->config["table"]["postDataProcessing"])) {
+                $fnNamePostDataProcessing = $this->config["table"]["postDataProcessing"];
+                $this->$fnNamePostDataProcessing($aRow, $row2, $row);
+            }
             $output['aaData'][] = $row;
         }
 
@@ -1275,7 +1281,7 @@ class Datatable {
      * @return void
      */
     protected function addRenderAction() {
-
+        
     }
 
     // --------------------------------------------------------------------
@@ -1286,7 +1292,7 @@ class Datatable {
      * @return void
      */
     protected function editRenderAction() {
-
+        
     }
 
     // --------------------------------------------------------------------
@@ -1341,7 +1347,7 @@ class Datatable {
         $params = $this->_convertUrlQuery(str_replace($_SERVER['REDIRECT_URL'] . "?", "", $requestUri));
         $paramsString = "";
         foreach ($params as $paramsKey => $param) {
-            if($paramsKey == "name[]")
+            if ($paramsKey == "name[]")
                 unset($params[$paramsKey]);
             else {
                 $paramsString[] = "$paramsKey=$param";
@@ -1355,21 +1361,21 @@ class Datatable {
     }
 
     private function _convertUrlQuery($query) {
-    $queryParts = explode('&', $query);
-    $params = array();
-    foreach ($queryParts as $param) {
-        if ($param == "") {
-            continue;
+        $queryParts = explode('&', $query);
+        $params = array();
+        foreach ($queryParts as $param) {
+            if ($param == "") {
+                continue;
+            }
+            $item = explode('=', $param);
+            if (!isset($item[1])) {
+                $item[1] = null;
+            }
+            $params[$item[0]] = $item[1];
         }
-        $item = explode('=', $param);
-        if (!isset($item[1])) {
-            $item[1] = null;
-        }
-        $params[$item[0]] = $item[1];
-    }
 
-    return $params;
-}
+        return $params;
+    }
 
     // --------------------------------------------------------------------
 
