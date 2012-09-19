@@ -1,4 +1,4 @@
-<?
+<?php
 
 $config = array(
     "extra" => array(
@@ -15,6 +15,7 @@ $config = array(
         "title_item" => "contenu",
         "suffix_genre" => "",
         "fixedheader" => false,
+        "postDataProcessing" => "disallowDeleted",
     ),
     "columns" => array(
         /* Champs requis pour les actions */
@@ -26,6 +27,9 @@ $config = array(
         ),
         array(
             "name" => "id",
+        ),
+        array(
+            "name" => "suppr",
         ),
         array(
             "name" => "visible",
@@ -62,7 +66,6 @@ $config = array(
             "php_function" => array(
                 "\Slrfw\Library\Tools::RelativeTimeFromDate"
             ),
-            "index" => true,
             "show" => true,
             "filter_field" => "date-range",
             "filter_field_date_past" => true,
@@ -73,7 +76,6 @@ $config = array(
             "php_function" => array(
                 "\Slrfw\Library\Tools::RelativeTimeFromDate"
             ),
-            "index" => true,
             "show" => true,
             "filter_field" => "date-range",
             "filter_field_date_past" => true,
@@ -86,10 +88,10 @@ $config = array(
             "index" => true,
             "filter" => BACK_ID_VERSION,
         ),
-        array(
-            "name" => "suppr",
-            "filter" => 0,
-        )
+//        array(
+//            "name" => "suppr",
+//            "filter" => 0,
+//        )
     ),
 );
 //Si autre langue que version de base
@@ -105,7 +107,7 @@ if (BACK_ID_VERSION != 1) {
 }
 $config["columns"][] = array(
     "special" => "buildAction",
-    "sql" => "IF(`gab_page`.`visible` = 0, '&#10005; Non visible', '&#10003; Visible')",
+    "sql" => "IF(`gab_page`.`suppr` = 1, '&#8709; Supprimé', IF(`gab_page`.`visible` = 0, '&#10005; Non visible', '&#10003; Visible'))",
     "filter_field" => "select",
     "show" => true,
     "title" => "Actions",
