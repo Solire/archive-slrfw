@@ -28,7 +28,7 @@ abstract class GabaritField
             unset($champ["params"]);
         }
         if ($db)	$this->db = $db;
-        else		$this->db = Registry::get("db");
+        else		$this->db = Slrfw\Library\Registry::get("db");
 
         ;
         ;

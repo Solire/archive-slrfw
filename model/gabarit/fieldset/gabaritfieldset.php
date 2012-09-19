@@ -81,7 +81,7 @@ abstract class GabaritFieldSet
         $id = 'champ' . $champ['id'] . '_' . $idpage;
 
         if ($champ['typedonnee'] == 'DATE')
-            $value = Tools::formate_date_nombre($value, '-', '/');
+            $value = \Slrfw\Library\Tools::formate_date_nombre($value, '-', '/');
 
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
@@ -100,7 +100,7 @@ abstract class GabaritFieldSet
             $valueLabel = $field->getValueLabel();
         else {
             if($value != "") {
-                $valueLabel = mb_strlen($value, 'UTF-8') > 50 ? mb_substr($value, 0, 50, 'UTF-8') . '...' : $value;
+                $valueLabel = \mb_strlen($value, 'UTF-8') > 50 ? \mb_substr($value, 0, 50, 'UTF-8') . '...' : $value;
             } else {
                 $valueLabel =  "Nouvel élément";
             }
