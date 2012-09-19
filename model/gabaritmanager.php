@@ -8,6 +8,12 @@ namespace Slrfw\Model;
  * @author thomas
  */
 class gabaritManager extends manager {
+    
+    /**
+     * 
+     * @var bool 
+     */
+    protected $modePrevisualisation = FALSE;
 
     /**
      * <p>Donne l'identifiant d'une page d'après son rewriting et l'identifiant.</p>
@@ -17,8 +23,9 @@ class gabaritManager extends manager {
      * @return int
      */
     public function getIdByRewriting($id_version, $id_api, $rewriting, $id_parent = 0) {
+        $visible = $this->modePrevisualisation ? 0 : 1;
         $query = "SELECT `id` FROM `gab_page`"
-                . " WHERE `suppr` = 0 AND `visible` = 1 AND `id_parent` = $id_parent"
+                . " WHERE `suppr` = 0 AND `visible` = $visible AND `id_parent` = $id_parent"
                 . " AND `id_version` = $id_version AND `id_api` = $id_api AND `rewriting` = " . $this->_db->quote($rewriting);
 
         return $this->_db->query($query)->fetchColumn();
@@ -45,7 +52,7 @@ class gabaritManager extends manager {
      */
     public function getPage($id_version, $id_api, $id_gab_page, $id_gabarit = 0, $join = false, $visible = FALSE) {
         $page = new gabaritPage();
-
+        $visible = $this->modePrevisualisation ? 0 : $visible;
         if ($id_gab_page) {
             $query = "SELECT * FROM `gab_page` WHERE `id_version` = $id_version AND `id_api` = $id_api AND `id` = $id_gab_page AND `suppr` = 0";
             $meta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
@@ -475,6 +482,7 @@ class gabaritManager extends manager {
      * @return array
      */
     public function getList($id_version, $id_api = 1, $id_parent = FALSE, $id_gabarit = 0, $visible = FALSE, $orderby = "ordre", $sens = "ASC", $debut = 0, $nbre = 0, $main = FALSE) {
+        $visible = $this->modePrevisualisation ? 0 : $visible;
         $query = "SELECT `p`.*, COUNT(`e`.`id`) `nbre_enfants`"
                 . " FROM `gab_page` `p` LEFT JOIN `gab_page` `e` ON `e`.`id_parent` = `p`.`id` AND `e`.`suppr` = 0 AND `e`.`id_version` = $id_version"
                 . ($visible ? " AND `e`.`visible` = 1" : "")
@@ -550,6 +558,7 @@ class gabaritManager extends manager {
      * @see gabaritManager::getList
      */
     public function getSearch($id_version, $term, $id_gabarit = 0, $id_parent = FALSE, $visible = FALSE) {
+        $visible = $this->modePrevisualisation ? 0 : $visible;
         $query = "SELECT * FROM `gab_page` WHERE `suppr` = 0 AND `id_version` = "
                 . $id_version . " AND `titre` LIKE " . $this->_db->quote("%$term%");
 
@@ -585,10 +594,11 @@ class gabaritManager extends manager {
      * @return array
      */
     public function getFirstChild($id_version, $id_parent = 0) {
+        $visible = $this->modePrevisualisation ? 0 : $visible;
         $query = "SELECT *"
                 . " FROM `gab_page`"
                 . " WHERE `id_parent` = $id_parent AND `suppr` = 0 AND `id_version` = $id_version"
-                . " AND `visible` = 1"
+                . " AND `visible` = $visible"
                 . " ORDER BY `ordre`"
                 . " LIMIT 0, 1";
         $meta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
@@ -637,6 +647,14 @@ class gabaritManager extends manager {
 
         $page = $this->getPage($version, $api["id"], $page->getMeta("id"), 0);
         return $page;
+    }
+    
+    /**
+     * <p>Passe en mode prévisualisation</p>
+     * @param bool $enabled 
+     */
+    public function setModePrevisualisation($enabled = FALSE) {
+        $this->modePrevisualisation = $enabled;
     }
 
     /**

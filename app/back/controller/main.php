@@ -26,7 +26,7 @@ class Main extends \Slrfw\Library\Controller
 
     /**
      *
-     * @var utilisateur
+     * @var \Slrfw\Model\utilisateur
      */
     protected $_utilisateur;
 
@@ -188,6 +188,15 @@ class Main extends \Slrfw\Library\Controller
             && $_GET['controller'] . '/' . $_GET['action'] != 'sign/start'
         ) {
             $this->simpleRedirect('sign/start.html', true);
+        }
+        
+        /** 
+         * Si l'utilisateur a juste le droit de prévisualisation du site 
+         *  = possibilité de voir le site sans tenir compte de la visibilité
+         * Alors On le redirige vers le front
+         */
+        if ($this->_utilisateur->get("niveau") == "voyeur") {
+            $this->simpleRedirect('../', true);
         }
 
         $this->_view->utilisateur = $this->_utilisateur;
