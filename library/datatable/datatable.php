@@ -532,9 +532,19 @@ class Datatable {
             if (isset($column["creable_field"])) {
                 if (isset($column["creable_field"]["value"])) {
                     $values[$column["name"]] = $column["creable_field"]["value"];
-                } else if (isset($column["creable_field"]["encryption"])) {
-                    if ($column["creable_field"]["type"] != "password" || $_POST[$column["name"]] != "")
+                } else if (isset($column['creable_field']['encryption'])) {
+                    if ($column['creable_field']['type'] != 'password' || $_POST[$column['name']] != '') {
                         $values[$column["name"]] = hash($column["creable_field"]["encryption"], $_POST[$column["name"]]);
+                    }
+
+                } elseif (isset($column['creable_field']['type'])
+                    && $column['creable_field']['type'] == 'password'
+                ) {
+                    /**
+                     * Si le champ est un mot de passe on le fait passer
+                     * par la fonction de préparation des mots de passes
+                     */
+                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
                 } else {
                     if (isset($_POST[$column["name"]]))
                         $values[$column["name"]] = $_POST[$column["name"]];
@@ -606,7 +616,7 @@ class Datatable {
      * @return 	void
      */
     public function afterAddAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -617,7 +627,7 @@ class Datatable {
      * @return 	void
      */
     public function afterEditAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -628,7 +638,7 @@ class Datatable {
      * @return 	void
      */
     public function afterDeleteAction($row) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1281,7 +1291,7 @@ class Datatable {
      * @return void
      */
     protected function addRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1292,7 +1302,7 @@ class Datatable {
      * @return void
      */
     protected function editRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------

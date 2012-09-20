@@ -219,7 +219,6 @@ $config = array(
             'title' => 'Pass',
             'creable_field' => array(
                 "type"       => "password",
-                "encryption" => "SHA1",
             ),
         ),
         array(

@@ -25,8 +25,9 @@ class Main extends \Slrfw\Library\Controller
 {
 
     /**
+     * Session en cours
      *
-     * @var utilisateur
+     * @var \Slrfw\Library\Session
      */
     protected $_utilisateur;
 
@@ -115,7 +116,6 @@ class Main extends \Slrfw\Library\Controller
             $this->_view->action = '';
         }
 
-        $this->_utilisateurManager = new \Slrfw\Model\utilisateurManager();
         $this->_gabaritManager = new \Slrfw\Model\gabaritManager();
         $this->_fileManager = new \Slrfw\Model\fileManager();
 
@@ -145,8 +145,6 @@ class Main extends \Slrfw\Library\Controller
             define('BACK_ID_VERSION', 1);
         }
 
-        $this->_utilisateur = $this->_utilisateurManager->get();
-
 
         if (isset($this->_post['log']) && isset($this->_post['pwd'])
             && ($this->_post['log'] == '' || $this->_post['pwd'] == '')
@@ -158,31 +156,28 @@ class Main extends \Slrfw\Library\Controller
             exit(json_encode($retour));
         }
 
-        if (isset($this->_post['log'])
-            && isset($this->_post['pwd'])
-            && $this->_post['log']
-            && $this->_post['pwd']
+        $this->_utilisateur = new \Slrfw\Library\Session('back');
+
+        if (isset($this->_post['log']) && isset($this->_post['pwd'])
+            && !empty($this->_post['log']) && !empty($this->_post['pwd'])
         ) {
-            $success = $this->_utilisateurManager->connect(
-                $this->_utilisateur, $this->_post['log'], $this->_post['pwd']
-            );
-            if ($success) {
-                $this->_log->logThis('Connexion réussie', $this->_utilisateur->get('id'));
-            } else {
+            try {
+                $this->_utilisateur->connect($this->_post['log'], $this->_post['pwd']);
+            } catch (\Exception $exc) {
                 $log = 'Identifiant : ' . $this->_post['log'];
                 $this->_log->logThis('Connexion échouée', 0, $log);
+                throw $exc;
             }
 
-            if ($success) {
-                $message = 'Connexion réussie, vous allez être redirigé';
-            } else {
-                $message = 'Identifiant ou mot de passe invalide';
-            }
+            $this->_log->logThis('Connexion réussie', $this->_utilisateur->id);
 
-            exit(json_encode(array('success' => $success, 'message' => $message)));
+
+            $message = 'Connexion réussie, vous allez être redirigé';
+
+            exit(json_encode(array('success' => true, 'message' => $message)));
         }
 
-        if (!$this->_utilisateur->isconnected()
+        if (!$this->_utilisateur->isConnected()
             && isset($_GET['action'])
             && isset($_GET['controller'])
             && $_GET['controller'] . '/' . $_GET['action'] != 'sign/start'

@@ -34,7 +34,7 @@ class Board extends Main
 
         $this->_boardDatatable();
 
-        $idUtilisateur = $this->_utilisateur->get("id");
+        $idUtilisateur = $this->_utilisateur->id;
         $query = "SELECT board_state.cookie FROM `board_state` WHERE `board_state`.id_utilisateur = $idUtilisateur AND `id_api` = " . $this->_api["id"];
         $boardStateCookie = $this->_db->query($query)->fetchColumn();
 
@@ -141,7 +141,7 @@ class Board extends Main
 
     public function saveStateAction() {
         $this->_view->enable(false);
-        $idUtilisateur = $this->_utilisateur->get("id");
+        $idUtilisateur = $this->_utilisateur->id;
         $cookieString = $this->_db->quote(urldecode($_POST["cookie"]));
 
         $this->_db->exec("REPLACE INTO board_state SET id_utilisateur=$idUtilisateur, cookie=$cookieString, `id_api` = " . $this->_api["id"]);
@@ -149,7 +149,7 @@ class Board extends Main
 
     public function deleteStateAction() {
         $this->_view->enable(false);
-        $idUtilisateur = $this->_utilisateur->get("id");
+        $idUtilisateur = $this->_utilisateur->id;
 
         $this->_db->exec("DELETE FROM board_state WHERE id_utilisateur=$idUtilisateur");
         setcookie("inettuts-widget-preferences", null, 0);

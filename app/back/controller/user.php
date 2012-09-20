@@ -64,13 +64,16 @@ class User extends Main
 
         //Si aucune erreur on essaie de modifier le mot de passe
         if (count($errors) == 0) {
-            $response['status'] = $this->_utilisateurManager->changePassword(
-                $this->_utilisateur, $this->_utilisateur->get('email'),
-                $_POST['old_password'], $_POST['new_password']
-            );
-            if (!$response['status']) {
-                $errors[] = 'Mot de passe actuel incorrect';
-            }
+
+            $newPass = $this->_utilisateur->prepareMdp($_POST['new_password']);
+
+            $query = 'UPDATE utilisateur SET '
+                   . ' pass = ' . $this->_db->quote($newPass) . ' '
+                   . 'WHERE `id` = ' . $this->_utilisateur->id . ' ';
+
+            $this->_db->exec($query);
+
+            $errors[] = 'Mot de passe actuel incorrect';
         }
 
         if ($response['status']) {
