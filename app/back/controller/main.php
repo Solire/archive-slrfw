@@ -196,7 +196,8 @@ class Main extends \Slrfw\Library\Controller
          * Alors On le redirige vers le front
          */
         if ($this->_utilisateur->get("niveau") == "voyeur") {
-            $this->simpleRedirect('../', true);
+            if($_GET["controller"] . "/" . $_GET["action"] != "sign/signout")
+                $this->simpleRedirect('../', true);
         }
 
         $this->_view->utilisateur = $this->_utilisateur;

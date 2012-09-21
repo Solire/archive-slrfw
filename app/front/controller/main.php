@@ -52,13 +52,25 @@ class Main extends \Slrfw\Library\Controller {
          */
         $this->_utilisateurManager = new \Slrfw\Model\utilisateurManager();
         $this->_utilisateurAdmin = $this->_utilisateurManager->get();
+        $this->_view->utilisateurAdmin = $this->_utilisateurAdmin;
         
         if ($this->_utilisateurAdmin->isConnected() && $this->_ajax == FALSE) {
             if (isset($_GET["mode_previsualisation"])) {
                 $_SESSION["mode_previsualisation"] = (bool) $_GET["mode_previsualisation"];
             }
             $this->_gabaritManager->setModePrevisualisation($_SESSION["mode_previsualisation"]);
-            echo '<div style="position: absolute; top: 0px; right: 0px;padding: 5px;background: #DCDCDC">Mode : <a href="?mode_previsualisation=0">normal</a> / <a href="?mode_previsualisation=1">prévisualisation</a></div>';
+//            echo '<div style="position: absolute; top: 0px; right: 0px;padding: 5px;background: #DCDCDC">'
+//               . 'Mode : <a href="?mode_previsualisation=0">normal</a> / ' 
+//               . '<a href="?mode_previsualisation=1">prévisualisation</a>'
+//               . '<a href="back/sign/signout.html">Déconnexion</a>' 
+//               . '</div>';
+            //Inclusion Bootstrap twitter
+            $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
+            $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');
+            
+            $this->_view->site = Registry::get('project-name');
+            $this->_view->modePrevisualisation = $_SESSION["mode_previsualisation"];
+            
         }
 
         
