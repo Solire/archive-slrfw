@@ -184,6 +184,16 @@ class Main extends \Slrfw\Library\Controller
         ) {
             $this->simpleRedirect('sign/start.html', true);
         }
+        
+        /** 
+         * Si l'utilisateur a juste le droit de prévisualisation du site 
+         *  = possibilité de voir le site sans tenir compte de la visibilité
+         * Alors On le redirige vers le front
+         */
+        if ($this->_utilisateur->get("niveau") == "voyeur") {
+            if($_GET["controller"] . "/" . $_GET["action"] != "sign/signout")
+                $this->simpleRedirect('../', true);
+        }
 
         $this->_view->utilisateur = $this->_utilisateur;
         $this->_view->apis = $this->_apis;

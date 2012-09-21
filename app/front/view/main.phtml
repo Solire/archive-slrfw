@@ -37,6 +37,12 @@ if ($this->seo->getUrlCanonical() != "") {
 
     </head>
     <body role="document">
+        <?php 
+        if ($this->utilisateurAdmin->isConnected()) {
+            $this->add("toolbar.phtml");
+        }
+        ?>
+        
 
         <header role="banner">
             <?php $this->add("menu.phtml"); ?>

@@ -14,6 +14,12 @@ use Slrfw\Library\Registry;
  * @license  Licence Shin
  */
 class Main extends \Slrfw\Library\Controller {
+    
+    /**
+     *
+     * @var \Slrfw\Model\utilisateur
+     */
+    protected $_utilisateurAdmin;
 
     /**
      * Always execute before other method in controller
@@ -22,11 +28,11 @@ class Main extends \Slrfw\Library\Controller {
      */
     public function start() {
 
-
-        // Set title of page !
+        
+        /** Set title of page ! */
         $this->_seo->setTitle($this->_project->getName());
 
-        //Noindex Nofollow pour tout (À modifier en production)
+        /** Noindex Nofollow pour tout (À modifier en production) */
         $this->_seo->disableIndex();
         $this->_seo->disableFollow();
 
@@ -37,9 +43,38 @@ class Main extends \Slrfw\Library\Controller {
 
         $this->_gabaritManager = new \Slrfw\Model\gabaritManagerOptimized();
 
-        /*
-         * EXEMPLE DE RECUPERATION DES RUBRIQUE parent et leurs enfants
+        /**
+         * MODE PREVISUALISATION
+         * 
+         * On teste si utilisateur de l'admin loggué 
+         *  = possibilité de voir le site sans tenir compte de la visibilité
+         * 
          */
+        $this->_utilisateurManager = new \Slrfw\Model\utilisateurManager();
+        $this->_utilisateurAdmin = $this->_utilisateurManager->get();
+        $this->_view->utilisateurAdmin = $this->_utilisateurAdmin;
+        
+        if ($this->_utilisateurAdmin->isConnected() && $this->_ajax == FALSE) {
+            if (isset($_GET["mode_previsualisation"])) {
+                $_SESSION["mode_previsualisation"] = (bool) $_GET["mode_previsualisation"];
+            }
+            $this->_gabaritManager->setModePrevisualisation($_SESSION["mode_previsualisation"]);
+//            echo '<div style="position: absolute; top: 0px; right: 0px;padding: 5px;background: #DCDCDC">'
+//               . 'Mode : <a href="?mode_previsualisation=0">normal</a> / ' 
+//               . '<a href="?mode_previsualisation=1">prévisualisation</a>'
+//               . '<a href="back/sign/signout.html">Déconnexion</a>' 
+//               . '</div>';
+            //Inclusion Bootstrap twitter
+            $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
+            $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');
+            
+            $this->_view->site = Registry::get('project-name');
+            $this->_view->modePrevisualisation = $_SESSION["mode_previsualisation"];
+            
+        }
+
+        
+        /** EXEMPLE DE RECUPERATION DES RUBRIQUE parent et leurs enfants */
         $this->_rubriques = $this->_gabaritManager->getList(ID_VERSION, ID_API, 0, array(3, 4, 5), TRUE);
         foreach ($this->_rubriques as $ii => $rubrique) {
             $pages = $this->_gabaritManager->getList(ID_VERSION, ID_API, $rubrique->getMeta('id'), FALSE, 1);
