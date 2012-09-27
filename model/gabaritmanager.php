@@ -23,9 +23,9 @@ class gabaritManager extends manager {
      * @return int
      */
     public function getIdByRewriting($id_version, $id_api, $rewriting, $id_parent = 0) {
-        $visible = $this->modePrevisualisation ? 0 : 1;
+        $visibleQuery = $this->modePrevisualisation ? "" : " AND `visible` = 1 ";
         $query = "SELECT `id` FROM `gab_page`"
-                . " WHERE `suppr` = 0 AND `visible` = $visible AND `id_parent` = $id_parent"
+                . " WHERE `suppr` = 0 $visibleQuery AND `id_parent` = $id_parent"
                 . " AND `id_version` = $id_version AND `id_api` = $id_api AND `rewriting` = " . $this->_db->quote($rewriting);
 
         return $this->_db->query($query)->fetchColumn();
@@ -595,11 +595,11 @@ class gabaritManager extends manager {
      * @return array
      */
     public function getFirstChild($id_version, $id_parent = 0) {
-        $visible = $this->modePrevisualisation ? 0 : $visible;
+        $visibleQuery = $this->modePrevisualisation ? "" : "`visible` = 1";
         $query = "SELECT *"
                 . " FROM `gab_page`"
                 . " WHERE `id_parent` = $id_parent AND `suppr` = 0 AND `id_version` = $id_version"
-                . " AND `visible` = $visible"
+                . " $visibleQuery"
                 . " ORDER BY `ordre`"
                 . " LIMIT 0, 1";
         $meta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);

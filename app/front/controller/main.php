@@ -63,11 +63,7 @@ class Main extends \Slrfw\Library\Controller {
             }
             
             $this->_gabaritManager->setModePrevisualisation($_SESSION["mode_previsualisation"]);
-//            echo '<div style="position: absolute; top: 0px; right: 0px;padding: 5px;background: #DCDCDC">'
-//               . 'Mode : <a href="?mode_previsualisation=0">normal</a> / ' 
-//               . '<a href="?mode_previsualisation=1">prévisualisation</a>'
-//               . '<a href="back/sign/signout.html">Déconnexion</a>' 
-//               . '</div>';
+
             //Inclusion Bootstrap twitter
             $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
             $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');

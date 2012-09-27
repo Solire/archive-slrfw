@@ -36,14 +36,15 @@ class Page extends Main
      */
     public function startAction() {
         $this->_view->enable(FALSE);
-
+        
         if (isset($_GET['rub'])) {
 
             if (isset($_GET['prub'])) {
                 $prubid = $this->_gabaritManager->getIdByRewriting(ID_VERSION, ID_API, $_GET['prub']);
+                
                 if (!$prubid)
                     $this->pageNotFound();
-
+                
                 $this->_rubriqueParent = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $prubid);
                 $this->_view->rubriqueParent = $this->_rubriqueParent;
 

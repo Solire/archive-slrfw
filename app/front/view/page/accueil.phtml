@@ -1,0 +1,33 @@
+
+<!-- GABARIT Accueil -->
+<h1>Accueil : <?php echo $this->page->getMeta('titre'); ?></h1>
+
+<!-- BLOCS STATIQUES -->
+
+    <!-- BLOCS STATIQUES Uncategorized -->
+    <div>
+    
+        <h2>Uncategorized</h2>
+        
+    
+    </div>
+    <!-- BLOCS STATIQUES Uncategorized -->
+    
+<!-- FIN BLOCS STATIQUES -->
+
+<!-- BLOCS DYNAMIQUES -->
+
+<!-- FIN BLOCS DYNAMIQUES -->
+
+
+<!-- PAGE GABARIT ENFANT -->
+<?php
+//Si pages enfants
+if(isset($this->pages))
+    foreach ($this->pages as $page) {
+        ?>
+        <a href="<?php echo $_GET["prub"]; ?>/<?php echo $_GET["rub"]; ?>/<?php echo $page->getMeta('rewriting'); ?>.html"><?php echo $page->getMeta('titre'); ?></a>
+        <?php
+    }
+?>
+<!-- FIN PAGE GABARIT ENFANT -->
