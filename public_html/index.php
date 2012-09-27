@@ -12,7 +12,7 @@ session_start();
 /* = Affichage des erreurs
   ------------------------------- */
 error_reporting(E_ALL);
-ini_set('display_errors', 'On');
+//ini_set('display_errors', 'On');
 
 set_include_path(
     get_include_path()
