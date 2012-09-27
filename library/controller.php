@@ -327,7 +327,7 @@ class Controller
      */
     final public function redirectError($codeError = null, $url = null)
     {
-        $exc = new Slrfw\Library\Exception\HttpError('Erreur HTTP');
+        $exc = new \Slrfw\Library\Exception\HttpError('Erreur HTTP');
         if (!empty($codeError)) {
             $exc->http($codeError, $url);
         }
