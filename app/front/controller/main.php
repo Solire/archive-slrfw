@@ -93,6 +93,12 @@ class Main extends \Slrfw\Library\Controller {
 
         //On recupere la page elements communs qui sera disponible sur toutes les pages
         $this->_view->mainPage["element_commun"] = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $this->_view->mainPage["element_commun"][0]->getMeta("id"), 0, FALSE, TRUE);
+        
+        $this->_view->breadCrumbs = array();
+        $this->_view->breadCrumbs[] = array(
+            "label" => "Accueil",
+            "url" => "./",
+        );
 
     }
 

@@ -34,8 +34,7 @@ class Page extends Main
      *
      * @return void
      */
-    public function startAction()
-    {
+    public function startAction() {
         $this->_view->enable(FALSE);
 
         if (isset($_GET['rub'])) {
@@ -47,6 +46,11 @@ class Page extends Main
 
                 $this->_rubriqueParent = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $prubid);
                 $this->_view->rubriqueParent = $this->_rubriqueParent;
+
+                $this->_view->breadCrumbs[] = array(
+                    "label" => $this->_rubriqueParent->getMeta("titre"),
+                    "url" => $this->_rubriqueParent->getMeta("rewriting") . ".html",
+                );
             }
             else
                 $prubid = 0;
@@ -73,14 +77,14 @@ class Page extends Main
                         $firstfirstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $firstchild->getMeta("id"));
 
                         if ($firstfirstchild)
-                            $this->_view->fil_ariane[] = array(
+                            $this->_view->breadCrumbs[] = array(
                                 "label" => $this->_rubriqueParent->getMeta("titre"),
                                 "url" => $this->_rubriqueParent->getMeta("rewriting") . "/"
                                 . $firstchild->getMeta("rewriting") . "/"
                                 . $firstfirstchild->getMeta("rewriting") . ".html",
                             );
                         else
-                            $this->_view->fil_ariane[] = array(
+                            $this->_view->breadCrumbs[] = array(
                                 "label" => $this->_rubriqueParent->getMeta("titre"),
                                 "url" => $this->_rubriqueParent->getMeta("rewriting") . "/"
                                 . $firstchild->getMeta("rewriting") . ".html",
@@ -88,7 +92,7 @@ class Page extends Main
                     }
 
                     $firstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $this->_rubrique->getMeta("id"));
-                    $this->_view->fil_ariane[] = array(
+                    $this->_view->breadCrumbs[] = array(
                         "label" => $this->_rubrique->getMeta("titre"),
                         "url" => $this->_rubriqueParent->getMeta("rewriting") . "/"
                         . $this->_rubrique->getMeta("rewriting") . "/"
@@ -97,7 +101,7 @@ class Page extends Main
                 }
                 else {
                     $firstchild = $this->_gabaritManager->getFirstChild(ID_VERSION, $this->_rubrique->getMeta("id"));
-                    $this->_view->fil_ariane[] = array(
+                    $this->_view->breadCrumbs[] = array(
                         "label" => $this->_rubrique->getMeta("titre"),
                         "url" => $this->_rubrique->getMeta("rewriting") . "/"
                         . $firstchild->getMeta("rewriting") . ".html",
@@ -105,7 +109,7 @@ class Page extends Main
                 }
 
 
-                $this->_view->fil_ariane[] = array(
+                $this->_view->breadCrumbs[] = array(
                     "label" => $this->_page->getMeta("titre"),
                     "url" => "",
                 );
@@ -143,7 +147,7 @@ class Page extends Main
 
 
 
-                $this->_view->fil_ariane[] = array(
+                $this->_view->breadCrumbs[] = array(
                     "label" => $this->_rubrique->getMeta("titre"),
                     "url" => "",
                 );

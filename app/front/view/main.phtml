@@ -48,6 +48,9 @@ if ($this->seo->getUrlCanonical() != "") {
             <?php $this->add("menu.phtml"); ?>
         </header>
         <!-- End header -->
+        
+        <div class="ariane" itemprop="breadcrumb"><?php $this->add("breadcrumbs.phtml"); ?></div>
+
 
         <?php $this->content(); ?>
 
