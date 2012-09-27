@@ -50,14 +50,18 @@ class Main extends \Slrfw\Library\Controller {
          *  = possibilité de voir le site sans tenir compte de la visibilité
          * 
          */
-        $this->_utilisateurManager = new \Slrfw\Model\utilisateurManager();
-        $this->_utilisateurAdmin = $this->_utilisateurManager->get();
+        $this->_utilisateurAdmin = new \Slrfw\Library\Session('back');
         $this->_view->utilisateurAdmin = $this->_utilisateurAdmin;
         
         if ($this->_utilisateurAdmin->isConnected() && $this->_ajax == FALSE) {
             if (isset($_GET["mode_previsualisation"])) {
                 $_SESSION["mode_previsualisation"] = (bool) $_GET["mode_previsualisation"];
             }
+            
+            if (!isset($_SESSION["mode_previsualisation"])) {
+                $_SESSION["mode_previsualisation"] = 0;
+            }
+            
             $this->_gabaritManager->setModePrevisualisation($_SESSION["mode_previsualisation"]);
 //            echo '<div style="position: absolute; top: 0px; right: 0px;padding: 5px;background: #DCDCDC">'
 //               . 'Mode : <a href="?mode_previsualisation=0">normal</a> / ' 
