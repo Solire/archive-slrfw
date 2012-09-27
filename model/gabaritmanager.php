@@ -82,7 +82,8 @@ class gabaritManager extends manager {
                     . " FROM `gab_page` `p`"
                     . " LEFT JOIN `gab_page` `q` ON `q`.`id` = `p`.`id_parent` AND `q`.`suppr` = 0 AND `q`.`id_version` = $id_version"
                     . " LEFT JOIN `gab_page` `r` ON `r`.`id` = `q`.`id_parent` AND `r`.`suppr` = 0 AND `r`.`id_version` = $id_version"
-                    . " WHERE `p`.`id_gabarit` = " . $gabarit->getIdParent() . " AND `p`.`suppr` = 0 AND `p`.`id_version` = $id_version";
+                    . " WHERE `p`.`id_gabarit` = " . $gabarit->getIdParent() . " AND `p`.`suppr` = 0 AND `p`.`id_version` = $id_version"
+                    . " ORDER BY `p`.`id_parent`, `q`.`id_parent`";
 
             $parents = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
             $gabarit->setParents($parents);
