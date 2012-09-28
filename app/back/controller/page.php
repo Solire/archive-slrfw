@@ -68,58 +68,7 @@ class Page extends Main
 
         $this->_gabarits = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
 
-        //Liste des début de label à regrouper pour les boutons de création
-        $groupIdentifications = array("Rubrique ", "Sous rubrique ", "Page ");
-        foreach ($this->_gabarits as $gabarit) {
-            $found = false;
-
-            $gabaritsGroup = array(
-                "label" => $gabarit["label"],
-            );
-
-            //Si utilisateur standart à le droit de créer ce type de gabarit ou si utilisateur solire
-            if ($gabarit["creable"] || $this->_utilisateur->get("niveau") == "solire") {
-
-                //Si on a un regroupement des boutons personnalisés dans le fichier de config
-                if (isset($currentConfigPageModule["boutons"]) && isset($currentConfigPageModule["boutons"]["groups"])) {
-                    foreach ($currentConfigPageModule["boutons"]["groups"] as $customGroup) {
-                        //Si le gabarit courant appartien à un des groupes personnalisés
-                        if (in_array($gabarit["id"], $customGroup["gabarits"])) {
-                            $gabaritsGroup = array(
-                                "label" => $customGroup["label"],
-                            );
-                            $found = true;
-                            break;
-                        }
-                    }
-                }
-
-                //On parcourt les Début de label à regrouper
-                if ($found == false) {
-                    foreach ($groupIdentifications as $groupIdentification) {
-                        if (preg_match("/^$groupIdentification/", $gabarit["label"])) {
-                            $gabaritsGroup = array(
-                                "label" => $groupIdentification,
-                            );
-                            $gabarit["label"] = ucfirst(trim(preg_replace("#^" . $groupIdentification . "#", "", $gabarit["label"])));
-                            $found = true;
-                            break;
-                        }
-                    }
-                }
-                $gabaritsGroup["gabarit"][] = $gabarit;
-                if (!$found) {
-                    $gabaritsGroup["label"] = "";
-                    $this->_view->gabaritsBtn[] = $gabaritsGroup;
-                } else {
-
-                    if (isset($this->_view->gabaritsBtn[md5($gabaritsGroup["label"])]))
-                        $this->_view->gabaritsBtn[md5($gabaritsGroup["label"])]["gabarit"][] = $gabarit;
-                    else
-                        $this->_view->gabaritsBtn[md5($gabaritsGroup["label"])] = $gabaritsGroup;
-                }
-            }
-        }
+        $this->getButton($currentConfigPageModule);
 
 
         $this->_view->gabarits = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
@@ -169,7 +118,7 @@ class Page extends Main
         $this->_view->action = "liste";
 
         $this->_javascript->addLibrary("back/tiny_mce/tiny_mce.js");
-        $this->_javascript->addLibrary("back/jquery/jquery.livequery.min.js");
+        
         $this->_javascript->addLibrary("back/autocomplete.js");
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
         $this->_javascript->addLibrary("back/formgabarit.js");
@@ -225,7 +174,7 @@ class Page extends Main
                             || !$page->getMeta("visible")
                     ) {
                         $devant .= '<div style="margin-left: 6px;margin-top: -7px;"><label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-'
-                                . $version['id'] . '">Visible : </label><input class="visible-lang" value="'
+                                . $version['id'] . '">Visible : </label><input class="visible-lang visible-lang-' . $page->getMeta("id") . '-' . $version['id'] . '" style="margin:0;" value="'
                                 . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" style="margin:0;" '
                                 . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /></div>';
                     }
@@ -290,6 +239,10 @@ class Page extends Main
             "label" => "Gestion des pages",
             "url" => "",
         );
+        
+        
+        $this->getButton($currentConfigPageModule);
+        
     }
 
     /**
@@ -317,7 +270,7 @@ class Page extends Main
 
         $json = array(
             "status" => $this->_page ? "success" : "error",
-            "search" => "?id_gab_page=" . $this->_page->getMeta("id"),
+            "search" => "?id_gab_page=" . $this->_page->getMeta("id") . "&popup=more",
             "id_gab_page" => $this->_page->getMeta("id"),
         );
 
@@ -643,6 +596,61 @@ class Page extends Main
         echo $ok ? 'Succès' : 'Echec';
 
         return FALSE;
+    }
+    
+    protected function getButton($currentConfigPageModule) {
+        //Liste des début de label à regrouper pour les boutons de création
+        $groupIdentifications = array("Rubrique ", "Sous rubrique ", "Page ");
+        foreach ($this->_gabarits as $gabarit) {
+            $found = false;
+
+            $gabaritsGroup = array(
+                "label" => $gabarit["label"],
+            );
+
+            //Si utilisateur standart à le droit de créer ce type de gabarit ou si utilisateur solire
+            if ($gabarit["creable"] || $this->_utilisateur->get("niveau") == "solire") {
+
+                //Si on a un regroupement des boutons personnalisés dans le fichier de config
+                if (isset($currentConfigPageModule["boutons"]) && isset($currentConfigPageModule["boutons"]["groups"])) {
+                    foreach ($currentConfigPageModule["boutons"]["groups"] as $customGroup) {
+                        //Si le gabarit courant appartien à un des groupes personnalisés
+                        if (in_array($gabarit["id"], $customGroup["gabarits"])) {
+                            $gabaritsGroup = array(
+                                "label" => $customGroup["label"],
+                            );
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+
+                //On parcourt les Début de label à regrouper
+                if ($found == false) {
+                    foreach ($groupIdentifications as $groupIdentification) {
+                        if (preg_match("/^$groupIdentification/", $gabarit["label"])) {
+                            $gabaritsGroup = array(
+                                "label" => $groupIdentification,
+                            );
+                            $gabarit["label"] = ucfirst(trim(preg_replace("#^" . $groupIdentification . "#", "", $gabarit["label"])));
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+                $gabaritsGroup["gabarit"][] = $gabarit;
+                if (!$found) {
+                    $gabaritsGroup["label"] = "";
+                    $this->_view->gabaritsBtn[] = $gabaritsGroup;
+                } else {
+
+                    if (isset($this->_view->gabaritsBtn[md5($gabaritsGroup["label"])]))
+                        $this->_view->gabaritsBtn[md5($gabaritsGroup["label"])]["gabarit"][] = $gabarit;
+                    else
+                        $this->_view->gabaritsBtn[md5($gabaritsGroup["label"])] = $gabaritsGroup;
+                }
+            }
+        }
     }
 
     protected function singulier($mot) {

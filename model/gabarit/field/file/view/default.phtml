@@ -6,7 +6,7 @@
     
     <input type="hidden" class="extensions" value="<?php  echo $this->params["EXTENSIONS.ALLOW"]; ?>" />
     
-    <a href="<?php echo ($this->value ? Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="previsu">
+    <a href="<?php echo ($this->value ? Slrfw\Library\Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="previsu">
         <?php echo $this->value; ?>
     </a>
 </div>

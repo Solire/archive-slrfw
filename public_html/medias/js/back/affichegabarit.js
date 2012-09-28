@@ -53,6 +53,13 @@ $(function(){
         path : '/'
     });
     
+    /**
+     * Popup apres sauvegarde de la page
+     */
+    $('#modalMore').modal()
+    
+    
+    
     $.datepicker.regional['fr'] = {
         closeText: 'Fermer',
         prevText: 'Précédent',
@@ -258,6 +265,23 @@ $(function(){
     }).dialog({
         title : "Attention",
         resizable : false,
+        open: function(){
+            $('.ui-widget-overlay').hide().fadeIn();
+            if(!$('.ui-dialog-buttonset button').hasClass("btn-a"))
+                $('.ui-dialog-buttonset button').attr("class", "").addClass("btn-a gradient-blue").unbind('mouseout keyup mouseup hover mouseenter mouseover focusin focusout mousedown focus').wrapInner("<a></a>");
+        },
+        beforeClose: function(){
+            $('.ui-widget-overlay').remove();
+            $("<div />", {
+                'class':'ui-widget-overlay'
+            }).css({
+                height: $(document).height(),
+                width: $(document).width(),
+                zIndex: 1001
+            }).appendTo("body").fadeOut(function(){
+                $(this).remove();
+            });
+        },
         buttons: {
             "Ok" : function(){
                 if(sort_elmt.find('textarea.tiny').length > 0)
@@ -277,6 +301,7 @@ $(function(){
             }
         },
         autoOpen : false,
+        modal: true,
         close: function(event, ui){
             sort_elmt = $(null);
         }
@@ -319,8 +344,13 @@ $(function(){
         if (!$(this).hasClass('translucide')) {
             sort_elmt = $(this).parents('.sort-elmt').first();
             sortpar = sort_elmt.parent();
+            
             confirm.html("Etes-vous sur de vouloir supprimer ce bloc?");
             confirm.dialog('open');
+            $(".delBloc", sort_elmt).effect("transfer", {
+                to: confirm.dialog("widget"),
+                className: "ui-effects-transfer"
+            }, 500);
         }
         return false;
     });
@@ -417,14 +447,14 @@ $(function(){
                         function( data, status, xhr ) {
                             response( data );
                         }
-                    );
+                        );
                 },
                 minLength: 0,
                 select: function(event, ui) {
                     if($(this).siblings('.previsu').length > 0)
                         $(this).siblings('.previsu').text(ui.item.label).attr('href', ui.item.path);
                     $(this).val(ui.item.value);
-//                    if (typeof ui.item.file_id != "undefined") $(this).addClass('atelecharger-' + ui.item.file_id)
+                    //                    if (typeof ui.item.file_id != "undefined") $(this).addClass('atelecharger-' + ui.item.file_id)
                     $(this).autocomplete("close");
 					
                     return false;
@@ -444,39 +474,39 @@ $(function(){
             tthis.data("autocomplete")._renderItem = function(ul, item){
                 var ext     = item.value.split('.').pop();
                 var prev    = $.inArray(ext, extensionsImage) != -1
-                            ? '<img class="img-polaroid" src="'+item.vignette+'" height="25" />'
-                            : '<img style="width:auto" class="" src="img/back/filetype/'+ext+'.png" height="25" />';
+                ? '<img class="img-polaroid" src="'+item.vignette+'" height="25" />'
+                : '<img style="width:auto" class="" src="img/back/filetype/'+ext+'.png" height="25" />';
                 
                 return $( "<li></li>" )
                 .data( "item.autocomplete", item )
                 .append(  '<a><span class="row">'
-                        + (prev != '' ?  '<span class="span1" style="margin-left:0px;">' + prev + '</span>': '' )
-                        + '<span class="span" style="margin-left:0px;width:325px">'
-                        + '<dl class="dl-horizontal"><dt>Nom de fichier</dt><dd><span>'+item.label+'<span></dd>' + (prev != "" ? '<dt>Taille</dt><dd><span>'+item.size+'<span></dd>' : '' ) + '</dl>'
-                        + '</span>'
-                        + '</span></a>')
+                    + (prev != '' ?  '<span class="span1" style="margin-left:0px;">' + prev + '</span>': '' )
+                    + '<span class="span" style="margin-left:0px;width:325px">'
+                    + '<dl class="dl-horizontal"><dt>Nom de fichier</dt><dd><span>'+item.label+'<span></dd>' + (prev != "" ? '<dt>Taille</dt><dd><span>'+item.size+'<span></dd>' : '' ) + '</dl>'
+                    + '</span>'
+                    + '</span></a>')
                 .appendTo( ul );
             };
         
             tthis.data("autocomplete")._renderMenu = function( ul, items ) {
                 var self = this;
                                 
-//                if (uploader.files.length > 0) {
-//                    for (var i = 0; i < uploader.files.length; i++) {
-//                        if (uploader.files[i].percent == 0) {
-//                            $( "<li></li>" )
-//                            .data( "item.autocomplete", {
-//                                label : uploader.files[i].name, 
-//                                path:'', 
-//                                vignette:'', 
-//                                value: uploader.files[i].name, 
-//                                file_id: uploader.files[i].id
-//                            })
-//                            .append( '<a>'+uploader.files[i].name+'</a>' )
-//                            .appendTo( ul );
-//                        }
-//                    }
-//                }
+                //                if (uploader.files.length > 0) {
+                //                    for (var i = 0; i < uploader.files.length; i++) {
+                //                        if (uploader.files[i].percent == 0) {
+                //                            $( "<li></li>" )
+                //                            .data( "item.autocomplete", {
+                //                                label : uploader.files[i].name, 
+                //                                path:'', 
+                //                                vignette:'', 
+                //                                value: uploader.files[i].name, 
+                //                                file_id: uploader.files[i].id
+                //                            })
+                //                            .append( '<a>'+uploader.files[i].name+'</a>' )
+                //                            .appendTo( ul );
+                //                        }
+                //                    }
+                //                }
                 
                 $.each( items, function( index, item ) {
                     self._renderItem( ul, item );
@@ -549,7 +579,9 @@ $(function(){
     
     //////////////////// PLUPLOAD ////////////////////
     basehref = $('base').attr('href');    
-    $.cookie("id_temp", 0, {path : '/'});
+    $.cookie("id_temp", 0, {
+        path : '/'
+    });
     
     uploader = new plupload.Uploader({
         runtimes : 'gears,html5,silverlight,flash,html4',
@@ -645,7 +677,9 @@ $(function(){
                 if(response.status != "error") {
                     if ('id_temp' in response) {
                         $('input[name=id_temp]:first').val(response.id_temp);
-                        $.cookie("id_temp", response.id_temp, {path : '/'});
+                        $.cookie("id_temp", response.id_temp, {
+                            path : '/'
+                        });
                     }
                     
                     $('.atelecharger-' + file.id).val(response.filename);

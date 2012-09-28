@@ -87,6 +87,7 @@ class Main extends \Slrfw\Library\Controller
         $this->_javascript->addLibrary('back/main.js');
         $this->_javascript->addLibrary('back/jquery/jquery.cookie.js');
         $this->_javascript->addLibrary('back/jquery/sticky.js');
+        $this->_javascript->addLibrary("back/jquery/jquery.livequery.min.js");
 
         $this->_javascript->addLibrary('back/jquery/jquery.stickyPanel.min.js');
 

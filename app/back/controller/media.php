@@ -2,6 +2,8 @@
 
 namespace Slrfw\App\Back\Controller;
 
+use Slrfw\Library\Registry;
+
 class Media extends Main {
 
     /**

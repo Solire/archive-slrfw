@@ -7,3 +7,60 @@
 
 
 <?php echo $this->form; ?>
+
+
+<?php
+if (isset($_GET["popup"]) && $_GET["popup"] == "more") {
+    ?>
+
+    <div class="modal  hide fade" id="modalMore" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Plus d'actions</h3>
+        </div>
+        <div class="modal-body">
+
+            <dl class="">
+
+                <?php
+                if ($this->page->getMeta("rewriting") != "") {
+                    if ($this->page->getGabarit()->getMake_hidden()
+                            || $this->utilisateur->get("niveau") == "solire"
+                            || !$this->page->getMeta("visible")
+                    ) {
+                        echo '<dt>Visible</dt> <dd><img src="img/flags/png/' . strtolower($this->versions[BACK_ID_VERSION]['suf']) . '.png" alt="" />';
+
+                        echo ' <input class="visible-lang visible-lang-' . $this->page->getMeta("id") . '-' . BACK_ID_VERSION . '" style="margin:0;" value="'
+                        . $this->page->getMeta("id") . '|' . BACK_ID_VERSION . '" id="visible-' . BACK_ID_VERSION . '" style="margin:0;" '
+                        . ($this->page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /><dd>';
+                    }
+                }
+                ?>
+
+                <dt>Rechercher une page à éditer</dt>
+                <dd>
+                    <div>
+                        <input type="text" placeholder="Recherche" class="search live-search ui-autocomplete-input" autocomplete="off" role="textbox" aria-autocomplete="list" aria-haspopup="true">
+                    </div>
+                </dd>
+            </dl>
+
+            <dt>Création d'un nouveau contenu</dt>
+            <dd>
+                <div style="min-height: 100px;">
+                    <?php $this->add("template/button.phtml"); ?>
+                </div>
+            </dd>
+            <dd>
+                <button class="btn btn-success btn-large" data-dismiss="modal" aria-hidden="true">Prévisualisation</button>
+            </dd>
+            
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-large" onclick="var link = $('.back-to-list a').attr('href');window.location = link;">Retour à la liste des pages</button>
+            <button class="btn btn-primary btn-large" data-dismiss="modal" aria-hidden="true">Continuer l'édition de la page en cours</button>
+        </div>
+    </div>
+    <?php
+}
+?>

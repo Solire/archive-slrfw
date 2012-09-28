@@ -309,7 +309,7 @@ class gabaritPage extends gabaritBloc {
                . '<div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
                . '<div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>'
                . '<!--a href="#" class="btn-a gradient-green formprev fl">Prévisualiser</a-->'
-               . '<div class="btn-a gradient-green cb fl"><a href="' . $retour
+               . '<div class="btn-a gradient-green cb fl back-to-list"><a href="' . $retour
                . ($metaId ? '?id_gab_page=' . $metaId : '')
                . '">Retour</a></div>'
                . '</div>'
