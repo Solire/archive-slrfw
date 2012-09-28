@@ -555,7 +555,7 @@ $(function(){
         runtimes : 'gears,html5,silverlight,flash,html4',
         browse_button : 'pickfiles',
         max_file_size : '1000mb',
-        chunk_size : '3mb',
+        chunk_size : '2mb',
         url : basehref + 'media/upload.html?id_gab_page=' + $('[name=id_gab_page]').val(),
         flash_swf_url : basehref + 'js/admin/plupload/plupload.flash.swf',
         silverlight_xap_url : basehref + 'js/admin/plupload/plupload.silverlight.xap',

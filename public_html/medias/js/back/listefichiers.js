@@ -137,7 +137,7 @@ $(function () {
         runtimes : 'gears,html5,silverlight,flash,html4',
         browse_button : 'pickfiles',
         max_file_size : '1000mb',
-        chunk_size : '7mb',
+        chunk_size : '2mb',
         url : basehref + 'media/upload.html',
         flash_swf_url : basehref + 'back/plupload/plupload.flash.swf',
         silverlight_xap_url : basehref + 'back/plupload/plupload.silverlight.xap',

@@ -1,6 +1,7 @@
 <?php
 
 namespace Slrfw\Model;
+use Slrfw\Library\Tools;
 
 class fileManager extends manager {
 

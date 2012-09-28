@@ -67,7 +67,7 @@ class Media extends Main {
 
             $file['class'] = 'hoverprevisu vignette';
 
-            if (array_key_exists($ext, fileManager::$_extensions['image'])) {
+            if (array_key_exists($ext, \Slrfw\Model\fileManager::$_extensions['image'])) {
                 $file['path_mini'] = $prefixPath . $this->_upload_path . DIRECTORY_SEPARATOR
                         . $file['id_gab_page'] . DIRECTORY_SEPARATOR
                         . $this->_upload_vignette . DIRECTORY_SEPARATOR
@@ -83,7 +83,7 @@ class Media extends Main {
             }
 
 //            $file['poids'] = (round((100 * $file['taille']) / (8 * 1024)) / 100) . " Ko";
-            $file['poids'] = Tools::format_taille($file['taille']);
+            $file['poids'] = \Slrfw\Library\Tools::format_taille($file['taille']);
         }
 
         $this->_view->files = $this->_files;
@@ -169,7 +169,7 @@ class Media extends Main {
                 if (isset($json["minipath"])) {
                     $json["minipath"]   = $prefixPath . $json["minipath"];
                     $json["path"]       = $prefixPath . $json["path"];
-                    $json["size"]       = tools::format_taille($json["size"]);
+                    $json["size"]       = \Slrfw\Library\Tools::format_taille($json["size"]);
                 }
 //            }
 //            else {
@@ -208,7 +208,7 @@ class Media extends Main {
             if (isset($json["minipath"])) {
                 $json["minipath"]   = $prefixPath . $json["minipath"];
                 $json["path"]       = $prefixPath . $json["path"];
-                $json["size"]       = tools::format_taille($json["size"]);
+                $json["size"]       = \Slrfw\Library\Tools::format_taille($json["size"]);
                 $json["id_temp"]    = $id_temp;
             }
         }
@@ -273,7 +273,7 @@ class Media extends Main {
             $dir = $id_gab_page ? $id_gab_page : "temp-$id_temp";
 
             foreach ($files as $file) {
-                if (!$tinyMCE || fileManager::isImage($file['rewriting'])) {
+                if (!$tinyMCE || \Slrfw\Model\fileManager::isImage($file['rewriting'])) {
                     $path = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
                             . $dir . DIRECTORY_SEPARATOR
                             . $file['rewriting'];
@@ -289,7 +289,7 @@ class Media extends Main {
                     $realpath = Registry::get("base") . $dir . '/' . $file['rewriting'];
 
 //                    $ext = array_pop(explode(".", $file['rewriting']));
-                    if (fileManager::isImage($file['rewriting'])) {
+                    if (\Slrfw\Model\fileManager::isImage($file['rewriting'])) {
                         $sizes = getimagesize($serverpath);
                         $size = $sizes[0] . " x " . $sizes[1];
                     }
