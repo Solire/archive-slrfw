@@ -211,6 +211,8 @@ class gabaritPage extends gabaritBloc {
         $noRedirections301 = !$_301_editable ? ';display: none' : '';
         $parentSelect = '';
 
+        $api = $this->_gabarit->getApi();
+        
         $redirections = count($redirections) == 0 ? array("") : $redirections;
 
         if ($metaId && $this->_meta['id_parent'] > 0) {
@@ -231,6 +233,7 @@ class gabaritPage extends gabaritBloc {
 		      . '<input type="hidden" name="id_gabarit" value="' . $this->_gabarit->getId() . '" />'
 			  . '<input type="hidden" name="id_gab_page" value="' . $metaId . '" />'
 			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
+			  . '<input type="hidden" name="id_api" value="' . $api['id'] . '" />'
 			  . '<input type="hidden" name="id_temp" />'
 
               . $parentSelect
@@ -308,7 +311,7 @@ class gabaritPage extends gabaritBloc {
                . ($mobile ? '<div class="btn-a gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
                . '<div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
                . '<div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>'
-               . '<!--a href="#" class="btn-a gradient-green formprev fl">Prévisualiser</a-->'
+               . '<div class="btn-a gradient-green cb fl"><a href="#" class="formprev">Prévisualiser</a></div>'
                . '<div class="btn-a gradient-green cb fl back-to-list"><a href="' . $retour
                . ($metaId ? '?id_gab_page=' . $metaId : '')
                . '">Retour</a></div>'
