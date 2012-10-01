@@ -2,8 +2,8 @@
 
 namespace Slrfw\Library\Datatable;
 
-use slrfw\Library\Loader;
-use slrfw\Library\Tools;
+use Slrfw\Library\Loader;
+use Slrfw\Library\Tools;
 
 /**
  * Datatable Class
