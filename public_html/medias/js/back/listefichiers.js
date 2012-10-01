@@ -11,7 +11,22 @@ var orderby = {
 var orderstates = ["", "asc", "desc", ""];
 var orderclasses = ["ui-icon-carat-2-n-s", "ui-icon-carat-1-n", "ui-icon-carat-1-s", "ui-icon-carat-2-n-s"]
 
-
+/**
+ * Suppression des fichiers
+ */
+$(".delete-file").live("click", function (e) {
+    e.preventDefault()
+    var tr = $(this).parents('tr').first();
+    $.post('media/delete.html', {
+        id_media_fichier : tr.attr('id').split('_').pop()
+    }, function(data){
+        if(data.status == 'success'){
+            tr.fadeOut(500, function(){
+                $(this).remove()
+            });
+        }
+    },'json');
+})
 
 
 function reloadDatatable(data) {
