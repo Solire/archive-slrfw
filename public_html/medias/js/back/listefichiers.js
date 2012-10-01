@@ -155,6 +155,10 @@ $(function () {
         {
             title : "Adobe", 
             extensions : "pdf,eps,psd,ai,indd"
+        },
+        {
+            title : "Fichiers vidéos", 
+            extensions : "mp4"
         }
         ],
         drop_element : 'colright',
