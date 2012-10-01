@@ -281,7 +281,7 @@ class fileManager extends manager {
     public function uploadGabPage($id_gab_page, $id_temp, $targetTmp, $targetDir, $vignetteDir, $apercuDir) {
         $json = $this->upload($targetTmp, $targetDir, $vignetteDir, $apercuDir);
         if (isset($json['filename'])) {
-            $this->_insertToMediaFile($json['filename'], $id_gab_page, $id_temp, $json['size'], $json['width'], $json['height']);
+            $json['id'] = $this->_insertToMediaFile($json['filename'], $id_gab_page, $id_temp, $json['size'], $json['width'], $json['height']);
         }
 
         return $json;
