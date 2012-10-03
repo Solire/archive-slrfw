@@ -1,6 +1,7 @@
 <?php
 
 namespace Slrfw\Model;
+
 use Slrfw\Library\Tools;
 
 class fileManager extends manager {
@@ -284,6 +285,72 @@ class fileManager extends manager {
             $json['id'] = $this->_insertToMediaFile($json['filename'], $id_gab_page, $id_temp, $json['size'], $json['width'], $json['height']);
         }
 
+        return $json;
+    }
+
+    public function crop($fileSource, $ext, $targetDir, $target, $id_gab_page, $id_temp,  $vignetteDir, $apercuDir, $x, $y, $w, $h, $targ_w = false, $targ_h = false) {
+        $destinationName = $targetDir . DIRECTORY_SEPARATOR . $target;
+        $fileNameNew = array_pop(explode("/", $destinationName));
+        $ext = strtolower(array_pop(explode(".", $fileNameNew)));
+        
+        
+        /* On cré et on enregistre l'image recadrée */
+        if ($targ_w == false) {
+            $targ_w = $w;
+        }
+        
+        if ($targ_h == false) {
+            $targ_h = $h;
+        }
+        
+
+        $src = $fileSource;
+        $img_r = call_user_func("imagecreatefrom" . self::$_extensions['image'][$ext], $src);
+        $dst_r = ImageCreateTrueColor($targ_w, $targ_h);
+
+        imagecopyresampled($dst_r, $img_r, 0, 0, $x, $y, $targ_w, $targ_h, $w, $h);
+
+        if ($ext == "png") {
+            call_user_func("image" . self::$_extensions['image'][$ext], $dst_r, $destinationName, 0);
+        }
+        elseif ($ext == "gif") {
+            call_user_func("image" . self::$_extensions['image'][$ext], $dst_r, $destinationName);
+        }
+        else {
+            call_user_func("image" . self::$_extensions['image'][$ext], $dst_r, $destinationName, 95);
+        }
+        
+        
+        call_user_func("image" . self::$_extensions['image'][$ext], $dst_r, $destinationName);
+        
+        
+        $size = filesize($destinationName);
+        $sizes = getimagesize($destinationName);
+        $width = $sizes[0];
+        $height = $sizes[1];
+        
+        $json = array();
+        $json['taille'] = $sizes[0] . " x " . $sizes[1];
+        $json['filename'] = $fileNameNew;
+        $json['size'] = $size;
+        $json['width'] = $width;
+        $json['height'] = $height;
+        $json['path'] = $targetDir . DIRECTORY_SEPARATOR . $fileNameNew;
+        $json['date'] = date("d/m/Y H:i:s");
+
+        /* On cré la vignette */
+        $largeurmax = self::$_vignette['max-width'];
+        $hauteurmax = self::$_vignette['max-height'];
+        
+        
+        if ($this->_vignette($targetDir . DIRECTORY_SEPARATOR . $fileNameNew, $ext, $vignetteDir . DIRECTORY_SEPARATOR . $fileNameNew, $largeurmax, $hauteurmax))
+            $jsonrpc['minipath'] = $vignetteDir . DIRECTORY_SEPARATOR . $fileNameNew;
+
+        $largeurmax = self::$_apercu['max-width'];
+        $hauteurmax = self::$_apercu['max-height'];
+        $this->_vignette($targetDir . DIRECTORY_SEPARATOR . $fileNameNew, $ext, $apercuDir . DIRECTORY_SEPARATOR . $fileNameNew, $largeurmax, $hauteurmax);
+        
+        $json['id'] = $this->_insertToMediaFile($json['filename'], $id_gab_page, 0, $json['size'], $json['width'], $json['height']);
         return $json;
     }
 

@@ -31,8 +31,10 @@ class Media extends Main {
         $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
         $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
         $this->_javascript->addLibrary("back/listefichiers.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.scroller-1.0.min.js");
 
         $this->_css->addLibrary("back/demo_table_jui.css");
+        $this->_css->addLibrary("back/jquery.scroller.css");
 
         $this->_view->breadCrumbs[] = array(
             "label" => "Gestion des fichiers",
@@ -121,7 +123,7 @@ class Media extends Main {
                         "rel" => "page"
                     ),
                     "data" => array(
-                        "title" => $rubrique->getMeta('titre')
+                        "title" => '<div class="horizontal_scroller" style="width:100px;height: 17px; cursor: pointer;"><div class="scrollingtext" style="left: 0px;">' . $rubrique->getMeta('titre') . '</div></div>'
                     ),
                     "state" => "closed"
                 );
@@ -137,7 +139,7 @@ class Media extends Main {
                         "rel" => "page"
                     ),
                     "data" => array(
-                        "title" => ( strlen($sous_rubrique->getMeta('titre')) > 16 ? mb_substr($sous_rubrique->getMeta('titre'), 0, 16, "utf-8") . "&hellip;" : $sous_rubrique->getMeta('titre') ) . " (<i>$nbre</i>)",
+                        "title" => '<div class="horizontal_scroller" style="width:100px;height: 17px; cursor: pointer;"><div class="scrollingtext" style="left: 0px;">' . ( strlen($sous_rubrique->getMeta('titre')) > 16 ? mb_substr($sous_rubrique->getMeta('titre'), 0, 16, "utf-8") . "&hellip;" : $sous_rubrique->getMeta('titre') ) . " (<i>$nbre</i>)" . '</div></div>',
                         "attr" => array(
                             "title" => $sous_rubrique->getMeta('titre')
                         )
@@ -160,19 +162,18 @@ class Media extends Main {
 
         if ($id_gab_page) {
 //            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
-
 //            if ($this->_page) {
-                $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
-                $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page;
-                $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_vignette;
-                $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+            $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
+            $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page;
+            $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+            $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
-                $json = $this->_fileManager->uploadGabPage($id_gab_page, 0, $targetTmp, $targetDir, $vignetteDir, $apercuDir);
-                if (isset($json["minipath"])) {
-                    $json["minipath"]   = $prefixPath . $json["minipath"];
-                    $json["path"]       = $prefixPath . $json["path"];
-                    $json["size"]       = \Slrfw\Library\Tools::format_taille($json["size"]);
-                }
+            $json = $this->_fileManager->uploadGabPage($id_gab_page, 0, $targetTmp, $targetDir, $vignetteDir, $apercuDir);
+            if (isset($json["minipath"])) {
+                $json["minipath"] = $prefixPath . $json["minipath"];
+                $json["path"] = $prefixPath . $json["path"];
+                $json["size"] = \Slrfw\Library\Tools::format_taille($json["size"]);
+            }
 //            }
 //            else {
 //                $json = array(
@@ -185,33 +186,30 @@ class Media extends Main {
 //                    "id" => "id",
 //                );
 //            }
-        }
-
-        else {
+        } else {
             if (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] && is_numeric($_COOKIE['id_temp'])) {
-                $id_temp    = (int) $_COOKIE['id_temp'];
-                $target     = "temp-$id_temp";
-            }
-            else {
-                $id_temp    = 1;
-                $target     = "temp-$id_temp";
+                $id_temp = (int) $_COOKIE['id_temp'];
+                $target = "temp-$id_temp";
+            } else {
+                $id_temp = 1;
+                $target = "temp-$id_temp";
                 while (file_exists("../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target)) {
-                    $id_temp ++;
+                    $id_temp++;
                     $target = "temp-$id_temp";
                 }
             }
 
-            $targetTmp      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
-            $targetDir      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target;
-            $vignetteDir    = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_vignette;
-            $apercuDir      = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+            $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
+            $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target;
+            $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+            $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_apercu;
 
             $json = $this->_fileManager->uploadGabPage(0, $id_temp, $targetTmp, $targetDir, $vignetteDir, $apercuDir);
             if (isset($json["minipath"])) {
-                $json["minipath"]   = $prefixPath . $json["minipath"];
-                $json["path"]       = $prefixPath . $json["path"];
-                $json["size"]       = \Slrfw\Library\Tools::format_taille($json["size"]);
-                $json["id_temp"]    = $id_temp;
+                $json["minipath"] = $prefixPath . $json["minipath"];
+                $json["path"] = $prefixPath . $json["path"];
+                $json["size"] = \Slrfw\Library\Tools::format_taille($json["size"]);
+                $json["id_temp"] = $id_temp;
             }
         }
 
@@ -221,6 +219,84 @@ class Media extends Main {
         } else {
             $this->_log->logThis("Upload réussi", $this->_utilisateur->get("id"), "<b>Nom</b> : " . $_REQUEST["name"] . "<br /><b>Page</b> : " . $id_gab_page);
         }
+
+        exit(json_encode($json));
+    }
+
+    public function cropAction() {
+        $this->_view->enable(FALSE);
+        $this->_view->main(FALSE);
+
+        $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
+
+
+        /* Dimensions de recadrage */
+        $x = $_POST["x"];
+        $y = $_POST["y"];
+        $w = $_POST["w"];
+        $h = $_POST["h"];
+
+        /* Information sur le fichier */
+        $filepath = $_POST["filepath"];
+        $filename = array_pop(explode("/", $filepath));
+        $ext = strtolower(array_pop(explode(".", $filename)));
+        $filenameWithoutExtension = array_shift(explode(".", $filename));
+        $prefixPath = "";
+
+        /* Cas d'une édition de page */
+        if ($id_gab_page) {
+            $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page;
+            $prefixPath = $this->_api["id"] == 1 ? "" : ".." . DIRECTORY_SEPARATOR;
+            $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+            $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $id_gab_page . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+        } else {
+            /* Cas d'une création de page */
+            if (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] && is_numeric($_COOKIE['id_temp'])) {
+                $id_temp = (int) $_COOKIE['id_temp'];
+                $target = "temp-$id_temp";
+            }
+
+            $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
+            $targetDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target;
+            $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+            $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $target . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+        }
+
+        $id_temp = 1;
+        $target = "$filenameWithoutExtension-$id_temp.$ext";
+        while (file_exists($targetDir . DIRECTORY_SEPARATOR . $target)) {
+            $id_temp++;
+            $target = "$filenameWithoutExtension-$id_temp.$ext";
+        }
+
+
+
+
+        if ($_POST["force-width"] == 1) {
+            $tw = false;
+            $th = false;
+        } else {
+            $tw = $_POST["minwidth"];
+            $th = ($_POST["minwidth"] / $w) * $h;
+        }
+
+        if ($id_gab_page) {
+            $this->_fileManager->crop($filepath, $ext, $targetDir, $target, $id_gab_page, 0, $vignetteDir, $apercuDir, $x, $y, $w, $h, $tw, $th);
+        } else {
+            $json = $this->_fileManager->crop($filepath, $ext, $targetDir, $target, 0, $id_temp, $vignetteDir, $apercuDir, $x, $y, $w, $h, $tw, $th);
+            if (isset($json["minipath"])) {
+                $json["minipath"] = $prefixPath . $json["minipath"];
+                $json["path"] = $prefixPath . $json["path"];
+                $json["size"] = \Slrfw\Library\Tools::format_taille($json["size"]);
+                $json["id_temp"] = $id_temp;
+            }
+        }
+
+        $json = array();
+
+        $json["path"] = $prefixPath . $targetDir . DIRECTORY_SEPARATOR . $target;
+        $json["filename"] = $target;
+
 
         exit(json_encode($json));
     }
@@ -245,13 +321,9 @@ class Media extends Main {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
-        $id_gab_page    = isset($_GET['id_gab_page']) && $_GET['id_gab_page']
-                        ? $_GET['id_gab_page']
-                        : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
+        $id_gab_page = isset($_GET['id_gab_page']) && $_GET['id_gab_page'] ? $_GET['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
 
-        $id_temp        = isset($_GET['id_temp']) && $_GET['id_temp']
-                        ? $_GET['id_temp']
-                        : (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] ? $_COOKIE['id_temp'] : 0);
+        $id_temp = isset($_GET['id_temp']) && $_GET['id_temp'] ? $_GET['id_temp'] : (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] ? $_COOKIE['id_temp'] : 0);
 
         if (isset($_REQUEST['extensions']) && $_REQUEST['extensions'] != "") {
             $extensions = explode(";", $_REQUEST['extensions']);

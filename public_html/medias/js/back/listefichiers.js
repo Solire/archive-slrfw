@@ -11,6 +11,8 @@ var orderby = {
 var orderstates = ["", "asc", "desc", ""];
 var orderclasses = ["ui-icon-carat-2-n-s", "ui-icon-carat-1-n", "ui-icon-carat-1-s", "ui-icon-carat-2-n-s"]
 
+
+
 /**
  * Suppression des fichiers
  */
@@ -77,6 +79,57 @@ function reloadDatatable(data) {
 
 
 $(function () {
+    
+    
+    
+    /**
+     * Titre trop long (scroll)
+     */
+    jQuery.fn.scroller = function () {
+        $(this).SetScroller({
+            velocity: 	 60,
+            direction: 	 'horizontal',
+            startfrom: 	 'right',
+            loop:	 'infinite',
+            movetype: 	 'linear',
+            onmouseover: 'pause',
+            onmouseout:  'pause',
+            onstartup: 	 'pause',
+            cursor: 	 'pointer'
+        });
+        
+        $(this).unbind("mouseover");
+        $(this).unbind("mouseout");
+        //how to play or stop scrolling animation outside the scroller...
+        $(this).mouseenter(function(){
+            if($('.scrollingtext', this).width() > $(this).width())$(this).PlayScroller();
+        });
+        $(this).mouseleave(function(){
+            $(this).PauseScroller();
+            $('.scrollingtext', this).css("left","0px");
+        });
+
+        $(' .scrollingtext', this).css("left","0px");
+        return this;
+    }
+    
+    
+    
+    $( ".horizontal_scroller" ).livequery(function() {
+        var newHeight = 0, $this = $( this );
+        $.each( $this.children(), function() {
+            newHeight += $( this ).height();
+        });
+        $this.height( newHeight );
+        $this.scroller();
+
+    });
+
+    
+    
+    
+    
+    
     basehref = $('base').attr('href');
     
     reloadDatatable("")
@@ -91,6 +144,7 @@ $(function () {
             "ajax" : {
                 "url" : "media/folderlist.html",
                 "data" : function (n) {
+                    console.log(n)
                     return {
                         "id" : n.attr ? n.attr("id").replace("node_","") : ""
                     };

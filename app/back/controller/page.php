@@ -129,6 +129,8 @@ class Page extends Main
         $this->_javascript->addLibrary("back/jquery/jquery.autogrow.js");
         $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
         $this->_css->addLibrary("back/demo_table_jui.css");
+        $this->_javascript->addLibrary("back/jquery/jcrop/jquery.Jcrop.min.js");
+        $this->_css->addLibrary("back/jcrop/jquery.Jcrop.min.css");
 
 
         $this->_javascript->addLibrary("back/autocomplete_multi/jquery.tokeninput.js");

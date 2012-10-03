@@ -54,6 +54,89 @@ $(function(){
     });
     
     /**
+     * Redimensionnement et recadrage des images
+     */
+    // Create variables (in this scope) to hold the API and image size
+    var jcrop_api, boundx, boundy, $inputFile;
+      
+    
+
+    function updatePreview(c)
+    {
+        if (parseInt(c.w) > 0)
+        {
+            var rx = 100 / c.w;
+            var ry = 100 / c.h;
+
+            $('#crop-preview').css({
+                width: Math.round(rx * boundx) + 'px',
+                height: Math.round(ry * boundy) + 'px',
+                marginLeft: '-' + Math.round(rx * c.x) + 'px',
+                marginTop: '-' + Math.round(ry * c.y) + 'px'
+            });
+            
+            updateCoords(c)
+        }
+        
+    };
+    
+    function updateCoords(c)
+    {
+        $('#x').val(c.x);
+        $('#y').val(c.y);
+        $('#w').val(c.w);
+        $('#h').val(c.h);
+        $('.wShow').html(c.w + "X");
+        $('.hShow').html(c.h);
+    };
+    
+    $('#modalCrop').modal({
+        show : false,
+        backdrop: true,
+        keyboard: true
+    }).addClass('modal-big');
+    
+    $(".form-crop-submit").bind("click", function() {
+        var action = $(".form-crop").attr("action")
+        var data = $(".form-crop").serialize()
+        $.post(action, data, function(response) {
+            $('#modalCrop').modal("hide")
+            $inputFile.val(response.filename);
+            $inputFile.parent().find(".previsu").html(response.filename).attr("href", response.path)
+        }, "json");
+    })
+    
+    $(".crop").live("click", function() {
+        $('.wShow').html("");
+        $('.hShow').html("");
+        var src = $(this).prev().attr("href")
+        $inputFile = $(this).parent().find(".form-file")
+        var minWidth = $inputFile.attr("data-min-width")
+        $("#minwidth").val(minWidth)
+        $("#modalCrop table tr:first td:first ").html('<img src="" id="crop-target" alt="" />')
+        $("#modalCrop #filepath").val(src)
+        $("#crop-target").add("#crop-preview").attr("src", src)
+        $(".jcrop-holder").remove()
+        $('#modalCrop').modal("show")
+        $('#crop-target').Jcrop({
+            minSize : [minWidth, 0],
+            boxWidth: 560,
+            onChange: updatePreview,
+            onSelect: updatePreview,
+            aspectRatio: 0
+        },function(){
+            // Use the API to get the real image size
+            var bounds = this.getBounds();
+            boundx = bounds[0];
+            boundy = bounds[1];
+            // Store the API in the jcrop_api variable
+            jcrop_api = this;
+        });
+    })
+    
+    
+    
+    /**
      * Popup apres sauvegarde de la page
      */
     $('#modalMore').modal()
@@ -103,6 +186,7 @@ $(function(){
         });
 		
         this.find('.previsu').text('').attr('href', '');
+        this.find('.crop').addClass("hide")
 
         return this;
     }
@@ -454,6 +538,14 @@ $(function(){
                     if($(this).siblings('.previsu').length > 0)
                         $(this).siblings('.previsu').text(ui.item.label).attr('href', ui.item.path);
                     $(this).val(ui.item.value);
+                    var ext     = ui.item.path.split('.').pop();
+                    var isImage    = $.inArray(ext, extensionsImage) != -1
+                    if(isImage) {
+                        $(this).siblings('.crop').removeClass("hide")
+                    } else {
+                        $(this).siblings('.previsu').addClass("hide")
+                    }
+                    
                     //                    if (typeof ui.item.file_id != "undefined") $(this).addClass('atelecharger-' + ui.item.file_id)
                     $(this).autocomplete("close");
 					

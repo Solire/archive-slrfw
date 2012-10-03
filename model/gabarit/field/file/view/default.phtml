@@ -2,11 +2,12 @@
     <label for="<?php echo $this->id; ?>">
         <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
     </label>
-    <input type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" />
+    <input data-min-width="<?php  echo $this->params["CROP.WIDTH.MIN"]; ?>" type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" />
     
     <input type="hidden" class="extensions" value="<?php  echo $this->params["EXTENSIONS.ALLOW"]; ?>" />
     
     <a href="<?php echo ($this->value ? Slrfw\Library\Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="previsu">
         <?php echo $this->value; ?>
     </a>
+    <bouton class="btn btn-primary crop <?php echo $this->isImage ? '' : 'hide'; ?>">Recadrer</bouton>
 </div>
