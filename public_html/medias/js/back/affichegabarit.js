@@ -106,10 +106,11 @@ $(function(){
         }, "json");
     })
     
-    $(".crop").live("click", function() {
+    $(".crop").live("click", function(e) {
+        e.preventDefault()
         $('.wShow').html("");
         $('.hShow').html("");
-        var src = $(this).prev().attr("href")
+        var src = $(this).parent().prev().find('a').attr("href")
         $inputFile = $(this).parent().find(".form-file")
         var minWidth = $inputFile.attr("data-min-width")
         $("#minwidth").val(minWidth)
@@ -535,15 +536,16 @@ $(function(){
                 },
                 minLength: 0,
                 select: function(event, ui) {
-                    if($(this).siblings('.previsu').length > 0)
-                        $(this).siblings('.previsu').text(ui.item.label).attr('href', ui.item.path);
+                    if($(this).siblings(".btn-a").find('.previsu').length > 0)
+                        $(this).siblings(".btn-a").find('.previsu').attr('href', ui.item.path);
                     $(this).val(ui.item.value);
+                    $(this).siblings(".btn-a").find('.previsu').parent().show()
                     var ext     = ui.item.path.split('.').pop();
                     var isImage    = $.inArray(ext, extensionsImage) != -1
                     if(isImage) {
-                        $(this).siblings('.crop').removeClass("hide")
+                        $(this).siblings(".btn-a").find('.crop').parent().show()
                     } else {
-                        $(this).siblings('.previsu').addClass("hide")
+                        $(this).siblings(".btn-a").find('.crop').parent().hide()
                     }
                     
                     //                    if (typeof ui.item.file_id != "undefined") $(this).addClass('atelecharger-' + ui.item.file_id)

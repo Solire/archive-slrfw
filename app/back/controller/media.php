@@ -123,7 +123,7 @@ class Media extends Main {
                         "rel" => "page"
                     ),
                     "data" => array(
-                        "title" => '<div class="horizontal_scroller" style="width:100px;height: 17px; cursor: pointer;"><div class="scrollingtext" style="left: 0px;">' . $rubrique->getMeta('titre') . '</div></div>'
+                        "title" => '<div class="horizontal_scroller" style="width:150px;height: 17px; cursor: pointer;"><div class="scrollingtext" style="left: 0px;">' . $rubrique->getMeta('titre') . '</div></div>'
                     ),
                     "state" => "closed"
                 );

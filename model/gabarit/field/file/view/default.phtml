@@ -6,8 +6,8 @@
     
     <input type="hidden" class="extensions" value="<?php  echo $this->params["EXTENSIONS.ALLOW"]; ?>" />
     
-    <a href="<?php echo ($this->value ? Slrfw\Library\Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="previsu">
-        <?php echo $this->value; ?>
-    </a>
-    <bouton class="btn btn-primary crop <?php echo $this->isImage ? '' : 'hide'; ?>">Recadrer</bouton>
+    <div class="btn-a gradient-blue" <?php echo $this->value != '' ? '' : 'style="display:none;"'?>><a class="previsu" href="<?php echo ($this->value ? Slrfw\Library\Registry::get("base") . $this->uploadPath . DIRECTORY_SEPARATOR . $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="previsu"><img src="img/back/voir.png" alt="Gérer"></a></div>
+    
+    <div class="btn-a gradient-blue" <?php echo $this->isImage ? '' : 'style="display:none;"'?>><a class="crop" href="#">Recadrer</a></div>
+
 </div>
