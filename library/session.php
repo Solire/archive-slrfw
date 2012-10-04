@@ -340,7 +340,7 @@ class Session
      */
     public function get($name)
     {
-        if (array_key_exists($name, $this->oldData)) {
+        if (is_array($this->oldData) && array_key_exists($name, $this->oldData)) {
             return $this->oldData[$name];
         }
 
