@@ -321,6 +321,8 @@ class Media extends Main {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
+        $prefixPath = $this->_api["id"] == 1 ? ".." . DIRECTORY_SEPARATOR : ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
+        
         $id_gab_page = isset($_GET['id_gab_page']) && $_GET['id_gab_page'] ? $_GET['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
 
         $id_temp = isset($_GET['id_temp']) && $_GET['id_temp'] ? $_GET['id_temp'] : (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] ? $_COOKIE['id_temp'] : 0);
@@ -348,10 +350,10 @@ class Media extends Main {
 
             foreach ($files as $file) {
                 if (!$tinyMCE || \Slrfw\Model\fileManager::isImage($file['rewriting'])) {
-                    $path = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
+                    $path = $prefixPath . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
                             . $dir . DIRECTORY_SEPARATOR
                             . $file['rewriting'];
-                    $vignette = Registry::get("base") . $this->_upload_path . DIRECTORY_SEPARATOR
+                    $vignette = $prefixPath . DIRECTORY_SEPARATOR . $this->_upload_path . DIRECTORY_SEPARATOR
                             . $dir . DIRECTORY_SEPARATOR
                             . $this->_upload_vignette . DIRECTORY_SEPARATOR
                             . $file['rewriting'];
