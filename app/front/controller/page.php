@@ -47,7 +47,7 @@ class Page extends Main
         }
         
         $this->_siblings = $this->_gabaritManager->getList(
-            ID_VERSION, $this->_page->getMeta("id_parent"), 0, true
+            ID_VERSION, ID_API, $this->_page->getMeta("id_parent"), 0, true
         );
 
         //Balise META
@@ -124,14 +124,14 @@ class Page extends Main
             $last = ($ii == count($_GET['rew']) - 1);
 
             $id_gab_page    = $this->_gabaritManager->getIdByRewriting(
-                ID_VERSION, $rewriting, $id_parent
+                ID_VERSION, ID_API, $rewriting, $id_parent
             );
             if (!$id_gab_page) {
                 $this->pageNotFound();
             }
 
             $page           = $this->_gabaritManager->getPage(
-                ID_VERSION, $id_gab_page, 0, $last, true
+                ID_VERSION, ID_API, $id_gab_page, 0, $last, true
             );
             if (!$page) {
                 $this->pageNotFound();
@@ -154,7 +154,7 @@ class Page extends Main
         }
         
         $this->_pages = $this->_gabaritManager->getList(
-            ID_VERSION, $this->_page->getMeta("id"), false, true, "ordre", "asc"
+            ID_VERSION, ID_API, $this->_page->getMeta("id"), false, true, "ordre", "asc"
         );
 
         if ($this->_page->getGabarit()->getName() == "produits_page"
@@ -162,7 +162,7 @@ class Page extends Main
         ) {
             foreach ($this->_pages as $ii => $page) {
                 $this->_pages[$ii] = $this->_gabaritManager->getPage(
-                    ID_VERSION, $page->getMeta("id"), 0, true, true
+                    ID_VERSION, ID_API, $page->getMeta("id"), 0, true, true
                 );
             }
         }
