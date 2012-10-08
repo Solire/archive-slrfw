@@ -2,6 +2,8 @@
 
 namespace Slrfw\Model;
 
+use \Slrfw\Library\Tools;
+
 /**
  * Description of gabaritmanager
  *
@@ -850,7 +852,7 @@ class gabaritManager extends manager {
                     $value = str_replace('"', '&quot;', $value);
 
                 if ($champ['typedonnee'] == 'DATE')
-                    $value = \Slrfw\Library\Tools::formate_date_nombre($value, "/", "-");
+                    $value = Tools::formate_date_nombre($value, "/", "-");
 
                 if ($champ['trad'] == 0 && $updating)
                     $queryT .= "`" . $champ['name'] . "` = " . $this->_db->quote($value) . ",";
