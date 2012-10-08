@@ -276,8 +276,13 @@ class Media extends Main {
             $tw = false;
             $th = false;
         } else {
-            $tw = $_POST["minwidth"];
-            $th = ($_POST["minwidth"] / $w) * $h;
+            if (isset($_POST["minwidth"]) && intval($_POST["minwidth"]) > 0) {
+                $tw = $_POST["minwidth"];
+                $th = ($_POST["minwidth"] / $w) * $h;
+            } else {
+                $tw = false;
+                $th = false;
+            }
         }
 
         if ($id_gab_page) {
@@ -322,7 +327,7 @@ class Media extends Main {
         $this->_view->main(FALSE);
 
         $prefixPath = $this->_api["id"] == 1 ? ".." . DIRECTORY_SEPARATOR : ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
-        
+
         $id_gab_page = isset($_GET['id_gab_page']) && $_GET['id_gab_page'] ? $_GET['id_gab_page'] : (isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0);
 
         $id_temp = isset($_GET['id_temp']) && $_GET['id_temp'] ? $_GET['id_temp'] : (isset($_COOKIE['id_temp']) && $_COOKIE['id_temp'] ? $_COOKIE['id_temp'] : 0);

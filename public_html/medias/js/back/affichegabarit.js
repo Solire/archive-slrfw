@@ -102,7 +102,7 @@ $(function(){
         $.post(action, data, function(response) {
             $('#modalCrop').modal("hide")
             $inputFile.val(response.filename);
-            $inputFile.parent().find(".previsu").html(response.filename).attr("href", response.path)
+            $inputFile.parent().find(".previsu").attr("href", response.path)
         }, "json");
     })
     
@@ -111,7 +111,7 @@ $(function(){
         $('.wShow').html("");
         $('.hShow').html("");
         var src = $(this).parent().prev().find('a').attr("href")
-        $inputFile = $(this).parent().find(".form-file")
+        $inputFile = $(this).parent().parent().find(".form-file")
         var minWidth = $inputFile.attr("data-min-width")
         $("#minwidth").val(minWidth)
         $("#modalCrop table tr:first td:first ").html('<img src="" id="crop-target" alt="" />')
