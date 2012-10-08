@@ -570,13 +570,21 @@ $(function(){
                 var prev    = $.inArray(ext, extensionsImage) != -1
                 ? '<img class="img-polaroid" src="'+item.vignette+'" height="25" />'
                 : '<img style="width:auto" class="" src="img/back/filetype/'+ext+'.png" height="25" />';
-                
+                /* Alert si image trop petite */
+                var alert = "";
+                if($.inArray(ext, extensionsImage) != -1 && tthis.attr("data-min-width") && tthis.attr("data-min-width") > 0) {
+                    var size = item.size.split("x")
+                    if (parseInt(size[0]) < tthis.attr("data-min-width")) {
+                        alert = '<dt style="color: red">Attention</dt><dd><span style="color: red">La largeur de l\'image est trop petite<span></dd>';
+                    }
+                }
+                    tthis.attr("data-min-width")
                 return $( "<li></li>" )
                 .data( "item.autocomplete", item )
                 .append(  '<a><span class="row">'
                     + (prev != '' ?  '<span class="span1" style="margin-left:0px;">' + prev + '</span>': '' )
                     + '<span class="span" style="margin-left:0px;width:325px">'
-                    + '<dl class="dl-horizontal"><dt>Nom de fichier</dt><dd><span>'+item.label+'<span></dd>' + (prev != "" ? '<dt>Taille</dt><dd><span>'+item.size+'<span></dd>' : '' ) + '</dl>'
+                    + '<dl class="dl-horizontal"><dt>Nom de fichier</dt><dd><span>'+item.label+'<span></dd>' + (prev != "" ? '<dt>Taille</dt><dd><span>'+item.size+'<span></dd>' : '' ) + alert + '</dl>'
                     + '</span>'
                     + '</span></a>')
                 .appendTo( ul );
