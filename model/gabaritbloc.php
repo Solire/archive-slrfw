@@ -156,7 +156,7 @@ class gabaritBloc
         $id = 'champ' . $champ['id'] . '_' . $idpage;
 
         if ($champ['typedonnee'] == 'DATE')
-            $value = Tools::formate_date_nombre($value, '-', '/');
+            $value = Slrfw\Library\Tools::formate_date_nombre($value, '-', '/');
 
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
