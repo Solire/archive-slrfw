@@ -109,10 +109,12 @@ $(function(){
         if(isNaN(y)) {
             y = 0
         }
-         jcrop_api.setSelect([ x,y,x+w,y+h ]);
+        jcrop_api.setSelect([ x,y,x+w,y+h ]);
     })
     
-    $('.spinner').spinner({ min: 0 });
+    $('.spinner').spinner({
+        min: 0
+    });
     
     $(".form-crop-submit").bind("click", function() {
         var action = $(".form-crop").attr("action")
@@ -129,36 +131,57 @@ $(function(){
         e.preventDefault()
         $('.wShow').html("");
         $('.hShow').html("");
+        
         var src = $(this).parent().prev().find('a').attr("href")
-        $inputFile = $(this).parent().parent().find(".form-file")
-        var minWidth = $inputFile.attr("data-min-width")
-        $('.spinner').spinner("destroy");
-        $('.spinner.wShow').spinner({ min: minWidth });
-        $('.spinner.hShow').spinner({ min: 0 });
-        if(parseInt(minWidth) > 0) {
-            $("#minwidthShow").html(minWidth)
-            $(".img-info").show()
-        }
-        $("#minwidth").val(minWidth)
-        $("#modalCrop table tr:first td:first ").html('<img src="" class="img-polaroid" id="crop-target" alt="" />')
-        $("#modalCrop #filepath").val(src)
-        $("#crop-target").add("#crop-preview").attr("src", src)
-        $(".jcrop-holder").remove()
-        $('#modalCrop').modal("show")
-        $('#crop-target').Jcrop({
-            minSize : [minWidth, 0],
-            boxWidth: 560,
-            onChange: updatePreview,
-            onSelect: updatePreview,
-            aspectRatio: 0
-        },function(){
-            // Use the API to get the real image size
-            var bounds = this.getBounds();
-            boundx = bounds[0];
-            boundy = bounds[1];
-            // Store the API in the jcrop_api variable
-            jcrop_api = this;
+        
+        var $overlay = $('<div class="loading-overlay"><div class="circle"></div><div class="circle1"></div></div>').hide()
+        $("body").prepend($overlay)
+        var marginTop = Math.floor(($overlay.height() - $overlay.find(".circle").height()) / 2);
+        $overlay.find(".circle").css({
+            'margin-top' : marginTop + "px"
+            })
+        $overlay.fadeIn(500);
+                    
+        $("<img>", {
+            src: src
+        }).load(function(){ 
+            $('div.loading-overlay').remove()
+            $inputFile = $(this).parent().parent().find(".form-file")
+            var minWidth = $inputFile.attr("data-min-width")
+            $('.spinner').spinner("destroy");
+            $('.spinner.wShow').spinner({
+                min: minWidth
+            });
+            $('.spinner.hShow').spinner({
+                min: 0
+            });
+            if(parseInt(minWidth) > 0) {
+                $("#minwidthShow").html(minWidth)
+                $(".img-info").show()
+            }
+            $("#minwidth").val(minWidth)
+            $("#modalCrop table tr:first td:first ").html('<img src="" class="img-polaroid" id="crop-target" alt="" />')
+            $("#modalCrop #filepath").val(src)
+            $("#crop-target").add("#crop-preview").attr("src", src)
+            $(".jcrop-holder").remove()
+            $('#modalCrop').modal("show")
+            $('#crop-target').Jcrop({
+                minSize : [minWidth, 0],
+                boxWidth: 560,
+                boxHeight: 400,
+                onChange: updatePreview,
+                onSelect: updatePreview,
+                aspectRatio: 0
+            },function(){
+                // Use the API to get the real image size
+                var bounds = this.getBounds();
+                boundx = bounds[0];
+                boundy = bounds[1];
+                // Store the API in the jcrop_api variable
+                jcrop_api = this;
+            });
         });
+        
     })
     
     
@@ -594,7 +617,7 @@ $(function(){
             tthis.data("autocomplete")._renderItem = function(ul, item){
                 var ext     = item.value.split('.').pop();
                 var prev    = $.inArray(ext, extensionsImage) != -1
-                ? '<img class="img-polaroid" src="'+item.vignette+'" height="25" />'
+                ? '<img class="img-polaroid" src="'+item.vignette+'" style="max-height:80px;width:auto;height:auto;max-width: 80px;" />'
                 : '<img style="width:auto" class="" src="img/back/filetype/'+ext+'.png" height="25" />';
                 /* Alert si image trop petite */
                 var alert = "";
@@ -604,7 +627,7 @@ $(function(){
                         alert = '<dt style="color: red">Attention</dt><dd><span style="color: red">La largeur de l\'image est trop petite<span></dd>';
                     }
                 }
-                    tthis.attr("data-min-width")
+                tthis.attr("data-min-width")
                 return $( "<li></li>" )
                 .data( "item.autocomplete", item )
                 .append(  '<a><span class="row">'
