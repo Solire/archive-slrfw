@@ -86,8 +86,8 @@ $(function(){
         $('#y').val(c.y);
         $('#w').val(c.w);
         $('#h').val(c.h);
-        $('.wShow').html(c.w + "X");
-        $('.hShow').html(c.h);
+        $('.wShow').html(Math.round(c.w) + "X");
+        $('.hShow').html(Math.round(c.h));
     };
     
     $('#modalCrop').modal({
