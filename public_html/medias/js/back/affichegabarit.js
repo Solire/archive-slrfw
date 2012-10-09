@@ -134,6 +134,8 @@ $(function(){
         
         var src = $(this).parent().prev().find('a').attr("href")
         
+        $inputFile = $(this).parent().parent().find(".form-file")
+        
         var $overlay = $('<div class="loading-overlay"><div class="circle"></div><div class="circle1"></div></div>').hide()
         $("body").prepend($overlay)
         var marginTop = Math.floor(($overlay.height() - $overlay.find(".circle").height()) / 2);
@@ -146,7 +148,7 @@ $(function(){
             src: src
         }).load(function(){ 
             $('div.loading-overlay').remove()
-            $inputFile = $(this).parent().parent().find(".form-file")
+            
             var minWidth = $inputFile.attr("data-min-width")
             $('.spinner').spinner("destroy");
             $('.spinner.wShow').spinner({
