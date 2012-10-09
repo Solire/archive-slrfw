@@ -86,8 +86,8 @@ $(function(){
         $('#y').val(c.y);
         $('#w').val(c.w);
         $('#h').val(c.h);
-        $('.wShow').html(Math.round(c.w) + "X");
-        $('.hShow').html(Math.round(c.h));
+        $('.wShow').val(Math.round(c.w));
+        $('.hShow').val(Math.round(c.h));
     };
     
     $('#modalCrop').modal({
@@ -95,6 +95,24 @@ $(function(){
         backdrop: true,
         keyboard: true
     }).addClass('modal-big');
+    
+    $('.wShow, .hShow').bind("change", function() {
+        
+        var w = parseInt($('.wShow').val())
+        var h = parseInt($('.hShow').val())
+        var x = parseInt($('#x').val());
+        var y = parseInt($('#y').val());
+        if(isNaN(x)) {
+            x = 0
+        }
+        
+        if(isNaN(y)) {
+            y = 0
+        }
+         jcrop_api.setSelect([ x,y,x+w,y+h ]);
+    })
+    
+    $('.spinner').spinner({ min: 0 });
     
     $(".form-crop-submit").bind("click", function() {
         var action = $(".form-crop").attr("action")
@@ -107,14 +125,22 @@ $(function(){
     })
     
     $(".crop").live("click", function(e) {
+        $(".img-info").hide()
         e.preventDefault()
         $('.wShow').html("");
         $('.hShow').html("");
         var src = $(this).parent().prev().find('a').attr("href")
         $inputFile = $(this).parent().parent().find(".form-file")
         var minWidth = $inputFile.attr("data-min-width")
+        $('.spinner').spinner("destroy");
+        $('.spinner.wShow').spinner({ min: minWidth });
+        $('.spinner.hShow').spinner({ min: 0 });
+        if(parseInt(minWidth) > 0) {
+            $("#minwidthShow").html(minWidth)
+            $(".img-info").show()
+        }
         $("#minwidth").val(minWidth)
-        $("#modalCrop table tr:first td:first ").html('<img src="" id="crop-target" alt="" />')
+        $("#modalCrop table tr:first td:first ").html('<img src="" class="img-polaroid" id="crop-target" alt="" />')
         $("#modalCrop #filepath").val(src)
         $("#crop-target").add("#crop-preview").attr("src", src)
         $(".jcrop-holder").remove()
