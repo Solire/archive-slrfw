@@ -118,6 +118,9 @@ $config = array(
  */
 
 $config = array(
+    'plugins'   =>  array(
+        "ShinForm",
+    ),
     'table' => array(
         'title' => 'Liste des utilisateurs',
         'title_item' => 'utilisateur',
@@ -210,6 +213,14 @@ $config = array(
             'title' => 'Email',
             'creable_field' => array(
                 "type" => "text",
+                'validate' => array(
+                    'rules' => array(
+                        "required" => true,
+                    ),
+                    'messages' => array(
+                        "required" => "Ce champ est obligatoire.",
+                    ),
+                ),
             ),
         ),
         array(
@@ -219,6 +230,21 @@ $config = array(
             'title' => 'Pass',
             'creable_field' => array(
                 "type"       => "password",
+                'validate' => array(
+                    'rules' => array(
+                        "required" => array(
+                            'param' => true,
+                            'depends' => array(
+                                "form.this.add" => true
+                            ),
+                        ),
+                        "minlength" => 5,
+                    ),
+                    'messages' => array(
+                        "required" => "Ce champ est obligatoire.",
+                        "minlength" => "Votre mot de passe doit contenir au moins 5 caractères.",
+                    ),
+                ),
             ),
         ),
         array(
