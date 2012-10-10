@@ -23,11 +23,17 @@ class ShinForm {
     private $_dataNotValidated = null;
     private $_queries = null;
 
-    public function __construct($configName, $db) {
+    public function __construct($configName, $db, $configArray = null) {
         if ($configName != null) {
             $config = Registry::get('mainconfig');
             include($config->get('formulaire', 'dirs') . $configName);
             $this->_config = $config;
+
+            $this->_buildValidate();
+        }
+        
+        if ($configArray != null) {
+            $this->_config = $configArray;
 
             $this->_buildValidate();
         }
@@ -558,6 +564,8 @@ class ShinForm {
                             break;
                         case "equalTo":
                             list($type, $formNameDep, $fieldNameEqual) = explode(".", $rule);
+                            if($formNameDep == "this")
+                                $formNameDep = $formName;
                             $fieldDepSelector = "form[name='$formNameDep'] input[name='$fieldNameEqual'], form[name='$formNameDep'] select[name='$fieldNameEqual']";
                             $form["validate"]["rules"][$fieldName][$key] = $fieldDepSelector;
                             break;
@@ -566,6 +574,8 @@ class ShinForm {
                             unset($field[$key]);
 
                             list($type, $formNameDep, $fieldNameDep) = explode(".", key($rule));
+                            if($formNameDep == "this")
+                                $formNameDep = $formName;
                             $fieldDepSelector = "form[name='$formNameDep'] input[name='$fieldNameDep'], form[name='$formNameDep'] select[name='$fieldNameDep']";
                             $fieldDepSelectorCheckbox = "form[name='$formNameDep'] input[name='$fieldNameDep']:checked, form[name='$formNameDep'] select[name='$fieldNameDep']";
                             $fieldDepVal = current($rule);
@@ -632,6 +642,8 @@ class ShinForm {
                                 case "depends":
                                     //Gestion de dependance avec d'autre champs
                                     list($type, $formNameDep, $fieldNameDep) = explode(".", key($ruleParam));
+                                    if($formNameDep == "this")
+                                        $formNameDep = $formName;
                                     $fieldDepSelector = "form[name='$formNameDep'] input[name='$fieldNameDep'], form[name='$formNameDep'] select[name='$fieldNameDep']";
                                     $fieldDepSelectorCheckbox = "form[name='$formNameDep'] input[name='$fieldNameDep']:checked, form[name='$formNameDep'] select[name='$fieldNameDep']";
                                     $fieldDepVal = current($ruleParam);
@@ -665,7 +677,7 @@ class ShinForm {
             }
 
             $form["validate"]["ignore"] = "";
-//            $form["validate"]["debug"] = true;
+            $form["validate"]["debug"] = true;
 
             $json = json_encode($form["validate"]);
 
