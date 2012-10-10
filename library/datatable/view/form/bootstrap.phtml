@@ -6,15 +6,16 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
     <div role="button" data-toggle="modal" href="#modal-<?php echo $this->name ?>" class="btn-a gradient-green">
         <a>Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>
     </div>
-    <?php
-}
-?>
+    <div class="group-modal">
 
 
-<div class="group-modal">
+        <div id="modal-<?php echo $this->name ?>" role="dialog" class="modal fade" aria-labelledby="myModalLabel" aria-hidden="true">
+
+            <?php
+        }
+        ?>
 
 
-    <div id="modal-<?php echo $this->name ?>" role="dialog" class="modal fade" aria-labelledby="myModalLabel" aria-hidden="true">
 
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -100,7 +101,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                 ?>
 
 
-
+                <input type="hidden" name="add" value="<?php echo (!isset($this->modeEdit) || $this->modeEdit == false) ? 1 : 0; ?>" />
 
             </div>
 
@@ -111,7 +112,6 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 
         </form>
 
-    </div>
 
 
 
@@ -119,10 +119,11 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 
 
 
-    <?php
-    if (!isset($this->modeEdit) || $this->modeEdit == false) {
-        ?>
 
+        <?php
+        if (!isset($this->modeEdit) || $this->modeEdit == false) {
+            ?>
+        </div>
         <div id="modal-response-add-<?php echo $this->name ?>" role="dialog" class="modal fade" aria-labelledby="myModalLabel" aria-hidden="true">
 
             <div class="modal-header">
@@ -139,8 +140,6 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 
             <div class="modal-footer">
             </div>
-
-            </form>
 
         </div>
 
@@ -161,22 +160,21 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
             <div class="modal-footer">
             </div>
 
-            </form>
 
         </div>
         <script type="text/javascript">
             $().ready(function() {
-                                                
+                                                            
                 $(".ui-select-load").livequery(function() {
                     $(this).selectLoad();
                 })
-                
+                            
                 $(".btn-file-upload").livequery(function() {
                     var idBtn = $(this).attr("id")
                     createUploader(idBtn)
                     uploader[idBtn].bind('FileUploaded', function(up, file, info) {
                         nbPlupload--
-                                                        
+                                                                    
                         $(file.div, '.progressbar').progressbar("destroy");
                         var response = $.parseJSON(info.response);
                         if(response.status != "error") {
@@ -186,56 +184,53 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                             if(nbPlupload == 0)
                                 saveForm($myForm)
                         }                
-                                                                            
+                                                                                        
                         uploader[idBtn].splice(0, 1);
-                                                                            
+                                                                                        
                     });
                 })
-                                                                                        
-                                                            
-                $("#myDatatable-<?php echo $this->name ?> .datatable-form .btn-primary").live("click", function(e) {
+                                                                                                    
+                                                                        
+                $(".datatable-form .btn-primary").live("click", function(e) {
                     e.preventDefault();
-                    nbPlupload =  0 
-                    $(".btn-file-upload").each(function() {
-                        var idBtn = $(this).attr("id")
-                        if (uploader[idBtn].files.length != 0) {
-                            nbPlupload++
-                        }
-                    })
-                                                    
-                    if (nbPlupload == 0) {
-                        var $myForm = $(this).parents("form");
-                        saveForm($myForm)
-                    } else {
+                    var $myForm = $(this).parents("form");
+                    if(typeof $myForm.valid != "function" || $myForm.valid()) {
+                        nbPlupload =  0 
                         $(".btn-file-upload").each(function() {
                             var idBtn = $(this).attr("id")
                             if (uploader[idBtn].files.length != 0) {
-                                uploader[idBtn].start();           
+                                nbPlupload++
                             }
                         })
+                                                                
+                        if (nbPlupload == 0) {
+                            saveForm($myForm)
+                        } else {
+                            $(".btn-file-upload").each(function() {
+                                var idBtn = $(this).attr("id")
+                                if (uploader[idBtn].files.length != 0) {
+                                    uploader[idBtn].start();           
+                                }
+                            })
+                        }
                     }
                 })
-                                                            
+                                                                        
                 $("#myDatatable-<?php echo $this->name ?> .edit-item").live("click", function(e) {
                     e.preventDefault();
                     var index = $(this).parents("tr:first").attr("id")
-                    $.post(
+                    var $modalForm = $('<div class="modal fade" ></div>').appendTo("body")
+                    $modalForm.load(
                     "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>&nomain=1&nojs=1&editRender&index=" + index + "&<?php echo $this->additionalParams ?>", 
-                    function(dataHtml) {
-                        var $modalForm = $('<div class="modal fade" >' + $(".modal:first", dataHtml).html() + '</div>').appendTo("#myDatatable-<?php echo $this->name ?>").modal();
-                        var position = null
-                                
-                                                
-                    }
-                );
-                                                                                
-
+                    function() {
+                        $modalForm.modal();
+                    });
                 })
-                                
-                                                                       
-                                                                                                                    
+                                            
+                                                                                   
+                                                                                                                                
             });
-            
+                        
             function saveForm ($myForm, callback) {
                 var $modal = $myForm.parents(".modal")
                 $.post($myForm.attr("action"), $myForm.serialize(), function() {
@@ -258,14 +253,14 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                                 nxt(); // continue the queue
                             })
                         }
-                           
-                                                                                                                                                                    
-                                                                                                                                                                    
+                                       
+                                                                                                                                                                                
+                                                                                                                                                                                
                     })
-                                                                                                                                                                        
+                                                                                                                                                                                    
                 })
             }
-                                                                                                                       
+                                                                                                                                   
         </script>
         <?php
     }

@@ -150,6 +150,14 @@ class Datatable {
      * @access protected
      */
     protected $_additionalWhereQuery;
+    
+    /**
+     *
+     *
+     * @var string
+     * @access protected
+     */
+    protected $_pluginsOutput;
 
     /**
      * Constructeur
@@ -226,6 +234,15 @@ class Datatable {
             require($this->_configPath . $this->_configName . ".cfg.php");
             $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->config = $config;
+            
+            /* INITIALISATION DES PLUGINS */
+            $plugins = array();
+            if (isset($this->config["plugins"])) {
+                foreach ($this->config["plugins"] as $plugin) {
+                    $pluginName = "\Slrfw\Library\Datatable\Plugin\Datatable" . $plugin;
+                    $plugins[$pluginName] = new $pluginName($this->_db, $this);
+                }
+            }
 
             $this->_aFilterColumnAdditional = array();
             $this->additionalParams = "";
@@ -283,6 +300,15 @@ class Datatable {
 
         if (method_exists($this, $this->_action . "Action")) {
             call_user_func(array($this, $this->_action . "Action"));
+            
+            /* Appel action dans plugins */
+            if (isset($plugins) && count($plugins)) {
+                foreach ($plugins as $plugin) {
+                    if (method_exists($plugin, $this->_action . "Action")) {
+                        $this->_pluginsOutput = call_user_func(array($plugin, $this->_action . "Action"));
+                    }
+                }
+            }
         }
     }
 
@@ -1225,10 +1251,10 @@ class Datatable {
         $view = $this->_view;
         if ($this->_view == "" && $this->_response != "")
             return $this->_response;
-        else if ($this->_view != "")
-            return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . $this->_viewPath . $view . ".phtml");
-        else
-            return "";
+        else if ($this->_view != "") {
+            return $this->output(dirname($rc->getFileName()) . DIRECTORY_SEPARATOR . $this->_viewPath . $view . ".phtml") . $this->_pluginsOutput;
+        } else
+            return $this->_pluginsOutput;
     }
 
     // --------------------------------------------------------------------
@@ -1244,6 +1270,28 @@ class Datatable {
         include($file);
         $output = ob_get_clean();
         return $output;
+    }
+    
+    // --------------------------------------------------------------------
+    
+    /**
+     * Renvoi le chargeur de fichier javascript
+     * 
+     * @return Javascript 
+     */
+    public function getJavascriptLoader() {
+        return $this->_javascript;
+    }
+    
+    // --------------------------------------------------------------------
+    
+    /**
+     * Renvoi le chargeur de fichier Css
+     * 
+     * @return Css 
+     */
+    public function getCssLoader() {
+        return $this->_css;
     }
 
     // --------------------------------------------------------------------
