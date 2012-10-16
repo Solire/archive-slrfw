@@ -217,6 +217,12 @@
             padding: 0;
             padding-bottom: 3px;
         }
+        
+        .style-raw {
+            color: black;
+            background: white;
+            background-color: white;
+        }
 
 
     </style>
@@ -263,7 +269,7 @@
                     if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]
                             && isset($column["show_detail"]) && $column["show_detail"]
                     ) {
-                        $details[] = $column["title"] . "|" . ($key - $keyAjust);
+                        $details[] = $column["title"] . "|" . ($key - $keyAjust)  . "|" . (isset($column["style"]) ? $column["style"] : 'default' );
                     }
 
                     if (isset($column["show"]) && $column["show"]
@@ -407,22 +413,44 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
     <?php
     if (is_array($details) && count($details) > 0)
         foreach ($details as $detail) {
-            list($detailName, $detailId) = explode("|", $detail);
+            list($detailName, $detailId, $style) = explode("|", $detail);
             ?>
-                                        if(aData[<?php echo $detailId; ?>] != '')
-                                        sOut += '<tr><td><?php echo $detailName; ?></td><td>'+aData[<?php echo $detailId; ?>]+'</td></tr>';
+                        
+                                        if(aData[<?php echo $detailId; ?>] != '') {
+                                            sOut += '<tr><td><?php echo $detailName; ?></td><td>';
+                                            <?php 
+            switch ($style) {
+                case "raw":
+            ?>
+                            sOut += '<div style="padding: 10px;" class="style-raw">'+aData[<?php echo $detailId; ?>]+'</div>'
+                                                <?php
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-            <?php
-        }
-    ?>
+                                break;
+
+
+                            default:
+                                ?>
+                                                sOut += aData[<?php echo $detailId; ?>];
+                                                <?php
+                                break;
+                        }
+                                                        ?>
+
+
+                                                        sOut += '</td></tr>';
+                                                    }
+
+
+
+                        <?php
+                    }
+                ?>
                         sOut += '</table>';
-                                                                                                                                                                                                                                     
                         return sOut;
                     }
                                                                                     
                     $('#tableau-<?php echo $this->name ?> tbody td img.detail').live( 'click', function () {
-                        var nTr = $(this).parents('tr')[0];
+                        var nTr = $(this).parents('tr:first')[0];
                         var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
                         if ( i === -1 ) {
                             /* Open this row */
@@ -432,7 +460,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                 odd = "odd";
                             }
                             var nDetailsRow = oTable_<?php echo $this->name ?>.fnOpen( nTr, fnFormatDetails(oTable_<?php echo $this->name ?>, nTr), 'details-other' );
-
+                            
                             $('div.innerDetails', nDetailsRow).slideDown();
                             anOpen_<?php echo $this->name ?>.push( nTr );
                             anOpen_<?php echo $this->name ?>Id.push( $(nTr).attr("id") );
@@ -457,9 +485,12 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                     $(nTr).find("td").removeClass("highlighted")
                                 }
                             })
-
+                            
                             $(".ajax-load", nDetailsRow).each(function() {
-                                loadAjax($(this), $(nTr).attr("id"));
+                                if ($(this).children().length == 0 ) {
+                                    loadAjax($(this), $(nTr).attr("id"));
+                                }
+            
                             })
 
                             $(".ajax-click-load", nDetailsRow).each(function() {
@@ -971,7 +1002,7 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
            
             }
         }
-    
+    var url<?php echo $this->nameConfig; ?> = '<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>';
     </script>
 
     <?php
