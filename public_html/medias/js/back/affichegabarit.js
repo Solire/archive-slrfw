@@ -141,7 +141,7 @@ $(function(){
         var marginTop = Math.floor(($overlay.height() - $overlay.find(".circle").height()) / 2);
         $overlay.find(".circle").css({
             'margin-top' : marginTop + "px"
-            })
+        })
         $overlay.fadeIn(500);
                     
         $("<img>", {
@@ -545,13 +545,19 @@ $(function(){
             return false;
         }
     });
+    
+    var openingLegend = false
 	
-    $('legend').live('click', function(){
-        $(this).next().slideToggle(500, function() {
-            if ($(this).parent(".sort-elmt").parents("fieldset:first").find(".expand-collapse").length) {
-                disabledExpandCollaspse($(this).parent(".sort-elmt").parents("fieldset:first"))
-            }
-        });
+    $('legend').bind('click', function(e){
+        if (!openingLegend) {
+            openingLegend = true
+            $(this).next().slideToggle(500, function() {
+                openingLegend = false
+                if ($(this).parent(".sort-elmt").parents("fieldset:first").find(".expand-collapse").length) {
+                    disabledExpandCollaspse($(this).parent(".sort-elmt").parents("fieldset:first"))
+                }
+            });
+        }
         return false;
     });
 

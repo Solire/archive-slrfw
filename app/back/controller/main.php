@@ -99,8 +99,9 @@ class Main extends \Slrfw\Library\Controller
         //Inclusion Bootstrap twitter
         $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
         $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');
+        $this->_css->addLibrary('back/bootstrap/bootstrap-responsive.min.css');
 
-        $this->_css->addLibrary('http://www.solire.fr/style_solire_fw/css/back/newstyle-1.1.css');
+        $this->_css->addLibrary('http://www.solire.fr/style_solire_fw/css/back/newstyle-1.2.css');
         $this->_css->addLibrary('back/sticky.css');
 
         $this->_view->site = Registry::get('project-name');
