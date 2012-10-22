@@ -4,6 +4,7 @@ namespace Slrfw\Library\Datatable;
 
 use Slrfw\Library\Loader;
 use Slrfw\Library\Tools;
+use Slrfw\Model\fileManager;
 
 /**
  * Datatable Class
@@ -38,6 +39,15 @@ class Datatable {
      * @access protected
      */
     protected $_viewPath = "view/";
+
+    /**
+     * Si vrai, le chemin des vues sera relatif
+     * à l'objet instancié
+     *
+     * @var bool
+     * @access protected
+     */
+    protected $_viewPathRelative = false;
 
     /**
      * Chemin du répertoire contenant les feuilles de style
@@ -157,7 +167,23 @@ class Datatable {
      * @var string
      * @access protected
      */
-    protected $_pluginsOutput;
+    protected $_pluginsOutput = "";
+
+    /**
+     *
+     *
+     * @var string
+     * @access protected
+     */
+    protected $_additionalForm;
+
+    /**
+     *
+     *
+     * @var string
+     * @access protected
+     */
+    protected $_columnActionButtons;
 
     /**
      * Constructeur
@@ -267,47 +293,55 @@ class Datatable {
         }
 
         $columnAction = array();
+        $columnActionButtons = array();
 
-        if ((isset($this->config["extra"])
-                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
-                || (isset($this->config["extra"])
-                && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])) {
-            $columnAction[0] = array(
-                "width" => "93px",
-                "content" => '<div class="btn-group">',
-                "show" => true,
-                "title" => "Action",
-            );
-        }
+
+        $columnAction[0] = array(
+            "width" => "93px",
+            "content" => '<div class="btn-group">',
+            "show" => true,
+            "title" => "Action",
+        );
 
         if (isset($this->config["extra"])
-                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]) {
-            $columnAction[0]["content"] .= '<button class="btn btn-primary edit-item">
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]
+                && (!isset($this->config["form"])
+                || !isset($this->config["form"]["ajax"])
+                || $this->config["form"]["ajax"] == true)) {
+            $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item">
                                                 <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier">
                                             </button>';
         }
 
         if (isset($this->config["extra"])
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]
+                && isset($this->config["form"])
+                && isset($this->config["form"]["ajax"])
+                && $this->config["form"]["ajax"] == false) {
+            $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item-no-ajax">
+                                                <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier" />
+                                            </button>';
+        }
+
+        if (isset($this->config["extra"])
                 && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
-            $columnAction[0]["content"] .= '
-                <button class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="img/back/white/trash_stroke_16x16.png"></button>';
+            $columnActionButtons[] = '
+                <button title="Supprimer" class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="img/back/white/trash_stroke_16x16.png"></button>';
         }
 
-        if ((isset($this->config["extra"])
-                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
-                || (isset($this->config["extra"])
-                && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"])) {
-            $columnAction[0]["content"] .= '</div>';
-        }
 
-        if (count($columnAction) > 0) {
-            $this->config["columns"] = array_merge($this->config["columns"], $columnAction);
-        }
 
+
+        $this->_columnActionButtons = $columnActionButtons;
 
         $this->url = self::_selfURL();
 
         $this->beforeRunAction();
+
+        if (count($this->_columnActionButtons) > 0) {
+            $columnAction[0]["content"] .= implode("", $this->_columnActionButtons) . "</div>";
+            $this->config["columns"] = array_merge($this->config["columns"], $columnAction);
+        }
 
         if (method_exists($this, $this->_action . "Action")) {
             call_user_func(array($this, $this->_action . "Action"));
@@ -395,8 +429,12 @@ class Datatable {
             $this->_javascript->addLibrary($this->_jsPath . "jquery/ColVis.js");
         }
 
+        /* Formulaire de création AJAX ONLY */
         if (isset($this->config["extra"])
-                && isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]) {
+                && isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]
+                && (!isset($this->config["form"])
+                || !isset($this->config["form"]["ajax"])
+                || $this->config["form"]["ajax"] == true)) {
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
             $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
@@ -409,6 +447,18 @@ class Datatable {
             } else {
                 $this->_beforeTableHTML .= $this->addRender();
             }
+        }
+
+        /* Formulaire de création AJAX FALSE */
+        if (isset($this->config["extra"])
+                && isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]
+                && isset($this->config["form"])
+                && isset($this->config["form"]["ajax"])
+                && $this->config["form"]["ajax"] == false) {
+            $this->_beforeTableHTML .= '
+                <div  class="btn-a gradient-green">
+                    <a href="' . $this->url . '&dt_action=formAddRender' . '">Ajouter un' . $this->config["table"]["suffix_genre"] . ' ' . $this->config["table"]["title_item"] . '</a>
+                </div>';
         }
 
         $this->_javascript->addLibrary($this->_jsPath . "jquery/ZeroClipboard.js");
@@ -569,6 +619,45 @@ class Datatable {
     // --------------------------------------------------------------------
 
     /**
+     * Formulaire sans ajax
+     *
+     * @return void
+     */
+    public function formAddRenderAction() {
+        $this->addRenderAction();
+        $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
+        $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
+        $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
+        $this->_javascript->addLibrary($this->_jsPath . "jquery/plupload_custom.js");
+        $this->noModal = "no";
+        $this->_view = "form/bootstrap-ajax-false";
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Formulaire sans ajax
+     *
+     * @return void
+     */
+    public function formEditRenderAction() {
+        if (isset($this->config["extra"])
+                && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]) {
+            $this->data = $this->getData($_GET["index"]);
+            $this->modeEdit = true;
+            $this->editRenderAction();
+            $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
+            $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
+            $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
+            $this->_javascript->addLibrary($this->_jsPath . "jquery/plupload_custom.js");
+            $this->noModal = "no";
+            $this->_view = "form/bootstrap-ajax-false";
+        }
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
      * Action qui va être appelée pour modifier un item
      *
      * @return 	void
@@ -670,6 +759,26 @@ class Datatable {
     // --------------------------------------------------------------------
 
     /**
+     * Action qui va enregistrer les fichiers
+     *
+     * @return 	void
+     */
+    public function uploadAction() {
+        $fileManager = new fileManager();
+        $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
+        $targetDir = "../" . $this->_upload_path;
+        $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_vignette;
+        $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+
+        $json = $fileManager->upload($targetTmp, $targetDir, $vignetteDir, $apercuDir);
+
+        $this->_view = "";
+        $this->_response = json_encode($json);
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
      * Action qui va être appelée après l'ajout de l'item
      *
      * @return 	void
@@ -712,7 +821,7 @@ class Datatable {
         $values = array();
         $keyCol = $_REQUEST['load'];
         $selectSqlArray = array();
-        
+
         $column = $this->config["columns"][$keyCol];
         $aVal = array();
         foreach ($column["from"]["columns"] as $sCol) {
@@ -759,15 +868,14 @@ class Datatable {
                     $aVal[] = $this->_db->quote($sColVal);
                 }
                 foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
-                if ($sColIndexVal == "THIS") {
-                    $selectSqlArray[] = $sColIndex . " id";
+                    if ($sColIndexVal == "THIS") {
+                        $selectSqlArray[] = $sColIndex . " id";
+                    }
                 }
             }
-            }
-            
         }
 
-        
+
 
 
 
@@ -955,6 +1063,7 @@ class Datatable {
           `---------------------------------------------------------------------- */
         $sTable = $this->config["table"]["name"];
         $sGroupBy = isset($this->config["table"]["groupby"]) ? $this->config["table"]["groupby"] : false;
+        $sHaving = isset($this->config["table"]["having"]) ? $this->config["table"]["having"] : false;
 
         $realIndex = 0;
 
@@ -986,6 +1095,54 @@ class Datatable {
             }
 
             $aColumnsFunctions[$keyCol] = false;
+
+            /* Gestion des formatage */
+            if (isset($column["format"])) {
+                foreach ($column["format"] as $type => $params) {
+                    $paramsFunc = array();
+                    $aColumnsFunctions[$keyCol][]["name"] = "\Slrfw\Library\Format\\" . ucfirst($type);
+                    $keyFunc = count($aColumnsFunctions[$keyCol])-1;
+                    switch ($type) {
+                        case "date":
+
+
+                            break;
+                        case "number":
+                            switch ($params["type"]) {
+                                case "money":
+                                    $aColumnsFunctions[$keyCol][$keyFunc]["name"] .= "::formatMoney";
+                                    $paramsFunc = array(
+                                        true,
+                                        (isset($params["currency"]) ? $params["currency"] : "") ,
+                                    );
+                                    break;
+
+                                default:
+                                    break;
+                            }
+
+                            break;
+
+                        case "string":
+
+
+                            break;
+
+
+                        default:
+                            break;
+                    }
+
+                    unset($params["type"]);
+
+                    $aColumnsFunctions[$keyCol][$keyFunc]["params"] = $paramsFunc;
+                }
+            }
+
+            /* Fin Gestion des formatage */
+
+
+
             if (isset($column["php_function"])) {
                 $aColumnsFunctions[$keyCol] = isset($column["php_function"]) ? $column["php_function"] : false;
             }
@@ -1087,7 +1244,14 @@ class Datatable {
                         }
 
                         $separator = isset($column2["from"]["separator"]) ? $column2["from"]["separator"] : '';
-                        $column2AdvancedName = "GROUP_CONCAT(" . implode(",", $aVal) . "  SEPARATOR '$separator')";
+
+                        /* Si on ne veut pas de group concat */
+                        if (isset($column2["from"]["group_concat"]) && !$column2["from"]["group_concat"]) {
+                            $column2AdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
+                        } else {
+                            $column2AdvancedName = "GROUP_CONCAT(" . implode(",", $aVal) . "  SEPARATOR '$separator')";
+                        }
+
 
 
                         $column2["name"] = $column2AdvancedName . " `" . $column2RawName . "`";
@@ -1362,7 +1526,7 @@ class Datatable {
                 . " $sTableJoin"
                 . " $sWhere"
                 . " $generalWhere"
-                . ($sGroupBy !== false ? " GROUP BY " . $sGroupBy : "" )
+                . ($sGroupBy !== false ? " GROUP BY " . $sGroupBy . ($sHaving !== false ? " HAVING " . $sHaving : "" ) : "" )
                 . " $sOrder"
                 . " $sLimit";
         $rResult = $this->_db->query($sQuery);
@@ -1436,8 +1600,21 @@ class Datatable {
 
                         if ($aColumnsFunctions[$aColRawKey] !== false) {
                             foreach ($aColumnsFunctions[$aColRawKey] as $function) {
-                                $row[count($row) - 2] = call_user_func($function, $row[count($row) - 2]);
-                                $row[count($row) - 2] = preg_replace("/(\r\n|\n|\r)/", "", $row[count($row) - 2]);
+                                $params = array(
+                                    $row[count($row) - 2],
+                                );
+                                if (is_array($function)) {
+                                    if (isset($function["params"]) && is_array($function["params"]) && count($function["params"]) > 0) {
+                                        $params = array_merge($params, $function["params"]);
+                                    }
+                                    $functionName = $function["name"];
+                                } else {
+                                    $functionName = $function;
+                                }
+                                $row[count($row) - 2] = call_user_func_array($functionName, $params);
+                                if ($functionName == "nl2br") {
+                                    $row[count($row) - 2] = preg_replace("/(\r\n|\n|\r)/", "", $row[count($row) - 2]);
+                                }
                             }
                         }
                     }
@@ -1487,7 +1664,11 @@ class Datatable {
      * @return 	string
      */
     public function __toString() {
-        $rc = new \ReflectionClass(__CLASS__);
+        if ($this->_viewPathRelative) {
+            $rc = new \ReflectionClass(get_class($this));
+        } else {
+            $rc = new \ReflectionClass(__CLASS__);
+        }
         $view = $this->_view;
         if ($this->_view == "" && $this->_response != "")
             return $this->_response;
@@ -1646,7 +1827,7 @@ class Datatable {
         $params = $this->_convertUrlQuery(str_replace($_SERVER['REDIRECT_URL'] . "?", "", $requestUri));
         $paramsString = "";
         foreach ($params as $paramsKey => $param) {
-            if ($paramsKey == "name[]")
+            if ($paramsKey == "name[]" || $paramsKey == "dt_action")
                 unset($params[$paramsKey]);
             else {
                 $paramsString[] = "$paramsKey=$param";
