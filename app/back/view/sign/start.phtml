@@ -79,7 +79,7 @@
 
             $(document).ready(function() {
 
-                $(".formsubmit-signin").click( function(e) {
+                $("#sign-in").submit( function(e) {
                     e.preventDefault()
                     // configurations for the buzzing effect. Be careful not to make it too annoying!
                     var conf = {
@@ -90,11 +90,13 @@
                     
                     var tthis = $(this);
                     var ok = true;
-                    var formu = tthis.parents('form').first();
+                    var formu = tthis;
                     $.post(formu.attr('action'), formu.serialize(), function(data){
                         if(data.success) {
                             $.sticky(data.message, "success")  
                             $(formu).delay(800).queue(function(){ 
+//                                $("#sign-in").unbind("submit")
+//                                formu.submit();
                                 document.location.href = formu.attr('action');
                             })
                         } else {
@@ -133,7 +135,7 @@
     <section>
 
         <article style="margin-top:15%; margin-right:auto; margin-left:auto; width:356px; padding:20px;box-shadow:3px 2px 5px #BFBFBF">
-            <form method="post" action="<?php echo $this->action; ?>">
+            <form id="sign-in" method="post" action="<?php echo $this->action; ?>">
                 <fieldset>
                     <legend><b>Module d'administration</b></legend>
 
@@ -148,9 +150,7 @@
                     </div>
 
                     <div class="">
-                        <div class="btn-a gradient-green">
-                            <a href="#" class="formsubmit-signin" id="intro" style="">Connexion</a>
-                        </div>
+                            <button class="btn-a gradient-green" type="submit">Connexion</button>
                 </fieldset>
             </form>
         </article>
