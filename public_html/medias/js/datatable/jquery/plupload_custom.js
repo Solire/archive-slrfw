@@ -1,15 +1,19 @@
 basehref = $('base').attr('href');
 var uploader = []
 var uploaderInited = [];
-
-var createUploader = function(idBtn) {
+var createUploader = function(idBtn, multi_selection) {
+    if (multi_selection) {
+        multi_selection = true;
+    } else {
+        multi_selection = false;
+    }
     uploader[idBtn] = new plupload.Uploader({
         runtimes : 'gears,html5,silverlight,flash,html4',
-        multi_selection:false,     // <-this is what you needed
+        multi_selection:multi_selection,     // <-this is what you needed
         browse_button : idBtn,
         max_file_size : '1000mb',
-        chunk_size : '7mb',
-        url : basehref + 'ressource/upload.html',
+        chunk_size : '2mb',
+        url : window.location.href + "&dt_action=upload&nomain=1",
         flash_swf_url : basehref + 'js/admin/plupload/plupload.flash.swf',
         silverlight_xap_url : basehref + 'js/admin/plupload/plupload.silverlight.xap',
         filters : [
@@ -34,7 +38,6 @@ var createUploader = function(idBtn) {
     });
     
     uploader[idBtn].name = idBtn.substr(16)
-    
     uploaderInited[idBtn] = false
     uploaderInit(idBtn)
     
@@ -48,11 +51,27 @@ var uploaderInit = function(idBtn){
         uploader[idBtn].init();
 
         uploader[idBtn].bind('FilesAdded', function(up, files) {
-            var file = files[0]
-            // affichage à l'ajout avec <div class="progressbar"></div>
-                
-            file.div = $('<div>');
+//            var file = files[0]
+//            // affichage à l'ajout avec <div class="progressbar"></div>
+//            
+//            file.div = $('<div>');
+//            $('#filelist').append(
+//                '<div id="' + file.id + '">' +
+//                file.name + ' (' + plupload.formatSize(file.size) + ') <b></b>' +
+//                '</div>');
 
+            if (uploader[idBtn].settings.multi_selection == false) {
+                $('#filelist').empty()
+            }
+
+            $.each(files, function(i, file) {
+                $('#filelist').append(
+                    '<div id="' + file.id + '">' +
+                    file.name + ' (' + plupload.formatSize(file.size) + ') <b></b>' +
+                    '</div>');
+            });
+            
+            
             $('.progressbar').progressbar({
                 value: 0
             });
@@ -69,19 +88,19 @@ var uploaderInit = function(idBtn){
             up.refresh();
         });
 
-        uploader[idBtn].bind('FileUploaded', function(up, file, info) {
-
-            $(file.div, '.progressbar').progressbar("destroy");
-
-            var response = $.parseJSON(info.response);
-
-            if(response.status != "error") {
-                    
-            }                
-                
-            uploader[idBtn].splice(0, 1);
-                
-        });
+//        uploader[idBtn].bind('FileUploaded', function(up, file, info) {
+//
+//            $(file.div, '.progressbar').progressbar("destroy");
+//
+//            var response = $.parseJSON(info.response);
+//
+//            if(response.status != "error") {
+//                    
+//            }                
+//                
+//            uploader[idBtn].splice(0, 1);
+//                
+//        });
     }
     else
         uploader[idBtn].refresh();
