@@ -229,6 +229,8 @@ class Media extends Main {
 
         $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
 
+        
+        $newImageName = \Slrfw\Library\Tools::friendlyURL($_POST["image-name"]);
 
         /* Dimensions de recadrage */
         $x = $_POST["x"];
@@ -242,6 +244,8 @@ class Media extends Main {
         $ext = strtolower(array_pop(explode(".", $filename)));
         $filenameWithoutExtension = array_shift(explode(".", $filename));
         $prefixPath = "";
+        $newFilename = $newImageName . "." . $ext;
+        $newFilenameWithoutExtension = $newImageName;
 
         /* Cas d'une édition de page */
         if ($id_gab_page) {
@@ -263,10 +267,10 @@ class Media extends Main {
         }
 
         $id_temp = 1;
-        $target = "$filenameWithoutExtension-$id_temp.$ext";
+        $target = "$newFilenameWithoutExtension.$ext";
         while (file_exists($targetDir . DIRECTORY_SEPARATOR . $target)) {
             $id_temp++;
-            $target = "$filenameWithoutExtension-$id_temp.$ext";
+            $target = "$newFilenameWithoutExtension-$id_temp.$ext";
         }
 
 

@@ -162,6 +162,12 @@ $(function(){
                 $(".img-info").show()
             }
             $("#minwidth").val(minWidth)
+            var imageNameInfos = $inputFile.val().split('.')
+            var imageExtension = imageNameInfos.pop()
+            var imageName = imageNameInfos.join("");
+
+            $("#image-name").val(imageName)
+            $("#image-extension").val(imageExtension)
             $("#modalCrop table tr:first td:first ").html('<img src="" class="img-polaroid" id="crop-target" alt="" />')
             $("#modalCrop #filepath").val(src)
             $("#crop-target").add("#crop-preview").attr("src", src)
