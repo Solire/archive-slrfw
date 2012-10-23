@@ -32,9 +32,9 @@ class Main extends \Slrfw\Library\Controller {
         /** Set title of page ! */
         $this->_seo->setTitle($this->_project->getName());
 
-        /** Noindex Nofollow pour tout (À modifier en production) */
-        $this->_seo->disableIndex();
-        $this->_seo->disableFollow();
+        /** Noindex Nofollow pour tout */
+//        $this->_seo->disableIndex();
+//        $this->_seo->disableFollow();
 
 
         $this->_view->google_analytics = Registry::get('analytics');
