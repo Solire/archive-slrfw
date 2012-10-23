@@ -285,7 +285,11 @@ $(function(){
                         $divToLoad.slideToggle(500, function() {
                             if (currentState == saveStateListPage.length 
                                 && anchorFound !== false) {
-                                var heightFixed = $(".navbar-fixed-top").height() + $("#breadcrumbs").height()
+                                var heightFixed = 0
+                                //Si la navbar est en fixed (taille écran > 980px)
+                                if($(".navbar-fixed-top").css("position") == "fixed") {
+                                    heightFixed = $(".navbar-fixed-top").height() + $("#breadcrumbs").height()
+                                }
                                 $.scrollTo($("#gab_page_" + getURLParameter("id_gab_page")), 1000, {
                                     queue:true, 
                                     offset:-heightFixed
