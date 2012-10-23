@@ -31,6 +31,9 @@ class Page extends Main
      */
     public function listeAction() {
         $this->_javascript->addLibrary("back/liste.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.ajaxqueue.js");
+        $this->_javascript->addLibrary("back/jquery/jquery.scrollTo-min.js");
+        
 
         $gabaritsList = array();
 

@@ -186,7 +186,7 @@ $(function(){
         });
         $(this).parents('form').submit();
     });
-
+    
     //// OUVERTURE / FERMETURE DES PAGES PARENTES.
     $('legend').live('click', function(){
         var $legend = $(this)
@@ -195,16 +195,30 @@ $(function(){
             $legend.find('span.ui-icon-plus').addClass("ui-icon-moins")
             if (!$(this).next('div').hasClass('children-loaded')) {         
                 var id = $(this).parent().attr('id').split('_').pop();
-                $(this).next('div').load('page/children.html', {
-                    id_parent : id
-                }, function(data){
-                    
-                    $(this).addClass('children-loaded');
-                    if (data != '') {
-                        initTri();
-                        $(this).slideToggle(500);
-                        $(this).siblings('.cat-modif').slideToggle(500);
+                
+                var $divToLoad = $(this).next('div')
+                $.ajax({
+                    mode: 'queue',
+                    port: 'ajaxWhois',
+                    type: 'GET',
+                    url: 'page/children.html',
+                    data: {
+                        id_parent : id
+                    },
+                    success: function(data){
+                        console.log(id)
+                        $divToLoad.html(data)
+                        $divToLoad.addClass('children-loaded');
+                        if (data != '') {
+                            initTri();
+                            $divToLoad.slideToggle(500);
+                            $divToLoad.siblings('.cat-modif').slideToggle(500);
+                        }
                     }
+                });
+                $.ajax({
+                    mode: 'dequeue', 
+                    port: 'ajaxWhois'
                 });
             }
         }
@@ -213,9 +227,90 @@ $(function(){
             $(this).next('div').slideToggle(500);
             $(this).siblings('.cat-modif').slideToggle(500);
         }
-        
+
+        saveState()
+
         return false;
     });
+    
+    
+    
+    
+    
+    /**
+     * Enregistre l'état de la liste des pages (Rubriques dépliées)
+     * Celui-ci est stocké en cookie
+     */
+    function saveState() {
+        var saveStateListPage = []
+        $("legend .ui-icon-moins").each(function(){
+            saveStateListPage.push($(this).parents("fieldset:first").attr("id"))
+        })
+        
+        $.cookie('state_list', saveStateListPage, {
+            path : '/'
+        });
+    }
+    
+    var anchorFound = false;
+    var currentState = 0
+    
+    /**
+     * Recharge l'état de la liste des pages (Rubriques dépliées)
+     * Récupéré dans le cookie correspondant
+     */
+    function reloadState() {
+        var saveStateListPage = $.cookie('state_list').split(",")
+        $.each(saveStateListPage, function(id, item) {
+            
+            var id = item.split('_').pop();
+            $.ajax({
+                mode: 'queue',
+                port: 'ajaxWhois',
+                type: 'GET',
+                url: 'page/children.html',
+                data: {
+                    id_parent : id
+                },
+                success: function(data){
+                    currentState++;
+                    var $legend = $("#" + item).find("legend:first")
+                    var $divToLoad = $("#" + item).find(".sort-box:first")
+                    
+                    $legend.find('span.ui-icon-plus').addClass("ui-icon-moins")
+                    $divToLoad.html(data)
+                    $divToLoad.addClass('children-loaded');
+                    if (data != '') {
+                        initTri();
+                        $divToLoad.slideToggle(500, function() {
+                            if (currentState == saveStateListPage.length 
+                                && anchorFound !== false) {
+                                var heightFixed = $(".navbar-fixed-top").height() + $("#breadcrumbs").height()
+                                $.scrollTo($("#gab_page_" + getURLParameter("id_gab_page")), 1000, {
+                                    queue:true, 
+                                    offset:-heightFixed
+                                });
+                            }
+                        });
+                        $divToLoad.siblings('.cat-modif').slideToggle(500);
+                    }
+                    if (anchorFound === false && $("#gab_page_" + getURLParameter("id_gab_page")).length > 0) {
+                        
+                        anchorFound = "#gab_page_" + getURLParameter("id_gab_page")
+                    } 
+                    
+                }
+            });
+        })
+        
+        $.ajax({
+            mode: 'dequeue', 
+            port: 'ajaxWhois'
+        });
+            
+    }
+    
+    reloadState();
     
     
     $(".sort-move").live("click", function(e) {
@@ -223,3 +318,13 @@ $(function(){
     })
     
 });
+
+/**
+ * Permet de récupérer des paramètres de l'url
+ */
+function getURLParameter(name) {
+    return decodeURI(
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+        );
+}
+
