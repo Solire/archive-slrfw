@@ -1,3 +1,11 @@
+<style>
+    .nomodal-footer {
+        text-align: right;
+    }
+    
+</style>
+
+
 
 <h1><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?> un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></h1>
 
@@ -15,34 +23,155 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
 <script src="js/back/tiny_mce/tiny_mce.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+    var filesUploaded = []
+    
     $().ready(function() {
+        
+        var addMsg = '';
+        addMsg += '<div class="alert alert-success">'
+        addMsg +=   '<?php echo ucfirst($this->config["table"]["title_item"]) ?> ajouté<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.'
+        addMsg += '</div>'
+        addMsg += '<p>'
+        addMsg += '<a href="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>" class="btn btn-large btn-primary">Retour à la liste</a>'
+        addMsg += '<a href="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>&dt_action=formAddRender" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>'
+        addMsg += '</p>'
+        
+        var editMsg = '';
+        editMsg += '<div class="alert alert-success">'
+        editMsg +=   '<?php echo ucfirst($this->config["table"]["title_item"]) ?> modifié<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.'
+        editMsg += '</div>'
+        editMsg += '<p>'
+        editMsg += '<button type="button" class="btn btn-large btn-primary">Retour à la liste</button>'
+        editMsg += '<button type="button" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></button>'
+        editMsg += '</p>'
+        
+        var myModal = {
+            confirm : function (heading, question, cancelButtonTxt, okButtonTxt, callback) {
+
+                var confirmModal = 
+                    $('<div class="modal hide fade">' +    
+                    '<div class="modal-header">' +
+                    '<a class="close" data-dismiss="modal" >&times;</a>' +
+                    '<h3>' + heading +'</h3>' +
+                    '</div>' +
+
+                    '<div class="modal-body">' +
+                    '<p>' + question + '</p>' +
+                    '</div>' +
+
+                    '<div class="modal-footer">' +
+                    '<a href="#" class="btn" data-dismiss="modal">' + 
+                    cancelButtonTxt + 
+                    '</a>' +
+                    '<a href="#" id="okButton" class="btn btn-danger">' + 
+                    okButtonTxt + 
+                    '</a>' +
+                    '</div>' +
+                    '</div>');
+
+                confirmModal.find('#okButton').click(function(event) {
+                    event.preventDefault()
+                    callback();
+                    confirmModal.modal('hide');
+                });
+
+                confirmModal.modal('show');     
+            },
+            message : function (heading, message, closeButtonTxt, closeDelay) {
+
+                var messageModal = 
+                    $('<div class="modal hide fade">' +    
+                    '<div class="modal-header">' +
+                    '<a class="close" data-dismiss="modal" >&times;</a>' +
+                    '<h3>' + heading +'</h3>' +
+                    '</div>' +
+
+                    '<div class="modal-body">' +
+                    '<p>' + message + '</p>' +
+                    '</div>' +
+
+                    '<div class="modal-footer">' +
+                    '<a href="#" id="closeButton" data-dismiss="modal" class="btn btn-primary">' + 
+                    closeButtonTxt + 
+                    '</a>' +
+                    '</div>' +
+                    '</div>');
+            
+                messageModal.modal('show');     
+                if (closeDelay) {
+                    messageModal.delay(closeDelay).queue(function(nxt) {
+                        messageModal.modal("hide")
+                        nxt(); // continue the queue
+                    })
+                }
+               
+            }
+                
+                
+        }
+        
+        
         $(".ui-select-load").livequery(function() {
             $(this).selectLoad();
         })
-                                                    
-        $(".btn-file-upload").livequery(function() {
+        
+        var currentPlupload = ""
+        
+        $.fn.createPlupload = function() {
             var idBtn = $(this).attr("id")
-            createUploader(idBtn)
+            createUploader(idBtn, true)
+            filesUploaded[uploader[idBtn].name] = []
             uploader[idBtn].bind('FileUploaded', function(up, file, info) {
-                nbPlupload--
-                                                                                            
+                if(idBtn != currentPlupload)
+                    nbPlupload--
+                currentPlupload = idBtn
                 $(file.div, '.progressbar').progressbar("destroy");
                 var response = $.parseJSON(info.response);
                 if(response.status != "error") {
                     var infoField = uploader[idBtn].name.split("-")
                     var $myForm = $("#btn-file-upload-" + uploader[idBtn].name).parents("form");
-                    $("#" + infoField[1], $myForm).val(response.filename)
-                    if(nbPlupload == 0)
-                        saveForm($myForm)
+                    filesUploaded[uploader[idBtn].name].push(response.filename)
+                    uploader[idBtn].splice(0, 1);
+                    if(nbPlupload == 0 && uploader[idBtn].files.length == 0)
+                        saveForm($myForm, function() {
+                        $myForm.hide(0, function() {
+                            if ($myForm.attr("data-response") == "add") {
+                                $(this).replaceWith(addMsg)
+                            } else {
+                                $(this).replaceWith(editMsg)
+                            }
+                        })
+                    })
                 }                
                                                                                                                 
-                uploader[idBtn].splice(0, 1);
+                
                                                                                                                 
             });
+        };
+                                                    
+        $(".btn-file-upload").livequery(function() {
+            $(this).createPlupload()
         })
+        
+        $(".nomodal-footer .btn-cancel").live("click", function(e) {
+            e.preventDefault()
+            // On recupere l'id de la row'
+            var id = $(this).parents("tr:first").attr('id');
+                                                                
+            var heading = 'Confirmation';
+            var question = 'Attention, les données saisies seront perdues, malgré cela êtes-vous sûr de vouloir quitter cette page ? ';
+            var cancelButtonTxt = 'Annuler';
+            var okButtonTxt = 'Confirmer';
+
+            var callback = function() {
+                history.back()
+            };
+
+            myModal.confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
+        });
                                                                                                                             
                                                                                                 
-        $(".btn-primary").live("click", function(e) {
+        $(".nomodal-footer .btn-primary").live("click", function(e) {
             e.preventDefault();
             var $myForm = $(this).parents("form");
             if(typeof $myForm.valid != "function" || $myForm.valid()) {
@@ -58,9 +187,9 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                     saveForm($myForm, function() {
                         $myForm.hide(0, function() {
                             if ($myForm.attr("data-response") == "add") {
-                                $(this).replaceWith('<p><?php echo ucfirst($this->config["table"]["title_item"]) ?> ajouté<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.</p>')
+                                $(this).replaceWith(addMsg)
                             } else {
-                                $(this).replaceWith('<p><?php echo ucfirst($this->config["table"]["title_item"]) ?> modifié<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.</p>')
+                                $(this).replaceWith(editMsg)
                             }
                         })
                     })
@@ -84,11 +213,17 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
         var $modal = $myForm.parents(".modal")
         if(typeof tinyMCE == "object")
             tinyMCE.triggerSave(true, true);
-        $.post($myForm.attr("action"), $myForm.serialize(), function() {
-            
+        
+        var data = $myForm.serialize()
+        for(i in filesUploaded) {
+            eval('var arrayData = {"' + i + '" : ' + JSON.stringify(filesUploaded[i]) + '}')
+            data += "&" + $.param(arrayData);
+        }
+        
+        $.post($myForm.attr("action"), data, function(response) {
             if (callback && typeof(callback) === "function") {
                 // execute the callback, passing parameters as necessary
-                callback();
+                callback(response);
             }
                                                                                                                                                                                       
                                                                                                                                                                                                             
@@ -402,7 +537,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             theme_advanced_toolbar_align : "left",
             theme_advanced_resizing : true,
 
-            theme_advanced_blockformats : "h1,h2,h3,h4,h5,h6",
+            theme_advanced_blockformats : "h3,h4,h5,h6",
 
             //        external_image_list_url : "../media/autocomplete.html?tinyMCE"
                         
