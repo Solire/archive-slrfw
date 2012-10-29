@@ -45,11 +45,6 @@ function autoload($name)
 spl_autoload_register('Slrfw\autoload');
 
 
-/* = Gestion des erreurs HTTP
-  ------------------------------- */
-//include_once 'exception.php';
-//include_once 'error.php';
-
 /* = lancement du script
   ------------------------------- */
 try {
@@ -62,8 +57,5 @@ try {
 } catch (Library\Exception\HttpError $exc) {
     Library\Error::http($exc->getHttp());
 } catch (\Exception $exc) {
-    $marv = new Library\Marvin('debug', $exc);
-    $marv->display();
-
     Library\Error::run();
 }

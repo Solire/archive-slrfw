@@ -121,7 +121,9 @@ final class Error
     public static function report(Exception\Marvin $exc)
     {
         $marvin = new Marvin($exc->getTitle(), $exc);
-        $marvin->display();
+        $marvin->send();
+
+        self::run();
     }
 
 
