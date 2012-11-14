@@ -1,11 +1,14 @@
 
 <div id="myDatatable-<?php echo $this->name ?>">
 
-
     <?php echo $this->_css; ?>
     <style>
 
         div.innerDetails { display: none }
+
+        .open-modal {
+            cursor: pointer;
+        }
 
         #tableau-<?php echo $this->name ?> td {
             overflow: hidden; /* this is what fixes the expansion */
@@ -21,14 +24,40 @@
             margin-bottom: 0px;
         }
 
+        
         #tableau-<?php echo $this->name ?>_wrapper input {
             height: auto;
             margin-bottom: 0px;
         }
 
+        #tableau-<?php echo $this->name ?>_wrapper .fg-toolbar.ui-corner-tl {
+            border-radius: 6px 6px 0px 0px;
+        }
+
+        #tableau-<?php echo $this->name ?>_wrapper .fg-toolbar.ui-corner-bl {
+            border-radius: 0px 0px 6px 6px;
+        }
+
+
+        #tableau-<?php echo $this->name ?>_wrapper .ui-widget-header {
+            margin: 0;
+            box-shadow: none;
+            border: none;
+            border-radius: 0px;
+            <?php
+            if (isset($this->config["style"]) && isset($this->config["style"]["datatable"])) {
+                foreach ($this->config["style"]["datatable"] as $keyStyle => $valueStyle) {
+                    ?>
+                    <?php echo $keyStyle . ":" . $valueStyle . ";" ?>
+                    <?php
+                }
+            }
+            ?>
+
+        }
 
         thead input { width: 100% }
-        input.search_init { color: #999;font-size : 11px; }
+        #tableau-<?php echo $this->name ?> tfoot input.search_init, #tableau-<?php echo $this->name ?> tfoot input.text_filter { font-size : 11px; }
 
         select.select_filter {max-width: 100px;font-size : 11px;}
 
@@ -193,6 +222,10 @@
             clear: right;
         }
 
+        #tableau-<?php echo $this->name ?>_info {
+            width: 70%;
+        }
+
         #tableau-<?php echo $this->name ?>_processing {
             border : 0px;
         }
@@ -209,6 +242,7 @@
         .dataTables_length {
             width: auto;
         }
+
 
         tfoot th input, tfoot th select { width: 75%;margin-bottom: 0px; }
         tfoot th select { margin-top: 7px; width: 90%;}
@@ -248,6 +282,11 @@
             align: center;
         }
 
+        #tableau-<?php echo $this->name ?> tbody tr.even td .btn-a a, #tableau-<?php echo $this->name ?> tbody tr.odd td .btn-a a {
+            color: white;
+            text-decoration: none;
+        }
+
 
 
     </style>
@@ -261,6 +300,7 @@
     }
     ?>
 
+    <?php echo $this->_beforeHTML; ?>
 
     <?php echo $this->_beforeTableHTML; ?>
 
@@ -271,6 +311,7 @@
                 $details = "";
                 $filterIndividualColumn = null;
                 $filterIndividualColumnShow = false;
+                $bottomColumn = false;
 
                 if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
                     $filterIndividualColumn .= '<td></td>';
@@ -315,6 +356,12 @@
                         if (isset($column["filter_field"]) && $column["filter_field"]) {
                             $filterIndividualColumnShow = true;
                             $filterIndividualColumn .= '<input style="width:100%;" type="text" name="search_' . $column["name"] . '" value="Recherche par ' . $column["title"] . '" class="search_init" />';
+                        }
+                        ?>
+
+                        <?php
+                        if (isset($column["bottom"]) && $column["bottom"]) {
+                            $bottomColumn = true;
                         }
                         ?>
 
@@ -363,23 +410,30 @@
 
 
             <!-- TOTAL DU BAS -->
-            <tr>
-                <?php
-                if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
-                    ?>
-                    <th style="background-color:#fff;"></th>
+            <?php
+            if ($bottomColumn) {
+                ?>
+                <tr>
                     <?php
-                }
-
-                foreach ($this->config["columns"] as $column) {
-                    if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+                    if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
                         ?>
-                        <th style="background-color:#fff; height:30px; font-size:14px; text-align:center; padding:3px 0; "></th>
+                        <th style="background-color:#fff;"></th>
                         <?php
                     }
-                }
-                ?>
-            </tr>
+
+                    foreach ($this->config["columns"] as $column) {
+                        if (isset($column["show"]) && $column["show"] || isset($column["show_detail"]) && $column["show_detail"]) {
+                            ?>
+                            <th style="background-color:#fff; height:30px; font-size:14px; text-align:center; padding:3px 0; "></th>
+                            <?php
+                        }
+                    }
+                    ?>
+                </tr>
+                <?php
+            }
+            ?>
+
         </tfoot>
     </table>
 
@@ -404,6 +458,40 @@
 
             return vCols;
         }
+        
+        
+        $.fn.fnSetFilteringDelay = function ( oSettings, iDelay ) {
+            var _that = this;
+ 
+            if ( iDelay === undefined ) {
+                iDelay = 250;
+            }
+      
+            this.each( function ( i ) {
+                $.fn.dataTableExt.iApiIndex = i;
+                var
+                $this = this,
+                oTimerId = null,
+                sPreviousSearch = null,
+                anControl = $( 'input', _that.fnSettings().aanFeatures.f );
+          
+                anControl.unbind( 'keyup' ).bind( 'keyup', function() {
+                    var $$this = $this;
+  
+                    if (sPreviousSearch === null || sPreviousSearch != anControl.val()) {
+                        window.clearTimeout(oTimerId);
+                        sPreviousSearch = anControl.val(); 
+                        oTimerId = window.setTimeout(function() {
+                            $.fn.dataTableExt.iApiIndex = i;
+                            _that.fnFilter( anControl.val() );
+                        }, iDelay);
+                    }
+                });
+          
+                return this;
+            } );
+            return this;
+        };
     
         var oTable_<?php echo $this->name ?>;
     
@@ -440,7 +528,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
         foreach ($details as $detail) {
             list($detailName, $detailId, $style) = explode("|", $detail);
             ?>
-                                                            
+                                                                                                                                                
                                     if(aData[<?php echo $detailId; ?>] != '') {
                                         sOut += '<tr><td><?php echo $detailName; ?></td><td>';
             <?php
@@ -472,10 +560,10 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                     sOut += '</table>';
                     return sOut;
                 }
-                                
-                                
-                                
-                                                                                                
+                                                            
+                                                            
+                                                            
+                                                                                                                            
                 $('#tableau-<?php echo $this->name ?> tbody td img.detail').live( 'click', function () {
                     var nTr = $(this).parents('tr:first')[0];
                     var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
@@ -487,7 +575,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                             odd = "odd";
                         }
                         var nDetailsRow = oTable_<?php echo $this->name ?>.fnOpen( nTr, fnFormatDetails(oTable_<?php echo $this->name ?>, nTr), 'details-other' );
-                                        
+                                                                    
                         $('div.innerDetails', nDetailsRow).slideDown();
                         anOpen_<?php echo $this->name ?>.push( nTr );
                         anOpen_<?php echo $this->name ?>Id.push( $(nTr).attr("id") );
@@ -512,12 +600,12 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                 $(nTr).find("td").removeClass("highlighted")
                             }
                         })
-                                        
+                                                                    
                         $(".ajax-load", nDetailsRow).each(function() {
                             if ($(this).children().length == 0 ) {
                                 loadAjax($(this), $(nTr).attr("id"));
                             }
-                        
+                                                    
                         })
 
                         $(".ajax-click-load", nDetailsRow).each(function() {
@@ -651,11 +739,14 @@ foreach ($this->config["columns"] as $column) {
             ],
 
             "fnPreDrawCallback": function() {
-                var $overlay = $('<div class="loading-overlay"><div class="circle"></div><div class="circle1"></div></div>').hide()
-                $("#tableau-<?php echo $this->name ?>_wrapper").prepend($overlay)
-                var marginTop = $("#tableau-<?php echo $this->name ?>_wrapper").outerHeight() / 2 - 25
-                $overlay.find(".circle").css({'margin-top' : marginTop + "px"})
-                $overlay.fadeIn(500);
+                if ($(".loading-overlay").length == 0) {
+                    var $overlay = $('<div class="loading-overlay"><div class="circle"></div><div class="circle1"></div></div>').hide()
+                    $("#tableau-<?php echo $this->name ?>_wrapper").prepend($overlay)
+                    var marginTop = $("#tableau-<?php echo $this->name ?>_wrapper").outerHeight() / 2 - 25
+                    $overlay.find(".circle").css({'margin-top' : marginTop + "px"})
+                    $overlay.fadeIn(500);
+                }
+                
                 return true;
             },
             'fnDrawCallback': function(a, b, c) {
@@ -801,7 +892,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"
             "sAjaxSource": "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>json&<?php echo $this->additionalParams ?>",
             "sServerMethod": "POST"
             
-        }).columnFilter({
+        }).fnSetFilteringDelay().columnFilter({
 <?php
 if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"]) && $this->config["extra"]["hide_columns"]) {
     ?>
@@ -926,7 +1017,7 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
             e.preventDefault()
             // On recupere l'id de la row'
             var id = $(this).parents("tr:first").attr('id');
-                                                                
+                                                                                            
             var heading = 'Confirmation de suppression d\'un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>';
             var question = 'Etes-vous sûr de vouloir supprimer cet élément ? ';
             var cancelButtonTxt = 'Annuler';
@@ -947,9 +1038,9 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
 
             myModal.confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
         });
-                                                        
-                                                        
-                                                        
+                                                                                    
+                                                                                    
+                                                                                    
 
 
 <?php } ?>                                                   
@@ -960,10 +1051,19 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
             e.preventDefault();
             var index = $(this).parents("tr:first").attr("id")
             window.location.href = '<?php echo $this->url . '&dt_action=formEditRender&index='; ?>' + index
-                                   
         });
-                                                                                                       
+                                                                                                                                   
 <?php } ?>
+
+<?php if (isset($this->config["extra"]["show"]) && $this->config["extra"]["show"]) { ?>
+        $("#tableau-<?php echo $this->name ?> .show-item-no-ajax").live("click", function(e) {
+            e.preventDefault();
+            var index = $(this).parents("tr:first").attr("id")
+            window.location.href = '<?php echo $this->url . '&dt_action=show&index='; ?>' + index
+        })
+                                                                                                                                   
+<?php } ?>
+
 
     function loadAjax($elem, id) {
         var filter = $elem.attr("data-filter")
@@ -980,6 +1080,26 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
         function() {
         return this.replace(/<br\s*\/?>/mg,"\n");
     };
+    
+    var extensionsImage = ['jpg', 'jpeg', 'gif', 'png'];
+
+    $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .open-modal").live("click", function() {
+        var rel = $(this).attr("rel")
+        var ext = rel.split('.').pop().toLowerCase();
+        if (extensionsImage.indexOf(ext) != -1) {
+            $("<img>", {
+                src : rel
+            }).load(function() {
+                myModal.message("Aperçu du fichier", $(this)[0].outerHTML, "Fermer l'aperçu");
+            });
+        } else {
+            $.get(rel, function(data) {
+                myModal.message("Aperçu", data, "Fermer l'aperçu");
+            })
+        }
+        
+        
+    })
         
         
     var myModal = {

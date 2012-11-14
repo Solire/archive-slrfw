@@ -116,7 +116,7 @@ class Datatable {
     /**
      * Chargeur de script Javascript
      *
-     * @var JavascriptLoader
+     * @var Loader\Javascript
      * @access protected
      */
     protected $_javascript;
@@ -124,7 +124,7 @@ class Datatable {
     /**
      * Chargeur de feuilles de styles
      *
-     * @var CssLoader
+     * @var Loader\Css
      * @access protected
      */
     protected $_css;
@@ -136,6 +136,14 @@ class Datatable {
      * @access protected
      */
     protected $_where;
+
+    /**
+     *
+     *
+     * @var string
+     * @access protected
+     */
+    protected $_beforeHTML;
 
     /**
      *
@@ -167,6 +175,14 @@ class Datatable {
      * @var string
      * @access protected
      */
+    protected $_additionalJoinQueryCount;
+
+    /**
+     *
+     *
+     * @var string
+     * @access protected
+     */
     protected $_pluginsOutput = "";
 
     /**
@@ -186,15 +202,25 @@ class Datatable {
     protected $_columnActionButtons;
 
     /**
+     *
+     *
+     * @var \Slrfw\Library\Log
+     * @access protected
+     */
+    protected $_log;
+
+    /**
      * Constructeur
      *
      * Défini les chemins des ressources, la connexion à la base de données
      * ainsi que les paramètres GET de l'url et le nom du fichier de configuration
      */
-    public function __construct($get, $configName, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/") {
+    public function __construct($get, $configName, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/", $log = null) {
         $this->_db = $db;
         $this->_get = $get;
         $this->_configName = $configName;
+        $this->_log = $log;
+
 
         /* Augmentation de la limite des group_concat */
         $this->_db->exec("SET GLOBAL group_concat_max_len = 100000;");
@@ -270,6 +296,8 @@ class Datatable {
             $this->nameConfig = str_replace(array(".", "-"), "_", $this->_configName);
             $this->config = $config;
 
+            $sTable = $this->config["table"]["name"];
+
             /* INITIALISATION DES PLUGINS */
             $plugins = array();
             if (isset($this->config["plugins"])) {
@@ -290,6 +318,10 @@ class Datatable {
                 $params["filter"] = $_GET["filter"];
 //                $this->additionalParams = http_build_query($params);
             }
+
+            if (isset($this->config["extra"]["logical delete"])) {
+                $this->_aFilterColumnAdditional[] = $sTable . "." . $this->config["extra"]["logical delete"]["column_bool"] . ' = 0';
+            }
         }
 
         $columnAction = array();
@@ -302,6 +334,14 @@ class Datatable {
             "show" => true,
             "title" => "Action",
         );
+
+        if (isset($this->config["extra"])
+                && isset($this->config["extra"]["show"]) && $this->config["extra"]["show"]
+        ) {
+            $columnActionButtons[] = '<button title="Voir" class="btn btn-primary show-item-no-ajax">
+                                        <img width="12" alt="Voir" src="img/back/white/magnifying_glass_12x12.png">
+                                    </button>';
+        }
 
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]
@@ -335,11 +375,13 @@ class Datatable {
         $this->_columnActionButtons = $columnActionButtons;
 
         $this->url = self::_selfURL();
+        $this->urlRaw = self::_selfURLRaw();
 
         $this->beforeRunAction();
 
         if (count($this->_columnActionButtons) > 0) {
             $columnAction[0]["content"] .= implode("", $this->_columnActionButtons) . "</div>";
+            $columnAction[0]["show_page_detail"] = false;
             $this->config["columns"] = array_merge($this->config["columns"], $columnAction);
         }
 
@@ -376,6 +418,21 @@ class Datatable {
     // --------------------------------------------------------------------
 
     /**
+     * Permet de modifier les styles
+     *
+     * @param array $style
+     * @return void
+     */
+    public function addStyle($style) {
+        if (!isset($this->config["style"])) {
+            $this->config["style"] = array();
+        }
+        $this->config["style"] = array_merge($this->config["style"], $style);
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
      * Permet d'ajouter un filtre sur les requêtes
      *
      * @param string $whereString chaine sql de filtre
@@ -383,6 +440,16 @@ class Datatable {
      */
     public function additionalWhereQuery($whereString) {
         $this->_additionalWhereQuery = $whereString;
+    }
+
+    /**
+     * Permet d'ajouter une jointure à la requete de comptage total
+     *
+     * @param string $joinString chaine sql de jointure
+     * @return void
+     */
+    public function additionalJoinQueryCount($joinString) {
+        $this->_additionalJoinQueryCount = $joinString;
     }
 
     // --------------------------------------------------------------------
@@ -394,6 +461,73 @@ class Datatable {
      */
     public function beforeTable($html) {
         $this->_beforeTableHTML = $html;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Permet entre autre d'ajouter le fil d'ariane
+     *
+     * @return 	void
+     */
+    public function beforeHtml($html) {
+        $this->_beforeHTML = $html;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Renvoi l'action courante
+     *
+     * @return 	string
+     */
+    public function getAction() {
+        return $this->_action;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Renvoi le fil de fer
+     *
+     * @return 	array
+     */
+    public function getBreadCrumbs() {
+        $breadCrumbs = array();
+
+        $breadCrumbs[] = array(
+            "label" => $this->config["table"]["title"],
+            "url" => isset($this->customeURLRaw) ? $this->customeURLRaw : $this->_selfURLRaw(),
+        );
+
+        switch ($this->getAction()) {
+            case "formAddRender":
+                $breadCrumbs[] = array(
+                    "label" => isset($this->pageTitle) ? $this->pageTitle : "Ajouter un" . $this->config["table"]["suffix_genre"] . " " . $this->config["table"]["title_item"],
+                    "url" => "",
+                );
+
+                break;
+            case "formEditRender":
+                $breadCrumbs[] = array(
+                    "label" => isset($this->pageTitle) ? $this->pageTitle : "Modifier un" . $this->config["table"]["suffix_genre"] . " " . $this->config["table"]["title_item"],
+                    "url" => "",
+                );
+
+                break;
+            case "show":
+                $breadCrumbs[] = array(
+                    "label" => isset($this->pageTitle) ? $this->pageTitle : "Détails " . $this->config["table"]["title_item"],
+                    "url" => "",
+                );
+
+                break;
+
+            default:
+                break;
+        }
+
+        return $breadCrumbs;
     }
 
     // --------------------------------------------------------------------
@@ -512,37 +646,63 @@ class Datatable {
         foreach ($this->config["columns"] as $iKeyJoin => &$column) {
             if (isset($column["filter_field"]) && $column["filter_field"] == "select") {
                 /* Jointure sur autre table */
+                $selectSqlArray = array();
                 if (isset($column["from"]) && $column["from"]) {
-                    $aFilterJoin = array();
-
-                    foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
-                        if ($sColIndexVal == "THIS") {
-                            $sVal = "`" . $sTable . "`.`" . $column["name"] . "`";
-                        } else {
-                            $sVal = $this->_db->quote($sColIndexVal);
-                        }
-                        $aFilterJoin[] = "`" . $column["from"]["table"] . "_$iKeyJoin`.`" . $sColIndex . "` = " . $sVal;
-                    }
-
                     $aVal = array();
                     foreach ($column["from"]["columns"] as $sCol) {
                         $sColVal = current($sCol);
                         $sColKey = key($sCol);
+                        $column2 = $sCol;
+                        /* Double jointure  */
+                        if (isset($column2["from"]) && $column2["from"]) {
+                            $table = "`" . $column2["from"]["table"] . "` `" . $column2["from"]["table"] . "_$iKeyJoin`";
+                            /* On construit le select  */
+                            $aVal = array();
+                            foreach ($column2["from"]["columns"] as $sCol) {
+                                $sColVal = current($sCol);
+                                $sColKey = key($sCol);
 
-                        if ($sColKey == "name") {
-                            $aVal[] = "`" . $column["from"]["table"] . "`.`$sColVal`";
+                                if ($sColKey === "name") {
+                                    $sColVal2 = next($sCol);
+                                    $sColKey2 = key($sCol);
+                                    if ($sColKey2 == "sql") {
+                                        continue;
+                                    } else
+                                        $aVal[] = "`" . $column2["from"]["table"] . "_$iKeyJoin`.`$sColVal`";
+                                } else {
+                                    $aVal[] = $this->_db->quote($sColVal);
+                                }
+                            }
+
+                            foreach ($column2["from"]["index"] as $sColIndex => $sColIndexVal) {
+                                if ($sColIndexVal == "THIS") {
+//                                    $selectSqlArray[] = $sColIndex . " id";
+                                }
+                            }
+                            /* FIN Double jointure  */
                         } else {
-                            $aVal[] = $this->_db->quote($sColVal);
+                            $table = $column["from"]["table"];
+                            if ($sColKey === "name") {
+                                $sColVal2 = next($sCol);
+                                $sColKey2 = key($sCol);
+                                if ($sColKey2 == "sql") {
+                                    $aVal[] = "$sColVal2";
+                                } else
+                                    $aVal[] = "`" . $column["from"]["table"] . "`.`$sColVal`";
+                            } else {
+                                $aVal[] = $this->_db->quote($sColVal);
+                            }
+                            foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
+                                if ($sColIndexVal == "THIS") {
+//                                    $selectSqlArray[] = $sColIndex . " id";
+                                }
+                            }
                         }
                     }
-
-                    $columnAdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
-                    $column["name"] = $columnAdvancedName . " `" . $column["name"] . "`";
-//                    $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["name"] . " FROM `" . $column["from"]["table"] . "`  ORDER BY " . $columnAdvancedName . " ASC")->fetchAll(\PDO::FETCH_COLUMN);
+                    $selectSqlArray[] = "CONCAT(" . implode(",", $aVal) . ") name ";
                     $column["values"] = $this->_db->query(
-                                    "SELECT DISTINCT " . $column["name"]
-                                    . " FROM `" . $column["from"]["table"] . "`"
-                                    . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : ""))->fetchAll(\PDO::FETCH_COLUMN);
+                                    'SELECT ' . implode(",", $selectSqlArray) . '
+                                     FROM ' . $table . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : "") . ';')->fetchAll(\PDO::FETCH_COLUMN);
                 } elseif (isset($column["sql"])) {
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["sql"] . ""
                                     . " FROM `" . $this->config["table"]["name"] . "` WHERE " . $column["sql"] . " <> '' "
@@ -561,6 +721,19 @@ class Datatable {
     // --------------------------------------------------------------------
 
     /**
+     * Affichage détails d'une ligne
+     *
+     * @return 	void
+     */
+    public function showAction() {
+        $index = intval($_GET["index"]);
+        $this->data = $this->getDataFormat($index);
+        $this->_view = "show";
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
      * Action qui va être appelée pour ajouter un item
      *
      * @return 	void
@@ -573,9 +746,109 @@ class Datatable {
             if (isset($column["creable_field"])) {
                 if (isset($column["creable_field"]["value"]))
                     $values[$column["name"]] = $column["creable_field"]["value"];
-                else if (isset($column["creable_field"]["encryption"]))
+                else if (isset($column["creable_field"]["encryption"])) {
                     $values[$column["name"]] = hash($column["creable_field"]["encryption"], $_POST[$column["name"]]);
-                else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
+                } elseif (isset($column['creable_field']['type'])
+                        && $column['creable_field']['type'] == 'password'
+                ) {
+                    /**
+                     * Si le champ est un mot de passe on le fait passer
+                     * par la fonction de préparation des mots de passes
+                     */
+                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
+                } else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
+                    if (isset($_POST[$column["name"]]) && $column["name"] != "") {
+                        $ids = explode(",", $_POST[$column["name"]]);
+                        $queryAfterData = array();
+                        $queryAfterData["table"] = $column["from"]["table"];
+                        $queryAfterData["columnjoin"] = key($column["from"]["index"]);
+                        $queryAfterData["values"] = array();
+                        foreach ($ids as $id) {
+                            $queryAfterData["values"][][$column["from"]["columns"][0]["name"]] = $id;
+                        }
+                    }
+                } else {
+                    if (isset($_POST[$column["name"]]))
+                        $values[$column["name"]] = $_POST[$column["name"]];
+                }
+            }
+        }
+
+        if (isset($_GET["filter"])) {
+            foreach ($_GET["filter"] as $filter) {
+                list($filterColumn, $filterValue) = explode("|", $filter);
+                $values[$filterColumn] = $filterValue;
+            }
+        }
+
+        /* DB table to use */
+        $sTable = $this->config["table"]["name"];
+
+
+
+        $r = $this->_db->insert($sTable, $values);
+        $insertId = $this->_db->lastInsertId();
+        
+        if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["create"])) {
+            $this->_log->logThis("Ajout de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . $insertId);
+        }
+
+        if (count($queryAfterData) > 0) {
+            foreach ($queryAfterData["values"] as $queryData) {
+                $queryData[$queryAfterData["columnjoin"]] = $insertId;
+                $this->_db->insert($queryAfterData["table"], $queryData);
+            }
+        }
+        
+
+        $this->afterAddAction($insertId);
+
+        exit(1);
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Action qui va être appelée pour modifier un item
+     *
+     * @return 	void
+     */
+    public function editAction() {
+
+        $filter = explode('|', $_GET["index"]);
+        $i = 0;
+        $j = 0;
+        $where = array();
+
+        $queryAfterData = array();
+
+        $values = array();
+        foreach ($this->config["columns"] as $column) {
+            if (isset($column["index"]) && $column["index"]) {
+                $where[] = $column["name"] . " = " . $this->_db->quote($filter[$i]);
+                if ($column["name"] == "cle")
+                    $where[] = $column["name"] . " LIKE BINARY " . $this->_db->quote($filter[$i]);
+                $i++;
+            }
+            if (isset($column["creable_field"])) {
+                if (isset($column["creable_field"]["editable"]) && $column["creable_field"]["editable"] == false) {
+                    continue;
+                }
+                if (isset($column["creable_field"]["value"])) {
+                    $values[$column["name"]] = $column["creable_field"]["value"];
+                } else if (isset($column['creable_field']['encryption'])) {
+                    if ($column['creable_field']['type'] != 'password' || $_POST[$column['name']] != '') {
+                        $values[$column["name"]] = hash($column["creable_field"]["encryption"], $_POST[$column["name"]]);
+                    }
+                } elseif (isset($column['creable_field']['type'])
+                        && $column['creable_field']['type'] == 'password'
+                ) {
+                    /**
+                     * Si le champ est un mot de passe on le fait passer
+                     * par la fonction de préparation des mots de passes
+                     */
+                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
+                } else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
                     if (isset($_POST[$column["name"]]) && $column["name"] != "") {
                         $ids = explode(",", $_POST[$column["name"]]);
                         $queryAfterData = array();
@@ -600,18 +873,24 @@ class Datatable {
         $sTable = $this->config["table"]["name"];
 
 
-
-        $r = $this->_db->insert($sTable, $values);
-        $insertId = $this->_db->lastInsertId();
-
-        if (count($queryAfterData) > 0) {
-            foreach ($queryAfterData["values"] as $queryData) {
-                $queryData[$queryAfterData["columnjoin"]] = $insertId;
-                $this->_db->insert($queryAfterData["table"], $queryData);
+        if (count($where) != 0) {
+            $r = $this->_db->update($sTable, $values, implode(" AND ", $where));
+            if (count($queryAfterData) > 0) {
+                $this->_db->delete($queryAfterData["table"], $queryAfterData["columnjoin"] . " = " . intval($_GET["index"]));
+                foreach ($queryAfterData["values"] as $queryData) {
+                    $queryData[$queryAfterData["columnjoin"]] = $_GET["index"];
+                    $this->_db->insert($queryAfterData["table"], $queryData);
+                }
             }
+            if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["edit"])) {
+                $this->_log->logThis("Edition de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . $_GET["index"]);
+            }
+
+            $this->afterEditAction($_GET["index"]);
         }
 
-        $this->afterAddAction($insertId);
+
+
 
         exit(1);
     }
@@ -658,69 +937,6 @@ class Datatable {
     // --------------------------------------------------------------------
 
     /**
-     * Action qui va être appelée pour modifier un item
-     *
-     * @return 	void
-     */
-    public function editAction() {
-
-        $filter = explode('|', $_GET["index"]);
-        $i = 0;
-        $j = 0;
-        $where = array();
-
-
-        $values = array();
-        foreach ($this->config["columns"] as $column) {
-            if (isset($column["index"]) && $column["index"]) {
-                $where[] = $column["name"] . " = " . $this->_db->quote($filter[$i]);
-                if ($column["name"] == "cle")
-                    $where[] = $column["name"] . " LIKE BINARY " . $this->_db->quote($filter[$i]);
-                $i++;
-            }
-            if (isset($column["creable_field"])) {
-                if (isset($column["creable_field"]["value"])) {
-                    $values[$column["name"]] = $column["creable_field"]["value"];
-                } else if (isset($column['creable_field']['encryption'])) {
-                    if ($column['creable_field']['type'] != 'password' || $_POST[$column['name']] != '') {
-                        $values[$column["name"]] = hash($column["creable_field"]["encryption"], $_POST[$column["name"]]);
-                    }
-                } elseif (isset($column['creable_field']['type'])
-                        && $column['creable_field']['type'] == 'password'
-                ) {
-                    /**
-                     * Si le champ est un mot de passe on le fait passer
-                     * par la fonction de préparation des mots de passes
-                     */
-                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
-                } else {
-                    if (isset($_POST[$column["name"]]))
-                        $values[$column["name"]] = $_POST[$column["name"]];
-                }
-            }
-        }
-
-
-
-
-        /* DB table to use */
-        $sTable = $this->config["table"]["name"];
-
-
-        if (count($where) != 0) {
-            $r = $this->_db->update($sTable, $values, implode(" AND ", $where));
-            $this->afterEditAction($_GET["index"]);
-        }
-
-
-
-
-        exit(1);
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
      * Action qui va être appelée pour supprimer un élément
      *
      * @return 	void
@@ -748,7 +964,22 @@ class Datatable {
         $sTable = $this->config["table"]["name"];
 
         $row = $this->_db->select($sTable, FALSE, "*", implode(" AND ", $where));
-        $r = $this->_db->delete($sTable, implode(" AND ", $where));
+
+        if (isset($this->config["extra"]["logical delete"])) {
+            $values = array(
+                $this->config["extra"]["logical delete"]["column_bool"] => 1,
+                $this->config["extra"]["logical delete"]["column_date"] => date('Y-m-d H:i:s'),
+            );
+            $r = $this->_db->update($sTable, $values, implode(" AND ", $where));
+        } else {
+            $r = $this->_db->delete($sTable, implode(" AND ", $where));
+        }
+        
+        if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["delete"])) {
+            $this->_log->logThis("Suppression de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . implode(" AND ", $where));
+        }
+
+
 
         $this->afterDeleteAction(current($row));
 
@@ -764,6 +995,12 @@ class Datatable {
      * @return 	void
      */
     public function uploadAction() {
+        if (isset($this->config["file"])) {
+            $this->_upload_path = $this->config["file"]["upload_path"];
+            $this->_upload_temp = $this->config["file"]["upload_temp"];
+            $this->_upload_vignette = $this->config["file"]["upload_vignette"];
+            $this->_upload_apercu = $this->config["file"]["upload_apercu"];
+        }
         $fileManager = new fileManager();
         $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
         $targetDir = "../" . $this->_upload_path;
@@ -821,6 +1058,7 @@ class Datatable {
         $values = array();
         $keyCol = $_REQUEST['load'];
         $selectSqlArray = array();
+        $selectSqlArrayWhere = array();
 
         $column = $this->config["columns"][$keyCol];
         $aVal = array();
@@ -857,7 +1095,7 @@ class Datatable {
                 /* FIN Double jointure  */
             } else {
                 $table = $column["from"]["table"];
-                if ($sColKey == "name") {
+                if ($sColKey === "name") {
                     $sColVal2 = next($sCol);
                     $sColKey2 = key($sCol);
                     if ($sColKey2 == "sql") {
@@ -867,11 +1105,13 @@ class Datatable {
                 } else {
                     $aVal[] = $this->_db->quote($sColVal);
                 }
-                foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
-                    if ($sColIndexVal == "THIS") {
-                        $selectSqlArray[] = $sColIndex . " id";
-                    }
-                }
+            }
+        }
+        foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
+            if ($sColIndexVal == "THIS") {
+                $selectSqlArray[] = $sColIndex . " id";
+            } else {
+                $selectSqlArrayWhere[] = $sColIndex . " = " . $this->_db->quote($sColIndexVal);
             }
         }
 
@@ -887,7 +1127,8 @@ class Datatable {
         $response = array();
         $response = $this->_db->query('
             SELECT ' . implode(",", $selectSqlArray) . '
-            FROM ' . $table . ';')->fetchAll(\PDO::FETCH_UNIQUE);
+            FROM ' . $table .
+                        (count($selectSqlArrayWhere) > 0 ? " WHERE " . implode(" AND ", $selectSqlArrayWhere) : "") . ';')->fetchAll(\PDO::FETCH_UNIQUE);
 
         $this->_response = json_encode($response, JSON_FORCE_OBJECT);
     }
@@ -921,8 +1162,46 @@ class Datatable {
                 foreach ($column2["from"]["columns"] as $sCol) {
                     $sColVal = current($sCol);
                     $sColKey = key($sCol);
+                    $column3 = $sCol;
+                    /* TRIPLE jointure  */
+                    if (isset($column3["from"]) && $column3["from"]) {
+                        $table .= " INNER JOIN `" . $column3["from"]["table"] . "` `" . $column3["from"]["table"] . "_$keyCol`";
+                        $filterJoin = array();
+                        foreach ($column3["from"]["index"] as $sColIndex => $sColIndexVal) {
+                            if ($sColIndexVal == "THIS") {
+                                $sVal = "`" . $column2["from"]["table"] . "_$keyCol`.`" . $column3["name"] . "`";
+                            } else {
+                                if (!is_array($sColIndexVal)) {
+                                    $sColIndexVal = array($sColIndexVal);
+                                }
 
-                    if ($sColKey === "name") {
+                                foreach ($sColIndexVal as $ii => $v) {
+                                    $sColIndexVal[$ii] = $this->_db->quote($v);
+                                }
+
+                                $sVal = implode(",", $sColIndexVal);
+                            }
+                            $filterJoin[] = "`" . $column3["from"]["table"] . "_$keyCol`.`" . $sColIndex . "`"
+                                    . " IN (" . $sVal . ")";
+                        }
+
+                        $table .= " ON " . implode(" AND ", $filterJoin);
+
+                        foreach ($column3["from"]["columns"] as $sCol) {
+                            $sColVal2 = current($sCol);
+                            $sColKey2 = key($sCol);
+                            if ($sColKey2 === "name") {
+                                $sColVal3 = next($sCol);
+                                $sColKey3 = key($sCol);
+                                if ($sColKey3 == "sql") {
+                                    continue;
+                                } else
+                                    $aVal[] = "`" . $column3["from"]["table"] . "_$keyCol`.`$sColVal2`";
+                            } else {
+                                $aVal[] = $this->_db->quote($sColVal2);
+                            }
+                        }
+                    } else if ($sColKey === "name") {
                         $sColVal2 = next($sCol);
                         $sColKey2 = key($sCol);
                         if ($sColKey2 == "sql") {
@@ -936,7 +1215,7 @@ class Datatable {
 
                 foreach ($column2["from"]["index"] as $sColIndex => $sColIndexVal) {
                     if ($sColIndexVal == "THIS") {
-                        $selectSqlArray[] = $sColIndex . " id";
+                        $selectSqlArray[] = "`" . $column2["from"]["table"] . "_$keyCol`." . $sColIndex . " id";
                     }
                 }
                 /* FIN Double jointure  */
@@ -1101,10 +1380,19 @@ class Datatable {
                 foreach ($column["format"] as $type => $params) {
                     $paramsFunc = array();
                     $aColumnsFunctions[$keyCol][]["name"] = "\Slrfw\Library\Format\\" . ucfirst($type);
-                    $keyFunc = count($aColumnsFunctions[$keyCol])-1;
+                    $keyFunc = count($aColumnsFunctions[$keyCol]) - 1;
                     switch ($type) {
-                        case "date":
+                        case "datetime":
+                            switch ($params["type"]) {
+                                case "short":
+                                    $aColumnsFunctions[$keyCol][$keyFunc]["name"] .= "::toShortText";
+                                    $paramsFunc = array(
+                                    );
+                                    break;
 
+                                default:
+                                    break;
+                            }
 
                             break;
                         case "number":
@@ -1113,7 +1401,7 @@ class Datatable {
                                     $aColumnsFunctions[$keyCol][$keyFunc]["name"] .= "::formatMoney";
                                     $paramsFunc = array(
                                         true,
-                                        (isset($params["currency"]) ? $params["currency"] : "") ,
+                                        (isset($params["currency"]) ? $params["currency"] : ""),
                                     );
                                     break;
 
@@ -1164,9 +1452,13 @@ class Datatable {
             /* Jointure sur autre table
               `---------------------------------------------------------------------- */ elseif (isset($column["from"]) && $column["from"]) {
                 $aFilterJoin = array();
+                $aFilterJoin3 = array();
 
                 /* On construit le filtre pour la jointure */
                 foreach ($column["from"]["index"] as $sColIndex => $sColIndexVal) {
+                    $sTableJoin2 = "";
+                    $sTableJoin3 = "";
+
                     if ($sColIndexVal == "THIS") {
                         $sVal = "`" . $sTable . "`.`" . $column["name"] . "`";
                     } else {
@@ -1175,13 +1467,19 @@ class Datatable {
                         }
 
                         foreach ($sColIndexVal as $ii => $v) {
-                            $sColIndexVal[$ii] = $this->_db->quote($v);
+                            if (substr($v, 0, 1) == "`") {
+                                $sColIndexVal[$ii] = $v;
+                            } else {
+                                $sColIndexVal[$ii] = $this->_db->quote($v);
+                            }
                         }
 
                         $sVal = implode(",", $sColIndexVal);
                     }
 
                     $aFilterJoin[] = "`" . $column["from"]["table"] . "_$keyCol`.`" . $sColIndex . "`"
+                            . " IN (" . $sVal . ")";
+                    $aFilterJoin3[] = "`" . $column["from"]["table"] . "_${keyCol}_2`.`" . $sColIndex . "`"
                             . " IN (" . $sVal . ")";
                 }
 
@@ -1194,42 +1492,176 @@ class Datatable {
                     /* Double jointure  */
                     if (isset($column2["from"]) && $column2["from"]) {
                         $aFilterJoin2 = array();
+                        $aFilterJoin4 = array();
 
                         /* On construit le filtre pour la jointure */
                         foreach ($column2["from"]["index"] as $sColIndex => $sColIndexVal) {
                             if ($sColIndexVal == "THIS") {
                                 $sVal = "`" . $column["from"]["table"] . "_$keyCol`.`" . $column2["name"] . "`";
+                                $sVal3 = "`" . $column["from"]["table"] . "_${keyCol}_2`.`" . $column2["name"] . "`";
                             } else {
                                 if (!is_array($sColIndexVal)) {
                                     $sColIndexVal = array($sColIndexVal);
                                 }
 
                                 foreach ($sColIndexVal as $ii => $v) {
-                                    $sColIndexVal[$ii] = $this->_db->quote($v);
+                                    if (substr($v, 0, 1) == "`") {
+                                        $sColIndexVal[$ii] = $v;
+                                    } else {
+                                        $sColIndexVal[$ii] = $this->_db->quote($v);
+                                    }
                                 }
 
                                 $sVal = implode(",", $sColIndexVal);
+                                $sVal3 = implode(",", $sColIndexVal);
                             }
 
                             $aFilterJoin2[] = "`" . $column2["from"]["table"] . "_$keyCol`.`" . $sColIndex . "`"
                                     . " IN (" . $sVal . ")";
+                            $aFilterJoin4[] = "`" . $column2["from"]["table"] . "_${keyCol}_2`.`" . $sColIndex . "`"
+                                    . " IN (" . $sVal3 . ")";
                         }
 
                         /* On construit le select  */
                         $aVal = array();
+                        $aVal3 = array();
+                        $sTableJoin2 = "";
+                        $sTableJoin3 = "";
+                        $sTableJoin4 = "";
+                        $sTableJoin5 = "";
                         foreach ($column2["from"]["columns"] as $sCol) {
+
                             $sColVal = current($sCol);
                             $sColKey = key($sCol);
+                            $column3 = $sCol;
+                            /* TRIPLE jointure  */
+                            if (isset($column3["from"]) && $column3["from"]) {
+                                $aFilterJoin6 = array();
+                                $aFilterJoin7 = array();
 
-                            if ($sColKey === "name") {
-                                $sColVal2 = next($sCol);
-                                $sColKey2 = key($sCol);
-                                if ($sColKey2 == "sql") {
-                                    $aVal[] = "$sColVal2";
-                                } else
-                                    $aVal[] = "`" . $column2["from"]["table"] . "_$keyCol`.`$sColVal`";
+                                /* On construit le filtre pour la jointure */
+                                foreach ($column3["from"]["index"] as $sColIndex => $sColIndexVal) {
+                                    if ($sColIndexVal == "THIS") {
+                                        $sVal = "`" . $column2["from"]["table"] . "_$keyCol`.`" . $column3["name"] . "`";
+                                        $sVal3 = "`" . $column2["from"]["table"] . "_${keyCol}_2`.`" . $column3["name"] . "`";
+                                    } else {
+                                        if (!is_array($sColIndexVal)) {
+                                            $sColIndexVal = array($sColIndexVal);
+                                        }
+
+                                        foreach ($sColIndexVal as $ii => $v) {
+                                            if (substr($v, 0, 1) == "`") {
+                                                $sColIndexVal[$ii] = $v;
+                                            } else {
+                                                $sColIndexVal[$ii] = $this->_db->quote($v);
+                                            }
+                                        }
+
+                                        $sVal = implode(",", $sColIndexVal);
+                                        $sVal3 = implode(",", $sColIndexVal);
+                                    }
+
+                                    $aFilterJoin6[] = "`" . $column3["from"]["table"] . "_$keyCol`.`" . $sColIndex . "`"
+                                            . " IN (" . $sVal . ")";
+                                    $aFilterJoin7[] = "`" . $column3["from"]["table"] . "_${keyCol}_2`.`" . $sColIndex . "`"
+                                            . " IN (" . $sVal3 . ")";
+                                }
+
+                                /* On construit le select  */
+//                                $aVal = array();
+                                $aVal5 = array();
+                                foreach ($column3["from"]["columns"] as $sCol) {
+
+
+
+
+                                    $sColVal = current($sCol);
+                                    $sColKey = key($sCol);
+
+                                    if ($sColKey === "name") {
+                                        $sColVal2 = next($sCol);
+                                        $sColKey2 = key($sCol);
+                                        if ($sColKey2 == "sql") {
+                                            $aVal5[] = "$sColVal2";
+                                        } else {
+//                                            $aVal[] = "`" . $column3["from"]["table"] . "_$keyCol`.`$sColVal`";
+                                            $aVal5[] = "`" . $column3["from"]["table"] . "_${keyCol}`.`$sColVal`";
+                                            $aVal3[] = "`" . $column3["from"]["table"] . "_${keyCol}_2`.`$sColVal`";
+                                        }
+                                    } else {
+                                        $aVal5[] = $this->_db->quote($sColVal);
+                                        $aVal3[] = $this->_db->quote($sColVal);
+                                    }
+                                }
+
+
+                                $column2RawName = $column2["name"];
+                                for ($index = 1; $index < 10; $index++) {
+
+                                    if (in_array($column2RawName, $aColumnsRawAll) === false)
+                                        break;
+
+                                    $column2RawName = $column3["name"] . "_" . $index;
+                                }
+
+                                $separator = isset($column3["from"]["separator"]) ? $column3["from"]["separator"] : '';
+
+                                /* Si on ne veut pas de group concat */
+//                                if (isset($column3["from"]["group_concat"]) && !$column3["from"]["group_concat"]) {
+                                $column4AdvancedName = "CONCAT(" . implode(",", $aVal5) . ")";
+                                $column3AdvancedName = "CONCAT(" . implode(",", $aVal5) . ")";
+//                                } else {
+//                                    $column4AdvancedName = "GROUP_CONCAT(DISTINCT " . implode(",", $aVal) . "  SEPARATOR '$separator')";
+////                                    $column3AdvancedName = "CONCAT(" . implode(",", $aVal3) . ")";
+//                                }
+
+
+
+                                $column3["name"] = $column4AdvancedName . " `" . $column2RawName . "`";
+
+                                $column2Select = $column3["name"];
+
+                                /* Type de jointure (LEFT/RIGHT/INNER) */
+                                $joinType = isset($column3["from"]["type"]) ? $column3["from"]["type"] : "INNER";
+                                /* Si on a une clause groupby de definit pour la jointure */
+                                if (isset($column3["from"]["groupby"])) {
+                                    $sTableJoin4 .= " $joinType JOIN (SELECT *, $column2Select FROM `" . $column3["from"]["table"] . "` GROUP BY " . $column3["from"]["groupby"] . "";
+                                    $column2Select = $column2RawName;
+                                    if (isset($column3["from"]["having"])) {
+                                        $sTableJoin4 .= " HAVING " . $column3["from"]["having"];
+                                    }
+
+                                    $sTableJoin4 .= ") `" . $column3["from"]["table"] . "_$keyCol`  ON " . implode(" AND ", $aFilterJoin6);
+                                } else {
+                                    $sTableJoin4 .= " $joinType JOIN `" . $column3["from"]["table"] . "` `" . $column3["from"]["table"] . "_$keyCol`  ON " . implode(" AND ", $aFilterJoin6);
+                                    $sTableJoin5 .= " $joinType JOIN `" . $column3["from"]["table"] . "` `" . $column3["from"]["table"] . "_${keyCol}_2`  ON " . implode(" AND ", $aFilterJoin7);
+//                                    exit($sTableJoin2);
+                                }
+
+                                //Si on a un group concat, on rejoint une fois la table
+                                if (!isset($column3["from"]["group_concat"]) || $column3["from"]["group_concat"]) {
+                                    $column2AdvancedName = $column3AdvancedName;
+                                }
+                                $aVal[] = $column4AdvancedName;
+
+                                /* FIN TRIPLE jointure  */
                             } else {
-                                $aVal[] = $this->_db->quote($sColVal);
+                                $sColVal = current($sCol);
+                                $sColKey = key($sCol);
+
+                                if ($sColKey === "name") {
+                                    $sColVal2 = next($sCol);
+                                    $sColKey2 = key($sCol);
+                                    if ($sColKey2 == "sql") {
+                                        $aVal[] = "$sColVal2";
+                                    } else {
+                                        $aVal[] = "`" . $column2["from"]["table"] . "_$keyCol`.`$sColVal`";
+                                        $aVal3[] = "`" . $column2["from"]["table"] . "_${keyCol}_2`.`$sColVal`";
+                                    }
+                                } else {
+                                    $aVal[] = $this->_db->quote($sColVal);
+                                    $aVal3[] = $this->_db->quote($sColVal);
+                                }
                             }
                         }
 
@@ -1249,7 +1681,8 @@ class Datatable {
                         if (isset($column2["from"]["group_concat"]) && !$column2["from"]["group_concat"]) {
                             $column2AdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
                         } else {
-                            $column2AdvancedName = "GROUP_CONCAT(" . implode(",", $aVal) . "  SEPARATOR '$separator')";
+                            $column2AdvancedName = "GROUP_CONCAT(DISTINCT " . implode(",", $aVal) . "  SEPARATOR '$separator')";
+                            $column3AdvancedName = "CONCAT(" . implode(",", $aVal3) . ")";
                         }
 
 
@@ -1260,7 +1693,7 @@ class Datatable {
 
                         /* Type de jointure (LEFT/RIGHT/INNER) */
                         $joinType = isset($column2["from"]["type"]) ? $column2["from"]["type"] : "INNER";
-                        $sTableJoin2 = "";
+
                         /* Si on a une clause groupby de definit pour la jointure */
                         if (isset($column2["from"]["groupby"])) {
                             $sTableJoin2 .= " $joinType JOIN (SELECT *, $column2Select FROM `" . $column2["from"]["table"] . "` GROUP BY " . $column2["from"]["groupby"] . "";
@@ -1272,6 +1705,12 @@ class Datatable {
                             $sTableJoin2 .= ") `" . $column2["from"]["table"] . "_$keyCol`  ON " . implode(" AND ", $aFilterJoin2);
                         } else {
                             $sTableJoin2 .= " $joinType JOIN `" . $column2["from"]["table"] . "` `" . $column2["from"]["table"] . "_$keyCol`  ON " . implode(" AND ", $aFilterJoin2);
+                            $sTableJoin3 .= " $joinType JOIN `" . $column2["from"]["table"] . "` `" . $column2["from"]["table"] . "_${keyCol}_2`  ON " . implode(" AND ", $aFilterJoin4);
+                        }
+
+                        //Si on a un group concat, on rejoint une fois la table
+                        if (!isset($column2["from"]["group_concat"]) || $column2["from"]["group_concat"]) {
+                            $column2AdvancedName = $column3AdvancedName;
                         }
 
                         /* FIN Double jointure  */
@@ -1299,7 +1738,12 @@ class Datatable {
                     $columnRawName = $column["name"] . "_" . $index;
                 }
 
-                $columnAdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
+                if (isset($column["concat"]) && $column["concat"] == false) {
+                    $columnAdvancedName = "" . implode(",", $aVal) . "";
+                } else {
+                    $columnAdvancedName = "CONCAT(" . implode(",", $aVal) . ")";
+                }
+
 
                 $column["name"] = $columnAdvancedName . " `" . $columnRawName . "`";
 
@@ -1310,7 +1754,7 @@ class Datatable {
 
                 /* Si on a une clause groupby de definit pour la jointure */
                 if (isset($column["from"]["groupby"])) {
-                    $sTableJoin .= " $joinType JOIN (SELECT *, $columnSelect FROM `" . $column["from"]["table"] . "` GROUP BY " . $column["from"]["groupby"] . "";
+                    $sTableJoin .= " $joinType JOIN (SELECT *, $columnSelect FROM `" . $column["from"]["table"] . "` `" . $column["from"]["table"] . "_$keyCol` GROUP BY " . $column["from"]["groupby"] . "";
                     $columnSelect = $columnRawName;
                     if (isset($column["from"]["having"])) {
                         $sTableJoin .= " HAVING " . $column["from"]["having"];
@@ -1319,8 +1763,8 @@ class Datatable {
                     $sTableJoin .= ") `" . $column["from"]["table"] . "_$keyCol`  ON " . implode(" AND ", $aFilterJoin);
                 } else {
                     $sTableJoin .= " $joinType JOIN `" . $column["from"]["table"] . "` `" . $column["from"]["table"] . "_$keyCol`  ON " . implode(" AND ", $aFilterJoin);
+                    $sTableJoin .= " $joinType JOIN `" . $column["from"]["table"] . "` `" . $column["from"]["table"] . "_${keyCol}_2`  ON " . implode(" AND ", $aFilterJoin3);
                 }
-
                 /* Double jointure */
                 if (isset($column2AdvancedName)) {
                     $columnAdvancedName = $column2AdvancedName;
@@ -1328,6 +1772,9 @@ class Datatable {
                     $columnRawName = $column2RawName;
                     $columnSelect = $column2Select;
                     $sTableJoin .= " " . $sTableJoin2;
+                    $sTableJoin .= " " . $sTableJoin3;
+                    $sTableJoin .= " " . $sTableJoin4;
+                    $sTableJoin .= " " . $sTableJoin5;
                 }
             }
             /* = Cas par défaut : pas de jointure et pas de contenu statique.
@@ -1371,6 +1818,7 @@ class Datatable {
                     || isset($column["show_detail"]) && $column["show_detail"]
             ) {
                 $aColumns[$keyCol] = $column["name"];
+
                 $aColumnsRaw[$keyCol] = $columnRawName;
                 $aColumnsFull[] = $column;
                 $aColumnsAdvanced[] = $columnAdvancedName;
@@ -1529,6 +1977,8 @@ class Datatable {
                 . ($sGroupBy !== false ? " GROUP BY " . $sGroupBy . ($sHaving !== false ? " HAVING " . $sHaving : "" ) : "" )
                 . " $sOrder"
                 . " $sLimit";
+        /** Pour debug * */
+//        $this->_debugQuery($sQuery);
         $rResult = $this->_db->query($sQuery);
 
         /* = Data set length after filtering.
@@ -1541,13 +1991,15 @@ class Datatable {
         /* = Total data set length.
           `-------------------------------------------------------- */
         $sQuery2 = "SELECT COUNT(*)"
-                . " FROM   $sTable"
+                . " FROM   $sTable "
+                . $this->_additionalJoinQueryCount
                 . (substr($generalWhere, 0, 5) == "WHERE" ? " " : " WHERE 1 " )
                 . " $generalWhere";
 
         $rResultTotal = $this->_db->query($sQuery2);
         $aResultTotal = $rResultTotal->fetch(\PDO::FETCH_NUM);
         $iTotal = $aResultTotal[0];
+
 
 
         /* = On remplit le tableau renvoyé.
@@ -1786,9 +2238,113 @@ class Datatable {
 
         $filter = explode('|', $index);
         $i = 0;
+        $queryAfterData = array();
         $j = 0;
         $where = array();
         foreach ($this->config["columns"] as $column) {
+            if (isset($column["creable_field"])) {
+                if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
+
+                    $aVal = array();
+                    foreach ($column["from"]["columns"] as $sCol) {
+                        $sColVal = current($sCol);
+                        $sColKey = key($sCol);
+                        $column2 = $sCol;
+                        /* Double jointure  */
+                        if (isset($column2["from"]) && $column2["from"]) {
+                            $table = "`" . $column2["from"]["table"] . "` `" . $column2["from"]["table"] . "`";
+                            /* On construit le select  */
+                            $aVal = array();
+                            foreach ($column2["from"]["columns"] as $sCol) {
+                                $sColVal = current($sCol);
+                                $sColKey = key($sCol);
+                                $column3 = $sCol;
+                                /* TRIPLE jointure  */
+                                if (isset($column3["from"]) && $column3["from"]) {
+                                    $table .= " INNER JOIN `" . $column3["from"]["table"] . "` `" . $column3["from"]["table"] . "`";
+                                    $filterJoin = array();
+                                    foreach ($column3["from"]["index"] as $sColIndex => $sColIndexVal) {
+                                        if ($sColIndexVal == "THIS") {
+                                            $sVal = "`" . $column2["from"]["table"] . "`.`" . $column3["name"] . "`";
+                                        } else {
+                                            if (!is_array($sColIndexVal)) {
+                                                $sColIndexVal = array($sColIndexVal);
+                                            }
+
+                                            foreach ($sColIndexVal as $ii => $v) {
+                                                $sColIndexVal[$ii] = $this->_db->quote($v);
+                                            }
+
+                                            $sVal = implode(",", $sColIndexVal);
+                                        }
+                                        $filterJoin[] = "`" . $column3["from"]["table"] . "`.`" . $sColIndex . "`"
+                                                . " IN (" . $sVal . ")";
+                                    }
+
+                                    $table .= " ON " . implode(" AND ", $filterJoin);
+
+                                    foreach ($column3["from"]["columns"] as $sCol) {
+                                        $sColVal2 = current($sCol);
+                                        $sColKey2 = key($sCol);
+                                        if ($sColKey2 === "name") {
+                                            $sColVal3 = next($sCol);
+                                            $sColKey3 = key($sCol);
+                                            if ($sColKey3 == "sql") {
+                                                continue;
+                                            } else
+                                                $aVal[] = "`" . $column3["from"]["table"] . "`.`$sColVal2`";
+                                        } else {
+                                            $aVal[] = $this->_db->quote($sColVal2);
+                                        }
+                                    }
+                                } else if ($sColKey === "name") {
+                                    $sColVal2 = next($sCol);
+                                    $sColKey2 = key($sCol);
+                                    if ($sColKey2 == "sql") {
+                                        continue;
+                                    } else
+                                        $aVal[] = "`" . $column2["from"]["table"] . "`.`$sColVal`";
+                                } else {
+                                    $aVal[] = $this->_db->quote($sColVal);
+                                }
+                            }
+
+                            foreach ($column2["from"]["index"] as $sColIndex => $sColIndexVal) {
+                                if ($sColIndexVal == "THIS") {
+                                    $selectSqlArray[] = "`" . $column2["from"]["table"] . "`." . $sColIndex . " id";
+                                }
+                            }
+                            /* FIN Double jointure  */
+                        } else {
+                            if ($sColKey == "name") {
+                                $sColVal2 = next($sCol);
+                                $sColKey2 = key($sCol);
+                                if ($sColKey2 == "sql") {
+                                    $aVal[] = "$sColVal2";
+                                } else
+                                    $aVal[] = "`" . $column["from"]["table"] . "`.`$sColVal`";
+                            } else {
+                                $aVal[] = $this->_db->quote($sColVal);
+                            }
+                        }
+                    }
+
+                    $label = "CONCAT(" . implode(",", $aVal) . ")";
+                    $selectSqlArray[] = "$label label ";
+
+                    $queryAfterData = array();
+                    $queryAfterData["table"] = $table;
+                    $queryAfterData["table"] .= "
+                        INNER JOIN " . $column["from"]["table"] . " 
+                            ON " . $column["from"]["table"] . "." . $column["from"]["columns"][0]["name"] . " = `" . $column2["from"]["table"] . "`." . key($column["from"]["columns"][0]["from"]["index"]);
+
+                    $queryAfterData["columns"] = $selectSqlArray;
+                    $queryAfterData["columnref"] = $column["name"];
+                    $queryAfterData["where"] = key($column["from"]["index"]) . " = " . $this->_db->quote((current($column["from"]["index"]) == "THIS" ? $index : current($column["from"]["index"])));
+                }
+            }
+
+
             if (isset($column["index"]) && $column["index"]) {
                 $where[] = $column["name"] . " = " . $this->_db->quote($filter[$i]);
                 if ($column["name"] == "cle")
@@ -1796,7 +2352,6 @@ class Datatable {
                 $i++;
             }
         }
-
 
 
 
@@ -1808,7 +2363,46 @@ class Datatable {
         ";
 
         $data = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
+        if (count($queryAfterData) > 0) {
+            $query = "
+                SELECT " . implode(",", $queryAfterData["columns"]) . " FROM " . $queryAfterData["table"] . " WHERE " . $queryAfterData["where"] . ";
+            ";
+
+            $dataM = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            $data[$queryAfterData["columnref"]] = htmlentities(json_encode($dataM));
+        }
+
+
+
         return $data;
+    }
+
+    /**
+     * Récupere les valeurs d'une entrée
+     *
+     * @return void
+     */
+    protected function getDataFormat($index) {
+
+
+        $sTable = $this->config["table"]["name"];
+        $_POST["sEcho"] = 1;
+
+        $filter = explode('|', $index);
+        $i = 0;
+        $j = 0;
+        $where = array();
+        foreach ($this->config["columns"] as $column) {
+            if (isset($column["index"]) && $column["index"]) {
+                $this->_aFilterColumnAdditional[] = "`" . $sTable . "`." . $column["name"] . ' = ' . $this->_db->quote($filter[$i]);
+                $i++;
+            }
+        }
+
+        $this->jsonAction();
+        $response = json_decode($this->_response, true);
+        return $response["aaData"][0];
     }
 
     // --------------------------------------------------------------------
@@ -1843,6 +2437,33 @@ class Datatable {
         return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $requestUri;
     }
 
+    /**
+     * Renvoi l'url de la page complète
+     *
+     * @return string url complète
+     */
+    private function _selfURLRaw() {
+        $s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
+        $protocol = self::_strleft(strtolower($_SERVER["SERVER_PROTOCOL"]), "/") . $s;
+        $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":" . $_SERVER["SERVER_PORT"]);
+        $requestUri = $_SERVER['REQUEST_URI'];
+
+        $params = explode('&', str_replace($_SERVER['REDIRECT_URL'] . "?", "", $requestUri));
+        $paramsString = "";
+        foreach ($params as $paramsKey => $param) {
+            if (substr($param, 0, 10) == "dt_action=")
+                unset($params[$paramsKey]);
+            else {
+                $paramsString[] = "$param";
+            }
+        }
+        $requestUri = $_SERVER['REDIRECT_URL'] . "?";
+        if (is_array($paramsString) && count($paramsString) > 0) {
+            $requestUri .= implode("&", $paramsString);
+        }
+        return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $requestUri;
+    }
+
     private function _convertUrlQuery($query) {
         $queryParts = explode('&', $query);
         $params = array();
@@ -1872,6 +2493,37 @@ class Datatable {
      */
     private function _strleft($s1, $s2) {
         return substr($s1, 0, strpos($s1, $s2));
+    }
+
+    private function _debugQuery($query) {
+        require_once 'external/geshi/geshi.php';
+        $geshi = new \GeSHi($query, "sql");
+        $geshi->set_header_type(GESHI_HEADER_DIV);
+        $geshi->set_highlight_lines_extra_style('background: #497E7E;');
+        $geshi->highlight_lines_extra(6);
+        $sourceCodeRaw = $geshi->parse_code();
+        $sourceCode = $sourceCodeRaw;
+        $keyWords = array("FROM", "WHERE", "ORDER", "INNER", "LIMIT", "LEFT");
+        $keyWords = array('<span style="color: #993333; font-weight: bold;">');
+        $sourceCode = str_replace($keyWords, array_map(function($value) {
+                            return "<br />" . $value;
+                        }, $keyWords), $sourceCode);
+        $keyWords = array(
+            '<span style="color: #993333; font-weight: bold;">LEFT</span>',
+            '<span style="color: #993333; font-weight: bold;">RIGHT</span>',
+            '<span style="color: #993333; font-weight: bold;">INNER</span>',
+            '<span style="color: #993333; font-weight: bold;">JOIN</span>',
+            '<span style="color: #993333; font-weight: bold;">WHERE</span>',
+            '<span style="color: #993333; font-weight: bold;">FROM</span>',
+            '<span style="color: #993333; font-weight: bold;">GROUP</span>',
+            '<span style="color: #993333; font-weight: bold;">LIMIT</span>',
+        );
+        $sourceCode = str_replace($keyWords, array_map(function($value) {
+                            return "<br /><hr>" . $value;
+                        }, $keyWords), $sourceCode);
+        echo $sourceCodeRaw;
+        echo "<hr><hr>";
+        echo $sourceCode;
     }
 
 }

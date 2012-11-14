@@ -18,30 +18,42 @@
                     <div class="control-group">
                         <?php
                         if (isset($column["creable_field"]["type"])) {
+                            ?>
+                            <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label">
+                                <?php echo $column["title"]; ?>
+                                <?php
+                                if (isset($column["creable_field"]["validate"]) && isset($column["creable_field"]["validate"]["rules"]["required"]) && $column["creable_field"]["validate"]["rules"]["required"]) {
+                                    ?>
+                                    <span class="required">*</span>
+                                    <?php
+                                }
+                                ?>
+                            </label>
+                            <?php
                             $value = isset($this->data[$column["name"]]) ? $this->data[$column["name"]] : "";
                             switch ($column["creable_field"]["type"]) {
                                 case "text":
                                     ?>
-                                    <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+
                                     <input type="text" class="input-xlarge" value="<?php echo $value; ?>" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>" />
                                     <?php
                                     break;
                                 case "textarea":
                                 case "wysiwyg":
                                     ?>
-                                    <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+
                                     <textarea row="3" class="input-xlarge<?php echo $column["creable_field"]["type"] == 'wysiwyg' ? ' tiny' : ''; ?>" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>"><?php echo $value; ?></textarea>
                                     <?php
                                     break;
                                 case "password":
                                     ?>
-                                    <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+
                                     <input type="password" class="input-xlarge" value="" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" name="<?php echo $column["name"]; ?>" />
                                     <?php
                                     break;
                                 case "file":
                                     ?>
-                                    <label for="<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+
                                     <div id="btn-file-upload-<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="btn-a gradient-green btn-file-upload">
                                         <a>Parcourir ...</a>
                                     </div>
@@ -51,13 +63,13 @@
                                     break;
                                 case "checkbox":
                                     ?>
-                                    <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+
                                     <input type="checkbox" class="input-xlarge" id="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" <?php echo $value == 1 ? 'checked' : ''; ?> value="1" name="<?php echo $column["name"]; ?>" />
                                     <?php
                                     break;
                                 case "select":
                                     ?>
-                                    <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
+
                                     <?php
                                     if (isset($column["creable_field"]["load"]) && $column["creable_field"]["load"] == true) {
                                         ?>
@@ -84,10 +96,10 @@
                                     break;
                                 case "multi-autocomplete":
                                     ?>
-                                    <label for="<?php echo $this->name ?>-<?php echo $column["name"]; ?>" class="control-label"><?php echo $column["title"]; ?></label>
-                                    <input name="<?php echo $column["name"]; ?>" data-column-key="<?php echo $key; ?>" type="text" data-url="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>multi_autocomplete=1&nomain=1" data-join-table="utilisateur" data-join-field-label="email" data-join-field-id="id" class="autocomplete-multi input-xlarge " />
-                                    <input type="hidden" class="prepopulate" value="<?php echo isset($this->clientsString) ? $this->clientsString : ""; ?>" />
 
+                                    <input name="<?php echo $column["name"]; ?>" data-column-key="<?php echo $key; ?>" type="text" data-url="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>multi_autocomplete=1&nomain=1" data-join-table="utilisateur" data-join-field-label="email" data-join-field-id="id" class="autocomplete-multi input-xlarge" />
+                                    
+                                    <input type="hidden" class="prepopulate" value="<?php echo $value; ?>" />
                                     <?php
                                     break;
                                 default:
@@ -119,7 +131,7 @@
 
     <div class="<?php echo isset($this->noModal) ? $this->noModal : ''; ?>modal-footer">
         <a data-dismiss="modal" class="btn btn-cancel" aria-hidden="true" href="#">Annuler</a>
-        <a class="btn btn-primary" href="#"><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?></a>
+        <a class="btn btn-primary" id="add-<?php echo $this->name ?>" href="#"><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?></a>
     </div>
 
 </form>

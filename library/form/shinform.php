@@ -675,9 +675,31 @@ class ShinForm {
                     }
                 }
             }
+            
+            $functions[] = '
+            function(form, validator){
+                var position = $(validator.invalidElements()[0]).position()
+                var newTopPosition = position.top
+                if($(validator.invalidElements()[0]).parents(".modal-body:first").length > 0) {
+                    $scrollRel = $(validator.invalidElements()[0]).parents(".modal-body:first")
+                } else {
+                    $scrollRel = $("html, body")
+                    newTopPosition = newTopPosition - 60
+                }
+                $scrollRel.animate({scrollTop: newTopPosition}, "slow", function() {
+                    $(validator.invalidElements()[0]).focus();
+                });
+                
+            }';
+            $functionsKeys[] = '"[%functioninvalidHandler%]"';
+            $form["validate"]["invalidHandler"] = "[%functioninvalidHandler%]";
+            $form["validate"]["focusInvalid"] = false;
+            
+            
+            
 
             $form["validate"]["ignore"] = "";
-            $form["validate"]["debug"] = true;
+//            $form["validate"]["debug"] = true;
 
             $json = json_encode($form["validate"]);
 

@@ -58,6 +58,14 @@ class DatatableShinForm extends \ShinForm {
     public function editFormRenderAction() {
         return $this->getValidateJS();
     }
+    
+    public function formEditRenderAction() {
+        return $this->getValidateJS();
+    }
+    
+    public function formAddRenderAction() {
+        return $this->getValidateJS();
+    }
 
 }
 

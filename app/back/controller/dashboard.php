@@ -33,7 +33,7 @@ class Dashboard extends Main
 
             $this->_view->datatableRender = "";
 
-            foreach ($configsName as $configName) {
+            foreach ($configsName as $configKey => $configName) {
                 $datatableClassName = '\\Slrfw\\Datatable\\' . $configName;
 
                 try {
@@ -51,6 +51,12 @@ class Dashboard extends Main
                 $datatable->start();
                 $datatableString = $datatable;
                 $data = $datatableString;
+                
+                if ($configKey == 0 && (!isset($_GET["nomain"]) || $_GET["nomain"] == 0)) {
+                    $sBreadCrumbs = $this->_buildBreadCrumbs($datatable->getBreadCrumbs());
+                    //On ajoute le chemin de fer
+                    $datatable->beforeHtml($sBreadCrumbs);
+                }
 
                 if (isset($_GET["json"]) || (isset($_GET["nomain"]) && $_GET["nomain"] == 1)) {
                     echo $data;
@@ -63,6 +69,14 @@ class Dashboard extends Main
                 }
             }
         }
+    }
+    
+    private function _buildBreadCrumbs($additionnalBreadCrumbs) {
+        $this->_view->breadCrumbs = array_merge($this->_view->breadCrumbs, $additionnalBreadCrumbs);
+        ob_start();
+        $this->_view->add("breadcrumbs.phtml");
+        $sBreadCrumbs = ob_get_clean();
+        return $sBreadCrumbs;
     }
 
 }

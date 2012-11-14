@@ -2,14 +2,27 @@
     .nomodal-footer {
         text-align: right;
     }
-    
+
 </style>
 
 
 
-<h1><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?> un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></h1>
+<h1>
+    <?php
+    if (isset($this->pageTitle)) {
+        ?>
+        <?php echo $this->pageTitle; ?>
+        <?php
+    } else {
+        ?>
+        <?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?> un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>
 
+        <?php
+    }
+    ?>
+</h1>
 
+<?php echo $this->_beforeHTML; ?>
 
 <?php include("bootstrap-form.phtml"); ?>
 
@@ -32,8 +45,8 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
         addMsg +=   '<?php echo ucfirst($this->config["table"]["title_item"]) ?> ajouté<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.'
         addMsg += '</div>'
         addMsg += '<p>'
-        addMsg += '<a href="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>" class="btn btn-large btn-primary">Retour à la liste</a>'
-        addMsg += '<a href="<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>&dt_action=formAddRender" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>'
+        addMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>" class="btn btn-large btn-primary">Retour à la liste</a>'
+        addMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>&dt_action=formAddRender" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>'
         addMsg += '</p>'
         
         var editMsg = '';
@@ -41,8 +54,8 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
         editMsg +=   '<?php echo ucfirst($this->config["table"]["title_item"]) ?> modifié<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.'
         editMsg += '</div>'
         editMsg += '<p>'
-        editMsg += '<button type="button" class="btn btn-large btn-primary">Retour à la liste</button>'
-        editMsg += '<button type="button" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></button>'
+        editMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>" class="btn btn-large btn-primary">Retour à la liste</a>'
+        editMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>&dt_action=formAddRender" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>'
         editMsg += '</p>'
         
         var myModal = {
@@ -129,17 +142,18 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                 var response = $.parseJSON(info.response);
                 if(response.status != "error") {
                     var infoField = uploader[idBtn].name.split("-")
-                    var $myForm = $("#btn-file-upload-" + uploader[idBtn].name).parents("form");
+                    var $myForm = $("#" + idBtn).parents("form");
                     filesUploaded[uploader[idBtn].name].push(response.filename)
                     uploader[idBtn].splice(0, 1);
                     if(nbPlupload == 0 && uploader[idBtn].files.length == 0)
                         saveForm($myForm, function() {
-                        $myForm.hide(0, function() {
-                            if ($myForm.attr("data-response") == "add") {
-                                $(this).replaceWith(addMsg)
-                            } else {
-                                $(this).replaceWith(editMsg)
-                            }
+                            $myForm.hide(0, function() {
+                                $("html, body").animate({ scrollTop: 0 }, "slow");
+                                if ($myForm.attr("data-response") == "add") {
+                                    $(this).replaceWith(addMsg)
+                                } else {
+                                    $(this).replaceWith(editMsg)
+                                }
                         })
                     })
                 }                
@@ -160,8 +174,8 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                                                                 
             var heading = 'Confirmation';
             var question = 'Attention, les données saisies seront perdues, malgré cela êtes-vous sûr de vouloir quitter cette page ? ';
-            var cancelButtonTxt = 'Annuler';
-            var okButtonTxt = 'Confirmer';
+            var cancelButtonTxt = 'Non';
+            var okButtonTxt = 'Oui';
 
             var callback = function() {
                 history.back()
@@ -186,6 +200,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                 if (nbPlupload == 0) {
                     saveForm($myForm, function() {
                         $myForm.hide(0, function() {
+                            $("html, body").animate({ scrollTop: 0 }, "slow");
                             if ($myForm.attr("data-response") == "add") {
                                 $(this).replaceWith(addMsg)
                             } else {
@@ -219,6 +234,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             eval('var arrayData = {"' + i + '" : ' + JSON.stringify(filesUploaded[i]) + '}')
             data += "&" + $.param(arrayData);
         }
+        
         
         $.post($myForm.attr("action"), data, function(response) {
             if (callback && typeof(callback) === "function") {
@@ -517,7 +533,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             language : "fr",
             plugins : "safari,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template",
             width:"500px",
-            height:"290px",
+            height:"150px",
             //      height:hauteur,
 
             // ne transforme plus les en html_entities
@@ -529,7 +545,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             //      force_p_newlines : false,
 
             // Theme options
-            theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,formatselect,|,bullist,numlist,|,undo,redo,|,link,unlink,image",
+            theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,formatselect,|,bullist,numlist,|,undo,redo,|,link,unlink",
             theme_advanced_buttons2 : "",
             theme_advanced_buttons3 : "",
 

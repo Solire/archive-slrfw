@@ -35,6 +35,17 @@ class Number {
             $valformat = number_format($number, 2, '.', ' ');
         return $valformat . $currencyChar;
     }
+    
+    /**
+     *
+     * @param float $number 
+     * @param int $nbZero
+     * @param string $currencyChar Caractère de la devise
+     * @return string 
+     */
+    static function zeroFill($number, $nbZero = 11) {
+        return printf("%0" . $nbZero . "d", $number);
+    }
 
 }
 
