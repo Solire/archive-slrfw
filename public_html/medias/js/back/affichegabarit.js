@@ -903,7 +903,12 @@ $(function(){
             autoOpen : false,
             width : 625,
             resizable : false,
-            height : 'auto'
+            height: "auto",
+            maxHeight : $(window).height()-230,
+            maxWidth : $(window).width()-180
+        }).css({
+            "max-height" : $(window).height()-230,
+            "max-width" : $(window).width()-180
         });
                 
         $('.uploader_popup').click(function(){
