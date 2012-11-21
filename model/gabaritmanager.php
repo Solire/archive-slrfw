@@ -10,7 +10,7 @@ use \Slrfw\Library\Tools;
  * @author thomas
  */
 class gabaritManager extends manager {
-    
+
     /**
      * 
      * @var bool 
@@ -105,6 +105,9 @@ class gabaritManager extends manager {
             if ($values) {
                 $page->setValues($values);
 
+                if ($join)
+                    $this->getJoinsValues($page, $id_version, $id_api, $visible);
+
                 $blocs = $page->getBlocs();
                 foreach ($blocs as $blocName => $bloc) {
                     $valuesBloc = $this->getBlocValues($bloc, $id_gab_page, $id_version, $visible);
@@ -171,7 +174,7 @@ class gabaritManager extends manager {
         }
 
         //Fin parametre
-
+        $joins = array();
         foreach ($gabChampTypeParams as $idField => $params) {
             $params2 = array();
 
@@ -190,10 +193,16 @@ class gabaritManager extends manager {
                         $champ["params"] = array_merge($champ["params"], $params2);
 //                        break;
                     }
+
+                    if ($champ["type"] == "JOIN") {
+                        $joins[$champ["id"]] = $champ;
+                        unset($champ);
+                    }
                 }
             }
         }
         $gabarit->setChamps($champs);
+        $gabarit->setJoins($joins);
 
         return $gabarit;
     }
@@ -318,6 +327,38 @@ class gabaritManager extends manager {
                 . ($visible ? " AND `visible` = 1" : "")
                 . " ORDER BY `ordre`";
         return $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /* A REVOIR.
+     * @param gabaritPage $page
+     * @param type $id_gab_page
+     * @param type $id_version
+     * @param type $visible
+     * @return type
+     */
+
+    public function getJoinsValues($page, $id_version,  $id_api, $visible = FALSE) {
+        $joinFields = array();
+        foreach ($page->getGabarit()->getJoins() as $joinField) {
+            $joinFields[$joinField["name"]] = array(
+                'value' => $page->getValues($joinField["name"]),
+                'table' => $joinField["params"]["TABLE.NAME"],
+                'fieldId' => $joinField["params"]["TABLE.FIELD.ID"],
+            );
+        }
+
+        if (count($joinFields) == 0)
+            return;
+
+        foreach ($joinFields as $joinName => $joinField) {
+            if (!$joinField['value'])
+                continue;
+
+            $join = $this->getPage($id_version, $id_api, $joinField['value'], 0, FALSE, $visible);
+
+            if (!$visible || $join->getMeta('visible') > 0)
+                $page->setValue($joinName, $join);
+        }
     }
 
     /**
@@ -651,7 +692,7 @@ class gabaritManager extends manager {
         $page = $this->getPage($version, $api["id"], $page->getMeta("id"), 0);
         return $page;
     }
-    
+
     /**
      * <p>Passe en mode prévisualisation</p>
      * @param bool $enabled 
@@ -670,7 +711,7 @@ class gabaritManager extends manager {
         $updating = $donnees['id_gab_page'] > 0;
 
         //On recupere les ids de gabarits pour l'api courante
-        $api =  $page->getGabarit()->getApi();
+        $api = $page->getGabarit()->getApi();
         $query = "SELECT `gab_gabarit`.id FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $api["id"];
         $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
 
@@ -1007,7 +1048,7 @@ class gabaritManager extends manager {
      */
     public function previsu($donnees) {
         $this->_versions = $this->_db->query("SELECT `id` FROM `version`")->fetchAll(\PDO::FETCH_COLUMN);
-        
+
         $updating = ($donnees['id_gab_page'] > 0);
 
         $version = isset($donnees['id_version']) ? $donnees['id_version'] : 1;
@@ -1028,9 +1069,9 @@ class gabaritManager extends manager {
             $this->_previsuBloc($bloc, $donnees);
             $this->getBlocJoinsValues($page, $blocName, ID_VERSION);
         }
-        
+
         if (isset($donnees['id_parent'])) {
-            $parents    = $this->getParents($donnees['id_parent'], ID_VERSION);
+            $parents = $this->getParents($donnees['id_parent'], ID_VERSION);
             $page->setParents($parents);
         }
 
@@ -1061,12 +1102,12 @@ class gabaritManager extends manager {
         if ($updating) {
 
             $meta = array(
-                "titre"         => $donnees['titre'],
-                "bal_title"     => $donnees['bal_title'],
-                "bal_key"       => $donnees['bal_key'],
-                "bal_descr"     => $donnees['bal_descr'],
-                "id_version"    => $page->getMeta("id_version"),
-                "id"            => $page->getMeta("id"),
+                "titre" => $donnees['titre'],
+                "bal_title" => $donnees['bal_title'],
+                "bal_key" => $donnees['bal_key'],
+                "bal_descr" => $donnees['bal_descr'],
+                "id_version" => $page->getMeta("id_version"),
+                "id" => $page->getMeta("id"),
             );
 
             $meta = array_merge($page->getMeta(), $meta);
@@ -1074,14 +1115,14 @@ class gabaritManager extends manager {
             $id_parent = isset($donnees['id_parent']) && $donnees['id_parent'] ? $donnees['id_parent'] : 0;
 
             $meta = array(
-                "id"            => $donnees['id_temp'] ? "temp-" . $donnees['id_temp'] : 0,
-                "id_parent"     => $id_parent,
-                "id_version"    => $page->getMeta("id_version"),
-                "id_gabarit"    => $page->getGabarit()->getId(),
-                "titre"         => $donnees['titre'],
-                "bal_title"     => $donnees['bal_title'],
-                "bal_key"       => $donnees['bal_key'],
-                "bal_descr"     => $donnees['bal_descr'],
+                "id" => $donnees['id_temp'] ? "temp-" . $donnees['id_temp'] : 0,
+                "id_parent" => $id_parent,
+                "id_version" => $page->getMeta("id_version"),
+                "id_gabarit" => $page->getGabarit()->getId(),
+                "titre" => $donnees['titre'],
+                "bal_title" => $donnees['bal_title'],
+                "bal_key" => $donnees['bal_key'],
+                "bal_descr" => $donnees['bal_descr'],
             );
         }
 
@@ -1161,7 +1202,5 @@ class gabaritManager extends manager {
 
         return TRUE;
     }
-
-
 
 }
