@@ -151,17 +151,33 @@ class FrontController
         define("ID_API", isset($api['id']) ? $api['id'] : 1);
     }
 
-    public static function run() {
-        if (isset($_REQUEST['application']) && !empty($_REQUEST['application'])) {
-            $application = ucfirst($_REQUEST['application']);
-        } else {
-            $application = 'Front';
+    public static function run($application = NULL, $contString = NULL, $actString = NULL) {
+        if ($application == NULL) {
+            $application    = isset($_REQUEST['application']) && !empty($_REQUEST['application'])
+                            ? $_GET['application']
+                            : "front";
         }
+        
         $front = self::getInstance($application);
         $applicationPath = '../' . $front->_applicationConfig['path'];
-
-        $controller = str_replace("-", "", strtolower(isset($_GET["controller"]) ? $_GET["controller"] : $front->getDefault("controller")));
-        $action = str_replace("-", "", strtolower(isset($_GET["action"]) ? $_GET["action"] : $front->getDefault("action")));
+        
+        if ($contString == NULL) {
+            $contString = isset($_GET["controller"])
+                        ? $_GET["controller"]
+                        : $front->getDefault("controller");
+            $contString = strtolower($contString);
+        }
+        $controller         = str_replace("-", "", $contString);
+        
+        if ($actString == NULL) {
+            $actString  = isset($_GET["action"])
+                        ? $_GET["action"]
+                        : $front->getDefault("action");
+            $actString  = strtolower($actString);
+        }        
+        $action             = str_replace("-", "", $actString);
+        
+        
 
         $class = 'Slrfw\App\\' . $application . '\\Controller\\' . ucfirst($controller);
         $method = sprintf($front->getFormat("controller-action"), $action);
