@@ -551,7 +551,6 @@ $(function(){
 	
     $('legend').bind('click', function(e){
         var indexLegend = $(this).index("legend")
-        console.log(openingLegend[indexLegend])
         if (!openingLegend[indexLegend]) {
             openingLegend[indexLegend] = true
             $(this).next().slideToggle(500, function() {
