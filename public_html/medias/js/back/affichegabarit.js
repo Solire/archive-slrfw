@@ -243,8 +243,9 @@ $(function(){
             }
         });
 		
-        this.find('.previsu').text('').attr('href', '');
-        this.find('.crop').addClass("hide")
+        this.find('.previsu').attr('href', '');
+        this.find('.previsu').parent().hide()
+        this.find('.crop').parent().hide()
 
         return this;
     }
