@@ -547,13 +547,15 @@ $(function(){
         }
     });
     
-    var openingLegend = false
+    var openingLegend = []
 	
     $('legend').bind('click', function(e){
-        if (!openingLegend) {
-            openingLegend = true
+        var indexLegend = $(this).index("legend")
+        console.log(openingLegend[indexLegend])
+        if (!openingLegend[indexLegend]) {
+            openingLegend[indexLegend] = true
             $(this).next().slideToggle(500, function() {
-                openingLegend = false
+                openingLegend[indexLegend] = false
                 if ($(this).parent(".sort-elmt").parents("fieldset:first").find(".expand-collapse").length) {
                     disabledExpandCollaspse($(this).parent(".sort-elmt").parents("fieldset:first"))
                 }
