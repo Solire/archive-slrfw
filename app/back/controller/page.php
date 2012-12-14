@@ -172,19 +172,23 @@ class Page extends Main
                         AND id_version = " . $version['id'] . "
                 ")->fetchAll(\PDO::FETCH_COLUMN);
 
-                $devant .= '<div style="height: 54px;float: left;">'
-                        . '<div class="btn-a gradient-blue" style="margin-bottom: 5px;display:block;"><a title="' . $version['nom'] . '" class="openlang' . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
-                        . $version['nom'] . '" /></a></div>';
+                $devant    .= '<div style="height: 54px;float: left;">'
+                            . '<div class="btn-a gradient-blue" style="margin-bottom: 5px;display:block;">'
+                            . '<a title="' . $version['nom'] . '" class="openlang'
+                            . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">'
+                            . 'Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
+                            . $version['nom'] . '" /></a></div>';
 
                 if ($page->getMeta("rewriting") != "") {
                     if ($page->getGabarit()->getMake_hidden()
                             || $this->_utilisateur->get("niveau") == "solire"
                             || !$page->getMeta("visible")
                     ) {
-                        $devant .= '<div style="margin-left: 6px;margin-top: -7px;"><label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-'
-                                . $version['id'] . '">Visible : </label><input class="visible-lang visible-lang-' . $page->getMeta("id") . '-' . $version['id'] . '" style="margin:0;" value="'
-                                . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" style="margin:0;" '
-                                . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /></div>';
+                        $devant    .= '<div style="margin-left: 6px;margin-top: -7px;">'
+                                    . '<label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-'
+                                    . $version['id'] . '">Visible : </label><input class="visible-lang visible-lang-' . $page->getMeta("id") . '-' . $version['id'] . '" style="margin:0;" value="'
+                                    . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" '
+                                    . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /></div>';
                     }
                 } else {
                     $devant .= '<span class="notification gradient-red" style="margin-left: 6px;">Non traduit</span>';
@@ -209,8 +213,6 @@ class Page extends Main
             $this->_form = $form;
         }
 
-
-
         //on recupere la sous rubrique de page a laquelle il appartient pour le breadCrumbs et le lien retour
         $found = false;
         foreach ($this->_configPageModule as $index => $currentConfigPageModule) {
@@ -225,8 +227,6 @@ class Page extends Main
                 break;
             }
         }
-
-
 
         $this->_view->page = $this->_page;
         $this->_view->form = $this->_form;
@@ -248,9 +248,7 @@ class Page extends Main
             "url" => "",
         );
         
-        
         $this->getButton($currentConfigPageModule);
-        
     }
 
     /**

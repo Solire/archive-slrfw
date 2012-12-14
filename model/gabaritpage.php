@@ -203,17 +203,32 @@ class gabaritPage extends gabaritBloc {
      * @param type $mobile
      * @return string
      */
-    public function getForm($action, $retour, $upload_path, $mobile = FALSE, $meta = TRUE, $_301_editable = TRUE, $meta_titre = TRUE, $extension = "/", $versionId, $redirections = array()) {
-        $metaId = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
-        $metaLang = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : 1;
-        $noMeta = !$meta ? ' style="display: none;" ' : '';
-        $noMetaTitre = !$meta_titre ? ' style="display: none;" ' : '';
-        $noRedirections301 = !$_301_editable ? ';display: none' : '';
-        $parentSelect = '';
+    public function getForm($action, $retour, $upload_path, $mobile = FALSE,
+        $meta = TRUE, $_301_editable = TRUE, $meta_titre = TRUE, $extension = "/",
+        $versionId = BACK_ID_VERSION, $redirections = array()
+    ) {        
+        $metaId             = isset($this->_meta['id'])
+                            ? $this->_meta['id']
+                            : 0;
+        $metaLang           = isset($this->_meta['id_version'])
+                            ? $this->_meta['id_version']
+                            : 1;
+        $noMeta             = !$meta
+                            ? ' style="display: none;" '
+                            : '';
+        $noMetaTitre        = !$meta_titre
+                            ? ' style="display: none;" '
+                            : '';
+        $noRedirections301  = !$_301_editable
+                            ? ';display: none'
+                            : '';
+        $parentSelect       = '';
 
         $api = $this->_gabarit->getApi();
-        
-        $redirections = count($redirections) == 0 ? array("") : $redirections;
+
+        $redirections   = count($redirections) == 0
+                        ? array("")
+                        : $redirections;
 
         if ($metaId && $this->_meta['id_parent'] > 0) {
             $parentSelect = '<div class="line">'
@@ -229,94 +244,100 @@ class gabaritPage extends gabaritBloc {
                           . '</div>';
         }
 
-        $form = '<form action="' . $action . '" method="post" enctype="multipart/form-data">'
-		      . '<input type="hidden" name="id_gabarit" value="' . $this->_gabarit->getId() . '" />'
-			  . '<input type="hidden" name="id_gab_page" value="' . $metaId . '" />'
-			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
-			  . '<input type="hidden" name="id_api" value="' . $api['id'] . '" />'
-			  . '<input type="hidden" name="id_temp" />'
+        $allchamps = $this->_gabarit->getChamps();
 
-              . $parentSelect
-              . '<div ' . $noMetaTitre . ' class="line">'
-              . '<label for="titre-' . $metaLang . '">Titre <span class="required">*</span> </label>'
-              . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
-              . '</div>';
+        ob_start();
+        include __DIR__ . "/gabarit/form/default/default.phtml";
+        $form = ob_get_clean();
 
-        if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
-            $form .= '<div ' . $noMetaTitre . ' class="line">'
-                   . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting <span class="required">*</span> </label>'
-                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
-                   . '</div>';
-        }
-
-        $form .= '<fieldset ' . $noMeta . '><legend>Balise Meta</legend><div style="display:none;">'
-
-              . '<div class="line">'
-              . '<label for="rewriting-' . $metaLang . '">Rewriting' . ($meta && $metaId && isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? ' <span class="required">*</span>' : '' ) . '</label>'
-              . '<input type="text" name="rewriting" id="rewriting-' . $metaLang . '" value="' . (isset($this->_meta['rewriting']) ? $this->_meta['rewriting'] : '') . '" class="' . ($meta && $metaId && isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? 'form-controle form-oblig form-mix' : '') . '"  />'
-              . '</div>'
-
-              . '<div class="line">'
-              . '<label for="bal_title-' . $metaLang . '">Title</label>'
-              . '<input type="text" name="bal_title" id="bal_title-' . $metaLang . '" value="' . (isset($this->_meta['bal_title']) ? $this->_meta['bal_title'] : '') . '" size="80" maxlength="80" />'
-              . '</div>'
-
-              . '<div class="line">'
-              . '<label for="bal_descr-' . $metaLang . '">Description</label>'
-              . '<input type="text" name="bal_descr" id="bal_descr-' . $metaLang . '" value="' . (isset($this->_meta['bal_descr']) ? $this->_meta['bal_descr'] : '') . '" size="80" maxlength="250" />'
-              . '</div>'
-
-              . '<div class="line">'
-              . '<label for="bal_key-' . $metaLang . '">Keywords (<i>séparés par des ,</i>)</label>'
-              . '<input type="text" name="bal_key" id="bal_key-' . $metaLang . '" value="' . (isset($this->_meta['bal_key']) ? $this->_meta['bal_key'] : '') . '" size="80" maxlength="250" />'
-              . '</div>'
-
-              . '<div class="line">'
-              . '<label for="importance-' . $metaLang . '">Importance (<i>de 0,1 à 0,9</i>)</label>'
-              . '<select name="importance" class="span1" id="importance-' . $metaLang . '">';
-
-        for ($ii = 1 ; $ii < 10 ; $ii++)
-            $form .= '<option value="' . $ii . '"' . (isset($this->_meta['importance']) && $ii == $this->_meta['importance'] ? ' selected="selected"' : '') . '>' . $ii . '</option>';
-
-        $form .= '</select>'
-               . '</div>'
-
-               . '<div class="line">'
-               . '<label for="no_index' . $metaLang . '">No-index</label>'
-               . '<input type="checkbox" value="1" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
-               . '</div>';
-
-        $form .= '<div class="line">'
-               . '<label for="canonical-' . $metaLang . '">Url canonical</label>'
-               . '<input type="text" name="canonical" id="canonical-' . $metaLang . '" value="' . (isset($this->_meta['canonical']) ? $this->_meta['canonical'] : '') . '" class="autocomplete-link"  />'
-               . '</div>';
-               $form .= '<fieldset  style="margin-left: 15px' . $noRedirections301 . '"><legend>Redirection 301 permanent</legend><div style="display:none;">';
-               foreach ($redirections as $keyRedirection => $redirection) {
-                   $form .= '<div class="line">'
-                          . '<label for="301-' . $metaLang . '">Url</label>'
-                          . '<input type="text" name="301[]" id="301-' . $metaLang . '" value="' . $redirection . '" class=""  />'
-                          . '<div class="btn-a gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 220px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
-                          . '</div>';
-               }
-
-               $form .= '<div class="btn-a gradient-blue fr 301-add" style="margin-right: 223px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
-                      . '</div>';
-
-
-                $form .= '</div>'
-                       . '</fieldset>';
-		$form .= $this->buildForm($upload_path, $versionId);
-
-		$form .= '<div class="buttonfixed">'
-               . ($mobile ? '<div class="btn-a gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
-               . '<div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
-               . '<div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>'
-               . '<div class="btn-a gradient-green cb fl"><a href="#" class="formprev">Prévisualiser</a></div>'
-               . '<div class="btn-a gradient-green cb fl back-to-list"><a href="' . $retour
-               . ($metaId ? '?id_gab_page=' . $metaId : '')
-               . '">Retour</a></div>'
-               . '</div>'
-               . '</form>';
+//        $form = '<form action="' . $action . '" method="post" enctype="multipart/form-data">'
+//		      . '<input type="hidden" name="id_gabarit" value="' . $this->_gabarit->getId() . '" />'
+//			  . '<input type="hidden" name="id_gab_page" value="' . $metaId . '" />'
+//			  . '<input type="hidden" name="id_version" value="' . $metaLang . '" />'
+//			  . '<input type="hidden" name="id_api" value="' . $api['id'] . '" />'
+//			  . '<input type="hidden" name="id_temp" />'
+//
+//              . $parentSelect
+//              . '<div ' . $noMetaTitre . ' class="line">'
+//              . '<label for="titre-' . $metaLang . '">Titre <span class="required">*</span> </label>'
+//              . '<input type="text" name="titre" id="titre-' . $metaLang . '" value="' . (isset($this->_meta['titre']) ? $this->_meta['titre'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
+//              . '</div>';
+//
+//        if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
+//            $form .= '<div ' . $noMetaTitre . ' class="line">'
+//                   . '<label for="titre_rew-' . $metaLang . '">Titre pour le rewriting <span class="required">*</span> </label>'
+//                   . '<input type="text" name="titre_rew" id="titre_rew-' . $metaLang . '" value="' . (isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : '') . '" class="' . ($meta_titre ? 'form-controle form-oblig form-mix' : '') . '" />'
+//                   . '</div>';
+//        }
+//
+//        $form .= '<fieldset ' . $noMeta . '><legend>Balise Meta</legend><div style="display:none;">'
+//
+//              . '<div class="line">'
+//              . '<label for="rewriting-' . $metaLang . '">Rewriting' . ($meta && $metaId && isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? ' <span class="required">*</span>' : '' ) . '</label>'
+//              . '<input type="text" name="rewriting" id="rewriting-' . $metaLang . '" value="' . (isset($this->_meta['rewriting']) ? $this->_meta['rewriting'] : '') . '" class="' . ($meta && $metaId && isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? 'form-controle form-oblig form-mix' : '') . '"  />'
+//              . '</div>'
+//
+//              . '<div class="line">'
+//              . '<label for="bal_title-' . $metaLang . '">Title</label>'
+//              . '<input type="text" name="bal_title" id="bal_title-' . $metaLang . '" value="' . (isset($this->_meta['bal_title']) ? $this->_meta['bal_title'] : '') . '" size="80" maxlength="80" />'
+//              . '</div>'
+//
+//              . '<div class="line">'
+//              . '<label for="bal_descr-' . $metaLang . '">Description</label>'
+//              . '<input type="text" name="bal_descr" id="bal_descr-' . $metaLang . '" value="' . (isset($this->_meta['bal_descr']) ? $this->_meta['bal_descr'] : '') . '" size="80" maxlength="250" />'
+//              . '</div>'
+//
+//              . '<div class="line">'
+//              . '<label for="bal_key-' . $metaLang . '">Keywords (<i>séparés par des ,</i>)</label>'
+//              . '<input type="text" name="bal_key" id="bal_key-' . $metaLang . '" value="' . (isset($this->_meta['bal_key']) ? $this->_meta['bal_key'] : '') . '" size="80" maxlength="250" />'
+//              . '</div>'
+//
+//              . '<div class="line">'
+//              . '<label for="importance-' . $metaLang . '">Importance (<i>de 0,1 à 0,9</i>)</label>'
+//              . '<select name="importance" class="span1" id="importance-' . $metaLang . '">';
+//
+//        for ($ii = 1 ; $ii < 10 ; $ii++)
+//            $form .= '<option value="' . $ii . '"' . (isset($this->_meta['importance']) && $ii == $this->_meta['importance'] ? ' selected="selected"' : '') . '>' . $ii . '</option>';
+//
+//        $form .= '</select>'
+//               . '</div>'
+//
+//               . '<div class="line">'
+//               . '<label for="no_index' . $metaLang . '">No-index</label>'
+//               . '<input type="checkbox" value="1" name="no_index" id="no_index' . $metaLang . '"' . (isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : '') . ' />'
+//               . '</div>';
+//
+//        $form .= '<div class="line">'
+//               . '<label for="canonical-' . $metaLang . '">Url canonical</label>'
+//               . '<input type="text" name="canonical" id="canonical-' . $metaLang . '" value="' . (isset($this->_meta['canonical']) ? $this->_meta['canonical'] : '') . '" class="autocomplete-link"  />'
+//               . '</div>';
+//               $form .= '<fieldset  style="margin-left: 15px' . $noRedirections301 . '"><legend>Redirection 301 permanent</legend><div style="display:none;">';
+//               foreach ($redirections as $keyRedirection => $redirection) {
+//                   $form .= '<div class="line">'
+//                          . '<label for="301-' . $metaLang . '">Url</label>'
+//                          . '<input type="text" name="301[]" id="301-' . $metaLang . '" value="' . $redirection . '" class=""  />'
+//                          . '<div class="btn-a gradient-blue fr 301-remove' . (count($redirections) == 1 ? ' translucide' : '') .'" style="margin-right: 220px"><span class="ui-icon white ui-icon-minusthick"></span></div>'
+//                          . '</div>';
+//               }
+//
+//               $form .= '<div class="btn-a gradient-blue fr 301-add" style="margin-right: 223px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>'
+//                      . '</div>';
+//
+//
+//                $form .= '</div>'
+//                       . '</fieldset>';
+//		$form .= $this->buildForm($upload_path, $versionId);
+//
+//		$form .= '<div class="buttonfixed">'
+//               . ($mobile ? '<div class="btn-a gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a>' : '')
+//               . '<div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>'
+//               . '<div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>'
+//               . '<div class="btn-a gradient-green cb fl"><a href="#" class="formprev">Prévisualiser</a></div>'
+//               . '<div class="btn-a gradient-green cb fl back-to-list"><a href="' . $retour
+//               . ($metaId ? '?id_gab_page=' . $metaId : '')
+//               . '">Retour</a></div>'
+//               . '</div>'
+//               . '</form>';
 
 		return $form;
 	}

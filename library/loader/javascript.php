@@ -23,8 +23,10 @@ class Javascript {
     public function  __toString()
     {
         $js = "";
-        foreach ($this->libraries as $lib)
-            $js .= '<script src="' . $lib["src"] . '" type="text/javascript"></script>' . "\n\t";
+        foreach ($this->libraries as $lib) {
+            $js .= '        <script src="' . $lib["src"] . '" type="text/javascript"></script>' . "\n";
+        }
+        
         return $js;
     }
 

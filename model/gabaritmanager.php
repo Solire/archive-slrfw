@@ -1067,7 +1067,7 @@ class gabaritManager extends manager {
         $blocs = $page->getBlocs();
         foreach ($blocs as $blocName => $bloc) {
             $this->_previsuBloc($bloc, $donnees);
-            $this->getBlocJoinsValues($page, $blocName, ID_VERSION);
+            $this->getBlocJoinsValues($page, $blocName, ID_VERSION, TRUE);
         }
 
         if (isset($donnees['id_parent'])) {

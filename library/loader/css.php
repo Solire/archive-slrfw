@@ -23,8 +23,10 @@ class Css {
     public function  __toString()
     {
         $css = "";
-        foreach ($this->libraries as $lib)
-            $css .= '<link rel="stylesheet" href="' . $lib["src"] . '" type="text/css" media="' . $lib["media"] . '" title="" charset="utf-8" />' . "\n\t";
+        foreach ($this->libraries as $lib) {
+            $css .= '        <link rel="stylesheet" href="' . $lib["src"] . '" type="text/css" media="' . $lib["media"] . '" title="" charset="utf-8" />' . "\n";
+        }
+        
         return $css;
     }
 
