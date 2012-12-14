@@ -15,9 +15,9 @@
 <?php
     if (isset($this->_version['exotique']) && $this->_version['exotique'] > 0) {
 ?>
-    <div<?php echo $noMetaTitre; ?> class="line">'
-        <label for="titre_rew-<?php echo $metaLang; ?>">Titre pour le rewriting <span class="required">*</span> </label>'
-        <input type="text" name="titre_rew" id="titre_rew-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : ''; ?>" class="<?php echo ($meta_titre ? 'form-controle form-oblig form-mix' : ''); ?>" />'
+    <div<?php echo $noMetaTitre; ?> class="line">
+        <label for="titre_rew-<?php echo $metaLang; ?>">Titre pour le rewriting <span class="required">*</span> </label>
+        <input type="text" name="titre_rew" id="titre_rew-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['titre_rew']) ? $this->_meta['titre_rew'] : ''; ?>" class="<?php echo ($meta_titre ? 'form-controle form-oblig form-mix' : ''); ?>" />
     </div>
 <?php
     }
@@ -40,12 +40,12 @@
             <div class="line">
                 <label for="bal_descr-<?php echo $metaLang; ?>">Description</label>
                 <input type="text" name="bal_descr" id="bal_descr-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_descr']) ? $this->_meta['bal_descr'] : ''; ?>" size="80" maxlength="250" />
-            </div>'
+            </div>
 
             <div class="line">
                 <label for="bal_key-<?php echo $metaLang; ?>">Keywords (<i>séparés par des ,</i>)</label>
                 <input type="text" name="bal_key" id="bal_key-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_key']) ? $this->_meta['bal_key'] : ''; ?>" size="80" maxlength="250" />
-            </div>'
+            </div>
 
             <div class="line">
                 <label for="importance-<?php echo $metaLang; ?>">Importance (<i>de 0,1 à 0,9</i>)</label>
@@ -64,15 +64,15 @@
                 <label for="no_index-<?php echo $metaLang; ?>">No-index</label>
                 <input type="checkbox" value="1" name="no_index" id="no_index-<?php echo $metaLang; ?>"<?php echo isset($this->_meta['no_index']) && $this->_meta['no_index'] > 0 ? ' checked="checked"' : ''; ?> />
             </div>
-            
+
             <div class="line">
                 <label for="canonical-<?php echo $metaLang; ?>">Url canonical</label>
-                <input type="text" name="canonical" id="canonical-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['canonical']) ? $this->_meta['canonical'] : ''; ?>" class="autocomplete-link"  />'
+                <input type="text" name="canonical" id="canonical-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['canonical']) ? $this->_meta['canonical'] : ''; ?>" class="autocomplete-link"  />
             </div>
-            
+
             <fieldset  style="margin-left: 15px<?php echo $noRedirections301; ?>">
                 <legend>Redirection 301 permanent</legend>
-                
+
                 <div style="display:none;">
 <?php
     foreach ($redirections as $keyRedirection => $redirection) {
@@ -80,7 +80,6 @@
                     <div class="line">
                         <label for="301-<?php echo $metaLang; ?>">Url</label>
                         <input type="text" name="301[]" id="301-<?php echo $metaLang; ?>" value="<?php echo $redirection; ?>" class=""  />
-                        
                         <div class="btn-a gradient-blue fr 301-remove<?php echo count($redirections) == 1 ? ' translucide' : ''; ?>" style="margin-right: 220px"><span class="ui-icon white ui-icon-minusthick"></span></div>
                     </div>
 <?php
@@ -88,19 +87,19 @@
 ?>
                     <div class="btn-a gradient-blue fr 301-add" style="margin-right: 223px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>
                 </div>
-                
+
             </fieldset>
         </div>
     </fieldset>
-           
+
     <input type="hidden" name="id_<?php echo $this->_gabarit->getTable(); ?>" value="<?php echo isset($this->_values['id']) ? $this->_values['id'] : ''; ?>" />
-  
+
 <?php
     foreach ($allchamps as $name_group => $champs) {
 ?>
     <fieldset>
         <legend><?php echo $name_group; ?></legend>
-        
+
         <div<?php echo $metaId ? ' style="display:none;"' : ''; ?>>
 <?php
         foreach ($champs as $champ) {
@@ -108,34 +107,34 @@
                 $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
                 echo $this->_buildChamp($champ, $value, $id, $upload_path, $metaId);
         }
-?> 
+?>
         </div>
     </fieldset>
 <?php
     }
-    
+
     foreach ($this->_blocs as $bloc) {
         echo $bloc->buildForm($upload_path, $metaId, $versionId);
     }
 ?>
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="buttonfixed">
 <?php
     if ($mobile) {
@@ -150,9 +149,8 @@
         <div class="btn-a gradient-green cb fl back-to-list">
             <a href="<?php echo $retour . ($metaId ? '?id_gab_page=' . $metaId : ''); ?>">Retour</a>
         </div>
-    </div>    
+    </div>
 </form>
-                
-                
-                
-                
+
+
+

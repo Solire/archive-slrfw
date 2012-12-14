@@ -6,7 +6,7 @@
 
             $this->_buildChamps($value);
             ?>
-            <fieldset class="sort-elmt" style="margin-left:30px;"><legend><?php echo $this->valueLabel; ?></legend>
+            <fieldset class="sort-elmt"><legend><?php echo $this->valueLabel; ?></legend>
                 <div>
                     <div class="line">
                         <label for="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>">Visible</label>

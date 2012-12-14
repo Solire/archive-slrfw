@@ -26,7 +26,6 @@ class Javascript {
         foreach ($this->libraries as $lib) {
             $js .= '        <script src="' . $lib["src"] . '" type="text/javascript"></script>' . "\n";
         }
-        
         return $js;
     }
 
