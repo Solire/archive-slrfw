@@ -260,7 +260,15 @@ $(function(){
      * Récupéré dans le cookie correspondant
      */
     function reloadState() {
-        var saveStateListPage = $.cookie('state_list').split(",")
+        var saveStateListPage;
+        
+        if ($.cookie('state_list')) {
+            saveStateListPage = $.cookie('state_list').split(",");
+        }
+        else {
+            saveStateListPage = [];
+        }
+    
         $.each(saveStateListPage, function(id, item) {
             
             var id = item.split('_').pop();
