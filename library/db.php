@@ -51,19 +51,19 @@ class DB
     /**
      * Crée une connection à la base de données.
      *
-     * @param array  $ini         doit être sous la forme :
-     *      dsn => ''        // chaine de connexion propre à pdo, par exemple :
-     * "mysql:dbname=%s;host=%s" ou "mysql:dbname=%s;host=%s;port=%s"
-     *      host => ''       // host de la connexion à la bdd
-     *      dbname => ''     // Nom de la base de données
-     *      user => ''       // utilisateur mysql
-     *      password => ''   // mot de passe
-     *      port => ''       // [facultatif], port de la connexion
-     *      utf8 => true     // [facultatif], activer encodage buffer sortie
-     *      error => true    // [facultatif], activer les erreurs pdo
-     *      profil => false  // [facultatif], activer le profiling
-     *      nocache => false // [facultatif], désactiver le cache
-     *
+     * @param array  $ini         doit être sous la forme :<ul>
+     * <li>dsn => ''        // chaine de connexion propre à pdo, par exemple :
+     * "mysql:dbname=%s;host=%s" ou "mysql:dbname=%s;host=%s;port=%s"</li>
+     * <li>host => ''       // host de la connexion à la bdd</li>
+     * <li>dbname => ''     // Nom de la base de données</li>
+     * <li>user => ''       // utilisateur mysql</li>
+     * <li>password => ''   // mot de passe</li>
+     * <li>port => ''       // [facultatif], port de la connexion</li>
+     * <li>utf8 => true     // [facultatif], activer encodage buffer sortie</li>
+     * <li>error => true    // [facultatif], activer les erreurs pdo</li>
+     * <li>profil => false  // [facultatif], activer le profiling</li>
+     * <li>nocache => false // [facultatif], désactiver le cache</li>
+     * </ul>
      * @param string $otherDbName Nom de la base de données dans le cas où l'on
      * veut se connecter à une difference de celle présente dans $ini
      *
@@ -71,7 +71,6 @@ class DB
      */
     public static function factory($ini, $otherDbName = null)
     {
-
         if ($otherDbName) {
             $ini['dbname'] = $otherDbName;
         }
@@ -90,38 +89,37 @@ class DB
         );
 
 
-        /* = Option d'affichage des erreurs
-          | Parametrable dans le config.ini de la bdd
-          `-------------------------------------------------------------------- */
+        /**
+         * Option d'affichage des erreurs
+         * Parametrable dans le config.ini de la bdd
+         */
         if (isset($ini['error']) && $ini['error'] == true) {
             self::$_present[$ini['name']]->setAttribute(
                 \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
             );
         }
 
-        /* = Profiling
-          `-------------------------------------------------------------------- */
+        /** Profiling */
         if (isset($ini['profil']) && $ini['profil'] == true) {
             self::$_present[$ini['name']]->exec('SET profiling = 1;');
         }
 
-        /* = Spécifique à mysql
-          | Modifie l'encodage du buffer de sortie de la base qui est par
-          | defaut en ISO pour être en accord avec l'encodage de la base.
-          `-------------------------------------------------------------------- */
+        /**
+         * Spécifique à mysql
+         * Modifie l'encodage du buffer de sortie de la base qui est par
+         * defaut en ISO pour être en accord avec l'encodage de la base.
+         */
         if (isset($ini['utf8']) && $ini['utf8'] == true) {
             self::$_present[$ini['name']]->exec('SET NAMES UTF8');
         }
 
-        /* = Cache
-          `-------------------------------------------------------------------- */
+        /** Cache */
         if (isset($ini['nocache']) && $ini['nocache'] == true) {
             self::$_present[$ini['name']]->exec('SET SESSION query_cache_type = OFF;');
         }
 
         return self::$_present[$ini['name']];
     }
-
 
     /**
      * Renvois la connexion à la base déjà paramétré

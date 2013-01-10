@@ -28,7 +28,7 @@ class gabaritManager extends manager
     protected $modePrevisualisation = false;
 
     /**
-     * <p>Donne l'identifiant d'une page d'après son rewriting et l'identifiant.</p>
+     * Donne l'identifiant d'une page d'après son rewriting et l'identifiant.
      *
      * @param int    $id_version identifiant de la version
      * @param int    $id_api     identifiant de l'api
@@ -1035,9 +1035,9 @@ class gabaritManager extends manager
             $newUrl = $urlParent . $page->getMeta('rewriting')
                     . $page->getGabarit()->getExtension();
             $query2Del  = 'DELETE FROM `redirection`'
-                        . ' WHERE new = ' . $this->_db->quote($newUrl)
-                        . ' AND id_version = ' . $page->getMeta('id_version')
-                        . ' AND id_api = ' . $api['id'];
+                        . ' WHERE `new` = ' . $this->_db->quote($newUrl)
+                        . ' AND `id_version` = ' . $page->getMeta('id_version')
+                        . ' AND `id_api` = ' . $api['id'];
             $this->_db->query($query2Del);
 
             /** On insert toutes les urls dans le bloc redirection 301 */
@@ -1047,10 +1047,10 @@ class gabaritManager extends manager
 
                 if ($oldUrl != '' && $oldUrl != $newUrl) {
                     $queries2[] = 'INSERT INTO `redirection` SET'
-                                . ' old = ' . $this->_db->quote($oldUrl) . ', '
-                                . ' new = ' . $this->_db->quote($newUrl) . ', '
-                                . ' id_api = ' . $api['id'] . ', '
-                                . ' id_version = ' . $page->getMeta('id_version') . ';';
+                                . ' `old` = ' . $this->_db->quote($oldUrl) . ', '
+                                . ' `new` = ' . $this->_db->quote($newUrl) . ', '
+                                . ' `id_api` = ' . $api['id'] . ', '
+                                . ' `id_version` = ' . $page->getMeta('id_version') . ';';
                 }
             }
 
@@ -1085,8 +1085,8 @@ class gabaritManager extends manager
 
             $query  = 'SELECT MAX(`ordre`)'
                     . ' FROM `gab_page`'
-                    . ' WHERE id_api = ' . $api['id']
-                    . ' AND id_parent = ' . $id_parent;
+                    . ' WHERE `id_api` = ' . $api['id']
+                    . ' AND `id_parent` = ' . $id_parent;
             $ordre = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
             if ($ordre) {
                 $ordre++;
@@ -1153,10 +1153,10 @@ class gabaritManager extends manager
                 $oldUrl = $redirect301;
                 if ($oldUrl != '' && $oldUrl != $newUrl) {
                     $queries2[] = 'INSERT INTO `redirection` SET'
-                                . ' old = ' . $this->_db->quote($oldUrl) . ', '
-                                . ' new = ' . $this->_db->quote($newUrl) . ', '
-                                . ' id_api = ' . $api['id'] . ', '
-                                . ' id_version = 1;';
+                                . ' `old` = ' . $this->_db->quote($oldUrl) . ', '
+                                . ' `new` = ' . $this->_db->quote($newUrl) . ', '
+                                . ' `id_api` = ' . $api['id'] . ', '
+                                . ' `id_version` = 1;';
                 }
             }
 
