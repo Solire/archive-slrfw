@@ -68,7 +68,7 @@ class Error extends Main
         $request_url    = str_replace(\Slrfw\Library\Registry::get("url"), "", "http://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);
         $request_url    = urldecode($request_url);
         $request_url    = strtolower($request_url);
-        $request_url    = $this->_db->no_accent($request_url);
+        $request_url    = $this->_db->noAccent($request_url);
         $tab = preg_split("`[^a-z]+`", $request_url);
         
         $trash = array(

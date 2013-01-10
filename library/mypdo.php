@@ -1,35 +1,84 @@
 <?php
+/**
+ * Extention de PDO
+ *
+ * @package Library
+ * @author  smonnot <smonnot@solire.fr>
+ * @license Solire http://www.solire.fr/
+ */
 
 namespace Slrfw\Library;
 
-/** @todo faire la présentation du code */
-
 /**
  * Extention de PDO
+ *
+ * @package Model
+ * @author  smonnot <smonnot@solire.fr>
+ * @license Solire http://www.solire.fr/
  * @version 1
  */
-class MyPDO extends \PDO {
+class MyPDO extends \PDO
+{
 
-    const BINDMODE_VALUE = 'bindValue';
-    const BINDMODE_PARAM = 'bindParam';
+    /**
+     * Tableau des caractère accentué
+     * @var array
+     */
+    private $Pattern = array('/À/', '/Á/', '/Â/', '/Ã/', '/Ä/', '/Å/', '/à/', '/á/', '/â/',
+        '/ã/', '/ä/', '/å/', '/Ò/', '/Ó/', '/Ô/', '/Õ/', '/Ö/', '/Ø/', '/ò/',
+        '/ó/', '/ô/', '/õ/', '/ö/', '/ø/', '/È/', '/É/', '/Ê/', '/Ë/', '/é/',
+        '/è/', '/ê/', '/ë/', '/Ç/', '/ç/', '/Ì/', '/Í/', '/Î/', '/Ï/', '/ì/',
+        '/í/', '/î/', '/ï/', '/Ù/', '/Ú/', '/Û/', '/Ü/', '/ù/', '/ú/', '/û/',
+        '/ü/', '/ÿ/', '/Ñ/', '/ñ/', '/&/');
 
-    private $Pattern = Array("/À/", "/Á/", "/Â/", "/Ã/", "/Ä/", "/Å/", "/à/", "/á/", "/â/",
-        "/ã/", "/ä/", "/å/", "/Ò/", "/Ó/", "/Ô/", "/Õ/", "/Ö/", "/Ø/", "/ò/",
-        "/ó/", "/ô/", "/õ/", "/ö/", "/ø/", "/È/", "/É/", "/Ê/", "/Ë/", "/é/",
-        "/è/", "/ê/", "/ë/", "/Ç/", "/ç/", "/Ì/", "/Í/", "/Î/", "/Ï/", "/ì/",
-        "/í/", "/î/", "/ï/", "/Ù/", "/Ú/", "/Û/", "/Ü/", "/ù/", "/ú/", "/û/",
-        "/ü/", "/ÿ/", "/Ñ/", "/ñ/", "/&/");
-    private $RepPat = Array("A", "A", "A", "A", "A", "A", "a", "a", "a", "a", "a", "a",
-        "O", "O", "O", "O", "O", "O", "o", "o", "o", "o", "o", "o", "E", "E",
-        "E", "E", "e", "e", "e", "e", "C", "c", "I", "I", "I", "I", "i", "i",
-        "i", "i", "U", "U", "U", "U", "u", "u", "u", "u", "y", "N", "n", "et");
+    /**
+     * Tableau des caractères de remplacement des caractères accentués
+     * @var array
+     */
+    private $RepPat = array('A', 'A', 'A', 'A', 'A', 'A', 'a', 'a', 'a', 'a', 'a', 'a',
+        'O', 'O', 'O', 'O', 'O', 'O', 'o', 'o', 'o', 'o', 'o', 'o', 'E', 'E',
+        'E', 'E', 'e', 'e', 'e', 'e', 'C', 'c', 'I', 'I', 'I', 'I', 'i', 'i',
+        'i', 'i', 'U', 'U', 'U', 'U', 'u', 'u', 'u', 'u', 'y', 'N', 'n', 'et');
+
+    /**
+     *
+     * @var bool
+     */
+    private $enableLog = false;
+
+    /**
+     *
+     * @var float
+     */
+    private $tempsTotal = 0;
+
+    /**
+     *
+     * @var int
+     */
+    private $nbreRequetes = 0;
+
+    /**
+     * Met en mode log, écrivant les requetes dans un fichier
+     *
+     * @param type $bool vrai ou faux
+     *
+     * @return void
+     */
+    public function enableLog($bool)
+    {
+        $this->enableLog = $bool;
+    }
 
     /**
      * Supprime l'intégralité des accents de la chaine.
-     * @param <string> $String
-     * @return <string>
+     *
+     * @param string $String chaîne à traiter
+     *
+     * @return string
      */
-    public function no_accent($String) {
+    public function noAccent($String)
+    {
         $String = preg_replace($this->Pattern, $this->RepPat, $String);
         return $String;
     }
@@ -37,202 +86,310 @@ class MyPDO extends \PDO {
     /**
      * Transforme la chaine passé en parametre en chaine capable d'être mis
      * en url.
-     * @param <string> $String Chaîne a passer en mode URL.
-     * @param <string> $Table Nom de la table où il faudrait controller l'existence
-     * du rewritt
-     * @param <string> $Name Nom du champ de la table où ce trouve le rewrit,
-     *  à pour valeur par défaut : rewrit
-     * @return <string>
+     *
+     * @param string $string Chaîne a passer en mode URL
+     * @param string $table  Nom de la table où il faudrait controller l'existence
+     * @param string $name   Nom du champ de la table où ce trouve le rewrit
+     * @param string $param  Ajout de condition supplémentaire en mysql
+     *
+     * @return string
      */
-    public function rewrit($String, $Table = false, $Name = "rewrit", $Param = "") {
-        if ($Table) {
-//Controle de l'existence du rewrit contenu dans le champ $Name
-// de la table $Table.
-            $I = 0;
+    public function rewrit($string, $table = false, $name = 'rewrit', $param = '')
+    {
+        if ($table) {
+            /**
+             * Controle de l'existence du rewrit contenu dans le champ $Name
+             * de la table $Table.
+             */
+            $i = 0;
             do {
-                $Temp = (($I) ? $I : "") . " $String";
-                $Rewrit = $this->make_rew($Temp);
-                $Query = "SELECT * FROM $Table WHERE $Name = '$Rewrit' $Param;";
-                $Row = $this->query($Query)->fetch(\PDO::FETCH_ASSOC);
-                $I++;
-            } while ($Row);
+                if ($i > 0) {
+                    $temp = $i . ' ' . $string;
+                } else {
+                    $temp = $string;
+                }
+                $rewrit = $this->makeRew($temp);
+                $query  = 'SELECT *'
+                        . ' FROM `' . $table . '`'
+                        . ' WHERE `' . $name . '` = ' . $this->quote($rewrit)
+                        . ' ' . $param;
+                $row = $this->query($query)->fetch(\PDO::FETCH_ASSOC);
+                $i++;
+            } while ($row);
         } else {
-            $Rewrit = $this->make_rew($String);
+            $rewrit = $this->makeRew($string);
         }
 
-        return $Rewrit;
+        return $rewrit;
     }
 
-    public function listTable($table_name) {
-        $query = $this->query("Select * from $table_name");
-        $result = $query->fetchAll(\PDO::FETCH_ASSOC);
+    /**
+     * Renvoi toutes les lignes d'une table de la bdd
+     *
+     * @param string $table nom de la table où il faudrait controller l'existence
+     *
+     * @return type
+     */
+    public function listTable($table)
+    {
+        $query  = 'SELECT *'
+                . ' FROM `' . $table . '`';
+        $result = $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
         return $result;
     }
 
-    public function getRowFromTable($table_name, $id, $fieldId = "id") {
-        $query = $this->query("Select * from $table_name WHERE $fieldId=$id");
-        $result = $query->fetch(\PDO::FETCH_ASSOC);
+    /**
+     * Renvoi une ligne d'une table de la bdd
+     *
+     * @param string $table   nom de la table où il faudrait controller l'existence
+     * @param int    $id      valeur du champ
+     * @param string $fieldId nom du champ
+     *
+     * @return array
+     */
+    public function getRowFromTable($table, $id, $fieldId = 'id')
+    {
+        $query  = 'SELECT *'
+                . ' FROM `' . $table . '`'
+                . ' WHERE `' . $fieldId . '` = ' . $id;
+        $result = $this->query($query)->fetch(\PDO::FETCH_ASSOC);
         return $result;
     }
 
-    public function getRowsFromTable($table_name, $id, $fieldId = "id") {
-        $query = $this->query("Select * from $table_name WHERE $fieldId=$id");
-        $result = $query->fetchAll(\PDO::FETCH_ASSOC);
-        return $result;
+    /**
+     * Transforme une chaine par une chaine avec uniquement des caractères
+     * alphanumérique et des tirets du 6
+     *
+     * @param string $string chaîne de caractère à traiter
+     *
+     * @return string
+     */
+    private function makeRew($string)
+    {
+        $string = $this->noAccent($string);
+
+        /** On retire tout ce qu'il y a entre chevrons, crochets, parenthèses. */
+        $string = preg_replace('#\[(.+)]#isU', '', $string);
+        $string = preg_replace('#<(.+)>#isU', '', $string);
+        $string = preg_replace('#\((.+)\)#isU', '', $string);
+        $string = strtolower($string);
+
+        /** Tout les caractères qui ne sont pas aplhanum sur copprimés. */
+        $string = preg_replace('#([^a-z0-9 \-]?)#', '', $string);
+        $string = trim($string);
+        $string = str_replace(' ', '-', $string);
+
+        /** On remplace tous les - concécutifs par des uniques. */
+        $string = preg_replace('#([\-]+)#', '-', $string);
+
+        return $string;
     }
 
-    private function make_rew($String) {
-        $String = $this->no_accent($String);
-// On retire tout ce qu'il y a entre chevrons, crochets, parenthèses.
-        $String = preg_replace('#\[(.+)]#isU', '', $String);
-        $String = preg_replace('#<(.+)>#isU', '', $String);
-        $String = preg_replace('#\((.+)\)#isU', '', $String);
-
-        $String = strtolower($String);
-
-// Tout les caractères qui ne sont pas aplhanum sur copprimés.
-        $String = preg_replace("#([^a-z0-9 \-]?)#", "", $String);
-        $String = trim($String);
-        $String = str_replace(" ", "-", $String);
-
-// On remplace tous les - concécutifs par des uniques.
-        $String = preg_replace("#([\-]+)#", "-", $String);
-
-        return $String;
-    }
-
-    public function query($query, $params = array()) {
-
+    /**
+     * Execute une requete sql, retourne un objet PDOStatement
+     *
+     * @param string $query requete à exécuter
+     *
+     * @return \PDOStatement
+     */
+    public function query($query)
+    {
         $start = microtime(true);
 
-        if (!is_array($params))
-            $params = array($params);
-        foreach ($params as &$p) {
-            if (!is_numeric($p))
-                $p = $this->quote($p);
-        }
-        unset($p);
-        if ($params == NULL) {
-            $funcQuery = parent::query($query);
-        } else {
-            $funcQuery = parent::query(vsprintf($query, $params));
-        }
+        $result = parent::query($query);
 
         $end = microtime(true);
         $time = $end - $start;
-        $this->log($time, $query, "query");
+        $this->log($time, $query, 'query');
 
-        return $funcQuery;
+        return $result;
     }
 
-    public function exec($query, $params = array()) {
+    /**
+     * Execute une requete sql, retourne le nombre de lignes impactées
+     *
+     * @param string $query requete à exécuter
+     *
+     * @return int
+     */
+    public function exec($query)
+    {
         $start = microtime(true);
-        if (!is_array($params))
-            $params = array($params);
-        foreach ($params as &$p) {
-            if (!is_numeric($p))
-                $p = $this->quote($p);
-        }
-        unset($p);
-        if ($params == NULL) {
-            $ok = parent::exec($query);
-        } else {
-            $ok = parent::exec(vsprintf($query, $params));
-        }
+
+        $result = parent::exec($query);
+
         $end = microtime(true);
         $time = $end - $start;
-        $this->log($time, $query, "exec");
-        return $ok;
+        $this->log($time, $query, 'exec');
+
+        return $result;
     }
 
-    public function log($time, $Query, $pref = '') {
-        return false;
-        $value = Registry::get("somme") + $time;
-        Registry::set("somme", $value);
+    /**
+     * Ecrit une requete et le temps d'exécution dans un fichier de log
+     *
+     * @param float  $time  temps d'exécution
+     * @param string $query requete sql
+     * @param string $pref  préfixe pour le fichier à écrire
+     *
+     * @return boolean
+     */
+    public function log($time, $query, $pref = '')
+    {
+        $value = $this->tempsTotal + $time;
+        $this->tempsTotal = $value;
 
-        $nb = Registry::get("nbresql") + 1;
-        Registry::set("nbresql", $nb);
+        $this->nbreRequetes++;
 
-
-        $dir = "../logs/sql";
-        if (is_dir($dir) && $Query != "SET NAMES UTF8") {
-            $content = '<div><u>' . date("H:i:s") . ' </u>&nbsp;<i>' . $_SERVER['REQUEST_URI'] . '</i><br /> ' . $Query . '</div>'
-                    . '<div style="color : #' . ($time > 0.2 ? 'CC0000' : ($time > 0.01 ? 'ED7F10' : '009900' )) . ';">'
-                    . round($time, 4) . '</div><div style="color:pink;">total (' . $nb . ') : ' . round($value, 4) . '</div><hr />';
-            file_put_contents($dir . "/" . date("Y-m-d") . "_$pref.html", $content, FILE_APPEND);
+        $dir = '../logs/sql';
+        if ($this->enableLog && is_dir($dir) && $query != 'SET NAMES UTF8') {
+            $content    = '<div><u>' . date('H:i:s') . ' </u>&nbsp;<i>'
+                        . $_SERVER['REQUEST_URI'] . '</i><br /> ' . $query
+                        . '</div>'
+                        . '<div style="color : #' . ($time > 0.2 ? 'CC0000' : ($time > 0.01 ? 'ED7F10' : '009900' )) . ';">'
+                        . round($time, 4) . '</div><div style="color:pink;">total (' . $nb . ') : ' . round($value, 4) . '</div><hr />';
+            file_put_contents($dir . '/' . date('Y-m-d') . '_' . $pref . '.html', $content, FILE_APPEND);
         }
     }
 
-    // insertion de données dans MySQL
-    public function insert($table, $values) {
+    /**
+     * insertion de données dans MySQL
+     *
+     * @param string $table  nom de la table où il faudrait controller l'existence
+     * @param array  $values tableau des valeurs à insérer
+     *
+     * @return type
+     */
+    public function insert($table, $values)
+    {
         $values = array_map(array($this, 'quote'), (array) $values);
         $fieldNames = array_keys($values);
-        return $this->exec("INSERT INTO `" . $table . "` (`" . implode("`,`", $fieldNames) . "`) VALUES(" . implode(",", $values) . ")");
+        $query  = 'INSERT INTO `' . $table . '`'
+                . ' (`' . implode('`,`', $fieldNames) . '`)'
+                . ' VALUES(' . implode(',', $values) . ')';
+        return $this->exec($query);
     }
 
-    // replace de données dans MySQL
-    public function replace($table, $values) {
+    /**
+     * replace de données dans MySQL
+     *
+     * @param type $table
+     * @param type $values
+     *
+     * @return type
+     */
+    public function replace($table, $values)
+    {
         $values = array_map(array($this, 'quote'), (array) $values);
         $fieldNames = array_keys($values);
-        return $this->exec("REPLACE INTO " . $table . " (`" . implode("`,`", $fieldNames) . "`) VALUES(" . implode(",", $values) . ")");
+        $query  = 'REPLACE INTO `' . $table . '`'
+                . ' (`' . implode("`,`", $fieldNames) . '`)'
+                . ' VALUES(' . implode(',', $values) . ')';
+        return $this->exec($query);
     }
 
-    // sélection de données depuis MySQL
-    public function select($table, $small_size = FALSE, $fields, $where = '', $order = '') {
+    /**
+     * sélection de données depuis MySQL
+     *
+     * @param string $table      table
+     * @param array  $fields     tableau des champs à récupérer
+     * @param bool   $small_size petite requete
+     * @param string $where      condition
+     * @param string $order      ordre
+     *
+     * @return array
+     */
+    public function select($table, $fields, $small_size = false, $where = '', $order = '')
+    {
+        if (!empty($small_size)) {
+            $result_size = 'SQL_SMALL_RESULT';
+        } else {
+            $result_size = '';
+        }
 
-        $result_size = !empty($small_size) ? 'SQL_SMALL_RESULT' : '';
-        $where = !empty($where) ? ' WHERE ' . $where : '';
+        if (!empty($where)) {
+            $where =' WHERE ' . $where;
+        }
 
-        return $this->query("SELECT " . $result_size . " " . implode(", ", (array) $fields) . " FROM " .
-                        "`" . $table . "`" . $where . $order)->fetchAll();
+        $query  = 'SELECT ' . $result_size . ' ' . implode(', ', (array) $fields)
+                . ' FROM ' . '`' . $table . '`'
+                . $where . $order;
+
+        return $this->query($query)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    // tri des résultat d'une requête SELECT
-    public function order($fields, $order = 'ASC') {
-
+    /**
+     * tri des résultat d'une requête SELECT
+     *
+     * @param array  $fields
+     * @param string $order
+     *
+     * @return boolean
+     */
+    public function order($fields, $order = 'ASC')
+    {
         $order = array_map(array($this, 'quote'), (array) $order);
         if (count($fields) == count($order)) {
-
             $set = array();
             $fields = (array) $fields;
             for ($i = 0; $i < count($fields); $i++) {
-
                 $set[] = $fields[$i] . ' ' . $order[$i];
             }
 
-            return " ORDER BY " . implode(", ", $set);
-        } else {
-
-            return FALSE;
+            return ' ORDER BY ' . implode(', ', $set);
         }
+
+        return FALSE;
     }
 
-    // limitation des résultats d'une requête SELECT
-    public function limit($offset, $number) {
-
+    /**
+     * limitation des résultats d'une requête SELECT
+     *
+     * @param int $offset
+     * @param int $number
+     *
+     * @return boolean
+     */
+    public function limit($offset, $number)
+    {
         if (is_numeric($offset) && is_numeric($number)) {
-
-            return " LIMIT " . intval($offset) . ", " . intval($number);
+            return ' LIMIT ' . intval($offset) . ', ' . intval($number);
         } else {
-
             return FALSE;
         }
     }
 
-    // mis à jour de données de MySQL
-    public function update($table, $values, $where = FALSE) {
+    /**
+     * mis à jour de données de MySQL
+     *
+     * @param string $table  nom de la table où il faudrait controller l'existence
+     * @param array  $values
+     * @param string $where
+     *
+     * @return int
+     */
+    public function update($table, $values, $where = false)
+    {
         $set = array();
         foreach ((array) $values as $field => $value) {
 
-            $set[] = "`" . $field . "` = " . $this->quote($value);
+            $set[] = '`' . $field . '` = ' . $this->quote($value);
         }
 
-        return $this->exec("UPDATE `" . $table . "` SET " . implode(", ", $set) . (!empty($where) ? " WHERE " . $where : ''));
+        return $this->exec('UPDATE `' . $table . '` SET ' . implode(', ', $set) . (!empty($where) ? ' WHERE ' . $where : ''));
     }
 
-    // suppression de données de MySQL
-    public function delete($table, $where) {
-        return $this->exec("DELETE FROM " . $table . " WHERE " . $where);
+    /**
+     * suppression de données de MySQL
+     *
+     * @param string $table nom de la table où il faudrait controller l'existence
+     * @param string $where
+     *
+     * @return int
+     */
+    public function delete($table, $where)
+    {
+        return $this->exec('DELETE FROM ' . $table . ' WHERE ' . $where);
     }
 
 }
