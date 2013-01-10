@@ -194,9 +194,6 @@ class gabarit
     }
 
     public function getParentsSelect() {
-//        if (count($this->_parents) == 0)
-//            return "";
-
         $form = '<select name="id_parent" id="id_parent-1"'
               . ($this->_gabaritParent['id'] != $this->_id ? ' class="form-controle form-oblig form-notnul"' : '')
               . '><option value="0">---</option>';

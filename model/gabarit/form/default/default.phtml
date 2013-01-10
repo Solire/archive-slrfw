@@ -114,19 +114,12 @@
     }
 
     foreach ($this->_blocs as $bloc) {
-        echo $bloc->buildForm($upload_path, $metaId, $versionId);
+        echo $bloc->buildForm($upload_path, $metaId);
     }
 ?>
 
 
     <div class="buttonfixed">
-<?php
-    if ($mobile) {
-?>
-        <div class="btn-a gradient-green cb fl"><a href="#" class="changemedia">Version mobile</a></div>
-<?php
-    }
-?>
         <div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>
         <div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>
         <div class="btn-a gradient-green cb fl"><a href="#" class="formprev">Prévisualiser</a></div>

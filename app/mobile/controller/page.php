@@ -127,7 +127,7 @@ class Page extends Main
                         $page->setGabarit($gabarit);
                         $values = $this->_gabaritManager->getValues($page);
                         $page->setValues($values);
-                        $blocs = $this->_gabaritManager->getBlocs($gabarit, $page->getMeta("id"));
+                        $blocs = $this->_gabaritManager->getBlocs($gabarit);
                         foreach ($blocs as $blocName => $bloc) {
                             $valuesBloc = $this->_gabaritManager->getBlocValues($bloc, $page->getMeta("id"), ID_VERSION);
                             if ($valuesBloc) {

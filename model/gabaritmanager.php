@@ -110,15 +110,11 @@ class gabaritManager extends manager
 
             $page->setMeta($meta);
             $id_gabarit = $meta['id_gabarit'];
-
-            $data = $this->getVersion($id_version);
-            if (!$data) {
-                return false;
-            }
-
-            $page->setVersion($data);
         }
 
+        $data = $this->getVersion($id_version);
+        $page->setVersion($data);
+        
         $gabarit = $this->getGabarit($id_gabarit);
 
         $query = 'SELECT * FROM `gab_gabarit` WHERE `id` = ' . $gabarit->getIdParent();
@@ -146,7 +142,7 @@ class gabaritManager extends manager
 
         $page->setGabarit($gabarit);
 
-        $blocs = $this->getBlocs($gabarit, $id_gab_page);
+        $blocs = $this->getBlocs($gabarit);
         $page->setBlocs($blocs);
 
         if ($id_gab_page) {
@@ -291,7 +287,7 @@ class gabaritManager extends manager
      *
      * @return gabaritBloc tableau associatif des blocs dynamiques
      */
-    public function getBlocs($gabarit, $id_gab_page = 0)
+    public function getBlocs($gabarit)
     {
         $query = 'SELECT *'
                 . ' FROM `gab_bloc`'
@@ -618,8 +614,7 @@ class gabaritManager extends manager
                     $pageJoin->setParents($parents);
                     /** Recuperation des blocs */
                     $blocs = $this->getBlocs(
-                        $this->getGabarit($pageJoin->getMeta('id_gabarit')),
-                        $pageJoin->getMeta('id'));
+                        $this->getGabarit($pageJoin->getMeta('id_gabarit')));
                     foreach ($blocs as $blocName => $bloc) {
                         $valuesBloc = $this->getBlocValues($bloc,
                             $pageJoin->getMeta('id'), $id_version, true);
@@ -820,7 +815,7 @@ class gabaritManager extends manager
         $query  = 'SELECT *'
                 . ' FROM `gab_page`'
                 . ' WHERE `suppr` = 0 AND `id_version` = ' . $id_version
-                . ' AND `titre` LIKE ' . $this->_db->quote('%$term%');
+                . ' AND `titre` LIKE ' . $this->_db->quote('%' . $term . '%');
 
         if ($id_gabarit) {
             $query .= ' AND `id_gabarit` = ' . $id_gabarit;
