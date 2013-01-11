@@ -186,7 +186,7 @@ class Page extends Main
                         . '"><div class="clearin" style="margin-top:0"></div>';
 
                 $form .= $page->getForm("page/save.html", "page/liste.html",
-                    $upload_path, $version["id"], $redirections);
+                    $upload_path, $redirections);
 
                 $form .= '</div>';
             }

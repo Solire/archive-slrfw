@@ -107,8 +107,17 @@ class gabaritBloc
     }
 
     /**
-     *
-     * @return type
+     * @return string élément de formulaire en HTML
+     */
+    
+    /**
+     * Retourne l'élément d'un formulaire en HTML correspondant à ce bloc dynamique
+     * 
+     * @param string $upload_path
+     * @param string $id_gab_page
+     * @param int    $versionId
+     * 
+     * @return string élément de formulaire en HTML
      */
     public function buildForm($upload_path, $id_gab_page, $versionId)
     {
@@ -117,40 +126,46 @@ class gabaritBloc
 
         $champs = $this->_gabarit->getChamps();
 
-        $type = strtolower("default");
+        $type = strtolower('default');
 
-        if(count($champs) == 1 && $champs[0]["type"] == "JOIN" && $champs[0]["params"]["VIEW"] == "simple") {
-            $type = strtolower("simple");
+        if (count($champs) == 1 && $champs[0]['type'] == 'JOIN'
+            && $champs[0]['params']['VIEW'] == 'simple') {
+            $type = strtolower('simple');
         }
 
-        $classNameType = $type . "fieldset";
+        $classNameType = $type . 'fieldset';
 
-        require_once "gabarit/fieldset/$type/$classNameType.php";
-        $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values, $upload_path, $id_gab_page,   isset($this->_meta) ? $this->_meta : null , $versionId);
+        require_once 'gabarit/fieldset/' . $type . '/' . $classNameType . '.php';
+        
+        $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values,
+            $upload_path, $id_gab_page, isset($this->_meta) ? $this->_meta : null , $versionId);
         $fieldset->start();
         $form .= $fieldset;
 
         return $form;
-
-
-
     }
 
     /**
-     *
-     * @param array $champ
-     * @param string $value
-     * @param string $idpage
-     * @param string $upload_path nom du dossier où sont uploadés les images.
-     * @param int $id_gab_page nom du dossier dans lequel sont les images.
-     * @return string
+     * Retourne l'élément d'un formulaire en HTML correspondant à un champ
+     * 
+     * @param array  $champ       données du champ (ligne en BDD dans la table
+     * 'gab_champ')
+     * @param string $value       valeur du champ
+     * @param string $idpage      chaîne à concatainer à l'attribut 'id' de
+     * l'élément du formulaire
+     * @param string $upload_path nom du dossier où sont uploadés les images
+     * @param int    $id_gab_page nom du dossier dans lequel sont les images
+     * 
+     * @return string élément de formulaire en HTML
      */
     protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page)
     {
-
         $form = '';
-        if($champ["visible"] == 0)
+
+        if($champ["visible"] == 0) {
             return $form;
+        }
+
         $label = $champ['label'];
         $classes = 'form-controle form-' . $champ['oblig'] . ' form-' . strtolower($champ['typedonnee']);
         $id = 'champ' . $champ['id'] . '_' . $idpage;
@@ -167,5 +182,5 @@ class gabaritBloc
 
         return $form;
     }
-
 }
+
