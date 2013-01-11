@@ -6,12 +6,9 @@ use Slrfw\Library\Tools;
 
 class Page extends Main
 {
-
-    private $_cache = null;
-
     /**
      *
-     * @var gabarit_page
+     * @var \Slrfw\Model\gabaritPage
      */
     private $_page = null;
 
@@ -20,7 +17,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function start() {
+    public function start()
+    {
         parent::start();
     }
 
@@ -28,7 +26,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function listeAction() {
+    public function listeAction()
+    {
         $this->_javascript->addLibrary("back/liste.js");
         $this->_javascript->addLibrary("back/jquery/jquery.ajaxqueue.js");
         $this->_javascript->addLibrary("back/jquery/jquery.scrollTo-min.js");
@@ -76,7 +75,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function childrenAction() {
+    public function childrenAction()
+    {
         $this->_view->main(FALSE);
         $this->_pages = $this->_gabaritManager->getList(BACK_ID_VERSION, $this->_api["id"], $_REQUEST['id_parent']);
         if (count($this->_pages) == 0) {
@@ -95,7 +95,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function displayAction() {
+    public function displayAction()
+    {
         $upload_path = $this->_mainConfig->get('path', 'upload');
 
         $id_gab_page = isset($_GET['id_gab_page']) ? $_GET['id_gab_page'] : 0;
@@ -164,8 +165,8 @@ class Page extends Main
 
                 if ($page->getMeta("rewriting") != "") {
                     if ($page->getGabarit()->getMake_hidden()
-                            || $this->_utilisateur->get("niveau") == "solire"
-                            || !$page->getMeta("visible")
+                        || $this->_utilisateur->get("niveau") == "solire"
+                        || !$page->getMeta("visible")
                     ) {
                         $devant    .= '<div style="margin-left: 6px;margin-top: -7px;">'
                                     . '<label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-'
@@ -245,7 +246,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function saveAction() {
+    public function saveAction()
+    {
         $this->_view->main(FALSE);
         $this->_view->enable(FALSE);
 
@@ -308,7 +310,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function autocompleteAction() {
+    public function autocompleteAction()
+    {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
@@ -331,7 +334,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function autocompleteJoinAction() {
+    public function autocompleteJoinAction()
+    {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
@@ -377,7 +381,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function autocompleteOldLinksAction() {
+    public function autocompleteOldLinksAction()
+    {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
@@ -400,7 +405,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function liveSearchAction() {
+    public function liveSearchAction()
+    {
         $this->_view->enable(FALSE);
         $this->_view->main(FALSE);
 
@@ -502,7 +508,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function autocompleteLinkAction() {
+    public function autocompleteLinkAction()
+    {
         header('content-type: application/x-javascript; charset=UTF-8');
         $json = file_get_contents($this->_url . '../sitemap.xml?visible=0&json=1&onlylink=1');
         exit('var tinyMCELinkList = ' . $json . ';');
@@ -512,7 +519,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function visibleAction() {
+    public function visibleAction()
+    {
         $this->_view->enable(FALSE);
 
         $json = array('status' => 'error');
@@ -545,7 +553,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function deleteAction() {
+    public function deleteAction()
+    {
         $this->_view->enable(FALSE);
 
         $json = array('status' => "error");
@@ -568,7 +577,8 @@ class Page extends Main
      *
      * @return void
      */
-    public function orderAction() {
+    public function orderAction()
+    {
         $ok = true;
 
         $this->_view->main(FALSE);
@@ -595,7 +605,8 @@ class Page extends Main
         return FALSE;
     }
 
-    protected function getButton($currentConfigPageModule) {
+    protected function getButton($currentConfigPageModule)
+    {
         //Liste des début de label à regrouper pour les boutons de création
         $groupIdentifications = array("Rubrique ", "Sous rubrique ", "Page ");
         foreach ($this->_gabarits as $gabarit) {
@@ -650,15 +661,18 @@ class Page extends Main
         }
     }
 
-    protected function singulier($mot) {
+    protected function singulier($mot)
+    {
         return (substr($mot, -1) == "s") ? substr($mot, 0, -1) : $mot;
     }
 
-    protected function pluriel($mot) {
+    protected function pluriel($mot)
+    {
         return (substr($mot, -1) == "s") ? $mot : ($mot . 's');
     }
 
-    protected function length_cmp($a, $b) {
+    protected function length_cmp($a, $b)
+    {
         return strlen($b) - strlen($a);
     }
 
