@@ -9,38 +9,6 @@ namespace Slrfw\Model;
  */
 class gabarit
 {
-//    private $_id;
-//
-//    private $_id_parent;
-//
-//    private $_api;
-//
-//    private $_table;
-//
-//    private $_name;
-//
-//    private $_main;
-//
-//    private $_creable;
-//
-//    private $_deletable;
-//
-//    private $_sortable;
-//
-//    private $_make_hidden;
-//
-//    private $_editable;
-//
-//    private $_meta;
-//
-//    private $_label;
-//
-//    private $_301_editable;
-//
-//    private $_meta_titre;
-//
-//    private $_extension;
-
     private $_data = array();
 
     private $_table;

@@ -20,7 +20,7 @@
 <?php
                                 } else {
 ?>
-                                <select name="id_parent" id="id_parent-1" class="form-controle form-oblig form-notnul">
+                                <select name="id_parent" id="id_parent-1"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent()) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
                                     <option value="0">---</option>
 <?php
                                     foreach ($this->_gabarit->getParents() as $p) {
