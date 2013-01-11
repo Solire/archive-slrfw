@@ -34,6 +34,12 @@ class gabaritPage extends gabaritBloc {
 
     /**
      *
+     * @var array
+     */
+    private $_children = array();
+
+    /**
+     *
      * @param array $meta
      */
     public function __construct() {
@@ -196,7 +202,7 @@ class gabaritPage extends gabaritBloc {
 
     /**
      * Retourne le formulaire de création/d'édition de la page
-     * 
+     *
      * @param string $action        adresse de l'action du formulaire
      * @param string $retour        adresse de retour
      * @param string $upload_path   emplacement des images
@@ -207,13 +213,13 @@ class gabaritPage extends gabaritBloc {
      * @param string $extension     extension de la page '/', '.html'...
      * @param int    $versionId     identifiant de la version
      * @param array  $redirections  tableau des redirections
-     * 
+     *
      * @return string formulaire au format HTML
      */
     public function getForm($action, $retour, $upload_path, $redirections = array())
     {
         $versionId          = $this->_version['id'];
-        
+
         $metaId             = isset($this->_meta['id'])
                             ? $this->_meta['id']
                             : 0;
@@ -236,20 +242,6 @@ class gabaritPage extends gabaritBloc {
         $redirections   = count($redirections) == 0
                         ? array("")
                         : $redirections;
-
-        if ($metaId && $this->_meta['id_parent'] > 0) {
-            $parentSelect = '<div class="line">'
-                          . '<label for="id_parent">' . $this->_gabarit->getGabaritParent("label") . '</label>'
-                          . '<select disabled="disabled"><option>' . $this->getParent(0)->getMeta("titre") . '</option></select>'
-                          . '<input type="hidden" disabled="disabled" name="id_parent" value="' . $this->getParent(0)->getMeta("id") . '" />'
-                          . '</div>';
-        }
-        elseif (!$metaId && $this->_gabarit->getIdParent() > 0) {
-            $parentSelect = '<div class="line">'
-                          . '<label for="id_parent">' . $this->_gabarit->getGabaritParent("label") . '</label>'
-                          . $this->_gabarit->getParentsSelect()
-                          . '</div>';
-        }
 
         $allchamps = $this->_gabarit->getChamps();
 
@@ -287,7 +279,7 @@ class gabaritPage extends gabaritBloc {
             $form .=  $bloc->buildForm($upload_path, $id_gab_page,
                 $this->_version['id']);
         }
-        
+
 		return $form;
 	}
 

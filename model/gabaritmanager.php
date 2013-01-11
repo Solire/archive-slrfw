@@ -114,29 +114,67 @@ class gabaritManager extends manager
 
         $data = $this->getVersion($id_version);
         $page->setVersion($data);
-        
+
         $gabarit = $this->getGabarit($id_gabarit);
 
-        $query = 'SELECT * FROM `gab_gabarit` WHERE `id` = ' . $gabarit->getIdParent();
+        $query  = 'SELECT *'
+                . ' FROM `gab_gabarit`'
+                . ' WHERE `id` = ' . $gabarit->getIdParent();
         $parentData = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
         $gabarit->setGabaritParent($parentData);
 
         if (!$id_gab_page && $gabarit->getIdParent() > 0) {
-            $query  = 'SELECT `p`.`id`, `p`.`titre`, `p`.`rewriting`,'
-                    . ' `q`.`id` `p_id`, `q`.`titre` `p_titre`,'
-                    . ' `q`.`rewriting` `p_rewriting`,'
-                    . ' `r`.`id` `pp_id`, `r`.`titre` `pp_titre`,'
-                    . ' `r`.`rewriting` `pp_rewriting`'
-                    . ' FROM `gab_page` `p`'
-                    . ' LEFT JOIN `gab_page` `q` ON `q`.`id` = `p`.`id_parent`'
-                    . ' AND `q`.`suppr` = 0 AND `q`.`id_version` = ' . $id_version
-                    . ' LEFT JOIN `gab_page` `r` ON `r`.`id` = `q`.`id_parent`'
-                    . ' AND `r`.`suppr` = 0 AND `r`.`id_version` = ' . $id_version
-                    . ' WHERE `p`.`id_gabarit` = ' . $gabarit->getIdParent()
-                    . ' AND `p`.`suppr` = 0 AND `p`.`id_version` = ' . $id_version
-                    . ' ORDER BY `p`.`id_parent`, `q`.`id_parent`';
+            $parents = array();
 
-            $parents = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            /** Si le gabarit parent est lui-même son parent */
+            if ($parentData['id_parent'] == $parentData['id']) {
+                $parents = $this->getList($id_version, $id_api, 0,
+                    $parentData['id']);
+
+                foreach ($parents as $parent) {
+                    $enfants = $this->getList($id_version, $id_api,
+                        $parent->getMeta('id'), $parentData['id']);
+                    $parent->setChildren($enfants);
+
+                    foreach ($enfants as $enfant) {
+                        $ptenfants = $this->getList($id_version, $id_api,
+                            $enfant->getMeta('id'), $parentData['id']);
+                        $enfant->setChildren($ptenfants);
+                    }
+                }
+
+            } else {
+                $idParents = array();
+
+                $idTemp  = $parentData['id'];
+
+                while ($idTemp > 0) {
+                    $idParents[] = $idTemp;
+                    $query  = 'SELECT `id_parent` FROM `gab_gabarit` WHERE `id` = ' . $idTemp;
+                    $idTemp   = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
+                }
+
+                array_reverse($idParents);
+
+                $parents = $this->getList($id_version, $id_api, 0, $idParents[0]);
+
+                if (isset($idParents[1])) {
+                    foreach ($parents as $parent) {
+                        $enfants = $this->getList($id_version, $id_api,
+                            $parent->getMeta('id'), $idParents[1]);
+                        $parent->setChildren($enfants);
+
+                        if (isset($idParents[2])) {
+                            foreach ($enfants as $enfant) {
+                                $ptenfants = $this->getList($id_version, $id_api,
+                                    $enfant->getMeta('id'), $idParents[2]);
+                                $enfant->setChildren($ptenfants);
+                            }
+                        }
+                    }
+                }
+            }
+
             $gabarit->setParents($parents);
         }
 
@@ -182,21 +220,19 @@ class gabaritManager extends manager
      *
      * @param int $id_gabarit identifiant du gabarit en BDD
      *
-     * @return gabarit
+     * @return Slrfw\Model\gabarit
      */
     public function getGabarit($id_gabarit)
     {
         $query = 'SELECT * FROM `gab_gabarit` WHERE `id` = ' . $id_gabarit;
         $row = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
-        $gabarit = new gabarit($row['id'], $row['id_parent'], $row['name'],
-            $row['label'], $row['main'], $row['creable'], $row['deletable'],
-            $row['sortable'], $row['make_hidden'], $row['editable'],
-            $row['meta'], $row['301_editable'], $row['meta_titre'],
-            $row['extension']);
+        $gabarit = new gabarit($row);
 
         if ($row['id_api'] > 0) {
-            $query = 'SELECT * FROM `gab_api` WHERE `id` = ' . $row['id_api'];
+            $query  = 'SELECT *'
+                    . ' FROM `gab_api`'
+                    . ' WHERE `id` = ' . $row['id_api'];
             $api = $this->_db->query($query)->fetch();
             $gabarit->setApi($api);
             $table = $api['name'] . '_' . $row['name'];
@@ -205,8 +241,9 @@ class gabaritManager extends manager
         }
         $gabarit->setTable($table);
 
-
-
+        /**
+         * Récupération des champs
+         */
         $query  = 'SELECT IF (`g`.`label` IS NULL, "general", `g`.`label`), `c`.*'
                 . ' FROM `gab_champ` `c`'
                 . ' LEFT JOIN `gab_champ_group` `g` ON `g`.`id` = `c`.`id_group`'
@@ -219,19 +256,19 @@ class gabaritManager extends manager
          * a optimiser (1 requete pour champ dyn et champ normaux,
          * filtrer par id champ + type, voir faire des jointure sur gab_champ)
          */
-        $query  = 'SELECT gc.id, gcpv.*'
-                . ' FROM gab_champ gc'
-                . ' INNER JOIN gab_champ_param_value gcpv'
-                . ' ON gcpv.id_champ = gc.id'
-                . ' ORDER BY id_group, ordre';
+        $query  = 'SELECT `gc`.`id`, `gcpv`.*'
+                . ' FROM `gab_champ` `gc`'
+                . ' INNER JOIN `gab_champ_param_value` `gcpv`'
+                . ' ON `gcpv`.`id_champ` = `gc`.`id`'
+                . ' ORDER BY `id_group`, `ordre`';
         $gabChampTypeParams = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
-        $query  = 'SELECT gct.code, gcp.*, gcp.default_value value'
-                . ' FROM gab_champ_type gct'
-                . ' INNER JOIN gab_champ_param gcp'
-                . ' ON gct.code = gcp.code_champ_type'
-                . ' ORDER BY  gct.ordre, gct.code';
+        $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
+                . ' FROM `gab_champ_type` `gct`'
+                . ' INNER JOIN `gab_champ_param` `gcp`'
+                . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
+                . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
         $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
         foreach ($gabChampTypeParamsDefault as $type => $params) {
@@ -241,7 +278,6 @@ class gabaritManager extends manager
             }
         }
 
-        //Fin parametre
         $joins = array();
         foreach ($gabChampTypeParams as $idField => $params) {
             $params2 = array();
@@ -262,8 +298,6 @@ class gabaritManager extends manager
 
                     if ($champ['id'] == $idField) {
                         $champ['params'] = array_merge($champ['params'], $params2);
-                        // break;
-
                     }
 
                     if ($champ['type'] == 'JOIN') {
@@ -289,17 +323,10 @@ class gabaritManager extends manager
      */
     public function getBlocs($gabarit)
     {
-        $query = 'SELECT *'
+        $query  = 'SELECT *'
                 . ' FROM `gab_bloc`'
                 . ' WHERE `id_gabarit` = ' . $gabarit->getId();
-        $rows = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
-
-        $query  = 'SELECT *'
-                . ' FROM `gab_champ`'
-                . ' WHERE `id_parent` = :id_bloc'
-                . ' AND `type_parent` = "bloc"'
-                . ' ORDER BY `ordre`';
-        $stmt = $this->_db->prepare($query);
+        $rows   = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         /**
          * TODO
@@ -328,22 +355,24 @@ class gabaritManager extends manager
                 $paramsDefault[$type][$param['code']] = $param['value'];
             }
         }
-        //Fin parametre
-
-
 
         $blocs = array();
         foreach ($rows as $row) {
-            $gabarit_bloc = new gabarit($row['id'], 0, $row['name'], $row['label']);
+            $gabarit_bloc = new gabarit($row);
 
             $table = $gabarit->getTable() . '_' . $row['name'];
             $gabarit_bloc->setTable($table);
 
-            $stmt->bindValue(':id_bloc', $row['id'], \PDO::PARAM_INT);
-            $stmt->execute();
             $joins = array();
-            $champs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            //Parametre
+
+            $query  = 'SELECT *'
+                    . ' FROM `gab_champ`'
+                    . ' WHERE `id_parent` = ' . $row['id']
+                    . ' AND `type_parent` = "bloc"'
+                    . ' ORDER BY `ordre`';
+            $champs = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+
+            /** Paramètres */
             foreach ($gabChampTypeParams as $idField => $params) {
                 $params2 = array();
 
@@ -371,10 +400,6 @@ class gabaritManager extends manager
                     }
                 }
             }
-
-            //Fin parametre
-
-            $stmt->closeCursor();
 
             $gabarit_bloc->setChamps($champs);
             $gabarit_bloc->setJoins($joins);

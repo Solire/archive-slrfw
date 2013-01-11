@@ -104,7 +104,7 @@ class Page extends Main
         $this->_view->action = 'liste';
 
         $this->_javascript->addLibrary('back/tiny_mce/tiny_mce.js');
-        
+
         $this->_javascript->addLibrary('back/autocomplete.js');
         $this->_javascript->addLibrary('back/plupload/plupload.full.min.js');
         $this->_javascript->addLibrary('back/formgabarit.js');
@@ -117,7 +117,7 @@ class Page extends Main
         $this->_css->addLibrary('back/demo_table_jui.css');
         $this->_javascript->addLibrary('back/jquery/jcrop/jquery.Jcrop.min.js');
         $this->_css->addLibrary('back/jcrop/jquery.Jcrop.min.css');
-        
+
         $this->_javascript->addLibrary('back/jquery/ui.spinner.min.js');
         $this->_css->addLibrary('back/ui.spinner.css');
 
@@ -183,10 +183,10 @@ class Page extends Main
                 $form  .= '<div class="langue" style="clear:both;'
                         . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
                         . '"><div class="clearin" style="margin-top:0"></div>';
-                
+
                 $form .= $page->getForm("page/save.html", "page/liste.html",
                     $upload_path, $version["id"], $redirections);
-                
+
                 $form .= '</div>';
             }
 
@@ -237,7 +237,7 @@ class Page extends Main
             'label' => 'Gestion des pages',
             'url'   => '',
         );
-        
+
         $this->getButton($currentConfigPageModule);
     }
 
@@ -484,7 +484,7 @@ class Page extends Main
                 . (isset($filterWords) ? " AND (" . implode(" OR ", $filterWords) . ")" : '')
                 . " ORDER BY " . implode(",", $orderBy) . " LIMIT 10";
 
-        $pagesFound = $this->_db->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
+        $pagesFound = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($pagesFound as $page) {
             $pages[] = array(
@@ -594,7 +594,7 @@ class Page extends Main
 
         return FALSE;
     }
-    
+
     protected function getButton($currentConfigPageModule) {
         //Liste des début de label à regrouper pour les boutons de création
         $groupIdentifications = array("Rubrique ", "Sous rubrique ", "Page ");
