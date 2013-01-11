@@ -963,7 +963,7 @@ class Datatable {
         /* DB table to use */
         $sTable = $this->config["table"]["name"];
 
-        $row = $this->_db->select($sTable, FALSE, "*", implode(" AND ", $where));
+        $row = $this->_db->select($sTable, "*", false, implode(" AND ", $where));
 
         if (isset($this->config["extra"]["logical delete"])) {
             $values = array(

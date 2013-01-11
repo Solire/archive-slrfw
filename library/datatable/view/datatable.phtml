@@ -1013,7 +1013,8 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
     
     
 <?php if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) { ?>
-        $("#tableau-<?php echo $this->name ?> .delete-item").live("click", function(e) {
+//        $("#tableau-<?php echo $this->name ?> .delete-item").live("click", function(e) {
+        $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .btn-group > .delete-item").live("click", function(e) {
             e.preventDefault()
             // On recupere l'id de la row'
             var id = $(this).parents("tr:first").attr('id');
