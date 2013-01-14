@@ -57,7 +57,7 @@ class Path
         $this->_path = $this->test($filePath);
 
         if ($this->_path == false) {
-            if (!self::$_silentMode && !$option == self::SILENT) {
+            if (!self::$_silentMode && $option != self::SILENT) {
                 throw new \Exception('Fichier introuvable : ' . $filePath);
             }
         }
@@ -95,6 +95,10 @@ class Path
      */
     public function get()
     {
+        if (!$this->_path) {
+            return false;
+        }
+
         if (is_dir($this->_path)) {
             return $this->_path . DIRECTORY_SEPARATOR;
         } else {

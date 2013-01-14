@@ -404,10 +404,14 @@ class gabaritManager extends manager
             $gabarit_bloc->setChamps($champs);
             $gabarit_bloc->setJoins($joins);
 
-            $bloc = new gabaritBloc();
+            if (class_exists('\Slrfw\Model\Personnalise\\' . $table)) {
+                $className = '\Slrfw\Model\Personnalise\\' . $table;
+                $bloc = new $className();
+            } else {
+                $bloc = new gabaritBloc();
+            }
 
             $bloc->setGabarit($gabarit_bloc);
-
             $blocs[$gabarit_bloc->getName()] = $bloc;
         }
 
@@ -1349,7 +1353,7 @@ class gabaritManager extends manager
                 else {
                     $value = array_shift($donnees['champ' . $champ['id']]);
                 }
-                
+
                 if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA') {
                     $value = str_replace('"', '&quot;', $value);
                 }

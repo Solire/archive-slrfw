@@ -38,8 +38,12 @@ function autoload($name)
         $name = strtolower($name) . '.php';
     }
 
-    $path = new Library\Path($name);
-    require_once $path->get();
+    $path = new Library\Path($name, Library\Path::SILENT);
+    $fullPath = $path->get();
+    
+    if ($fullPath) {
+        require_once $path->get();
+    }
 }
 
 spl_autoload_register('Slrfw\autoload');
