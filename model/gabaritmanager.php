@@ -198,7 +198,8 @@ class gabaritManager extends manager
 
                 $blocs = $page->getBlocs();
                 foreach ($blocs as $blocName => $bloc) {
-                    $valuesBloc = $this->getBlocValues($bloc, $id_gab_page, $id_version, $visible);
+                    $valuesBloc = $this->getBlocValues($bloc, $id_gab_page,
+                        $id_version, $visible);
 
                     if ($valuesBloc) {
                         $bloc->setValues($valuesBloc);
@@ -247,9 +248,11 @@ class gabaritManager extends manager
         $query  = 'SELECT IF (`g`.`label` IS NULL, "general", `g`.`label`), `c`.*'
                 . ' FROM `gab_champ` `c`'
                 . ' LEFT JOIN `gab_champ_group` `g` ON `g`.`id` = `c`.`id_group`'
-                . ' WHERE `id_parent` = ' . $id_gabarit . ' AND `type_parent` = "gabarit"'
+                . ' WHERE `id_parent` = ' . $id_gabarit
+                . ' AND `type_parent` = "gabarit"'
                 . ' ORDER BY `g`.`ordre`, `c`.`ordre`';
-        $champs = $this->_db->query($query)->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+        $champs = $this->_db->query($query)->fetchAll(
+            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
         /**
          * TODO
@@ -271,8 +274,10 @@ class gabaritManager extends manager
                 . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
         $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+
         foreach ($gabChampTypeParamsDefault as $type => $params) {
             $paramsDefault[$type] = array();
+
             foreach ($params as $param) {
                 $paramsDefault[$type][$param['code']] = $param['value'];
             }
@@ -333,19 +338,19 @@ class gabaritManager extends manager
          * a optimiser (1 requete pour champ dyn et champ normaux,
          * filtrer par id champ + type, voir faire des jointure sur gab_champ)
          */
-        $query  = 'SELECT gc.id, gcpv.*'
-                . ' FROM gab_champ gc'
-                . ' INNER JOIN gab_champ_param_value gcpv'
-                . ' ON gcpv.id_champ = gc.id'
-                . ' ORDER BY id_group, ordre';
+        $query  = 'SELECT `gc`.`id`, `gcpv`.*'
+                . ' FROM `gab_champ` `gc`'
+                . ' INNER JOIN `gab_champ_param_value` `gcpv`'
+                . ' ON `gcpv`.`id_champ` = `gc`.`id`'
+                . ' ORDER BY `id_group`, `ordre`';
         $gabChampTypeParams = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
-        $query  = 'SELECT gct.code, gcp.*, gcp.default_value value'
-                . ' FROM gab_champ_type gct'
-                . ' INNER JOIN gab_champ_param gcp'
-                . ' ON gct.code = gcp.code_champ_type'
-                . ' ORDER BY  gct.ordre, gct.code';
+        $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
+                . ' FROM `gab_champ_type` `gct`'
+                . ' INNER JOIN `gab_champ_param` `gcp`'
+                . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
+                . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
         $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
@@ -390,8 +395,6 @@ class gabaritManager extends manager
 
                     if ($champ['id'] == $idField) {
                         $champ['params'] = array_merge($champ['params'], $params2);
-                        // break;
-
                     }
 
                     if ($champ['type'] == 'JOIN') {
@@ -494,7 +497,8 @@ class gabaritManager extends manager
                 continue;
             }
 
-            $join = $this->getPage($id_version, $id_api, $joinField['value'], 0, false, $visible);
+            $join = $this->getPage($id_version, $id_api, $joinField['value'], 0,
+                false, $visible);
 
             if (!$visible || $join->getMeta('visible') > 0) {
                 $page->setValue($joinName, $join);
@@ -550,7 +554,8 @@ class gabaritManager extends manager
                 $query .= ' AND `visible` = 1';
             }
 
-            $meta = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+            $meta = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
             if (!$meta) {
                 continue;
             }
@@ -561,10 +566,12 @@ class gabaritManager extends manager
                     . ' WHERE `id_gab_page` IN (' . implode(',', array_keys($meta)) . ')'
                     . ' AND `' . $joinField['table'] . '`.`id_version` = ' . $id_version;
 
-            $values = $this->_db->query($query)->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+            $values = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
 
             /** On recupere les pages jointes. */
-            foreach ($page->getBlocs($name_bloc)->getValues() as $keyValue => $value) {
+            $blocsValues = $page->getBlocs($name_bloc)->getValues();
+            foreach ($blocsValues as $keyValue => $value) {
                 if (!isset($meta[$value[$joinName]])) {
                     continue;
                 }
@@ -672,7 +679,7 @@ class gabaritManager extends manager
         $version = $this->getVersion($id_version);
 
         while ($id_gab_page_parent > 0) {
-            $query = 'SELECT * FROM `gab_page`'
+            $query  = 'SELECT * FROM `gab_page`'
                     . ' WHERE `id_version` = ' . $id_version
                     . ' AND `id` = ' . $id_gab_page_parent
                     . ' AND `suppr` = 0';
@@ -805,7 +812,8 @@ class gabaritManager extends manager
                 . ' AND `g`.`main` = 1 AND  `g`.`id_api` = ' . $id_api
                 . ' WHERE `p`.`suppr` = 0 AND `p`.`id_version` = ' . $id_version
                 . ' ORDER BY `p`.`ordre` ASC';
-        $metas = $this->_db->query($query)->fetchAll(\PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+        $metas = $this->_db->query($query)->fetchAll(
+            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
         $pages = array();
         foreach ($metas as $gabaritName => $metasGabarit) {
@@ -886,7 +894,8 @@ class gabaritManager extends manager
     {
         $query  = 'SELECT *'
                 . ' FROM `gab_page`'
-                . ' WHERE `id_parent` = ' . $id_parent . ' AND `suppr` = 0'
+                . ' WHERE `id_parent` = ' . $id_parent
+                . ' AND `suppr` = 0'
                 . ' AND `id_version` = ' . $id_version;
 
         if (!$this->modePrevisualisation) {
@@ -947,7 +956,8 @@ class gabaritManager extends manager
 
         $blocs = $page->getBlocs();
         foreach ($blocs as $bloc) {
-            $this->saveBloc($bloc, $id_gab_page, $page->getMeta('id_version'), $donnees);
+            $this->saveBloc($bloc, $id_gab_page, $page->getMeta('id_version'),
+                $donnees);
         }
 
         $newPage = $this->getPage($version, $api['id'], $page->getMeta('id'), 0);
@@ -982,7 +992,8 @@ class gabaritManager extends manager
         $api    = $page->getGabarit()->getApi();
         $query  = 'SELECT `gab_gabarit`.id FROM `gab_gabarit`'
                 . ' WHERE `gab_gabarit`.`id_api` = ' . $api['id'];
-        $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+        $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(
+            \PDO::FETCH_COLUMN);
 
         // Insertion dans la table `gab_page`.
         if ($updating) {
@@ -1010,13 +1021,15 @@ class gabaritManager extends manager
                     . ' AND `id_parent` = ' . $page->getMeta('id_parent')
                     . ' AND `id_version` = ' . $page->getMeta('id_version')
                     . ' AND `id` != ' . $page->getMeta('id');
-            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', $query);
+            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting',
+                $query);
 
             $query = 'UPDATE `gab_page` SET'
                     . ' `titre`      = ' . $this->_db->quote($donnees['titre']) . ',';
 
             if ($page->getVersion('exotique') > 0) {
-                $query .= ' `titre_rew`      = ' . $this->_db->quote($donnees['titre_rew']) . ',';
+                $query .= ' `titre_rew`      = '
+                        . $this->_db->quote($donnees['titre_rew']) . ',';
             }
 
             if ($donnees['bal_title'] == '') {
@@ -1043,7 +1056,8 @@ class gabaritManager extends manager
             $this->_db->query($query);
 
             $urlParent = '';
-            $parents = $this->getParents($page->getMeta('id_parent'), $page->getMeta('id_version'));
+            $parents = $this->getParents($page->getMeta('id_parent'),
+                $page->getMeta('id_version'));
             foreach ($parents as $parent) {
                 $urlParent .= $parent->getMeta('rewriting') . '/';
             }
@@ -1110,7 +1124,8 @@ class gabaritManager extends manager
                     . implode(', ', $gabaritsFromCurrentApi) . ')'
                     . ' AND `id_parent` = ' . $id_parent
                     . ' AND `id_version` = 1';
-            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting', $query);
+            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting',
+                $query);
 
             $query  = 'SELECT MAX(`ordre`)'
                     . ' FROM `gab_page`'
@@ -1172,7 +1187,8 @@ class gabaritManager extends manager
                 $urlParent .= $parent->getMeta('rewriting') . '/';
             }
 
-            $newUrl = $urlParent . $rewriting . $page->getGabarit()->getExtension();
+            $newUrl = $urlParent . $rewriting
+                    . $page->getGabarit()->getExtension();
 
             $donnees['301'] = array_unique($donnees['301']);
 
@@ -1236,7 +1252,9 @@ class gabaritManager extends manager
                 }
 
                 $value = $donnees['champ' . $champ['id']][0];
-                if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA') {
+                if ($champ['type'] != 'WYSIWYG'
+                    && $champ['type'] != 'TEXTAREA'
+                ) {
                     $value = str_replace('"', '&quot;', $value);
                 }
 
@@ -1245,10 +1263,12 @@ class gabaritManager extends manager
                 }
 
                 if ($champ['trad'] == 0 && $updating) {
-                    $queryT .= '`' . $champ['name'] . '` = ' . $this->_db->quote($value) . ',';
+                    $queryT    .= '`' . $champ['name'] . '` = '
+                                . $this->_db->quote($value) . ',';
                 }
 
-                $query .= '`' . $champ['name'] . '` = ' . $this->_db->quote($value) . ',';
+                $query .= '`' . $champ['name'] . '` = '
+                        . $this->_db->quote($value) . ',';
             }
         }
 
@@ -1309,7 +1329,8 @@ class gabaritManager extends manager
 
             if (isset($donnees['champ' . $firstField['id']])) {
                 foreach ($donnees['champ' . $firstField['id']] as $value) {
-                    $fieldSql = '`' . $firstField['name'] . '` = ' . $this->_db->quote($value);
+                    $fieldSql   = '`' . $firstField['name'] . '` = '
+                                . $this->_db->quote($value);
 
                     $query  = 'INSERT INTO `' . $table . '` SET'
                             . ' `id_gab_page` = ' . $id_gab_page . ','
@@ -1354,7 +1375,9 @@ class gabaritManager extends manager
                     $value = array_shift($donnees['champ' . $champ['id']]);
                 }
 
-                if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA') {
+                if ($champ['type'] != 'WYSIWYG'
+                    && $champ['type'] != 'TEXTAREA'
+                ) {
                     $value = str_replace('"', '&quot;', $value);
                 }
 
@@ -1362,7 +1385,8 @@ class gabaritManager extends manager
                     $value = Tools::formate_date_nombre($value, '/', '-');
                 }
 
-                $query .= '`' . $champ['name'] . '` = ' . $this->_db->quote($value) . ',';
+                $query .= '`' . $champ['name'] . '` = '
+                        . $this->_db->quote($value) . ',';
             }
 
 
@@ -1378,9 +1402,11 @@ class gabaritManager extends manager
                     $queryTmp = $query . ' `id_version`  = ' . $id_version;
 
                     if ($id_bloc) {
-                        $queryTmp .= ', `id` = ' . $id_bloc . ', `visible` = 0';
+                        $queryTmp  .= ', `id` = ' . $id_bloc
+                                    . ', `visible` = 0';
                     } else {
-                        $queryTmp .= ', `id` = ' . $id_bloc . ', `visible` = ' . $visible;
+                        $queryTmp  .= ', `id` = ' . $id_bloc
+                                    . ', `visible` = ' . $visible;
                     }
 
                     $this->_db->exec($queryTmp);
@@ -1411,7 +1437,8 @@ class gabaritManager extends manager
     public function previsu($donnees)
     {
         $query = 'SELECT `id` FROM `version`';
-        $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+        $this->_versions = $this->_db->query($query)->fetchAll(
+            \PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
@@ -1422,9 +1449,11 @@ class gabaritManager extends manager
         }
 
         if ($updating) {
-            $page = $this->getPage($version, $donnees['id_api'], $donnees['id_gab_page'], 0);
+            $page = $this->getPage($version, $donnees['id_api'],
+                $donnees['id_gab_page'], 0);
         } else {
-            $page = $this->getPage($version, $donnees['id_api'], 0, $donnees['id_gabarit']);
+            $page = $this->getPage($version, $donnees['id_api'], 0,
+                $donnees['id_gabarit']);
         }
 
         $this->previsuMeta($page, $donnees);
@@ -1516,7 +1545,9 @@ class gabaritManager extends manager
 
                 $value = $donnees['champ' . $champ['id']][0];
 
-                if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA') {
+                if ($champ['type'] != 'WYSIWYG'
+                    && $champ['type'] != 'TEXTAREA'
+                ) {
                     $value = str_replace('"', '&quot;', $value);
                 }
 
@@ -1558,7 +1589,9 @@ class gabaritManager extends manager
 
                 $value = array_shift($donnees['champ' . $champ['id']]);
 
-                if ($champ['type'] != 'WYSIWYG' && $champ['type'] != 'TEXTAREA') {
+                if ($champ['type'] != 'WYSIWYG'
+                    && $champ['type'] != 'TEXTAREA'
+                ) {
                     $value = str_replace('"', '&quot;', $value);
                 }
 
