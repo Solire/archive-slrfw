@@ -12,4 +12,3 @@ class TextareaField extends GabaritField
 
 }
 
-?>

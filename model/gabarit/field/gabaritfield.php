@@ -30,8 +30,6 @@ abstract class GabaritField
         if ($db)	$this->db = $db;
         else		$this->db = Slrfw\Library\Registry::get("db");
 
-        ;
-        ;
         $this->idGabPage = $id_gab_page;
         $this->uploadPath = $upload_path;
         $this->champ = $champ;
@@ -73,4 +71,3 @@ abstract class GabaritField
 
 }
 
-?>

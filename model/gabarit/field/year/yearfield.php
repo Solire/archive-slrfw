@@ -12,4 +12,3 @@ class YearField extends GabaritField
 
 }
 
-?>

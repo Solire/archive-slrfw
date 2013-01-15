@@ -48,7 +48,7 @@ class JoinField extends GabaritField {
             }
 
             $sql = "SELECT $labelField label
-                    FROM `$table` 
+                    FROM `$table`
                     $gabPageJoin
                     WHERE $filterVersion  AND `$table`.`$idField` = $id";
             $this->valueLabel = $this->db->query($sql)->fetch(\PDO::FETCH_COLUMN);
@@ -83,7 +83,7 @@ class JoinField extends GabaritField {
         }
 
         $sql = "SELECT $idField id, $labelField label
-                    FROM `$table` 
+                    FROM `$table`
                     $gabPageJoin
                     WHERE $filterVersion";
 
@@ -98,4 +98,3 @@ class JoinField extends GabaritField {
 
 }
 
-?>

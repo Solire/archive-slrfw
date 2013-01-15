@@ -121,7 +121,6 @@ class gabaritBloc
      */
     public function buildForm($upload_path, $id_gab_page, $versionId)
     {
-
         $form = '';
 
         $champs = $this->_gabarit->getChamps();
@@ -135,10 +134,8 @@ class gabaritBloc
 
         $classNameType = $type . 'fieldset';
 
-        require_once 'gabarit/fieldset/' . $type . '/' . $classNameType . '.php';
-        
-        $fieldset = new $classNameType($this->_gabarit, $champs, $this->_values,
-            $upload_path, $id_gab_page, isset($this->_meta) ? $this->_meta : null , $versionId);
+        require_once 'gabarit/fieldset/' . $type . '/' . $classNameType . '.php';        
+        $fieldset = new $classNameType($this, $upload_path, $id_gab_page, $versionId);
         $fieldset->start();
         $form .= $fieldset;
 
@@ -170,9 +167,10 @@ class gabaritBloc
         $classes = 'form-controle form-' . $champ['oblig'] . ' form-' . strtolower($champ['typedonnee']);
         $id = 'champ' . $champ['id'] . '_' . $idpage;
 
-        if ($champ['typedonnee'] == 'DATE')
+        if ($champ['typedonnee'] == 'DATE') {
             $value = \Slrfw\Library\Tools::formate_date_nombre($value, '-', '/');
-
+        }
+        
         $type = strtolower($champ['type']);
         $classNameType = $type . "field";
         require_once "gabarit/field/$type/$classNameType.php";

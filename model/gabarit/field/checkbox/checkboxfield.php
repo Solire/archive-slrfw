@@ -12,4 +12,3 @@ class CheckBoxField extends GabaritField
 
 }
 
-?>

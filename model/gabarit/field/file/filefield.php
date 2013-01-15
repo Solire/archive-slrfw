@@ -19,4 +19,3 @@ class FileField extends GabaritField
     }
 }
 
-?>

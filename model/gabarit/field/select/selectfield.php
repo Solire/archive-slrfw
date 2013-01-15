@@ -16,4 +16,3 @@ class SelectField extends GabaritField
     }
 }
 
-?>

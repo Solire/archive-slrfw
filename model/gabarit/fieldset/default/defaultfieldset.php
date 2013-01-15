@@ -9,13 +9,9 @@ require_once 'gabarit/fieldset/gabaritfieldset.php';
  */
 class DefaultFieldSet extends GabaritFieldSet
 {
-    
     public function start()
     {
-        
+        parent::start();
     }
-
-
 }
 
-?>
