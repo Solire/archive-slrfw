@@ -7,7 +7,7 @@ $(function(){
     confirmationSupprMessage += '<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Attention ! Cette action supprimera la page dans tous les langues.'
     confirmationSupprMessage += '</p>'
     confirmationSupprMessage += '<div style="margin-left: 23px;margin-top: 16px;">Etes-vous sur de vouloir supprimer cette page ?</div>'
-    
+
     //// SUPPRIMER UNE PAGE.
     confirm = $('<div>')
     .html(confirmationSupprMessage)
@@ -53,11 +53,11 @@ $(function(){
             }
         }
     });
-    
+
     var confirmOpen = function(sort_elmt) {
         var sort_box = sort_elmt.parent();
         var id_gab_page = parseInt(sort_elmt.attr('id').split('_').pop());
-        
+
         confirm.dialog('option', 'buttons', {
             "Ok" : function(){
                 $.post(
@@ -81,7 +81,7 @@ $(function(){
             },
             "Annuler" : function(){
                 $(this).dialog("close");
-            }            
+            }
         }).dialog('open');
         $(".supprimer", sort_elmt).effect("transfer", {
             to: confirm.dialog("widget"),
@@ -89,26 +89,25 @@ $(function(){
         }, 500);
 
     }
-	
-    $('.supprimer').live('click', function(){
-        confirmOpen($(this).parents('.sort-elmt').first());
 
-        return false
+    $('.supprimer').live('click', function(e){
+        e.preventDefault();
+        confirmOpen($(this).parents('.sort-elmt').first());
     });
-	
+
     //// RENDRE VISIBLE UNE PAGE.
     $('.rendrevisible').live('click', function(){
         var $this = $(this);
         var id_gab_page = parseInt($this.parents('.sort-elmt').first().attr('id').split('_').pop());
         var checked = $this.is(':checked');
-		
+
         $.post(
             'page/visible.html',
             {
                 id_gab_page : id_gab_page,
                 visible     : checked ? 1 : 0
             },
-            function(data){                
+            function(data){
                 if(data.status != 'success') {
                     $this.attr('checked', !checked);
                     $.sticky("Une erreur est survenue", {
@@ -125,13 +124,9 @@ $(function(){
                         });
                     }
                 }
-                
-                
-                
-                
             },
             'json'
-            );
+        );
     });
 
     //// GESTION DU TRI DES PAGES.
@@ -146,7 +141,7 @@ $(function(){
                 placeholder: 'empty',
                 items: '> .sort-elmt',
                 handle: '.sort-move',
-                deactivate: function(){
+                update: function(){
                     var i = 1;
                     $(this).children().each(function(){
                         positions[parseInt($(this).attr('id').split('_').pop())] = i++;
@@ -156,7 +151,7 @@ $(function(){
             });
         });
     }
-        
+
     var orderProcess = function(){
         $.post('page/order.html', {
             'positions' : positions
@@ -170,7 +165,7 @@ $(function(){
                     type:"error"
                 });
             }
-            
+
         });
 
         return false;
@@ -178,7 +173,7 @@ $(function(){
 
     initTri();
 
-	
+
     $('select[name=id_sous_rubrique]').change(function(){
         var id_sous_rubrique = $(this).val();
         $.cookie('id_sous_rubrique', id_sous_rubrique, {
@@ -186,16 +181,16 @@ $(function(){
         });
         $(this).parents('form').submit();
     });
-    
+
     //// OUVERTURE / FERMETURE DES PAGES PARENTES.
     $('legend').live('click', function(){
         var $legend = $(this)
         if ($(this).next('div').is(':hidden') && $(this).next('div').html()=='') {
-                
+
             $legend.find('span.ui-icon-plus').addClass("ui-icon-moins")
-            if (!$(this).next('div').hasClass('children-loaded')) {         
+            if (!$(this).next('div').hasClass('children-loaded')) {
                 var id = $(this).parent().attr('id').split('_').pop();
-                
+
                 var $divToLoad = $(this).next('div')
                 $.ajax({
                     mode: 'queue',
@@ -217,7 +212,7 @@ $(function(){
                     }
                 });
                 $.ajax({
-                    mode: 'dequeue', 
+                    mode: 'dequeue',
                     port: 'ajaxWhois'
                 });
             }
@@ -232,11 +227,11 @@ $(function(){
 
         return false;
     });
-    
-    
-    
-    
-    
+
+
+
+
+
     /**
      * Enregistre l'état de la liste des pages (Rubriques dépliées)
      * Celui-ci est stocké en cookie
@@ -246,31 +241,31 @@ $(function(){
         $("legend .ui-icon-moins").each(function(){
             saveStateListPage.push($(this).parents("fieldset:first").attr("id"))
         })
-        
+
         $.cookie('state_list', saveStateListPage, {
             path : '/'
         });
     }
-    
+
     var anchorFound = false;
     var currentState = 0
-    
+
     /**
      * Recharge l'état de la liste des pages (Rubriques dépliées)
      * Récupéré dans le cookie correspondant
      */
     function reloadState() {
         var saveStateListPage;
-        
+
         if ($.cookie('state_list')) {
             saveStateListPage = $.cookie('state_list').split(",");
         }
         else {
             saveStateListPage = [];
         }
-    
+
         $.each(saveStateListPage, function(id, item) {
-            
+
             var id = item.split('_').pop();
             $.ajax({
                 mode: 'queue',
@@ -284,14 +279,14 @@ $(function(){
                     currentState++;
                     var $legend = $("#" + item).find("legend:first")
                     var $divToLoad = $("#" + item).find(".sort-box:first")
-                    
+
                     $legend.find('span.ui-icon-plus').addClass("ui-icon-moins")
                     $divToLoad.html(data)
                     $divToLoad.addClass('children-loaded');
                     if (data != '') {
                         initTri();
                         $divToLoad.slideToggle(500, function() {
-                            if (currentState == saveStateListPage.length 
+                            if (currentState == saveStateListPage.length
                                 && anchorFound !== false) {
                                 var heightFixed = 0
                                 //Si la navbar est en fixed (taille écran > 980px)
@@ -299,7 +294,7 @@ $(function(){
                                     heightFixed = $(".navbar-fixed-top").height() + $("#breadcrumbs").height()
                                 }
                                 $.scrollTo($("#gab_page_" + getURLParameter("id_gab_page")), 1000, {
-                                    queue:true, 
+                                    queue:true,
                                     offset:-heightFixed
                                 });
                             }
@@ -307,28 +302,28 @@ $(function(){
                         $divToLoad.siblings('.cat-modif').slideToggle(500);
                     }
                     if (anchorFound === false && $("#gab_page_" + getURLParameter("id_gab_page")).length > 0) {
-                        
+
                         anchorFound = "#gab_page_" + getURLParameter("id_gab_page")
-                    } 
-                    
+                    }
+
                 }
             });
         })
-        
+
         $.ajax({
-            mode: 'dequeue', 
+            mode: 'dequeue',
             port: 'ajaxWhois'
         });
-            
+
     }
-    
+
     reloadState();
-    
-    
+
+
     $(".sort-move").live("click", function(e) {
         e.preventDefault()
     })
-    
+
 });
 
 /**
