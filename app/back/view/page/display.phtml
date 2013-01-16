@@ -159,9 +159,13 @@
                                             <form class="form-crop form-horizontal" action="media/crop.html" method="post">
                                                 <fieldset class="img-info">
                                                     <legend>Information</legend>
-                                                    <dl class="dl-horizontal">
+                                                    <dl style="display: none" class="dl-horizontal expected-width">
                                                         <dt style="width: 180px;">Largeur minimale attendue</dt>
                                                         <dd style="margin-left: 190px;"><span id="minwidthShow"></span>px</dd>
+                                                    </dl>
+                                                    <dl style="display: none" class="dl-horizontal expected-height">
+                                                        <dt style="width: 180px;">Hauteur minimale attendue</dt>
+                                                        <dd style="margin-left: 190px;"><span id="minheightShow"></span>px</dd>
                                                     </dl>
                                                 </fieldset>
 
@@ -185,10 +189,17 @@
                                                     <legend>Enregistrement</legend>
 
                                                     <div class="control-group">
-                                                        <label class="radio">
-                                                            <input type="radio" checked="checked" name="force-width">Respecter la largeur minimum
+                                                        <label class="radio expected-height">
+                                                            <input type="radio" value="height" class="" name="force-width">Respecter la hauteur minimum
                                                         </label>
-                                                        <label class="radio">
+                                                        <label class="radio expected-width">
+                                                            <input type="radio" value="width" class="" name="force-width">Respecter la largeur minimum
+                                                        </label>
+                                                        <label class="radio expected-width-height">
+                                                            <input type="radio" value="width-height" class="" name="force-width">Respecter la hauteur et la largeur minimum
+                                                        </label>
+                                                        
+                                                        <label class="radio force-selection">
                                                             <input type="radio"  value="1" name="force-width">Forcer la taille en fonction de la sélection
                                                         </label>
                                                     </div>
@@ -205,6 +216,7 @@
                                                     <input type="hidden" id="w" name="w" />
                                                     <input type="hidden" id="h" name="h" />
                                                     <input type="hidden" id="minwidth" name="minwidth" />
+                                                    <input type="hidden" id="minheight" name="minheight" />
                                                 </fieldset>
                                             </form>
                                         </td>
