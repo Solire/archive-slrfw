@@ -354,7 +354,9 @@ $(function(){
 
     $('textarea.tiny').tinymce('enable');
 
-    $('label > .switch-editor').live('click', function(){
+    $('label > .switch-editor').live('click', function(e){
+        e.preventDefault();
+
         if($(this).parent().next().is('textarea')){
             if($(this).children().eq(0).hasClass('translucide')) {
                 $(this).children().eq(0).removeClass('translucide');
@@ -367,8 +369,6 @@ $(function(){
 
             $(this).parent().next().tinymce('change');
         }
-
-        return false;
     });
 
     //// GESTION DU TRI
@@ -388,7 +388,9 @@ $(function(){
             }
         });
     });
-    $('.addBloc').live('click', function(){
+    $('.addBloc').live('click', function(e){
+        e.preventDefault();
+
         var $this = $(this).parents('.buttonright').first();
         var adupliquer = $this.prev();
         $('textarea.tiny', adupliquer).tinymce('disableOnly');
@@ -406,11 +408,11 @@ $(function(){
         });
         $('textarea.tiny', adupliquer).tinymce('enableOnly');
         $('textarea.tiny', clone).tinymce('enableOnly');
-
-        return false;
     });
 
-    $('.301-add').live('click', function(){
+    $('.301-add').live('click', function(e){
+        e.preventDefault();
+
         var $this = $(this).parents('fieldset:first').find('.line:first');
         var $fieldSet301 = $(this).parents("fieldset:first");
         var adupliquer = $this;
@@ -420,17 +422,17 @@ $(function(){
         if($(".301-remove", $fieldSet301).length > 1) {
             $(".301-remove", $fieldSet301).removeClass("translucide");
         }
-        return false;
     });
 
-    $('.301-remove:not(.translucide)').live('click', function(){
+    $('.301-remove:not(.translucide)').live('click', function(e){
+        e.preventDefault();
+
         var $this = $(this).parents('.line:first');
         var $fieldSet301 = $(this).parents("fieldset:first");
         $this.remove();
-        if($(".301-remove", $fieldSet301).length == 1) {
+        if ($(".301-remove", $fieldSet301).length == 1) {
             $(".301-remove", $fieldSet301).addClass("translucide");
         }
-        return false;
     });
 
     var confirm = $('<div>', {
@@ -513,7 +515,9 @@ $(function(){
         }
     });
 
-    $('.delBloc').live('click', function(){
+    $('.delBloc').live('click', function(e){
+        e.preventDefault();
+
         if (!$(this).hasClass('translucide')) {
             sort_elmt = $(this).parents('.sort-elmt').first();
             sortpar = sort_elmt.parent();
@@ -525,7 +529,6 @@ $(function(){
                 className: "ui-effects-transfer"
             }, 500);
         }
-        return false;
     });
 
 
@@ -548,7 +551,8 @@ $(function(){
     });
 
 
-    $('.previsu').live('click', function(){
+    $('.previsu').live('click', function(e){
+        e.preventDefault();
         image = $(this);
 
         var link = $(this).attr('href');
@@ -565,8 +569,6 @@ $(function(){
                 previsu.dialog('option', 'position', "center");
                 previsu.html(this);
             });
-
-            return false;
         } else {
             previsu.dialog( "option" , "height" , 0 );
             previsu.html('');
@@ -579,6 +581,8 @@ $(function(){
     var openingLegend = [];
 
     $('legend').bind('click', function(e){
+        e.preventDefault();
+
         var indexLegend = $(this).index("legend");
         if (!openingLegend[indexLegend]) {
             openingLegend[indexLegend] = true;
@@ -589,7 +593,6 @@ $(function(){
                 }
             });
         }
-        return false;
     });
 
     $('.form-date').datepicker($.datepicker.regional['fr']);
@@ -618,7 +621,9 @@ $(function(){
                         );
                 },
                 minLength: 0,
-                select: function(event, ui) {
+                select: function(e, ui) {
+                    e.preventDefault();
+
                     if($(this).siblings(".btn-a").find('.previsu').length > 0)
                         $(this).siblings(".btn-a").find('.previsu').attr('href', ui.item.path);
                     $(this).val(ui.item.value);
@@ -631,10 +636,8 @@ $(function(){
                         $(this).siblings(".btn-a").find('.crop').parent().hide();
                     }
 
-                    //                    if (typeof ui.item.file_id != "undefined") $(this).addClass('atelecharger-' + ui.item.file_id)
                     $(this).autocomplete("close");
 
-                    return false;
                 }
             }).focus(function(){
                 if (this.value == "") {
@@ -680,17 +683,25 @@ $(function(){
             };
 
             tthis.data("autocomplete").__response = function( content ) {
-                var contentlength = typeof uploader == "undefined" ? content.length : content.length + uploader.files.length;
+                var contentlength = content.length;
+                if (typeof uploader != "undefined") {
+                    contentlength += uploader.files.length;
+                }
 
-                if ( !this.options.disabled && content && contentlength ) {
+                if (!this.options.disabled
+                    && content
+                    && contentlength
+                ) {
                     content = this._normalize( content );
-                    this._suggest( content );
-                    this._trigger( "open" );
+                    this._suggest(content);
+                    this._trigger("open");
                 } else {
                     this.close();
                 }
+
                 this.pending--;
-                if ( !this.pending ) {
+
+                if (!this.pending) {
                     this.element.removeClass( "ui-autocomplete-loading" );
                 }
             };
@@ -701,18 +712,17 @@ $(function(){
     initAutocompletePat();
 
     if ($('.langue').length > 1) {
-        $('.openlang').click(function() {
-            i = $('.openlang').index($(this));
+        $('.openlang').click(function(e) {
+            e.preventDefault();
+
+            var i = $('.openlang').index($(this));
 
             if($('.langue').eq(i).is(':hidden')) {
                 $('.openlang').removeClass('active').addClass('translucide');
                 $(this).removeClass('translucide').addClass('active');
-
                 $('.langue:visible').slideUp(500);
                 $('.langue').eq(i).slideDown(500);
             }
-
-            return false;
         });
     }
 
@@ -858,8 +868,8 @@ $(function(){
         }
     };
 
-    $('#pickfiles').live('click', function(){
-        return false;
+    $('#pickfiles').live('click', function(e){
+        e.preventDefault();
     });
 
     var uploader_popup = $('<div>', {
@@ -878,15 +888,15 @@ $(function(){
             "max-width" : $(window).width()-180
         });
 
-        $('.uploader_popup').click(function(){
+        $('.uploader_popup').click(function(e){
+            e.preventDefault();
+
             if(oTable == null) {
                 reloadDatatable();
             }
 
             uploader_popup.dialog("open");
             uploaderInit();
-
-            return false;
         });
     });
 
@@ -954,7 +964,6 @@ $(function(){
                 return false;
             }
 
-
             $this.attr('autocomplete','off').qtip({
                 position: {
                     my: 'left center',  // Position my top left...
@@ -981,16 +990,12 @@ $(function(){
                 contentRule.push('<span style="color:#1292CC">Facultatif</span>');
             }
 
-
             var $this = $(this);
             if($('#aide-' + name, formu).length != 0) {
                 content += $('#aide-' + name, formu).html();
             } else {
                 return false;
             }
-
-
-
 
             $this.attr('autocomplete','off').qtip({
 
@@ -1010,13 +1015,9 @@ $(function(){
         });
 
         $(".mceEditor").live("mouseout", function() {
-            var id = $(this).attr("id").split("_");
-            var name = id[0];
-
-
-            var $this = $(this);
-
-
+            var id = $(this).attr("id").split("_"),
+                name = id[0],
+                $this = $(this);
 
             $this.qtip('hide');
         });
@@ -1097,3 +1098,4 @@ function reloadDatatable() {
 
     $('.dataTables_filter input').attr("placeholder", "Recherche...");
 }
+
