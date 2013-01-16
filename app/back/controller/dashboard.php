@@ -36,12 +36,12 @@ class Dashboard extends Main
             foreach ($configsName as $configKey => $configName) {
                 $datatableClassName = '\\Slrfw\\Datatable\\' . $configName;
 
-                try {
+                if (class_exists($datatableClassName)) {
                     $datatable = new $datatableClassName(
                         $_GET, $configName, $this->_db, "./datatable/",
                         "./datatable/", "img/datatable/"
                     );
-                } catch (\Exception $exc) {
+                } else {
                     $datatable = new \Slrfw\Library\Datatable\Datatable(
                         $_GET, $configName, $this->_db, "./datatable/",
                         "./datatable/", "img/datatable/"
