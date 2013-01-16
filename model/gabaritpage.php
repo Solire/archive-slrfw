@@ -47,8 +47,10 @@ class gabaritPage extends gabaritBloc {
     }
 
     /**
-     *
+     *  
      * @param array $meta
+     * 
+     * @return void
      */
     public function setMeta($meta) {
         $this->_meta = $meta;
