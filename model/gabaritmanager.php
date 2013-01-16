@@ -126,7 +126,7 @@ class gabaritManager extends manager
         if (!$id_gab_page && $gabarit->getIdParent() > 0) {
             $parents = array();
 
-            /** Si le gabarit parent est lui-même son parent */
+            /** Si le gabarit parent est lui-même son propre parent */
             if ($parentData['id_parent'] == $parentData['id']) {
                 $parents = $this->getList($id_version, $id_api, 0,
                     $parentData['id']);
@@ -1346,76 +1346,8 @@ class gabaritManager extends manager
         }
 
         foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
-            $updating = ($id_bloc > 0);
-            $visible  = array_shift($donnees['visible']);
-
-            if ($updating) {
-                $query  = 'UPDATE `' . $table . '` SET'
-                        . ' `ordre` = ' . $ordre . ','
-                        . ' `visible` = ' . $visible . ',';
-            } else {
-                $query  = 'INSERT INTO `' . $table . '` SET'
-                        . ' `id_gab_page` = ' . $id_gab_page . ','
-                        . ' `ordre` = ' . $ordre . ',';
-            }
-
-            foreach ($champs as $champ) {
-                if ($champ['visible'] == 0) {
-                    continue;
-                }
-
-                if ($champ['type'] == 'CHECKBOX'){
-                    if (!isset($donnees['champ' . $champ['id']])) {
-                        $value = 0;
-                    } else {
-                        $value = 1;
-                    }
-                }
-                else {
-                    $value = array_shift($donnees['champ' . $champ['id']]);
-                }
-
-                if ($champ['type'] != 'WYSIWYG'
-                    && $champ['type'] != 'TEXTAREA'
-                ) {
-                    $value = str_replace('"', '&quot;', $value);
-                }
-
-                if ($champ['typedonnee'] == 'DATE') {
-                    $value = Tools::formate_date_nombre($value, '/', '-');
-                }
-
-                $query .= '`' . $champ['name'] . '` = '
-                        . $this->_db->quote($value) . ',';
-            }
-
-
-            if ($updating) {
-                $queryTmp   = substr($query, 0, -1)
-                            . ' WHERE `id_version` = ' . $id_version
-                            . ' AND `id` = ' . $id_bloc;
-
-                $this->_db->exec($queryTmp);
-            } else {
-                $id_bloc = 0;
-                foreach ($this->_versions as $id_version) {
-                    $queryTmp = $query . ' `id_version`  = ' . $id_version;
-
-                    if ($id_bloc) {
-                        $queryTmp  .= ', `id` = ' . $id_bloc
-                                    . ', `visible` = 0';
-                    } else {
-                        $queryTmp  .= ', `id` = ' . $id_bloc
-                                    . ', `visible` = ' . $visible;
-                    }
-
-                    $this->_db->exec($queryTmp);
-
-                    $id_bloc = $this->_db->lastInsertId();
-                }
-            }
-
-            $ids_blocs[] = $id_bloc;
+            $ids_blocs[] = $this->saveBlocLine($table, $champs, $id_bloc,
+                $ordre, $donnees, $id_gab_page, $id_version);
             $ordre++;
         }
 
@@ -1426,6 +1358,101 @@ class gabaritManager extends manager
 
         return true;
     }
+
+    /**
+     * Sauve une ligne d'un bloc dynamique
+     *
+     * @param string $table
+     * @param array  $champs
+     * @param int    $id_bloc
+     * @param int    $ordre
+     * @param array  &$donnees
+     * @param int    $id_gab_page
+     * @param int    $id_version
+     *
+     * @return int identifiant de la ligne sauvée
+     */
+    protected function saveBlocLine(
+        $table,
+        $champs,
+        $id_bloc,
+        $ordre,
+        &$donnees,
+        $id_gab_page,
+        $id_version
+    ) {
+        $visible  = array_shift($donnees['visible']);
+        $updating = ($id_bloc > 0);
+
+        if ($updating) {
+            $query  = 'UPDATE `' . $table . '` SET'
+                    . ' `ordre` = ' . $ordre . ','
+                    . ' `visible` = ' . $visible . ',';
+        } else {
+            $query  = 'INSERT INTO `' . $table . '` SET'
+                    . ' `id_gab_page` = ' . $id_gab_page . ','
+                    . ' `ordre` = ' . $ordre . ',';
+        }
+
+        foreach ($champs as $champ) {
+            if ($champ['visible'] == 0) {
+                continue;
+            }
+
+            if ($champ['type'] == 'CHECKBOX'){
+                if (!isset($donnees['champ' . $champ['id']])) {
+                    $value = 0;
+                } else {
+                    $value = 1;
+                }
+            }
+            else {
+                $value = array_shift($donnees['champ' . $champ['id']]);
+            }
+
+            if ($champ['type'] != 'WYSIWYG'
+                && $champ['type'] != 'TEXTAREA'
+            ) {
+                $value = str_replace('"', '&quot;', $value);
+            }
+
+            if ($champ['typedonnee'] == 'DATE') {
+                $value = Tools::formate_date_nombre($value, '/', '-');
+            }
+
+            $query .= '`' . $champ['name'] . '` = '
+                    . $this->_db->quote($value) . ',';
+        }
+
+
+        if ($updating) {
+            $queryTmp   = substr($query, 0, -1)
+                        . ' WHERE `id_version` = ' . $id_version
+                        . ' AND `id` = ' . $id_bloc;
+
+            $this->_db->exec($queryTmp);
+        } else {
+            $id_bloc = 0;
+            foreach ($this->_versions as $id_version) {
+                $queryTmp = $query . ' `id_version`  = ' . $id_version;
+
+                if ($id_bloc) {
+                    $queryTmp  .= ', `id` = ' . $id_bloc
+                                . ', `visible` = 0';
+                } else {
+                    $queryTmp  .= ', `id` = ' . $id_bloc
+                                . ', `visible` = ' . $visible;
+                }
+
+                $this->_db->exec($queryTmp);
+
+                $id_bloc = $this->_db->lastInsertId();
+            }
+        }
+
+        return $id_bloc;
+    }
+
 
     /**
      * Permet de prévisualiser une page
