@@ -196,6 +196,11 @@ class gabaritPage extends gabaritBloc {
         return $this->_parents;
     }
 
+    /**
+     * Retourne la première page enfant
+     * 
+     * @return gabaritPage
+     */
     public function getFirstChild(){
         return $this->_firstChild;
     }
@@ -266,7 +271,8 @@ class gabaritPage extends gabaritBloc {
         $id_gab_page = isset($this->_meta['id']) ? $this->_meta['id'] : 0;
 
         foreach ($allchamps as $name_group => $champs) {
-            $form .= '<fieldset><legend>' . $name_group . '</legend><div ' . ($id_gab_page ? 'style="display:none;"' : '') . '>';
+            $form  .= '<fieldset><legend>' . $name_group . '</legend>'
+                    . '<div ' . ($id_gab_page ? 'style="display:none;"' : '') . '>';
             foreach ($champs as $champ) {
                 $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
                 $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
