@@ -276,18 +276,39 @@ class Media extends Main {
 
 
 
-        if ($_POST["force-width"] == 1) {
-            $tw = false;
-            $th = false;
-        } else {
-            if (isset($_POST["minwidth"]) && intval($_POST["minwidth"]) > 0) {
-                $tw = $_POST["minwidth"];
-                $th = ($_POST["minwidth"] / $w) * $h;
-            } else {
+        
+            switch ($_POST["force-width"]) {
+                case "width":
+                    $tw = $_POST["minwidth"];
+                    $th = ($_POST["minwidth"] / $w) * $h;
+                    break;
+                case "height":
+                    $th = $_POST["minheight"];
+                    $tw = ($_POST["minheight"] / $h) * $w;
+
+                    break;
+                case "width-height":
+                    $tw = $_POST["minwidth"];
+                    $th = $_POST["minheight"];
+                    break;
+
+                default:
+                    $tw = false;
+                    $th = false;
+                    break;
+            }
+            
+            
+            if(intval($tw) <= 0) {
                 $tw = false;
+            }
+            
+            if(intval($th) <= 0) {
                 $th = false;
             }
-        }
+            
+            
+        
 
         if ($id_gab_page) {
             $this->_fileManager->crop($filepath, $ext, $targetDir, $target, $id_gab_page, 0, $vignetteDir, $apercuDir, $x, $y, $w, $h, $tw, $th);

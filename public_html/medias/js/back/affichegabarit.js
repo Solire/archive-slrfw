@@ -127,7 +127,11 @@ $(function(){
     })
     
     $(".crop").live("click", function(e) {
-        $(".img-info").hide()
+        var aspectRatio = 0
+        
+        $(".img-info, .expected-width, .expected-height, .expected-width-height").hide()
+        $(".force-selection input").attr("checked", "checked")
+        
         e.preventDefault()
         $('.wShow').html("");
         $('.hShow').html("");
@@ -150,18 +154,37 @@ $(function(){
             $('div.loading-overlay').remove()
             
             var minWidth = $inputFile.attr("data-min-width")
+            var minHeight = $inputFile.attr("data-min-height")
             $('.spinner').spinner("destroy");
             $('.spinner.wShow').spinner({
                 min: minWidth
             });
             $('.spinner.hShow').spinner({
-                min: 0
+                min: minHeight
             });
             if(parseInt(minWidth) > 0) {
                 $("#minwidthShow").html(minWidth)
-                $(".img-info").show()
+                $(".img-info, .expected-width").show()
+                $(".expected-width").find("input").attr("checked", "checked")
             }
+        
+            if(parseInt(minHeight) > 0) {
+                $("#minheightShow").html(minHeight)
+                $(".img-info, .expected-height").show()
+                $(".expected-height").find("input").attr("checked", "checked")
+            }
+        
+            if(parseInt(minHeight) > 0 && parseInt(minWidth) > 0) {
+                $("#minheightShow").html(minHeight)
+                $(".expected-width-height").show()
+                $(".expected-width-height").find("input").attr("checked", "checked")
+                $("label.expected-width").hide()
+                $("label.expected-height").hide()
+                aspectRatio = minWidth / minHeight
+            }
+        
             $("#minwidth").val(minWidth)
+            $("#minheight").val(minHeight)
             var imageNameInfos = $inputFile.val().split('.')
             var imageExtension = imageNameInfos.pop()
             var imageName = imageNameInfos.join("");
@@ -174,12 +197,12 @@ $(function(){
             $(".jcrop-holder").remove()
             $('#modalCrop').modal("show")
             $('#crop-target').Jcrop({
-                minSize : [minWidth, 0],
+                minSize : [minWidth, minHeight],
                 boxWidth: 560,
                 boxHeight: 400,
                 onChange: updatePreview,
                 onSelect: updatePreview,
-                aspectRatio: 0
+                aspectRatio: aspectRatio
             },function(){
                 // Use the API to get the real image size
                 var bounds = this.getBounds();
