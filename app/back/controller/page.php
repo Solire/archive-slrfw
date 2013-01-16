@@ -139,16 +139,16 @@ class Page extends Main
 
         if ($id_gab_page) {
             $query = 'SELECT * FROM `version` WHERE `id_api` = ' . $this->_api['id'];
-            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
-            foreach ($this->_versions as $version) {
-                $this->_pages[] = $this->_gabaritManager->getPage($version['id'], BACK_ID_API, $id_gab_page);
+            foreach ($this->_versions as $id_version => $version) {
+                $this->_pages[$id_version] = $this->_gabaritManager->getPage($id_version, BACK_ID_API, $id_gab_page);
             }
         } else {
             $query = 'SELECT * FROM `version` WHERE `id` = ' . BACK_ID_VERSION;
-            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
-            $this->_pages[] = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
+            $this->_pages[BACK_ID_VERSION] = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
         }
 
         $this->_view->versions = $this->_versions;
