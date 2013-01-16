@@ -44,6 +44,7 @@
             box-shadow: none;
             border: none;
             border-radius: 0px;
+            background:#3A87AD; 
             <?php
             if (isset($this->config["style"]) && isset($this->config["style"]["datatable"])) {
                 foreach ($this->config["style"]["datatable"] as $keyStyle => $valueStyle) {
@@ -67,13 +68,16 @@
 
         #tableau-<?php echo $this->name ?> table a { text-decoration: underline; }
         #tableau-<?php echo $this->name ?> table tr  >  td { border: 0px;text-align: left;vertical-align: top;  }
-        #tableau-<?php echo $this->name ?> table tr  >  td:first-child {  padding-left: 50px;width: 100px;font-weight: bold;  }
+        #tableau-<?php echo $this->name ?> table tr  >  td:first-child {  padding-left: 50px;width: 100px;  }
+        #myDatatable-<?php echo $this->name ?> .btn {
+            font-weight: bold;
+        }
         #tableau-<?php echo $this->name ?> table  >  tbody {
             border-top: 0px dotted #333333;
         }
         #tableau-<?php echo $this->name ?> table  >  tbody tr:hover {
-            background-color: #4A9DD7;
-            color: #FFF;
+            background-color: #E9F2F5;
+            /*color: #FFF;*/
         }
         #tableau-<?php echo $this->name ?> tbody tr.even, #tableau-<?php echo $this->name ?> tbody tr.odd,
         #tableau-<?php echo $this->name ?> tbody tr.even td a, #tableau-<?php echo $this->name ?> tbody tr.odd td a{
@@ -81,63 +85,63 @@
 
         }
         #tableau-<?php echo $this->name ?> tbody tr.even:hover, #tableau-<?php echo $this->name ?> > tbody tr.even td.highlighted {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tbody tr.even:hover > td >  a, #tableau-<?php echo $this->name ?> > tbody tr.even td.highlighted > a {
-            color: #FFF;
+            /*color: #FFF;*/
         }
 
 
         #tableau-<?php echo $this->name ?> tbody tr.odd:hover, #tableau-<?php echo $this->name ?> > tbody tr.odd td.highlighted {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tbody tr.odd:hover > td > a, #tableau-<?php echo $this->name ?> > tbody tr.odd td.highlighted > a {
-            color: #FFF;
+            /*color: #FFF;*/
         }
 
 
         #tableau-<?php echo $this->name ?> tr.even:hover {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.even:hover > td.sorting_1 {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.even:hover > td.sorting_2 {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.even:hover > td.sorting_3 {
             background-color: #E2FF89;
-            color: #FFF;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.odd:hover {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.odd:hover > td.sorting_1 {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.odd:hover > td.sorting_2 {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         #tableau-<?php echo $this->name ?> tr.odd:hover > td.sorting_3 {
-            background-color: #117ECA;
-            color: #FFF;
+            background-color: #CEE7F0;
+            /*color: #FFF;*/
         }
 
         .ColVis {
