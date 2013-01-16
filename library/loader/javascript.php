@@ -35,6 +35,8 @@ class Javascript {
             
             $js .= '        <script src="' . $lib["src"] . $filemtime . '" type="text/javascript"></script>' . "\n";
         }
+        
+        return $js;
     }
 
 
