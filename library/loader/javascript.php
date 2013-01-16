@@ -24,9 +24,17 @@ class Javascript {
     {
         $js = "";
         foreach ($this->libraries as $lib) {
-            $js .= '        <script src="' . $lib["src"] . '" type="text/javascript"></script>' . "\n";
+            if (substr($lib["src"], 0, 7) != 'http://'
+                && substr($lib["src"], 0, 8) != 'https://'
+            ) {
+                $filemtime = "?" . filemtime("./medias/" . $lib["src"]);
+            }
+            else {
+                $filemtime = "";
+            }
+            
+            $js .= '        <script src="' . $lib["src"] . $filemtime . '" type="text/javascript"></script>' . "\n";
         }
-        return $js;
     }
 
 

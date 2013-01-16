@@ -27,10 +27,22 @@ class Css {
     {
         $css = "";
         foreach ($this->libraries as $lib) {
-            $css .= '        <link rel="stylesheet" href="' . $lib["src"] . '" type="text/css" media="' . $lib["media"] . '" title="" charset="utf-8" />' . "\n";
+            if (substr($lib["src"], 0, 7) != 'http://'
+                && substr($lib["src"], 0, 8) != 'https://'
+            ) {
+                $filemtime = "?" . filemtime("./medias/" . $lib["src"]);
+            }
+            else {
+                $filemtime = "";
+            }
+            
+            $css   .= '        <link rel="stylesheet" href="' . $lib["src"]
+                    . $filemtime . '" type="text/css" media="' . $lib["media"]
+                    . '" title="" charset="utf-8" />' . "\n";
         }
         
         return $css;
+        
     }
 
     public function addLibrary($path, $media = "screen")
