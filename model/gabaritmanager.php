@@ -1369,7 +1369,7 @@ class gabaritManager extends manager
      * @param array  &$donnees
      * @param int    $id_gab_page
      * @param int    $id_version
-     * 
+     *
      * @return int identifiant de la ligne sauvée
      */
     protected function saveBlocLine(
