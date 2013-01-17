@@ -198,7 +198,7 @@ $(function(){
             $('#modalCrop').modal("show");
             $('#crop-target').Jcrop({
                 minSize : [minWidth, minHeight],
-                boxWidth: 560,
+                boxWidth: 540,
                 boxHeight: 400,
                 onChange: updatePreview,
                 onSelect: updatePreview,
