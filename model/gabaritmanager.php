@@ -1440,8 +1440,7 @@ class gabaritManager extends manager
                     $queryTmp  .= ', `id` = ' . $id_bloc
                                 . ', `visible` = 0';
                 } else {
-                    $queryTmp  .= ', `id` = ' . $id_bloc
-                                . ', `visible` = ' . $visible;
+                    $queryTmp  .= ', `visible` = ' . $visible;
                 }
 
                 $this->_db->exec($queryTmp);

@@ -1,11 +1,11 @@
-<div class="line<?php echo $this->champ['media']; ?>">
+<div class="line">
     <label for="<?php echo $this->id; ?>">
         <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
     </label>
     <select name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" />
-    <?php
+<?php
     for ($i = 1970; $i <= 2030; $i++) {
-        // L'année est-elle l'année courante ?
+        /** L'année est-elle l'année courante ? */
         $selected="";
         if ($this->value != "") {
             if ($i == $this->value) {
@@ -16,11 +16,10 @@
                 $selected = ' selected="selected"';
             }
         }
-        ?>
-
+?>
                 <option value="<?php echo $i; ?>"<?php echo $selected; ?>><?php echo $i; ?></option>
-                    <?php
-                }
-                ?>
+<?php
+    }
+?>
     </select>
 </div>

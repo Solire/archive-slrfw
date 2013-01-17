@@ -1,4 +1,4 @@
-<div class="form-elmt line">
+<div class="line form-line">
     <div class="line">
         <label for="<?php echo $this->id; ?>">
             <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
@@ -11,6 +11,9 @@
     </div>
     
     <div class="line form-other-line" style="display:none;">
-        <iframe class="form-other-elmt"></iframe>
+        <label class="form-other-flag"></label>
+        <span style="display:inline-block; width: 500px; height: 290px; border-left:1px solid #CCC; border-right:1px solid #CCC; border-top:1px solid #CCC; border-bottom:1px solid #CCC;">
+            <iframe class="form-other-elmt"></iframe>
+        </span>
     </div>
 </div>
