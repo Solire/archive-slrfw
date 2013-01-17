@@ -26,16 +26,17 @@ class Javascript {
         foreach ($this->libraries as $lib) {
             if (substr($lib["src"], 0, 7) != 'http://'
                 && substr($lib["src"], 0, 8) != 'https://'
+                && file_exists("./medias/" . $lib["src"])
             ) {
                 $filemtime = "?" . filemtime("./medias/" . $lib["src"]);
             }
             else {
                 $filemtime = "";
             }
-            
+
             $js .= '        <script src="' . $lib["src"] . $filemtime . '" type="text/javascript"></script>' . "\n";
         }
-        
+
         return $js;
     }
 
