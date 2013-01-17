@@ -51,7 +51,7 @@
 
     foreach ($this->pages as $page) {
 ?>
-                        <div class="langue" id="langue_<?php echo $page->getMeta('id_version'); ?>" style="clear:both;<?php if ($page->getMeta('id_version') != BACK_ID_VERSION) { echo ' display:none;'; } ?>">
+                        <div class="langue" id="langue_<?php echo $page->getMeta('id_version'); ?>" style="clear:both;<?php if ($page->getMeta('id_version') != BACK_ID_VERSION && count($this->pages) > 1) { echo ' display:none;'; } ?>">
 <?php
         if (count($this->versions) > 1) {
 ?>
