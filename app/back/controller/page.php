@@ -97,13 +97,6 @@ class Page extends Main
      */
     public function displayAction()
     {
-        $upload_path = $this->_mainConfig->get('path', 'upload');
-
-        $id_gab_page = isset($_GET['id_gab_page']) ? $_GET['id_gab_page'] : 0;
-        $id_gabarit = isset($_GET['id_gabarit']) ? $_GET['id_gabarit'] : 1;
-
-        $this->_view->action = 'liste';
-
         $this->_javascript->addLibrary('back/tiny_mce/tiny_mce.js');
 
         $this->_javascript->addLibrary('back/autocomplete.js');
@@ -131,81 +124,46 @@ class Page extends Main
         $this->_css->addLibrary('back/autocomplete_multi/token-input.css');
         $this->_css->addLibrary('back/autocomplete_multi/token-input-facebook.css');
 
+        $this->_css->addLibrary('back/affichegabarit.css');
+
+        $this->_javascript->addLibrary('back/compareversion.js');
+
+        $id_gab_page = isset($_GET['id_gab_page']) ? $_GET['id_gab_page'] : 0;
+        $id_gabarit = isset($_GET['id_gabarit']) ? $_GET['id_gabarit'] : 1;
+
+        $this->_view->upload_path = $this->_mainConfig->get('path', 'upload');
+        $this->_view->action = 'liste';
+
         $this->_form = '';
+        $this->_pages = array();
 
         if ($id_gab_page) {
             $query = 'SELECT * FROM `version` WHERE `id_api` = ' . $this->_api['id'];
-            $versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
-            $form = '';
-            $devant = '';
-            foreach ($versions as $version) {
-                $page = $this->_gabaritManager->getPage($version['id'], BACK_ID_API, $id_gab_page);
-
-                $urlParent = "";
-                foreach ($this->_gabaritManager->getParents($page->getMeta("id_parent"), $page->getMeta("id_version")) as $parent) {
-                    $urlParent .= $parent->getMeta("rewriting") . "/";
-                }
-
-                $url = $urlParent . $page->getMeta("rewriting") . $page->getGabarit()->getExtension();
-
-                $query  = 'SELECT `old`'
-                        . ' FROM `redirection`'
-                        . ' WHERE  `new` = ' . $this->_db->quote($url)
-                        . ' AND `id_api` = ' . BACK_ID_API
-                        . ' AND `id_version` = ' . $version['id'];
-                $redirections = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
-
-                $devant    .= '<div style="height: 54px;float: left;">'
-                            . '<div class="btn-a gradient-blue" style="margin-bottom: 5px;display:block;">'
-                            . '<a title="' . $version['nom'] . '" class="openlang'
-                            . ($version['id'] == BACK_ID_VERSION ? ' active' : ' translucide') . '">'
-                            . 'Langue : <img src="img/flags/png/' . strtolower($version['suf']) . '.png" alt="'
-                            . $version['nom'] . '" /></a></div>';
-
-                if ($page->getMeta("rewriting") != "") {
-                    if ($page->getGabarit()->getMake_hidden()
-                        || $this->_utilisateur->get("niveau") == "solire"
-                        || !$page->getMeta("visible")
-                    ) {
-                        $devant    .= '<div style="margin-left: 6px;margin-top: -7px;">'
-                                    . '<label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-'
-                                    . $version['id'] . '">Visible : </label><input class="visible-lang visible-lang-' . $page->getMeta("id") . '-' . $version['id'] . '" style="margin:0;" value="'
-                                    . $page->getMeta("id") . '|' . $version['id'] . '" id="visible-' . $version['id'] . '" '
-                                    . ($page->getMeta("visible") ? 'checked="checked"' : '') . ' type="checkbox" /></div>';
-                    }
-                } else {
-                    $devant .= '<span class="notification gradient-red" style="margin-left: 6px;">Non traduit</span>';
-                }
-
-                $devant .= '</a></div>';
-
-
-                $form  .= '<div class="langue" style="clear:both;'
-                        . ($version['id'] == BACK_ID_VERSION ? '' : ' display:none;')
-                        . '"><div class="clearin" style="margin-top:0"></div>';
-
-                $form .= $page->getForm("page/save.html", "page/liste.html",
-                    $upload_path, $redirections);
-
-                $form .= '</div>';
+            foreach ($this->_versions as $id_version => $version) {
+                $this->_pages[$id_version] = $this->_gabaritManager->getPage($id_version, BACK_ID_API, $id_gab_page);
             }
-
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, $id_gab_page);
-
-            $this->_form .= '<div>' . $devant . '</div>' . $form;
         } else {
-            $this->_page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
+            $query = 'SELECT * FROM `version` WHERE `id` = ' . BACK_ID_VERSION;
+            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
-            $form = $this->_page->getForm('page/save.html', 'page/liste.html',
-                $upload_path);
-            $this->_form = $form;
+            $this->_pages[BACK_ID_VERSION] = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
         }
 
-        //on recupere la sous rubrique de page a laquelle il appartient pour le breadCrumbs et le lien retour
+        $this->_view->versions = $this->_versions;
+        $this->_view->pages = $this->_pages;
+//        $this->_view->utilisateur = $this->_utilisateur;
+
+        /**
+         * On recupere la sous rubrique de page a laquelle il appartient
+         * pour le breadCrumbs et le lien retour
+         */
         $found = false;
         foreach ($this->_configPageModule as $index => $currentConfigPageModule) {
-            //Si le gabarit courant appartien à un des groupes personnalisés
+            /**
+             * Si le gabarit courant appartien à un des groupes personnalisés
+             */
             if ($currentConfigPageModule['gabarits'] == '*'
                 || in_array($this->_page->getGabarit()->getId(), $currentConfigPageModule['gabarits'])
             ) {
@@ -218,9 +176,6 @@ class Page extends Main
                 break;
             }
         }
-
-        $this->_view->page = $this->_page;
-        $this->_view->form = $this->_form;
 
         if ($found) {
             $this->_view->breadCrumbs[] = array(

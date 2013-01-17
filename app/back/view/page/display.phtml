@@ -1,95 +1,93 @@
-                        <style type="text/css">
-.loading-overlay {
-    background: rgba(0,0,0,0.6);
-    position:fixed;
-    width:100%;
-    height:100%;
-    z-index:101
-}
-
-/* LOADING SPINNER*/
-.circle {
-    background-color: rgba(0,0,0,0);
-    border:5px solid rgba(0,183,229,0.9);
-    opacity:.9;
-    border-right:5px solid rgba(0,0,0,0);
-    border-left:5px solid rgba(0,0,0,0);
-    border-radius:50px;
-    box-shadow: 0 0 35px #2187e7;
-    width:50px;
-    height:50px;
-    margin:0 auto;
-    -moz-animation:spinPulse 1s infinite ease-in-out;
-    -webkit-animation:spinPulse 1s infinite linear;
-}
-.circle1 {
-    background-color: rgba(0,0,0,0);
-    border:5px solid rgba(0,183,229,0.9);
-    opacity:.9;
-    border-left:5px solid rgba(0,0,0,0);
-    border-right:5px solid rgba(0,0,0,0);
-    border-radius:50px;
-    box-shadow: 0 0 15px #2187e7;
-    width:30px;
-    height:30px;
-    margin:0 auto;
-    position:relative;
-    top:-50px;
-    -moz-animation:spinoffPulse 1s infinite linear;
-    -webkit-animation:spinoffPulse 1s infinite linear;
-}
-@-moz-keyframes spinPulse {
-    0% { -moz-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7;}
-50% { -moz-transform:rotate(145deg); opacity:1; }
-100% { -moz-transform:rotate(-320deg); opacity:0; }
-}
-@-moz-keyframes spinoffPulse {
-    0% { -moz-transform:rotate(0deg); }
-100% { -moz-transform:rotate(360deg);  }
-}
-@-webkit-keyframes spinPulse {
-    0% { -webkit-transform:rotate(160deg); opacity:0; box-shadow:0 0 1px #2187e7; }
-50% { -webkit-transform:rotate(145deg); opacity:1;}
-100% { -webkit-transform:rotate(-320deg); opacity:0; }
-}
-@-webkit-keyframes spinoffPulse {
-    0% { -webkit-transform:rotate(0deg); }
-100% { -webkit-transform:rotate(360deg); }
-}
-
-.border-none, .border-none tr, .border-none  td {
-    border: none;
-}
-
-.top, .bottom {
-    border: 0px;
-    padding: 0px;
-}
-
-.modal-big {
-    width: 900px;
-    margin-left: -450px;
-}
-
-@media (max-width: 942px) {
-    .modal-big {
-        width: auto;
-        margin-left: auto;
-    }
-}
-                        </style>
-
                         <h1>Gestion des pages</h1>
 
 <?php
     $this->add('breadcrumbs.phtml');
 ?>
 
-                        <h2><?php echo ($this->page->getMeta() ? 'Modification de ' : 'Création de ') . strtolower($this->page->getGabarit()->getLabel()); ?></h2>
+                        <h2><?php echo ($this->pages[BACK_ID_VERSION]->getMeta() ? 'Modification de ' : 'Création de ') . strtolower($this->pages[BACK_ID_VERSION]->getGabarit()->getLabel()); ?></h2>
 
 <?php
-    echo $this->form;
+//    echo $this->form;
+    if (count($this->versions) > 0) {
+?>
+                        <div>
+<?php
+        foreach ($this->versions as $id_version => $version) {
+            $page = $this->pages[$id_version];
+?>
+                            <div style="height: 54px;float: left;">
+                                <div class="btn-a gradient-blue" style="margin-bottom: 5px;display:block;">
+                                    <a title="<?php echo $version['nom']; ?>" class="openlang <?php echo $id_version == BACK_ID_VERSION ? 'active' : 'translucide'; ?>">
+                                        Langue : <img src="img/flags/png/<?php echo strtolower($version['suf']); ?>.png" alt="<?php echo $version['nom']; ?>" />
+                                    </a>
+                                </div>
 
+<?php
+            if ($page->getMeta("rewriting") != "") {
+                if ($page->getGabarit()->getMake_hidden()
+                    || $this->utilisateur->get("niveau") == "solire"
+                    || !$page->getMeta("visible")
+                ) {
+?>
+                                <div style="margin-left: 6px;margin-top: -7px;">
+                                    <label style="color:#A1A1A1;display:inline;text-shadow:none;margin-left:10px;" for="visible-<?php echo $id_version; ?>">Visible : </label>
+                                    <input class="visible-lang visible-lang-<?php echo $page->getMeta("id") . '-' . $id_version; ?>" style="margin:0;" value="<?php echo $page->getMeta("id") . '|' . $id_version; ?>" id="visible-<?php echo $id_version; ?>" type="checkbox"<?php if ($page->getMeta("visible")) { echo ' checked="checked"'; }?> />
+                                </div>
+<?php
+                }
+            }else {
+?>
+                                <span class="notification gradient-red" style="margin-left: 6px;">Non traduit</span>
+<?php
+            }
+?>
+                            </div>
+<?php
+        }
+?>
+                        </div>
+
+<?php
+    }
+        
+    foreach ($this->pages as $page) {
+?>
+                        <div class="langue" id="langue_<?php echo $page->getMeta('id_version'); ?>" style="clear:both;<?php if ($page->getMeta('id_version') != BACK_ID_VERSION) { echo ' display:none;'; } ?>">
+<?php
+        if (count($this->versions) > 1) {
+?>
+                        <div style="margin-top:0" class="clearin"></div>
+
+                        <div>
+                            <select class="fl" style="display:block;">
+<?php
+            foreach ($this->versions as $id_version => $version) {
+                if ($id_version != $page->getMeta('id_version')) {
+?>
+                                <option value="<?php echo $id_version; ?>"><?php echo $version['nom']; ?></option>
+<?php
+                }
+            }
+?>
+                            </select>
+                            
+                            <button class="btn-a gradient-green fl comparerversion" style="padding: 9px 18px; font-size: 12px; display: block; font-family: Arial; line-height: 12px;">Comparer</button>                            
+                        </div>
+<?php
+        }
+?>
+
+                        <div style="margin-top:0" class="clearin"></div>
+<?php
+        echo $page->getForm('page/save.html', 'page/liste.html', $this->upload_path);
+?>
+                        </div>
+
+<?php
+    }
+?>
+
+<?php
     if (isset($_GET['popup']) && $_GET['popup'] == 'more') {
 ?>
 
@@ -103,14 +101,16 @@
                                 <dl class="">
 
 <?php
-        if ($this->page->getMeta("rewriting") != '') {
-            if ($this->page->getGabarit()->getMake_hidden()
-                    || $this->utilisateur->get('niveau') == 'solire'
-                    || !$this->page->getMeta('visible')
+        $page = $this->pages[BACK_ID_VERSION];
+
+        if ($page->getMeta("rewriting") != '') {
+            if ($page->getGabarit()->getMake_hidden()
+                || $this->utilisateur->get('niveau') == 'solire'
+                || !$page->getMeta('visible')
             ) {
 ?>
-                <dt>Gérer la visibité :</dt><br /><dd><img src="img/flags/png/<?php echo strtolower($this->versions[BACK_ID_VERSION]['suf']); ?>.png" alt="" />
-                <input class="visible-lang visible-lang-<?php echo $this->page->getMeta("id") . '-' . BACK_ID_VERSION; ?>" style="margin:0;" value="<?php echo $this->page->getMeta('id') . '|' . BACK_ID_VERSION; ?>" id="visible-<?php echo BACK_ID_VERSION; ?>" style="margin:0;" <?php echo ($this->page->getMeta('visible') ? 'checked="checked"' : ''); ?> type="checkbox" /><dd>
+                                    <dt>Gérer la visibité :</dt><br /><dd><img src="img/flags/png/<?php echo strtolower($this->versions[BACK_ID_VERSION]['suf']); ?>.png" alt="" />
+                                    <input class="visible-lang visible-lang-<?php echo $page->getMeta("id") . '-' . BACK_ID_VERSION; ?>" style="margin:0;" value="<?php echo $page->getMeta('id') . '|' . BACK_ID_VERSION; ?>" id="visible-<?php echo BACK_ID_VERSION; ?>" style="margin:0;" <?php echo ($page->getMeta('visible') ? 'checked="checked"' : ''); ?> type="checkbox" /><dd>
 <?php
             }
         }

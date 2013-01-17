@@ -1361,7 +1361,7 @@ class gabaritManager extends manager
 
     /**
      * Sauve une ligne d'un bloc dynamique
-     *
+     * 
      * @param string $table
      * @param array  $champs
      * @param int    $id_bloc
