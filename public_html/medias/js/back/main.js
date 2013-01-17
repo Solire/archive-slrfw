@@ -52,6 +52,11 @@ $(function() {
      */
     if($(".live-search").length > 0 )
         $(".live-search").livequery(function() {
+            var appendTo = ".navbar-fixed-top";
+            if ($(this).parents(".nav-search:first").length == 0) {
+                appendTo = null
+            }
+            
             $(this).autocomplete({
                 source: function( request, response ) {
                 
@@ -70,7 +75,7 @@ $(function() {
                 return false
                 },
                 minLength: 2,
-                appendTo: ".navbar-fixed-top",
+                appendTo: appendTo,
                 select: function(e, ui) {
                 var baseHref = $("base").attr("href");
                 window.location.href = baseHref + ui.item.url;
