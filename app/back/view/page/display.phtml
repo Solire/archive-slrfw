@@ -158,58 +158,63 @@
 
                                         <td style="vertical-align:top;">
 
-                                            <form class="form-crop form-horizontal" action="media/crop.html" method="post" style="width: 350px;">
+                                            <form class="form-crop form-horizontal" action="media/crop.html" method="post" style="width: 325px;">
                                                 <fieldset class="img-info">
                                                     <legend>Information</legend>
-                                                    <dl style="display: none" class="dl-horizontal expected-width">
-                                                        <dt style="width: 180px;">Largeur minimale attendue</dt>
-                                                        <dd style="margin-left: 190px;"><span id="minwidthShow"></span>px</dd>
-                                                    </dl>
-                                                    <dl style="display: none" class="dl-horizontal expected-height">
-                                                        <dt style="width: 180px;">Hauteur minimale attendue</dt>
-                                                        <dd style="margin-left: 190px;"><span id="minheightShow"></span>px</dd>
-                                                    </dl>
+                                                    <div>
+                                                        <dl style="display: none" class="dl-horizontal expected-width">
+                                                            <dt style="width: 180px;">Largeur minimale attendue</dt>
+                                                            <dd style="margin-left: 190px;"><span id="minwidthShow"></span>px</dd>
+                                                        </dl>
+                                                        <dl style="display: none" class="dl-horizontal expected-height">
+                                                            <dt style="width: 180px;">Hauteur minimale attendue</dt>
+                                                            <dd style="margin-left: 190px;"><span id="minheightShow"></span>px</dd>
+                                                        </dl>
+                                                    </div>
                                                 </fieldset>
 
                                                 <fieldset>
                                                     <legend>Sélection</legend>
-                                                    <div class="control-group">
-                                                        <label class="control-label" for="wShow">Largeur</label>
-                                                        <div class="controls">
-                                                            <input type="text" style="width: 60px" class="wShow spinner" id="wShow" placeholder="Largeur" value="" />
+                                                    <div>
+                                                        <div class="control-group">
+                                                            <label class="control-label" for="wShow">Largeur</label>
+                                                            <div class="controls">
+                                                                <input type="text" style="width: 60px" class="wShow spinner" id="wShow" placeholder="Largeur" value="" />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="control-group">
-                                                        <label class="control-label" for="hShow">Hauteur</label>
-                                                        <div class="controls">
-                                                            <input type="text" style="width: 60px" class="hShow spinner" id="hShow" placeholder="Hauteur" value="" />
+                                                        <div class="control-group">
+                                                            <label class="control-label" for="hShow">Hauteur</label>
+                                                            <div class="controls">
+                                                                <input type="text" style="width: 60px" class="hShow spinner" id="hShow" placeholder="Hauteur" value="" />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </fieldset>
 
                                                 <fieldset>
                                                     <legend>Enregistrement</legend>
+                                                    <div>
+                                                        <div class="control-group">
+                                                            <label class="radio expected-height">
+                                                                <input type="radio" value="height" class="" name="force-width">Respecter la hauteur minimum
+                                                            </label>
+                                                            <label class="radio expected-width">
+                                                                <input type="radio" value="width" class="" name="force-width">Respecter la largeur minimum
+                                                            </label>
+                                                            <label class="radio expected-width-height">
+                                                                <input type="radio" value="width-height" class="" name="force-width">Respecter la hauteur et la largeur minimum
+                                                            </label>
 
-                                                    <div class="control-group">
-                                                        <label class="radio expected-height">
-                                                            <input type="radio" value="height" class="" name="force-width">Respecter la hauteur minimum
-                                                        </label>
-                                                        <label class="radio expected-width">
-                                                            <input type="radio" value="width" class="" name="force-width">Respecter la largeur minimum
-                                                        </label>
-                                                        <label class="radio expected-width-height">
-                                                            <input type="radio" value="width-height" class="" name="force-width">Respecter la hauteur et la largeur minimum
-                                                        </label>
-                                                        
-                                                        <label class="radio force-selection">
-                                                            <input type="radio"  value="1" name="force-width">Forcer la taille en fonction de la sélection
-                                                        </label>
-                                                    </div>
+                                                            <label class="radio force-selection">
+                                                                <input type="radio"  value="1" name="force-width">Forcer la taille en fonction de la sélection
+                                                            </label>
+                                                        </div>
 
-                                                    <div class="control-group radio">
-                                                        <label class="">Nom de l'image</label>
-                                                        <input type="text" id="image-name" name="image-name" class="input-xlarge" placeholder="Nom de l'image" value="" />
-                                                        <input type="hidden" id="image-extension" name="image-extension"  />
+                                                        <div class="control-group radio">
+                                                            <label class="">Nom de l'image</label>
+                                                            <input type="text" id="image-name" name="image-name" class="input-xlarge" placeholder="Nom de l'image" value="" />
+                                                            <input type="hidden" id="image-extension" name="image-extension"  />
+                                                        </div>
                                                     </div>
 
                                                     <input type="hidden" id="filepath" name="filepath" />

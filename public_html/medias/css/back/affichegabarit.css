@@ -76,3 +76,12 @@
         margin-left: auto;
     }
 }
+
+
+.form-crop fieldset {
+    margin-bottom: 0;
+}
+
+.form-horizontal.form-crop .control-group {
+    margin-bottom: 6px;
+}
