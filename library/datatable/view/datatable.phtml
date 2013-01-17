@@ -24,7 +24,7 @@
             margin-bottom: 0px;
         }
 
-        
+
         #tableau-<?php echo $this->name ?>_wrapper input {
             height: auto;
             margin-bottom: 0px;
@@ -44,7 +44,7 @@
             box-shadow: none;
             border: none;
             border-radius: 0px;
-            background:#3A87AD; 
+            /*background:#3A87AD;*/
             <?php
             if (isset($this->config["style"]) && isset($this->config["style"]["datatable"])) {
                 foreach ($this->config["style"]["datatable"] as $keyStyle => $valueStyle) {
@@ -183,7 +183,7 @@
             border-left:5px solid rgba(0,0,0,0);
             border-right:5px solid rgba(0,0,0,0);
             border-radius:50px;
-            box-shadow: 0 0 15px #2187e7; 
+            box-shadow: 0 0 15px #2187e7;
             width:30px;
             height:30px;
             margin:0 auto;
@@ -352,7 +352,7 @@
                         <?php echo isset($column["editable"]) && $column["editable"] ? "editable" : ""; ?>
                         <?php echo isset($column["editable_field"]) ? "editable-" . $column["editable_field"] : ""; ?>
                         <?php echo isset($column["nl2br"]) ? "editable-br2nl" : ""; ?>
-                             " 
+                             "
                              <?php echo isset($column["width"]) ? 'style="width:' . $column["width"] . '"' : ''; ?>
                              ><?php echo $column["title"]; ?></th>
 
@@ -448,7 +448,7 @@
         var anOpen_<?php echo $this->name ?>Id = [];
         var anOpen_<?php echo $this->name ?>2 = [];
         var anOpen_<?php echo $this->name ?>2Id = [];
-    
+
         // get visible columns
         $.fn.getColumnsShown = function(dTable)
         {
@@ -462,15 +462,15 @@
 
             return vCols;
         }
-        
-        
+
+
         $.fn.fnSetFilteringDelay = function ( oSettings, iDelay ) {
             var _that = this;
- 
+
             if ( iDelay === undefined ) {
                 iDelay = 250;
             }
-      
+
             this.each( function ( i ) {
                 $.fn.dataTableExt.iApiIndex = i;
                 var
@@ -478,27 +478,27 @@
                 oTimerId = null,
                 sPreviousSearch = null,
                 anControl = $( 'input', _that.fnSettings().aanFeatures.f );
-          
+
                 anControl.unbind( 'keyup' ).bind( 'keyup', function() {
                     var $$this = $this;
-  
+
                     if (sPreviousSearch === null || sPreviousSearch != anControl.val()) {
                         window.clearTimeout(oTimerId);
-                        sPreviousSearch = anControl.val(); 
+                        sPreviousSearch = anControl.val();
                         oTimerId = window.setTimeout(function() {
                             $.fn.dataTableExt.iApiIndex = i;
                             _that.fnFilter( anControl.val() );
                         }, iDelay);
                     }
                 });
-          
+
                 return this;
             } );
             return this;
         };
-    
+
         var oTable_<?php echo $this->name ?>;
-    
+
         $(document).ready(function() {
             $.datepicker.regional['fr'] = {
                 clearText: 'Effacer', clearStatus: '',
@@ -516,7 +516,7 @@
                 dayNamesShort: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
                 dayNamesMin: ['Di','Lu','Ma','Me','Je','Ve','Sa'],
                 dayStatus: 'Utiliser DD comme premier jour de la semaine', dateStatus: 'Choisir le DD, MM d',
-                dateFormat: 'dd/mm/yy', firstDay: 0, 
+                dateFormat: 'dd/mm/yy', firstDay: 0,
                 initStatus: 'Choisir la date', isRTL: false
             };
             $.datepicker.setDefaults($.datepicker.regional['fr']);
@@ -532,7 +532,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
         foreach ($details as $detail) {
             list($detailName, $detailId, $style) = explode("|", $detail);
             ?>
-                                                                                                                                                
+
                                     if(aData[<?php echo $detailId; ?>] != '') {
                                         sOut += '<tr><td><?php echo $detailName; ?></td><td>';
             <?php
@@ -564,10 +564,10 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                     sOut += '</table>';
                     return sOut;
                 }
-                                                            
-                                                            
-                                                            
-                                                                                                                            
+
+
+
+
                 $('#tableau-<?php echo $this->name ?> tbody td img.detail').live( 'click', function () {
                     var nTr = $(this).parents('tr:first')[0];
                     var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
@@ -579,7 +579,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                             odd = "odd";
                         }
                         var nDetailsRow = oTable_<?php echo $this->name ?>.fnOpen( nTr, fnFormatDetails(oTable_<?php echo $this->name ?>, nTr), 'details-other' );
-                                                                    
+
                         $('div.innerDetails', nDetailsRow).slideDown();
                         anOpen_<?php echo $this->name ?>.push( nTr );
                         anOpen_<?php echo $this->name ?>Id.push( $(nTr).attr("id") );
@@ -604,12 +604,12 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                                 $(nTr).find("td").removeClass("highlighted")
                             }
                         })
-                                                                    
+
                         $(".ajax-load", nDetailsRow).each(function() {
                             if ($(this).children().length == 0 ) {
                                 loadAjax($(this), $(nTr).attr("id"));
                             }
-                                                    
+
                         })
 
                         $(".ajax-click-load", nDetailsRow).each(function() {
@@ -645,7 +645,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
     <?php
 }
 ?>
-        
+
         oTable_<?php echo $this->name ?> = $('#tableau-<?php echo $this->name ?>').dataTable({
             "bAutoWidth": false,
 <?php
@@ -665,7 +665,7 @@ if (isset($this->config["table"]["info"]) && !$this->config["table"]["info"]) {
     ?>
                     'bInfo': false,
 <?php } ?>
-    
+
 <?php if (isset($this->config["table"]["filter"]) && !$this->config["table"]["filter"]) { ?>
                 'bFilter': false,
 <?php } ?>
@@ -694,7 +694,7 @@ foreach ($this->config["columns"] as $column) {
     if (isset($column["show"]) && $column["show"]) {
         if (isset($column["default_sorting"]) && $column["default_sorting"]) {
             ?>
-                                        [ <?php echo isset($this->config["table"]["detail"]) && $this->config["table"]["detail"] ? $numCol + 1 : $numCol; ?>, "<?php echo $column["default_sorting_direction"]; ?>" ],        
+                                        [ <?php echo isset($this->config["table"]["detail"]) && $this->config["table"]["detail"] ? $numCol + 1 : $numCol; ?>, "<?php echo $column["default_sorting_direction"]; ?>" ],
             <?php
         }
 
@@ -750,7 +750,7 @@ foreach ($this->config["columns"] as $column) {
                     $overlay.find(".circle").css({'margin-top' : marginTop + "px"})
                     $overlay.fadeIn(500);
                 }
-                
+
                 return true;
             },
             'fnDrawCallback': function(a, b, c) {
@@ -778,12 +778,12 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                     "url": sSource,
                     "data": aoData,
                     "success": function(data){
-                    
+
                         for (i in data.bottomsValue) {
                             $('tfoot tr:last th', oTable).eq(i).html(data.bottomsValue[i])
                         }
-                    
-                        fnCallback(data);                    
+
+                        fnCallback(data);
                     }
                 } );
             },
@@ -801,7 +801,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["copy"]) && $t
                             {
                                 'sExtends':    "collection",
                                 'sButtonText': "Copier",
-                                'aButtons': [  
+                                'aButtons': [
                                     {
                                         'sExtends': "copy",
                                         'sButtonText': "Colonnes visibles",
@@ -835,7 +835,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["pdf"]) && $th
                             {
                                 "sExtends":    "collection",
                                 "sButtonText": "PDF",
-                                "aButtons":    [  
+                                "aButtons":    [
                                     {
                                         "sExtends": "pdf",
                                         "sButtonText": "Colonnes visibles",
@@ -860,7 +860,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["csv"]) && $th
                             {
                                 "sExtends":    "collection",
                                 "sButtonText": "CSV",
-                                "aButtons":    [  
+                                "aButtons":    [
                                     {
                                         "sExtends": "csv",
                                         "sButtonText": "Colonnes visibles",
@@ -895,7 +895,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"
 ?>
             "sAjaxSource": "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>json&<?php echo $this->additionalParams ?>",
             "sServerMethod": "POST"
-            
+
         }).fnSetFilteringDelay().columnFilter({
 <?php
 if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"]) && $this->config["extra"]["hide_columns"]) {
@@ -905,7 +905,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"
 }
 ?>
 
-            'aoColumns': [ 
+            'aoColumns': [
 <?php
 if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
     echo ' null,';
@@ -933,12 +933,12 @@ foreach ($this->config["columns"] as $column) {
         $numCol++;
     }
 }
-?> 
+?>
             ]
         });
-    
+
         $('.dataTables_filter input').attr("placeholder", "Recherche...");
-    
+
         $('td', oTable_<?php echo $this->name ?>.fnGetNodes()).livequery(function(){
             $(this).hover(function() {
                 var odd = "even"
@@ -957,10 +957,10 @@ foreach ($this->config["columns"] as $column) {
                     $(this).parent().next().find("td").removeClass("highlighted")
                 }
             });
-        
+
             if(!$("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable"))
             return true;
-            
+
             /* Apply the jEditable handlers to the table */
             var type = $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-textarea") ? 'textarea' : "text" ;
             var type = $("#tableau-<?php echo $this->name ?> thead tr th").eq($(this).index()).hasClass("editable-autogrow") ? 'autogrow' : "text" ;
@@ -994,7 +994,7 @@ foreach ($this->config["columns"] as $column) {
                 "onblur"    : type != "text" ? "ignore" : null,
                 "height": type == "textarea" ? '100px' : "14px"
             } );
-        
+
         });
 
 <?php
@@ -1004,25 +1004,25 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
     <?php
 }
 ?>
-        
+
     });
-    
-    
 
-    
 
-  
 
-    
-    
-    
+
+
+
+
+
+
+
 <?php if (isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) { ?>
 //        $("#tableau-<?php echo $this->name ?> .delete-item").live("click", function(e) {
         $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .btn-group > .delete-item").live("click", function(e) {
             e.preventDefault()
             // On recupere l'id de la row'
             var id = $(this).parents("tr:first").attr('id');
-                                                                                            
+
             var heading = 'Confirmation de suppression d\'un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>';
             var question = 'Etes-vous sûr de vouloir supprimer cet élément ? ';
             var cancelButtonTxt = 'Annuler';
@@ -1036,28 +1036,28 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
                     var message = 'L<?php echo $this->config["table"]["suffix_genre"] == "e" ? "a" : "e" ?> <?php echo $this->config["table"]["title_item"] ?>'
                         + ' a été supprimé<?php echo $this->config["table"]["suffix_genre"] ?> avec succès'
                     var closeButtonTxt = 'Fermer';
-                    oTable_<?php echo $this->name ?>.fnDraw(false);             
+                    oTable_<?php echo $this->name ?>.fnDraw(false);
                     myModal.message(heading, message, closeButtonTxt, 2500);
                 });
             };
 
             myModal.confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
         });
-                                                                                    
-                                                                                    
-                                                                                    
 
 
-<?php } ?>                                                   
-                 
-        
+
+
+
+<?php } ?>
+
+
 <?php if (isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"]) { ?>
         $("#tableau-<?php echo $this->name ?> .edit-item-no-ajax").live("click", function(e) {
             e.preventDefault();
             var index = $(this).parents("tr:first").attr("id")
             window.location.href = '<?php echo $this->url . '&dt_action=formEditRender&index='; ?>' + index
         });
-                                                                                                                                   
+
 <?php } ?>
 
 <?php if (isset($this->config["extra"]["show"]) && $this->config["extra"]["show"]) { ?>
@@ -1066,7 +1066,7 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
             var index = $(this).parents("tr:first").attr("id")
             window.location.href = '<?php echo $this->url . '&dt_action=show&index='; ?>' + index
         })
-                                                                                                                                   
+
 <?php } ?>
 
 
@@ -1076,16 +1076,16 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
         var url = $elem.attr("rel") + "&" + filter;
         $elem.load(url)
     }
-        
-        
 
-                
+
+
+
     // Convert HTML breaks to newline
     String.prototype.br2nl =
         function() {
         return this.replace(/<br\s*\/?>/mg,"\n");
     };
-    
+
     var extensionsImage = ['jpg', 'jpeg', 'gif', 'png'];
 
     $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .open-modal").live("click", function() {
@@ -1102,16 +1102,16 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
                 myModal.message("Aperçu", data, "Fermer l'aperçu");
             })
         }
-        
-        
+
+
     })
-        
-        
+
+
     var myModal = {
         confirm : function (heading, question, cancelButtonTxt, okButtonTxt, callback) {
 
-            var confirmModal = 
-                $('<div class="modal hide fade">' +    
+            var confirmModal =
+                $('<div class="modal hide fade">' +
                 '<div class="modal-header">' +
                 '<a class="close" data-dismiss="modal" >&times;</a>' +
                 '<h3>' + heading +'</h3>' +
@@ -1122,11 +1122,11 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
                 '</div>' +
 
                 '<div class="modal-footer">' +
-                '<a href="#" class="btn" data-dismiss="modal">' + 
-                cancelButtonTxt + 
+                '<a href="#" class="btn" data-dismiss="modal">' +
+                cancelButtonTxt +
                 '</a>' +
-                '<a href="#" id="okButton" class="btn btn-danger">' + 
-                okButtonTxt + 
+                '<a href="#" id="okButton" class="btn btn-danger">' +
+                okButtonTxt +
                 '</a>' +
                 '</div>' +
                 '</div>');
@@ -1137,12 +1137,12 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
                 confirmModal.modal('hide');
             });
 
-            confirmModal.modal('show');     
+            confirmModal.modal('show');
         },
         message : function (heading, message, closeButtonTxt, closeDelay) {
 
-            var messageModal = 
-                $('<div class="modal hide fade">' +    
+            var messageModal =
+                $('<div class="modal hide fade">' +
                 '<div class="modal-header">' +
                 '<a class="close" data-dismiss="modal" >&times;</a>' +
                 '<h3>' + heading +'</h3>' +
@@ -1153,23 +1153,23 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
                 '</div>' +
 
                 '<div class="modal-footer">' +
-                '<a href="#" id="closeButton" data-dismiss="modal" class="btn btn-primary">' + 
-                closeButtonTxt + 
+                '<a href="#" id="closeButton" data-dismiss="modal" class="btn btn-primary">' +
+                closeButtonTxt +
                 '</a>' +
                 '</div>' +
                 '</div>');
-            
-            messageModal.modal('show');     
+
+            messageModal.modal('show');
             if (closeDelay) {
                 messageModal.delay(closeDelay).queue(function(nxt) {
                     messageModal.modal("hide")
                     nxt(); // continue the queue
                 })
             }
-               
+
         }
-                
-                
+
+
     }
     var url<?php echo $this->nameConfig; ?> = '<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>';
     </script>
