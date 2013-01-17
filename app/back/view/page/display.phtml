@@ -7,7 +7,6 @@
                         <h2><?php echo ($this->pages[BACK_ID_VERSION]->getMeta() ? 'Modification de ' : 'Création de ') . strtolower($this->pages[BACK_ID_VERSION]->getGabarit()->getLabel()); ?></h2>
 
 <?php
-//    echo $this->form;
     if (count($this->versions) > 0) {
 ?>
                         <div>
@@ -49,29 +48,30 @@
 
 <?php
     }
-        
+
     foreach ($this->pages as $page) {
 ?>
-                        <div class="langue" id="langue_<?php echo $page->getMeta('id_version'); ?>" style="clear:both;<?php if ($page->getMeta('id_version') != BACK_ID_VERSION) { echo ' display:none;'; } ?>">
+                        <div class="langue" id="langue_<?php echo $page->getMeta('id_version'); ?>" style="clear:both;<?php if ($page->getMeta('id_version') != BACK_ID_VERSION && count($this->pages) > 1) { echo ' display:none;'; } ?>">
 <?php
         if (count($this->versions) > 1) {
 ?>
                         <div style="margin-top:0" class="clearin"></div>
 
                         <div>
-                            <select class="fl" style="display:block;">
+                            <select class="compareversion-other fl" style="display:block;">
 <?php
             foreach ($this->versions as $id_version => $version) {
                 if ($id_version != $page->getMeta('id_version')) {
 ?>
-                                <option value="<?php echo $id_version; ?>"><?php echo $version['nom']; ?></option>
+                                <option value="<?php echo $id_version . '|' . strtolower($version['suf']); ?>"><?php echo $version['nom']; ?></option>
 <?php
                 }
             }
 ?>
                             </select>
-                            
-                            <button class="btn-a gradient-green fl comparerversion" style="padding: 9px 18px; font-size: 12px; display: block; font-family: Arial; line-height: 12px;">Comparer</button>                            
+
+                            <button class="btn-a gradient-green fl compareversion-submit" style="padding: 9px 18px; font-size: 12px; display: block; font-family: Arial; line-height: 12px;">Comparer</button>
+                            <button class="btn-a gradient-green fl compareversion-hide" style="padding: 9px 18px; font-size: 12px; display: block; font-family: Arial; line-height: 12px;">Cacher</button>
                         </div>
 <?php
         }
@@ -237,4 +237,3 @@
                             </div>
 
                         </div>
-
