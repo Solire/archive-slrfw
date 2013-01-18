@@ -515,6 +515,14 @@ $(function(){
         }
     });
 
+    $('.js-checkbox').live('click', function(){
+        if($(this).is(':checked')){
+            $(this).next().val(1);
+        } else {
+            $(this).next().val(0);
+        }
+    });
+
     $('.delBloc').live('click', function(e){
         e.preventDefault();
 
