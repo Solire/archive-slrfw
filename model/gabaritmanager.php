@@ -1361,7 +1361,7 @@ class gabaritManager extends manager
 
     /**
      * Sauve une ligne d'un bloc dynamique
-     * 
+     *
      * @param string $table
      * @param array  $champs
      * @param int    $id_bloc
@@ -1399,16 +1399,7 @@ class gabaritManager extends manager
                 continue;
             }
 
-            if ($champ['type'] == 'CHECKBOX'){
-                if (!isset($donnees['champ' . $champ['id']])) {
-                    $value = 0;
-                } else {
-                    $value = 1;
-                }
-            }
-            else {
-                $value = array_shift($donnees['champ' . $champ['id']]);
-            }
+            $value = array_shift($donnees['champ' . $champ['id']]);
 
             if ($champ['type'] != 'WYSIWYG'
                 && $champ['type'] != 'TEXTAREA'
