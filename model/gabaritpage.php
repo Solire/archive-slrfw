@@ -47,9 +47,9 @@ class gabaritPage extends gabaritBloc {
     }
 
     /**
-     *  
+     *
      * @param array $meta
-     * 
+     *
      * @return void
      */
     public function setMeta($meta) {
@@ -200,7 +200,7 @@ class gabaritPage extends gabaritBloc {
 
     /**
      * Retourne la première page enfant
-     * 
+     *
      * @return gabaritPage
      */
     public function getFirstChild(){
@@ -213,12 +213,6 @@ class gabaritPage extends gabaritBloc {
      * @param string $action        adresse de l'action du formulaire
      * @param string $retour        adresse de retour
      * @param string $upload_path   emplacement des images
-     * @param bool   $mobile        si vrai affiche la version mobile
-     * @param bool   $meta          affiche les metas
-     * @param bool   $_301_editable affiche les redirections 301
-     * @param bool   $meta_titre    affiche le titre principal
-     * @param string $extension     extension de la page '/', '.html'...
-     * @param int    $versionId     identifiant de la version
      * @param array  $redirections  tableau des redirections
      *
      * @return string formulaire au format HTML

@@ -136,24 +136,36 @@ class Page extends Main
 
         $this->_form = '';
         $this->_pages = array();
+        $this->_redirections = array();
 
         if ($id_gab_page) {
             $query = 'SELECT * FROM `version` WHERE `id_api` = ' . $this->_api['id'];
             $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
             foreach ($this->_versions as $id_version => $version) {
-                $this->_pages[$id_version] = $this->_gabaritManager->getPage($id_version, BACK_ID_API, $id_gab_page);
+                $page = $this->_gabaritManager->getPage($id_version, BACK_ID_API, $id_gab_page);
+                $this->_pages[$id_version] = $page;
+
+                $path = $page->getMeta('rewriting') . $page->getGabarit()->getExtension();
+                foreach ($page->getParents() as $parent) {
+                    $path = $parent->getMeta('rewriting') . '/' . $path;
+                }
+
+                $query  = 'SELECT `old` FROM `redirection` WHERE `new` LIKE ' . $this->_db->quote($path);
+                $this->_redirections[$id_version] = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
             }
         } else {
             $query = 'SELECT * FROM `version` WHERE `id` = ' . BACK_ID_VERSION;
             $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
-            $this->_pages[BACK_ID_VERSION] = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
+            $page = $this->_gabaritManager->getPage(BACK_ID_VERSION, BACK_ID_API, 0, $id_gabarit);
+            $this->_pages[BACK_ID_VERSION] = $page;
+            $this->_redirections[BACK_ID_VERSION] = array();
         }
 
         $this->_view->versions = $this->_versions;
         $this->_view->pages = $this->_pages;
-//        $this->_view->utilisateur = $this->_utilisateur;
+        $this->_view->redirections = $this->_redirections;
 
         /**
          * On recupere la sous rubrique de page a laquelle il appartient
@@ -633,4 +645,3 @@ class Page extends Main
 
 }
 
-//end class

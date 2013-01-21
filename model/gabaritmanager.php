@@ -1059,24 +1059,21 @@ class gabaritManager extends manager
             $parents = $this->getParents($page->getMeta('id_parent'),
                 $page->getMeta('id_version'));
             foreach ($parents as $parent) {
-                $urlParent .= $parent->getMeta('rewriting') . '/';
+                $urlParent = $parent->getMeta('rewriting') . '/' . $urlParent;
             }
-
             $newUrl = $urlParent . $rewriting . $page->getGabarit()->getExtension();
 
+            $redirections = $donnees['301'];
             /** Si le rewriting a été modifié */
             if ($rewriting != $page->getMeta('rewriting')
                 && $page->getMeta('rewriting') != ''
             ) {
-                $donnees['301'][]   = $urlParent . $page->getMeta('rewriting')
+                $redirections[]   = $urlParent . $page->getMeta('rewriting')
                                     . $page->getGabarit()->getExtension();
             }
-
-            $donnees['301'] = array_unique($donnees['301']);
+            $redirections = array_unique($redirections);
 
             /** On supprime toutes les urls de redirection 301 pour la page courante */
-            $newUrl = $urlParent . $page->getMeta('rewriting')
-                    . $page->getGabarit()->getExtension();
             $query2Del  = 'DELETE FROM `redirection`'
                         . ' WHERE `new` = ' . $this->_db->quote($newUrl)
                         . ' AND `id_version` = ' . $page->getMeta('id_version')
@@ -1085,10 +1082,12 @@ class gabaritManager extends manager
 
             /** On insert toutes les urls dans le bloc redirection 301 */
             $queries2 = array();
-            foreach ($donnees['301'] as $redirect301) {
+            foreach ($redirections as $redirect301) {
                 $oldUrl = $redirect301;
 
-                if ($oldUrl != '' && $oldUrl != $newUrl) {
+                if ($oldUrl != ''
+                    && $oldUrl != $newUrl
+                ) {
                     $queries2[] = 'INSERT INTO `redirection` SET'
                                 . ' `old` = ' . $this->_db->quote($oldUrl) . ', '
                                 . ' `new` = ' . $this->_db->quote($newUrl) . ', '
@@ -1184,7 +1183,7 @@ class gabaritManager extends manager
 
             $urlParent = '';
             foreach ($this->getParents($id_parent, $version['id']) as $parent) {
-                $urlParent .= $parent->getMeta('rewriting') . '/';
+                $urlParent = $parent->getMeta('rewriting') . '/' . $urlParent;
             }
 
             $newUrl = $urlParent . $rewriting
