@@ -598,9 +598,11 @@ class gabaritManager extends manager
                         . ' AND `suppr` = 0';
                 $parentsMeta = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
                 foreach ($parentsMeta as $parentMeta) {
-                    // if (!isset($meta[$value[$joinName]]))
-                    //     continue;
-                    if ($parentsMeta[$value[$joinName]]['id_parent'] != 0) {
+                    if (!isset($meta[$value[$joinName]])) {
+                        continue;
+                    }
+
+                    if ($parentMeta['id_parent'] != 0) {
                         $parents[] = $parentMeta['id_parent'];
                     }
 
