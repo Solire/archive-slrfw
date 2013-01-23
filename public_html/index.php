@@ -21,7 +21,6 @@ set_include_path(
     . PATH_SEPARATOR . realpath('../model/')
 );
 require_once 'library/path.php';
-require_once 'library/front-controller.php';
 
 /* = Autoload
   ------------------------------- */
