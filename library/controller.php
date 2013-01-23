@@ -105,6 +105,20 @@ class Controller
     protected $_log = null;
 
     /**
+     * Informations de rewriting
+     *
+     * @var stdClass
+     */
+    protected $rew;
+
+    /**
+     * Accepte ou non les rewritings
+     *
+     * @var boolean
+     */
+    public $acceptRew = false;
+
+    /**
      * Fonction éxécutée avant l'execution de la fonction relative à la page en cours
      *
      * @return void
@@ -333,6 +347,20 @@ class Controller
         }
 
         throw $exc;
+    }
+
+    /**
+     * Enregistrement des paramètres de rewriting
+     *
+     * @param array  $categories Rewriting contenu dans les "/"
+     * @param string $target     Rewriting de l'action
+     *
+     * @return void
+     *
+     */
+    final public function setRewriting(array $categories)
+    {
+        $this->rew = $categories;
     }
 
     /**

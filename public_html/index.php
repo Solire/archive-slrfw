@@ -40,7 +40,7 @@ function autoload($name)
 
     $path = new Library\Path($name, Library\Path::SILENT);
     $fullPath = $path->get();
-    
+
     if ($fullPath) {
         require_once $path->get();
     }
@@ -59,13 +59,10 @@ try {
 } catch (Library\Exception\User $exc) {
     Library\Error::message($exc);
 } catch (Library\Exception\HttpError $exc) {
-//    Library\Error::http($exc->getHttp());
-    if (current($exc->getHttp()) == "404") {
+    if (current($exc->getHttp()) == '404') {
         header('HTTP/1.0 404 Not Found');
-        Library\FrontController::run("front", "error", "error404");
+        Library\FrontController::run('front', 'error', 'error404');
     }
 } catch (\Exception $exc) {
-//    $marv = new Library\Marvin('debug', $exc);
-//    $marv->display();
     Library\Error::run();
 }

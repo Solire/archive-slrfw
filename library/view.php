@@ -77,13 +77,15 @@ class View
 
     public function exists($controller, $action)
     {
+        $controller = strtolower($controller);
+        $action = strtolower($action);
         return file_exists($this->_dir . $controller . "/" . sprintf($this->_format, $action));
     }
 
     public function display($controller, $action, $custom = true)
     {
-        $this->_controller = $controller;
-        $this->_action = $action;
+        $this->_controller = strtolower($controller);
+        $this->_action = strtolower($action);
 
         if (($this->isEnabled() || $custom) && $this->isIncludeMain()) {
             include $this->_dir . 'main.phtml';

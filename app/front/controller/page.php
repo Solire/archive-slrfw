@@ -17,6 +17,13 @@ class Page extends Main
     private $_page = null;
 
     /**
+     * Accepte les rewritings
+     *
+     * @var boolean
+     */
+    public $acceptRew = true;
+
+    /**
      * Toujours executé avant l'action.
      *
      * @return void
@@ -25,8 +32,8 @@ class Page extends Main
     {
         parent::start();
         $this->_cache = Registry::get('cache');
-    }   
-    
+    }
+
     public function startAction()
     {
         $this->_view->enable(false);
@@ -45,7 +52,7 @@ class Page extends Main
             );
             $this->_parents[1]->setFirstChild($firstChild);
         }
-        
+
         $this->_siblings = $this->_gabaritManager->getList(
             ID_VERSION, ID_API, $this->_page->getMeta("id_parent"), 0, true
         );
@@ -57,12 +64,12 @@ class Page extends Main
         $this->_seo->setUrlCanonical($this->_page->getMeta("canonical"));
         if ($this->_page->getMeta("no_index"))
             $this->_seo->disableIndex();
-                
+
         $this->_view->page      = $this->_page;
         $this->_view->parents   = $this->_parents;
         $this->_view->pages     = $this->_pages;
         $this->_view->siblings  = $this->_siblings;
-        
+
         $view = $this->_page->getGabarit()->getName();
         if (method_exists($this, "_" . $view . "Gabarit"))
             $this->{"_" . $view . "Gabarit"}();
@@ -71,7 +78,7 @@ class Page extends Main
         $this->_view->display("page", $view);
     }
 
-    
+
     private function _previsu()
     {
         $first = TRUE;
@@ -83,7 +90,7 @@ class Page extends Main
             $this->_pages = $this->_gabaritManager->getList(
                 $_POST['id_version'], $_POST['id_api'],
                 $this->_page->getMeta("id"), false, true, "ordre", "asc"
-            );            
+            );
         }
 
 
@@ -94,34 +101,33 @@ class Page extends Main
                 $_POST['id_version'], $_POST['id_api'], $parent->getMeta("id"),
                 0, false, false
             );
-            
+
             $this->_fullRewriting[] = $parent->getMeta("rewriting") . "/";
-            
+
             $this->_view->breadCrumbs[] = array(
                 "label" => $parent->getMeta("titre"),
                 "url"   => implode("/", $this->_fullRewriting) . "/",
             );
-            
+
         }
     }
-    
+
     private function _display()
     {
-        if (!isset($_GET['rew']) || !is_array($_GET['rew'])) {
-            $this->pageNotFound();
+        if (empty($this->rew)) {
+            $this->rew[] = 'accueil';
         }
-
         $this->_parents         = array();
         $this->_fullRewriting   = array();
 
         $id_parent = 0 ;
 
-        foreach ($_GET['rew'] as $ii => $rewriting) {
+        foreach ($this->rew as $ii => $rewriting) {
             if (!$rewriting) {
                 $this->pageNotFound();
             }
 
-            $last = ($ii == count($_GET['rew']) - 1);
+            $last = ($ii == count($this->rew) - 1);
 
             $id_gab_page    = $this->_gabaritManager->getIdByRewriting(
                 ID_VERSION, ID_API, $rewriting, $id_parent
@@ -152,7 +158,7 @@ class Page extends Main
 
             $id_parent      = $id_gab_page;
         }
-        
+
         $this->_pages = $this->_gabaritManager->getList(
             ID_VERSION, ID_API, $this->_page->getMeta("id"), false, true, "ordre", "asc"
         );
