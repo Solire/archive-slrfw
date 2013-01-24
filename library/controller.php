@@ -125,7 +125,28 @@ class Controller
      */
     public function start()
     {
+        $this->_css = new Loader\Css();
+        $this->_javascript = new Loader\Javascript();
+        $this->_translate = new TranslateMysql(ID_VERSION, ID_API, $this->_db);
+        $this->_translate->addTranslation();
+        $this->_seo = new Seo();
+        $this->_project = new Project($this->_mainConfig->get('name', 'project'));
+        $this->_view = new View($this->_translate);
+        $this->_view->mainConfig = Registry::get('mainconfig');
+        $this->_view->appConfig = Registry::get('appconfig');
+        $this->_view->envConfig = Registry::get('envconfig');
+        $this->_view->ajax = $this->_ajax;
 
+        $this->_view->seo = $this->_seo;
+
+        if (isset($this->_option['mobile.enable'])) {
+            $mobile = new Mobile(
+                Registry::get('base'), $_SERVER['HTTP_USER_AGENT'], 'mobile', 'mobile'
+            );
+            $this->_version = $mobile->currentVersion();
+            $this->_view->version = $this->_version;
+            Registry::set('base', $mobile->baseHref());
+        }
     }
 
     /**
@@ -179,29 +200,6 @@ class Controller
         $this->_root = Registry::get('baseroot');
         $this->_db = Registry::get('db');
         $this->_log = Registry::get('log');
-        $this->_css = new Loader\Css();
-        $this->_javascript = new Loader\Javascript();
-        $this->_translate = new TranslateMysql(ID_VERSION, ID_API, $this->_db);
-        $this->_translate->addTranslation();
-        $this->_seo = new Seo();
-        $this->_project = new Project($this->_mainConfig->get('name', 'project'));
-        $this->_view = new View($this->_translate);
-        $this->_view->mainConfig = Registry::get('mainconfig');
-        $this->_view->appConfig = Registry::get('appconfig');
-        $this->_view->envConfig = Registry::get('envconfig');
-        $this->_view->ajax = $this->_ajax;
-
-        $this->_view->seo = $this->_seo;
-
-        if (isset($this->_option['mobile.enable'])) {
-            $mobile = new Mobile(
-                Registry::get('base'), $_SERVER['HTTP_USER_AGENT'], 'mobile', 'mobile'
-            );
-            $this->_version = $mobile->currentVersion();
-            $this->_view->version = $this->_version;
-            Registry::set('base', $mobile->baseHref());
-        }
-
     }
 
 
@@ -352,15 +350,14 @@ class Controller
     /**
      * Enregistrement des paramètres de rewriting
      *
-     * @param array  $categories Rewriting contenu dans les "/"
-     * @param string $target     Rewriting de l'action
+     * @param array $rew Rewriting contenu dans les "/"
      *
      * @return void
      *
      */
-    final public function setRewriting(array $categories)
+    final public function setRewriting(array $rew)
     {
-        $this->rew = $categories;
+        $this->rew = $rew;
     }
 
     /**

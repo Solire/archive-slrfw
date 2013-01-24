@@ -44,6 +44,7 @@ class Main extends \Slrfw\Library\Controller
      */
     public function start()
     {
+        parent::start();
 
         $suffixApi = '';
         if (isset($_GET['api'])) {
@@ -186,9 +187,9 @@ class Main extends \Slrfw\Library\Controller
         ) {
             $this->simpleRedirect('sign/start.html', true);
         }
-        
-        /** 
-         * Si l'utilisateur a juste le droit de prévisualisation du site 
+
+        /**
+         * Si l'utilisateur a juste le droit de prévisualisation du site
          *  = possibilité de voir le site sans tenir compte de la visibilité
          * Alors On le redirige vers le front
          */

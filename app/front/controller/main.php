@@ -14,7 +14,7 @@ use Slrfw\Library\Registry;
  * @license  Licence Shin
  */
 class Main extends \Slrfw\Library\Controller {
-    
+
     /**
      *
      * @var \Slrfw\Model\utilisateur
@@ -27,8 +27,8 @@ class Main extends \Slrfw\Library\Controller {
      * @return void
      */
     public function start() {
+        parent::start();
 
-        
         /** Set title of page ! */
         $this->_seo->setTitle($this->_project->getName());
 
@@ -45,35 +45,35 @@ class Main extends \Slrfw\Library\Controller {
 
         /**
          * MODE PREVISUALISATION
-         * 
-         * On teste si utilisateur de l'admin loggué 
+         *
+         * On teste si utilisateur de l'admin loggué
          *  = possibilité de voir le site sans tenir compte de la visibilité
-         * 
+         *
          */
         $this->_utilisateurAdmin = new \Slrfw\Library\Session('back');
         $this->_view->utilisateurAdmin = $this->_utilisateurAdmin;
-        
+
         if ($this->_utilisateurAdmin->isConnected() && $this->_ajax == FALSE) {
             if (isset($_GET["mode_previsualisation"])) {
                 $_SESSION["mode_previsualisation"] = (bool) $_GET["mode_previsualisation"];
             }
-            
+
             if (!isset($_SESSION["mode_previsualisation"])) {
                 $_SESSION["mode_previsualisation"] = 0;
             }
-            
+
             $this->_gabaritManager->setModePrevisualisation($_SESSION["mode_previsualisation"]);
 
             //Inclusion Bootstrap twitter
             $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
             $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');
-            
+
             $this->_view->site = Registry::get('project-name');
             $this->_view->modePrevisualisation = $_SESSION["mode_previsualisation"];
-            
+
         }
 
-        
+
         /** EXEMPLE DE RECUPERATION DES RUBRIQUE parent et leurs enfants */
         $this->_rubriques = $this->_gabaritManager->getList(ID_VERSION, ID_API, 0, array(3, 4, 5), TRUE);
         foreach ($this->_rubriques as $ii => $rubrique) {
@@ -93,7 +93,7 @@ class Main extends \Slrfw\Library\Controller {
 
         //On recupere la page elements communs qui sera disponible sur toutes les pages
         $this->_view->mainPage["element_commun"] = $this->_gabaritManager->getPage(ID_VERSION, ID_API, $this->_view->mainPage["element_commun"][0]->getMeta("id"), 0, FALSE, TRUE);
-        
+
         $this->_view->breadCrumbs = array();
         $this->_view->breadCrumbs[] = array(
             "label" => "Accueil",
