@@ -35,7 +35,6 @@ class DB
      */
     static private $_config = array(
         \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-//        \PDO::ATTR_STATEMENT_CLASS => array('Slrfw\Library\MyPDOStatement')
     );
 
     /**

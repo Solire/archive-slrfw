@@ -164,7 +164,7 @@ class Session
     /**
      * Génère un mot de passe
      *
-     * @var int $longueur Longueur du mot de passe
+     * @param int $longueur Longueur du mot de passe
      *
      * @return string
      */
@@ -358,7 +358,5 @@ class Session
     {
         return $this->user[$name];
     }
-
-
 }
 

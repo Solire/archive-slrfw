@@ -1,19 +1,22 @@
 <?php
-
-namespace Slrfw\Library;
-
-/** @todo faire la présentation du code */
-
-//+	 --------------------------------------------------------------------------------
 /**
  * Log : Classe de log par fichier ou mysql
  *
- * @version 2.02
- * @author Benoit Raux
- * Created : 2006/20/11 Benoit Raux (rauxbenoit@free.fr)
- * Updated : 2008/13/07 Benoit Raux	(rauxbenoit@free.fr)
+ * @package    Library
+ * @subpackage Core
+ * @author     Benoit Raux <rauxbenoit@free.fr>
+ * @license    Open Source (GPL)
+ */
+
+namespace Slrfw\Library;
+
+/**
+ * Log : Classe de log par fichier ou mysql
  *
- * Version PHP : 5.02
+ * @package    Library
+ * @subpackage Core
+ * @author     Benoit Raux <rauxbenoit@free.fr>
+ * @license    Open Source (GPL)
  *
  *
  * Par defaut et en mode fichier, la classe op?re une rotation sur les logs.
@@ -45,9 +48,8 @@ namespace Slrfw\Library;
  * 	$strIp : permet de faire une recherche sur les log de l'ip $strIp
  *
  */
-class Log {
-
-    //d?claration des variables
+class Log
+{
     /**
      * Pointeur vers le fichier ouvert
      *
@@ -97,42 +99,44 @@ class Log {
      */
     private $booArch;
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * Constructeur de la classe log
      *
-     * @param string $strToFileOrDbConnect :
-     * 	Chemin vers le fichier de log ( ? cr?er ou ? suivre).
+     * @param string $strToFileOrDbConnect Chemin vers le fichier de log ( ? cr?er ou ? suivre).
      * 	Si type db, on vas loguer dans la table $strTable
-     * @param string $strToLog :
-     * 	Une chaine ? logguer d?s l'intanciation (optionelle).
-     * @param string $strTable :
-     * 	 Un nom de table mysql pour les logs (optionelle, par defaut : logs).
-     * @param bool $booArch :
-     * 	 Active ou Desactive le syst?me de rotation par archivage.
+     * @param string $strToLog             Une chaine à logguer dès
+     * l'intanciation (optionelle).
+     * @param int    $idUser               identifiant utilisateur ??
+     * @param string $strTable             Un nom de table mysql
+     * pour les logs (optionelle, par defaut : logs).
+     * @param bool   $booArch              Active ou Desactive
+     * le système de rotation par archivage.
      */
-    //+	 --------------------------------------------------------------------------------
-    public function __construct($strToFileOrDbConnect, $strToLog='', $idUser = 0, $strTable='logs', $booArch=true) {
+    public function __construct(
+        $strToFileOrDbConnect,
+        $strToLog = '',
+        $idUser = 0,
+        $strTable = 'logs',
+        $booArch = true
+    ) {
         //test si on a une IP (en php-cli par exemple on a pas l'ip)
         if (!empty($_SERVER['REMOTE_ADDR'])) {
             $this->strIp = $_SERVER['REMOTE_ADDR'];
         } else {
             $this->strIp = 'NO IP';
         }
-        //On test si on doit ouvrir un fichier en ?criture, sinon on test existance de la table)
-       if (!is_string($strToFileOrDbConnect)) {
-
-                $this->strLogMode = 'mysql';
-                $this->strLogTable = $strTable;
-                $this->db = $strToFileOrDbConnect;
-                //Si table n'existe pas on la cr?er
-                $this->createTable();
-       } else {
-                $this->booArch = $booArch;
-                $this->strLogMode = 'file';
-                $this->strToFile = $strToFile;
-                $this->intFileSizeMax = 5 * 1024 * 1024;
-
+        //On test si on doit ouvrir un fichier en écriture, sinon on test existance de la table)
+        if (!is_string($strToFileOrDbConnect)) {
+            $this->strLogMode = 'mysql';
+            $this->strLogTable = $strTable;
+            $this->db = $strToFileOrDbConnect;
+            //Si table n'existe pas on la cr?er
+            $this->createTable();
+        } else {
+            $this->booArch = $booArch;
+            $this->strLogMode = 'file';
+            $this->strToFile = $strToFile;
+            $this->intFileSizeMax = 5 * 1024 * 1024;
         }
         //test si la chaine ?logguer est pr?sente
         if ($strToLog != '') {
@@ -141,18 +145,19 @@ class Log {
         }
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * mysqlQuery : Execute une requette
      *
-     * @param string $strFile : le ficher
+     * @param string $strReq le ficher
+     *
+     * @return ressource resultat de la requête sql
      */
-    private function mysqlQuery($strReq) {
+    private function mysqlQuery($strReq)
+    {
         $objResult = $this->db->query($strReq);
         try {
-            if ($objResult == FALSE) {
-                $strError = $reqTable . ' : ' . mysql_error();
-                $strError.= "\n";
+            if ($objResult == false) {
+                $strError = $reqTable . ' : ' . mysql_error() . "\n";
                 throw new \Slrfw\Library\Exception\Log($strError);
             }
         } catch (Exception $objExpetion) {
@@ -161,12 +166,13 @@ class Log {
         return $objResult;
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
-     * createTable : Cr?? la table de log si elle existe pas
+     * createTable : Créé la table de log si elle existe pas
      *
+     * @return void
      */
-    private function createTable() {
+    private function createTable()
+    {
         $reqTable = '
 				CREATE TABLE IF NOT EXISTS `' . $this->strLogTable . '` (
 				`logId` INT( 100 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -181,11 +187,13 @@ class Log {
         $objResult = $this->mysqlQuery($reqTable);
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * openLogFile : Ouvre le fichier de Log
+     *
+     * @return void
      */
-    private function openLogFile() {
+    private function openLogFile()
+    {
         //On vide la cache sur le syst?me de fichier
         clearstatcache();
         //Si le fichier existe -> Verifie la taile avant
@@ -217,20 +225,22 @@ class Log {
         }
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * openLogFile : Ouvre le fichier de Log
      *
      * @param string $strFile : le ficher
      * @param string $strMode : le mode d'ouverture
+     *
+     * @return resource file pointer
      */
-    private function fopenLogFile($strFile, $strMode) {
+    private function fopenLogFile($strFile, $strMode)
+    {
         $objFile = fopen($strFile, $strMode);
         try {
-            if ($objFile == FALSE) {
-                $strError = 'Erreur d\'ouverture du fichier ' . $strFile . ' en mode ' . $strMode . '!';
-                $strError.= "\n";
-                $strError.= 'V?rifiez l\'existance et les droits sur vos fichiers...';
+            if ($objFile == false) {
+                $strError = 'Erreur d\'ouverture du fichier ' . $strFile
+                          . ' en mode ' . $strMode . '!' . "\n"
+                          . 'Vérifiez l\'existance et les droits sur vos fichiers...';
                 throw new \Slrfw\Library\Exception\Log($strError);
             }
         } catch (Exception $objExpetion) {
@@ -239,13 +249,17 @@ class Log {
         return $objFile;
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * logThis : Ecrit la chaine $strToLog
      *
-     * @param string $strToLog : cha?ne a ajouter dans le log
+     * @param string $strToLog  chaîne a ajouter dans le log
+     * @param int    $idUser    identifiant utilisateur ???
+     * @param string $logStrOpt informations suplémentaires ???
+     *
+     * @return void
      */
-    public function logThis($strToLog, $idUser = 0, $logStrOpt = "") {
+    public function logThis($strToLog, $idUser = 0, $logStrOpt = '')
+    {
         switch ($this->strLogMode) {
             case 'mysql':
                 $this->logThisInTable($strToLog, $idUser, $logStrOpt);
@@ -259,55 +273,66 @@ class Log {
         }
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * logThisInFile : Ecrit la chaine $strToLog dans le fichier
      *
-     * @param string $strToLog : cha?ne a ajouter dans le log
+     * @param string $strToLog chaîne a ajouter dans le log
+     *
+     * @return void
      */
-    private function logThisInFile($strToLog) {
+    private function logThisInFile($strToLog)
+    {
         fwrite(
-                $this->objFile, date('Y-m-d') . "\t" . date('H:i:s') . "\t" . $this->strIp . "\t" . $strToLog . "\n"
+            $this->objFile, date('Y-m-d') . "\t" . date('H:i:s') . "\t"
+            . $this->strIp . "\t" . $strToLog . "\n"
         );
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * logThisInTable : Ecrit la chaine $strToLog dans la table mysql
      *
-     * @param string $strToLog : cha?ne a ajouter dans le log
+     * @param string $strToLog cha?ne a ajouter dans le log
+     * @param int    $idUser   identifiant utilisateur ???
+     * @param string $strOpt   informations suplémentaires ???
+     *
+     * @return void
      */
-    private function logThisInTable($strToLog, $idUser, $strOpt) {
-        $reqLog = 'INSERT INTO `' . $this->strLogTable . '` ';
-        $reqLog.= '(`logDate`,`logTime`,`logIp`,`logString`,`logStrOpt`, `logIdUser`) ';
-        $reqLog.= 'VALUES(';
-        $reqLog.= '\'' . date('Y-m-d') . '\',';
-        $reqLog.= '\'' . date('H:i:s') . '\',';
-        $reqLog.= '\'' . $this->strIp . '\',';
-        $reqLog.= '' . $this->db->quote($strToLog) . ',';
-        $reqLog.= '' . $this->db->quote($strOpt) . ',';
-        $reqLog.= '' . $idUser . '';
-        $reqLog.= '); ';
+    private function logThisInTable($strToLog, $idUser, $strOpt)
+    {
+        $reqLog = 'INSERT INTO `' . $this->strLogTable . '` '
+                . '(`logDate`,`logTime`,`logIp`,`logString`,`logStrOpt`, `logIdUser`) '
+                . 'VALUES('
+                . '\'' . date('Y-m-d') . '\','
+                . '\'' . date('H:i:s') . '\','
+                . '\'' . $this->strIp . '\','
+                . '' . $this->db->quote($strToLog) . ','
+                . '' . $this->db->quote($strOpt) . ','
+                . '' . $idUser . ''
+                . '); ';
         $objResult = $this->mysqlQuery($reqLog);
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * closeLogFile : Ferme le fichier de log en cours
+     *
+     * @return void
      */
-    private function closeLogFile() {
+    private function closeLogFile()
+    {
         fclose($this->objFile);
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * purgeLog : Purge le log selon une date / heure
      * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre)
+     *
      * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppr?ssion des logs
      *
+     * @return void
      */
-    public function purgeLog($strDateTime='0000-00-00 00:00:00') {
+    public function purgeLog($strDateTime = '0000-00-00 00:00:00')
+    {
         //Si par d?faut
         if ($strDateTime == '0000-00-00 00:00:00') {
             $strDateTime = date('Y-m-d H:i:s');
@@ -332,42 +357,49 @@ class Log {
         }
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * purgeLogTable : Purge la table de log selon une date / heure
-     * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre dans la table mysql de log)
-     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
+     * (supprime tous les enregistrement antérieurs à la date passée en paramètre
+     *  dans la table mysql de log)
+     *
+     * @param string $strDateTime chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppression des logs
      *
+     * @return void
      */
-    private function purgeLogTable($strDateTime) {
+    private function purgeLogTable($strDateTime)
+    {
         $strDate = substr($strDateTime, 0, 10);
         $strTime = substr($strDateTime, 11, 8);
-        $reqPurge = 'DELETE FROM `' . $db->quote($this->strLogTable) . '` ';
-        $reqPurge.= 'WHERE `logDate` < \'' . $strDate . '\' ';
-        $reqPurge.= 'OR (`logDate` = \'' . $strDate . '\' AND `logTime` <= \'' . $strTime . '\') ;';
+        $reqPurge = 'DELETE FROM `' . $db->quote($this->strLogTable) . '` '
+                  . 'WHERE `logDate` < \'' . $strDate . '\' '
+                  . 'OR (`logDate` = \'' . $strDate . '\' AND `logTime` <= \'' . $strTime . '\') ;';
         $objResult = $this->mysqlQuery($reqPurge);
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * dateToTimestamp : Renvoit le timestamp d'une date MYSQL.
+     *
      * @param string $strDateTime : chaine au format datetime MYSQL
      *
+     * @return int
      */
-    private function dateToTimestamp($strDateTime) {
+    private function dateToTimestamp($strDateTime)
+    {
         return strtotime($strDateTime);
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * purgeLogCurentFile : Purge le fichier log en cours selon une date / heure
-     * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre dans le fichier de log)
+     * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre)
+     *
      * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppression des logs
      *
+     * @return void
      */
-    private function purgeLogCurentFile($strDateTime) {
+    private function purgeLogCurentFile($strDateTime)
+    {
         $intTimeStampeDate = $this->dateToTimestamp($strDateTime);
         $strContent = '';
         $arrLineContent = array();
@@ -384,7 +416,7 @@ class Log {
                 $intTimeStampLine = $this->dateToTimestamp($strDateTimeLine);
                 //si la ligne respecte les crit?res de date on la stock
                 if ($intTimeStampLine > $intTimeStampeDate) {
-                    $strContent.=$strLineContent;
+                    $strContent .= $strLineContent;
                 }
             }
         }
@@ -398,27 +430,31 @@ class Log {
         $this->closeLogFile();
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
-     * purgeLogFiles : Purge les fichier log archiv?s selon une date / heure
-     * (supprime tous les enregistrement ant?rieurs ? la date pass?e en param?tre
-     * dans les fichier de log archiv?s)
-     * @param string $strDateTime : chaine au format datetime (Y-m-d H:i:s)
+     * purgeLogFiles : Purge les fichier log archivés selon une date / heure
+     * (supprime tous les enregistrement antérieurs à la date passée en paramètre
+     * dans les fichier de log archivés)
+     *
+     * @param string $strDateTime chaine au format datetime (Y-m-d H:i:s)
      * 	limite pour la suppression des logs
      *
+     * @return void
      */
-    public function purgeLogFiles($strDateTime) {
+    public function purgeLogFiles($strDateTime)
+    {
         $intTimeStampeDate = $this->dateToTimestamp($strDateTime);
         //vas chercher la listes des fichiers archiv?s
         $arrArchFiles = glob($this->strToFile . '.*.gz');
         foreach ($arrArchFiles as $strPathToArch) {
-            $strDateArch = str_replace(array($this->strToFile . '.', '.gz'), array(''), $strPathToArch);
-            $strDateTimeArch = substr($strDateArch, 0, 4) . '-';
-            $strDateTimeArch.= substr($strDateArch, 4, 2) . '-';
-            $strDateTimeArch.= substr($strDateArch, 6, 2) . ' ';
-            $strDateTimeArch.= substr($strDateArch, 9, 2) . ':';
-            $strDateTimeArch.= substr($strDateArch, 11, 2) . ':';
-            $strDateTimeArch.= substr($strDateArch, 13, 2);
+            $strDateArch = str_replace(
+                array($this->strToFile . '.', '.gz'), array(''), $strPathToArch
+            );
+            $strDateTimeArch = substr($strDateArch, 0, 4) . '-'
+                             . substr($strDateArch, 4, 2) . '-'
+                             . substr($strDateArch, 6, 2) . ' '
+                             . substr($strDateArch, 9, 2) . ':'
+                             . substr($strDateArch, 11, 2) . ':'
+                             . substr($strDateArch, 13, 2);
             $intTimeStampArch = $this->dateToTimestamp($strDateTimeArch);
             if ($intTimeStampArch <= $intTimeStampeDate) {
                 unlink($strPathToArch);
@@ -426,35 +462,45 @@ class Log {
         }
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * visuLog : Fonction pour afficher les logs dans la page
      *
-     * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) de debut
-     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin optionel,
-     * 	si = 0000-00-00 00:00:00 : pas de date de fin
-     * @param string $strContentToSearch : un contenu recherch? (optionel)
-     * @param bool $booDetail :affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)
+     * @param string $strDateTimeIni     dateTime (AAAA-MM-DD HH-MM-SS) de debut
+     * @param string $strDateTimeEnd     dateTime (AAAA-MM-DD HH-MM-SS) de fin,
+     * si = 0000-00-00 00:00:00 : pas de date de fin
+     * @param string $strContentToSearch un contenu recherch? (optionel)
+     * @param bool   $booDetail          affichage des detail actif ou non (Date / Heure / Ip)
+     * @param string $strIp              une ip recherch?e (optionel)
+     *
+     * @return void
      */
     public function visuLog(
-    $strDateTimeIni='0000-00-00 00:00:00', $strDateTimeEnd='0000-00-00 00:00:00', $strContentToSearch='', $booDetail=true, $strIp=''
+        $strDateTimeIni = '0000-00-00 00:00:00',
+        $strDateTimeEnd = '0000-00-00 00:00:00',
+        $strContentToSearch = '',
+        $booDetail = true,
+        $strIp = ''
     ) {
         //Controle datetime
-        if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeIni)) {
+        $pattern = '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/';
+        if (preg_match($pattern, $strDateTimeIni)) {
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log('Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log(
+                    'Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format'
+                );
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
         }
-        if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeEnd)) {
+        if (preg_match($pattern, $strDateTimeEnd)) {
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log('Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log(
+                    'Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format'
+                );
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
@@ -463,40 +509,52 @@ class Log {
         if ('0000-00-00 00:00:00' == $strDateTimeEnd) {
             $strDateTimeEnd = date('Y-m-d H:i:s');
         }
-        $strContent = $this->returnLog($strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp);
+        $strContent = $this->returnLog(
+            $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+        );
         echo '<pre>' . $strContent . '</pre>';
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * returnLog : Fonction pour r?cup?rer le contenu des log dans une chaine
      *
-     * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) debut de la plage de r?cup des logs.
-     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) fin de la plage de r?cup des logs.
-     *  Optionel, si = 0000-00-00 00:00:00 : pas de date de fin
-     * @param string $strContentToSearch : un contenu recherch? (optionel)
-     * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)
+     * @param string $strDateTimeIni     dateTime (AAAA-MM-DD HH-MM-SS) de debut
+     * @param string $strDateTimeEnd     dateTime (AAAA-MM-DD HH-MM-SS) de fin,
+     * si = 0000-00-00 00:00:00 : pas de date de fin
+     * @param string $strContentToSearch un contenu recherch? (optionel)
+     * @param bool   $booDetail          affichage des detail actif ou non (Date / Heure / Ip)
+     * @param string $strIp              une ip recherch?e (optionel)
+     *
      * @return string : contenu des logs
      */
     private function returnLog(
-    $strDateTimeIni='0000-00-00 00:00:00', $strDateTimeEnd='0000-00-00 00:00:00', $strContentToSearch='', $booDetail=true, $strIp=''
+        $strDateTimeIni = '0000-00-00 00:00:00',
+        $strDateTimeEnd = '0000-00-00 00:00:00',
+        $strContentToSearch = '',
+        $booDetail = true,
+        $strIp = ''
     ) {
+        $pattern = '/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/';
         //Controle datetime
-        if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeIni)) {
+        if (preg_match($pattern, $strDateTimeIni)) {
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log('Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log(
+                    'Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format'
+                );
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
         }
-        if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $strDateTimeEnd)) {
+
+        if (preg_match($pattern, $strDateTimeEnd)) {
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log('Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format');
+                throw new \Slrfw\Library\Exception\Log(
+                    'Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format'
+                );
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
@@ -510,35 +568,42 @@ class Log {
         switch ($this->strLogMode) {
             case 'mysql':
                 $strContent = $this->returnLogMysqlContent(
-                        $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+                    $strDateTimeIni, $strDateTimeEnd,
+                    $strContentToSearch, $booDetail, $strIp
                 );
                 break;
             case 'file':
-                $strContent.= $this->returnLogArchFilesContent(
-                        $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+                $strContent .= $this->returnLogArchFilesContent(
+                    $strDateTimeIni, $strDateTimeEnd,
+                    $strContentToSearch, $booDetail, $strIp
                 );
-                $strContent.= $this->returnLogFileContent(
-                        $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+                $strContent .= $this->returnLogFileContent(
+                    $strDateTimeIni, $strDateTimeEnd,
+                    $strContentToSearch, $booDetail, $strIp
                 );
                 break;
         }
         return $strContent;
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
-     * returnLogArchFilesContent : Fonction qui retourne le contenu des fichiers de log Archiv?s
+     * returnLogArchFilesContent : Fonction qui retourne le contenu des fichiers de log Archivés
      *
-     * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) de debut
-     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin,
+     * @param string $strDateTimeIni     dateTime (AAAA-MM-DD HH-MM-SS) de debut
+     * @param string $strDateTimeEnd     dateTime (AAAA-MM-DD HH-MM-SS) de fin,
      * si = 0000-00-00 00:00:00 : pas de date de fin
-     * @param string $strContentToSearch : un contenu recherch? (optionel)
-     * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)
+     * @param string $strContentToSearch un contenu recherch? (optionel)
+     * @param bool   $booDetail          affichage des detail actif ou non (Date / Heure / Ip)
+     * @param string $strIp              une ip recherch?e (optionel)
+     *
      * @return string : contenu des logs
      */
     private function returnLogArchFilesContent(
-    $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+        $strDateTimeIni,
+        $strDateTimeEnd,
+        $strContentToSearch,
+        $booDetail,
+        $strIp
     ) {
         $strContentRequired = '';
         $intTimeStampDateIni = $this->dateToTimestamp($strDateTimeIni);
@@ -548,19 +613,21 @@ class Log {
         //Declaration du tableau des fichiers archive ? parser
         $arrFilesToParse = array();
         foreach ($arrArchFiles as $strPathToArch) {
-            $strDateArch = str_replace(array($this->strToFile . '.', '.gz'), array(''), $strPathToArch);
-            $strDateTimeArch = substr($strDateArch, 0, 4) . '-';
-            $strDateTimeArch.= substr($strDateArch, 4, 2) . '-';
-            $strDateTimeArch.= substr($strDateArch, 6, 2) . ' ';
-            $strDateTimeArch.= substr($strDateArch, 9, 2) . ':';
-            $strDateTimeArch.= substr($strDateArch, 11, 2) . ':';
-            $strDateTimeArch.= substr($strDateArch, 13, 2);
+            $strDateArch = str_replace(
+                array($this->strToFile . '.', '.gz'), array(''), $strPathToArch
+            );
+            $strDateTimeArch = substr($strDateArch, 0, 4) . '-'
+                             . substr($strDateArch, 4, 2) . '-'
+                             . substr($strDateArch, 6, 2) . ' '
+                             . substr($strDateArch, 9, 2) . ':'
+                             . substr($strDateArch, 11, 2) . ':'
+                             . substr($strDateArch, 13, 2);
             $intTimeStampArch = $this->dateToTimestamp($strDateTimeArch);
             if ($intTimeStampArch >= $intTimeStampDateIni) {
                 $arrFilesToParse[] = $strPathToArch;
             }
         }
-        //Lecture des fichiers ? parser
+        //Lecture des fichiers à parser
         foreach ($arrFilesToParse as $strPathToArch) {
             $objFileArch = gzopen($strPathToArch, 'r');
             $strArchContent = '';
@@ -579,7 +646,9 @@ class Log {
                     $intTimeStampLine = $this->dateToTimestamp(
                             $arrArchColContent[0] . ' ' . $arrArchColContent[1], 'MYSQL'
                     );
-                    if ($intTimeStampLine >= $intTimeStampDateIni && $intTimeStampLine <= $intTimeStampDateEnd) {
+                    if ($intTimeStampLine >= $intTimeStampDateIni
+                        && $intTimeStampLine <= $intTimeStampDateEnd
+                    ) {
                         $booLineCheck = true;
                         //Test notre crit?re de contenu
                         if ($strContentToSearch != '') {
@@ -599,9 +668,9 @@ class Log {
                         if ($booLineCheck === true) {
                             //La ligne corespond a notre recherhe
                             if ($booDetail === true) {
-                                $strContentRequired.= $strLineArch . "\n";
+                                $strContentRequired .= $strLineArch . "\n";
                             } else {
-                                $strContentRequired.= str_replace(
+                                $strContentRequired .= str_replace(
                                                 $arrArchColContent[0] . "\t"
                                                 . $arrArchColContent[1] . "\t"
                                                 . $arrArchColContent[2] . "\t", '', $strLineArch
@@ -620,20 +689,24 @@ class Log {
         return $strContentRequired;
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * returnLogFileContent : Fonction qui retourne le contenu du fichier de log en cours
      *
-     * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) de debut
-     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin,
+     * @param string $strDateTimeIni     dateTime (AAAA-MM-DD HH-MM-SS) de debut
+     * @param string $strDateTimeEnd     dateTime (AAAA-MM-DD HH-MM-SS) de fin,
      * si = 0000-00-00 00:00:00 : pas de date de fin
-     * @param string $strContentToSearch : un contenu recherch? (optionel)
-     * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)
-     * @return string : contenu des logs
+     * @param string $strContentToSearch un contenu recherch? (optionel)
+     * @param bool   $booDetail          affichage des detail actif ou non (Date / Heure / Ip)
+     * @param string $strIp              une ip recherch?e (optionel)
+     *
+     * @return string contenu de la table de log
      */
     private function returnLogFileContent(
-    $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+        $strDateTimeIni,
+        $strDateTimeEnd,
+        $strContentToSearch,
+        $booDetail,
+        $strIp
     ) {
         $intTimeStampDateIni = $this->dateToTimestamp($strDateTimeIni);
         $intTimeStampDateEnd = $this->dateToTimestamp($strDateTimeEnd);
@@ -650,7 +723,9 @@ class Log {
                 $strTimeLine = $arrLineContent[1];
                 $strDateTimeLine = $strDateLine . ' ' . $strTimeLine;
                 $intTimeStampLine = $this->dateToTimestamp($strDateTimeLine);
-                if ($intTimeStampLine >= $intTimeStampDateIni && $intTimeStampLine <= $intTimeStampDateEnd) {
+                if ($intTimeStampLine >= $intTimeStampDateIni
+                    && $intTimeStampLine <= $intTimeStampDateEnd
+                ) {
                     $booLineCheck = true;
                     //Test notre crit?re de contenu
                     if ($strContentToSearch != '') {
@@ -670,9 +745,9 @@ class Log {
                     if ($booLineCheck === true) {
                         //La ligne corespond a notre recherhe
                         if ($booDetail === true) {
-                            $strContentRequired.= $strLineContent;
+                            $strContentRequired .= $strLineContent;
                         } else {
-                            $strContentRequired.= str_replace(
+                            $strContentRequired .= str_replace(
                                     $arrLineContent[0] . "\t"
                                     . $arrLineContent[1] . "\t"
                                     . $arrLineContent[2] . "\t", '', $strLineContent
@@ -692,91 +767,79 @@ class Log {
         return $strContentRequired;
     }
 
-    //+	 --------------------------------------------------------------------------------
     /**
      * returnLogMysqlContent : Fonction qui retourne le contenu de la table log
      *
-     * @param string $strDateTimeIni : dateTime (AAAA-MM-DD HH-MM-SS) de debut
-     * @param string $strDateTimeEnd : dateTime (AAAA-MM-DD HH-MM-SS) de fin,
+     * @param string $strDateTimeIni     dateTime (AAAA-MM-DD HH-MM-SS) de debut
+     * @param string $strDateTimeEnd     dateTime (AAAA-MM-DD HH-MM-SS) de fin,
      * si = 0000-00-00 00:00:00 : pas de date de fin
-     * @param string $strContentToSearch : un contenu recherch? (optionel)
-     * @param bool $booDetail : affichage des detail actif ou non (Date / Heure / Ip)
-     * @param string $strIp : une  ip recherch?e (optionel)
+     * @param string $strContentToSearch un contenu recherch? (optionel)
+     * @param bool   $booDetail          affichage des detail actif ou non (Date / Heure / Ip)
+     * @param string $strIp              une ip recherch?e (optionel)
+     *
      * @return string contenu de la table de log
      */
     private function returnLogMysqlContent(
-    $strDateTimeIni, $strDateTimeEnd, $strContentToSearch, $booDetail, $strIp
+        $strDateTimeIni,
+        $strDateTimeEnd,
+        $strContentToSearch,
+        $booDetail,
+        $strIp
     ) {
         $strContentRequired = '';
         $strDateIni = substr($strDateTimeIni, 0, 10);
         $strTimeIni = substr($strDateTimeIni, 11, 8);
         $strDateEnd = substr($strDateTimeEnd, 0, 10);
         $strTimeEnd = substr($strDateTimeEnd, 11, 8);
-        $reqLogContent = 'SELECT * FROM `' . mysql_real_escape_string($this->strLogTable) . '` ';
-        $reqLogContent.= 'WHERE ( ';
-        $reqLogContent.= '`logDate` < \'' . $strDateEnd . '\' ';
-        $reqLogContent.= 'OR ( ';
-        $reqLogContent.= '`logDate` = \'' . $strDateEnd . '\' ';
-        $reqLogContent.= 'AND `logTime` <= \'' . $strTimeEnd . '\' ';
-        $reqLogContent.= ') ';
-        $reqLogContent.= ') ';
-        $reqLogContent.= 'AND ( ';
-        $reqLogContent.= '`logDate` > \'' . $strDateIni . '\' ';
-        $reqLogContent.= 'OR (';
-        $reqLogContent.= '	`logDate` = \'' . $strDateIni . '\' ';
-        $reqLogContent.= 'AND `logTime` >= \'' . $strTimeIni . '\'';
-        $reqLogContent.= ') ';
-        $reqLogContent.= ') ';
+        $reqLogContent = 'SELECT * FROM `' . $this->db->quote($this->strLogTable) . '` '
+                       . 'WHERE ( '
+                       . '`logDate` < \'' . $strDateEnd . '\' '
+                       . 'OR ( '
+                       . '`logDate` = \'' . $strDateEnd . '\' '
+                       . 'AND `logTime` <= \'' . $strTimeEnd . '\' '
+                       . ') '
+                       . ') '
+                       . 'AND ( '
+                       . '`logDate` > \'' . $strDateIni . '\' '
+                       . 'OR ('
+                       . '	`logDate` = \'' . $strDateIni . '\' '
+                       . 'AND `logTime` >= \'' . $strTimeIni . '\''
+                       . ') '
+                       . ') ';
         if ($strIp != '') {
-            $reqLogContent.= 'AND `logIp` LIKE \'%' . mysql_real_escape_string($strIp) . '%\' ';
+            $reqLogContent .= 'AND `logIp` LIKE \'%'
+                            . $this->db->quote($strIp) . '%\' ';
         }
         if ($strContentToSearch != '') {
-            $reqLogContent.= 'AND `logString` LIKE ';
-            $reqLogContent.= '\'%' . mysql_real_escape_string($strContentToSearch) . '%\' ';
+            $reqLogContent .= 'AND `logString` LIKE '
+                           . '\'%' . $this->db->quote($strContentToSearch)
+                           . '%\' ';
         }
         $recLogContent = $this->mysqlQuery($reqLogContent);
         if (mysql_num_rows($recLogContent)) {
             while ($ojbLogContent = mysql_fetch_object($recLogContent)) {
                 //La ligne corespond a notre recherhe
                 if ($booDetail === true) {
-                    $strContentRequired.= $ojbLogContent->logDate . "\t"
+                    $strContentRequired .= $ojbLogContent->logDate . "\t"
                             . $ojbLogContent->logTime . "\t"
                             . $ojbLogContent->logIp . "\t"
                             . $ojbLogContent->logString . "\n";
                 } else {
-                    $strContentRequired.= $ojbLogContent->logString . "\n";
+                    $strContentRequired .= $ojbLogContent->logString . "\n";
                 }
             }
         }
         return $strContentRequired;
     }
 
-    //+	 --------------------------------------------------------------------------------
-    /**
-     * newLog : Fonction qui retourne une instance de l'objet log
-     *
-     * @param string $strToFile :
-     * 	Chemin vers le fichier de log ( ? cr?er ou ? suivre).
-     * 	Si ?gal a mysql, on vas loguer dans la table $strTable
-     * @param string $strToLog :
-     * 	Une chaine ? logguer d?s l'intanciation (optionelle).
-     * @param string $strTable :
-     * 	 Un nom de table mysql pour les logs (optionelle, par defaut : logs).
-     * @param bool $booArch :
-     * 	 Active ou Desactive le syst?me de rotation par archivage.
-     */
-    static public function newLog($strToFile, $strToLog='', $strTable='logs', $booArch=true) {
-        $objLog = new Log($strToFile, $strToLog, $strTable, $booArch);
-        return $objLog;
-    }
-
-    //+	 --------------------------------------------------------------------------------
     /**
      * _toString : Fonction "magic" qui retourne l'objet sous forme de chaine
      *
+     * @return string
      */
-    public function _toString() {
+    public function __toString()
+    {
         return '<pre>' . print_r($this, true) . '</pre>';
     }
-
 }
+
