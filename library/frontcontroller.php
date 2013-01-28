@@ -289,6 +289,7 @@ class FrontController
 
         $controller = false;
         /** Contrôle du controller **/
+        $rewritingMod = false;
         if (isset($_GET['controller']) && !empty($_GET['controller'])) {
             $url = strtolower($_GET['controller']);
             $arrSelect = explode('/', $url);
