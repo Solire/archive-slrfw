@@ -49,7 +49,7 @@ RewriteRule js/([a-zA-Z/0-9_\-\.]+\.js)$                     public_html/medias/
 RewriteRule img/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$     public_html/medias/img/$1 [L]
 
 RewriteRule swf/([a-zA-Z/0-9_\-\.]+\.swf)$                   public_html/medias/swf/$1 [L]
-RewriteRule ^font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$  public_html/medias/font/$2 [L]
+RewriteRule font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$   public_html/medias/font/$1 [L]
 
 RewriteRule ^$                                               public_html/index.php?%{QUERY_STRING} [L]
 RewriteRule ^(([a-zA-Z0-9\-]+).html)$                        public_html/index.php?action=$2&%{QUERY_STRING} [L]
