@@ -181,9 +181,7 @@ class Main extends \Slrfw\Library\Controller
         }
 
         if (!$this->_utilisateur->isConnected()
-            && isset($_GET['action'])
-            && isset($_GET['controller'])
-            && $_GET['controller'] . '/' . $_GET['action'] != 'sign/start'
+            && get_class($this) !== 'Slrfw\App\Back\Controller\Sign'
         ) {
             $this->simpleRedirect('sign/start.html', true);
         }
