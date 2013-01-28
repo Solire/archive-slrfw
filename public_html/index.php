@@ -62,6 +62,7 @@ try {
 } catch (Library\Exception\HttpError $exc) {
     if (current($exc->getHttp()) == '404') {
         header('HTTP/1.0 404 Not Found');
+        echo '<pre>' . print_r($exc, true) . '</pre>';
         Library\FrontController::run('front', 'error', 'error404');
     }
 } catch (\Exception $exc) {
