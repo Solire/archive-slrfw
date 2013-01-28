@@ -32,37 +32,32 @@ RewriteRule ^robots.txt$											- [L]
 RewriteRule ^private/											- [L]
 
 
-RewriteRule ^sitemap.xml$											index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
-RewriteRule ^mobile/sitemap.xml$											index.php?controller=sitemap&action=start&application=mobile&%{QUERY_STRING} [L]
-
+RewriteRule ^sitemap.xml$								index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
+RewriteRule ^mobile/sitemap.xml$						index.php?controller=sitemap&action=start&application=mobile&%{QUERY_STRING} [L]
 
 RewriteRule ^locale/(.{5})/LC_MESSAGES_JS/(.*).js$                          locale/$1/LC_MESSAGES_JS/$2.js [L]
 
+# Spécifique à La mache
+RewriteRule ^doc/([a-zA-Z0-9-_]+)\.([a-z]+)                                 public_html/medias/upload/16/$1.$2 [L]
 
 
-RewriteRule ^(mobile/|back/)?css/(.+)$                                                      public_html/medias/css/$2 [L]
-RewriteRule ^(mobile/|back/)?img/(.*)$                                                      public_html/medias/img/$2 [L]
-RewriteRule ^(mobile/|back/)?js/(.+)$                                                       public_html/medias/js/$2 [L]
-RewriteRule ^(mobile/|back/)?swf/(.*)$                                                      public_html/medias/swf/$2 [L]
-RewriteRule ^(mobile/|back/)?font/(.*)$                                                      public_html/medias/font/$2 [L]
 
-RewriteRule ^back/([a-z0-9\-]+)/css/(.+)$                                                      public_html/medias/css/$2 [L]
-RewriteRule ^back/([a-z0-9\-]+)/img/(.*)$                                                      public_html/medias/img/$2 [L]
-RewriteRule ^back/([a-z0-9\-]+)/js/(.+)$                                                       public_html/medias/js/$2 [L]
-RewriteRule ^back/([a-z0-9\-]+)/swf/(.*)$                                                      public_html/medias/swf/$2 [L]
-RewriteRule ^back/([a-z0-9\-]+)/font/(.*)$                                                      public_html/medias/font/$2 [L]
+RewriteRule ([0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$           public_html/medias/upload/$1/$2 [L]
 
-RewriteRule ^([0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$                         public_html/medias/upload/$1/$2 [L]
+RewriteRule css/([a-zA-Z/0-9_\-\.]+\.css)$                   public_html/medias/css/$1 [L]
+RewriteRule js/([a-zA-Z/0-9_\-\.]+\.js)$                     public_html/medias/js/$1 [L]
+RewriteRule img/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$     public_html/medias/img/$1 [L]
 
+RewriteRule swf/([a-zA-Z/0-9_\-\.]+\.swf)$                   public_html/medias/swf/$1 [L]
+RewriteRule ^font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$  public_html/medias/font/$2 [L]
 
-RewriteRule ^$                                                     public_html/index.php?%{QUERY_STRING} [L]
-RewriteRule ^(([a-zA-Z0-9\-]+).html)$                              public_html/index.php?action=$2&%{QUERY_STRING} [L]
-RewriteRule ^([a-zA-Z0-9/\-]+)/$				                   public_html/index.php?controller=$1&%{QUERY_STRING} [L]
-RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$              public_html/index.php?controller=$1&action=$2&%{QUERY_STRING} [L]
+RewriteRule ^$                                               public_html/index.php?%{QUERY_STRING} [L]
+RewriteRule ^(([a-zA-Z0-9\-]+).html)$                        public_html/index.php?action=$2&%{QUERY_STRING} [L]
+RewriteRule ^([a-zA-Z0-9/\-]+)/$                             public_html/index.php?controller=$1&%{QUERY_STRING} [L]
+RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$        public_html/index.php?controller=$1&action=$2&%{QUERY_STRING} [L]
 
 
 #   Toutes les URL qui ne correspondent pas à ces masques sont réécrites.
-RewriteCond $1 !^(public_html/)
 RewriteRule ^(.*)$                                                          public_html/index.php?%{QUERY_STRING} [L]
 
 SetEnv PHP_VER 5
