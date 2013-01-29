@@ -6,28 +6,12 @@ deny from all
 #   Empêche la visualisation de l'arborescence, n'a rien à voir avec le masquage du « index.php ».
 #Options -Indexes
 
-#ErrorDocument
-ErrorDocument 400 /public_html/index.php?controller=error&action=start&code=400
-ErrorDocument 401 /public_html/index.php?controller=error&action=start&code=401
-ErrorDocument 402 /public_html/index.php?controller=error&action=start&code=402
-ErrorDocument 403 /public_html/index.php?controller=error&action=start&code=403
-ErrorDocument 404 /public_html/index.php?controller=error&action=start&code=404
-ErrorDocument 405 /public_html/index.php?controller=error&action=start&code=405
-ErrorDocument 500 /public_html/index.php?controller=error&action=start&code=500
-ErrorDocument 501 /public_html/index.php?controller=error&action=start&code=501
-ErrorDocument 502 /public_html/index.php?controller=error&action=start&code=502
-ErrorDocument 503 /public_html/index.php?controller=error&action=start&code=503
-ErrorDocument 504 /public_html/index.php?controller=error&action=start&code=504
-ErrorDocument 505 /public_html/index.php?controller=error&action=start&code=505
-
 #   Active le module de réécriture d'URL.
 RewriteEngine on
 
 #
 #   Fixe les règles de réécriture d'URL. Ici, nous utilisons une liste blanche.
 #
-
-
 RewriteRule ^robots.txt$											- [L]
 RewriteRule ^private/											- [L]
 # Exception pour tiny_mce
@@ -53,6 +37,7 @@ RewriteRule img/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$     public_html/medias/
 RewriteRule swf/([a-zA-Z/0-9_\-\.]+\.swf)$                   public_html/medias/swf/$1 [L]
 RewriteRule font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$   public_html/medias/font/$1 [L]
 
+RewriteRule ^public_html/index.php$                          public_html/index.php?%{QUERY_STRING} [L]
 RewriteRule ^$                                               public_html/index.php?%{QUERY_STRING} [L]
 RewriteRule ^(([a-zA-Z0-9\-]+).html)$                        public_html/index.php?action=$2&%{QUERY_STRING} [L]
 RewriteRule ^([a-zA-Z0-9/\-]+)/$                             public_html/index.php?controller=$1&%{QUERY_STRING} [L]
@@ -60,7 +45,7 @@ RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$        public_html/index.p
 
 
 #   Toutes les URL qui ne correspondent pas à ces masques sont réécrites.
-RewriteRule ^(.*)$                                                          public_html/index.php?%{QUERY_STRING} [L]
+RewriteRule ^(.*)$                                                          public_html/index.php?controller=NopChuckTesta%{QUERY_STRING} [L]
 
 SetEnv PHP_VER 5
 # php_value magic_quotes_gpc "0"
