@@ -43,8 +43,8 @@ RewriteRule ^locale/(.{5})/LC_MESSAGES_JS/(.*).js$                          loca
 RewriteRule ^doc/([a-zA-Z0-9-_]+)\.([a-z]+)                                 public_html/medias/upload/16/$1.$2 [L]
 
 
-
-RewriteRule ([0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$           public_html/medias/upload/$1/$2 [L]
+# Images & documents ajoutés par l'utilisateur
+RewriteRule ((temp-)?([0-9]+))/(.+\.(jpg|jpeg|png|gif|pdf))$           public_html/medias/upload/$1/$4 [L]
 
 RewriteRule css/([a-zA-Z/0-9_\-\.]+\.css)$                   public_html/medias/css/$1 [L]
 RewriteRule js/([a-zA-Z/0-9_\-\.]+\.js)$                     public_html/medias/js/$1 [L]
