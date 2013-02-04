@@ -165,6 +165,8 @@ class FrontController
         Registry::set('project-name', self::$mainConfig->get('name', 'project'));
         $emails = self::$envConfig->get('email');
 
+        Registry::set('basehref', self::$envConfig->get('url', 'base'));
+
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
         if (isset($_GET['version-force'])) {
@@ -287,6 +289,7 @@ class FrontController
 
         $controller = false;
         /** Contrôle du controller **/
+        $rewritingMod = false;
         if (isset($_GET['controller']) && !empty($_GET['controller'])) {
             $url = strtolower($_GET['controller']);
             $arrSelect = explode('/', $url);
