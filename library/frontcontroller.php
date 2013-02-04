@@ -466,8 +466,11 @@ class FrontController
 
         $instance->start();
         $view = $instance->getView();
-        $viewDir = sprintf($front->getDir('views'), 'app/' . strtolower($front->application));
-        $view->setDir($viewDir);
+        foreach (self::$appDirs as $app) {
+            $viewDir = sprintf($front->getDir('views'), $app['dir']
+                     . DS . strtolower($front->application));
+            $view->setDir($viewDir);
+        }
         $view->setTemplate('main');
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
