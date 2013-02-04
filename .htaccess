@@ -24,16 +24,25 @@ RewriteRule ^doc/([a-zA-Z0-9-_]+)\.([a-z]+)                                 publ
 
 
 # Images & documents ajoutés par l'utilisateur
-RewriteRule ((temp-)?([0-9]+))/(.+\.(jpg|jpeg|png|gif|pdf))$           public_html/medias/upload/$1/$4 [L]
+RewriteRule ((temp-)?([0-9]+))/(.+\.(jpg|jpeg|png|gif|pdf))$         public_html/medias/upload/$1/$4 [L]
 
-RewriteRule css/([a-zA-Z/0-9_\-\.]+\.css)$                   public_html/medias/css/$1 [L]
-RewriteRule js/([a-zA-Z/0-9_\-\.]+\.js)$                     public_html/medias/js/$1 [L]
-RewriteRule img/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$     public_html/medias/img/$1 [L]
+RewriteRule css/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.css)$                 public_html/medias/$1/css/$2 [L]
+RewriteRule ^css/([a-zA-Z/0-9_\-\.]+\.css)$                          public_html/medias/css/$1 [L]
 
-RewriteRule swf/([a-zA-Z/0-9_\-\.]+\.swf)$                   public_html/medias/swf/$1 [L]
-RewriteRule font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$   public_html/medias/font/$1 [L]
+RewriteRule js/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.js)$                    public_html/medias/$1/js/$2 [L]
+RewriteRule ^js/([a-zA-Z/0-9_\-\.]+\.js)$                            public_html/medias/js/$1 [L]
 
-RewriteRule ^public_html/index.php$                          public_html/index.php?%{QUERY_STRING} [L]
+RewriteRule img/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$    public_html/medias/$1/img/$2 [L]
+RewriteRule ^img/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$            public_html/medias/img/$1 [L]
+
+RewriteRule swf/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.swf)$                  public_html/medias/$1/swf/$2 [L]
+RewriteRule ^swf/([a-zA-Z/0-9_\-\.]+\.swf)$                          public_html/medias/swf/$1 [L]
+
+RewriteRule font/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$  public_html/medias/$1/font/$2 [L]
+RewriteRule ^font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$          public_html/medias/font/$1 [L]
+
+#RewriteCond %{REQUEST_URI} !(public_html/index.php)
+#RewriteRule ^public_html/index.php$                          public_html/index.php?%{QUERY_STRING} [L]
 RewriteRule ^$                                               public_html/index.php?%{QUERY_STRING} [L]
 RewriteRule ^(([a-zA-Z0-9\-]+).html)$                        public_html/index.php?action=$2&%{QUERY_STRING} [L]
 RewriteRule ^([a-zA-Z0-9/\-]+)/$                             public_html/index.php?controller=$1&%{QUERY_STRING} [L]
@@ -41,7 +50,10 @@ RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$        public_html/index.p
 
 
 #   Toutes les URL qui ne correspondent pas à ces masques sont réécrites.
+RewriteCond $1 !^(public_html/medias/)
+RewriteCond %{REQUEST_URI} !(public_html/index.php)
 RewriteRule ^(.*)$                                                          public_html/index.php?controller=NopChuckTesta%{QUERY_STRING} [L]
+
 
 SetEnv PHP_VER 5
 # php_value magic_quotes_gpc "0"
