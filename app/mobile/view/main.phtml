@@ -46,7 +46,7 @@ if ($this->seo->getUrlCanonical() != "") {
                     <ul>
                         <?php foreach ($this->rubriques as $key => $rubrique) {
                             ?>
-                            <li><a <?php echo isset($_GET["rub"]) && $rubrique->getMeta("rewriting") == $_GET["rub"] ? 'class="ui-btn-active ui-state-persist"' : ''; ?> href="<?php echo $this->Url; ?><?php echo $rubrique->getMeta('rewriting'); ?>.html" data-theme="c"><?php echo $rubrique->getMeta('titre'); ?></a></li>
+                            <li><a <?php echo isset($_GET["rub"]) && $rubrique->getMeta("rewriting") == $_GET["rub"] ? 'class="ui-btn-active ui-state-persist"' : ''; ?> href="<?php echo $this->url; ?><?php echo $rubrique->getMeta('rewriting'); ?>.html" data-theme="c"><?php echo $rubrique->getMeta('titre'); ?></a></li>
                         <?php } ?>
                     </ul>
                 </div>
