@@ -52,7 +52,7 @@ RewriteCond $1 !^(public_html/)
 RewriteRule ^(.*)$                                                          public_html/index.php?controller=NopChuckTesta%{QUERY_STRING} [L]
 
 
-SetEnv PHP_VER 5
+SetEnv PHP_VER 5_3
 # php_value magic_quotes_gpc "0"
 SetEnv MAGIC_QUOTES 0
 
