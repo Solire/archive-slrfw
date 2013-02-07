@@ -156,7 +156,7 @@ class Controller
      */
     public function shutdown()
     {
-        $this->_view->Url = $this->_url;
+        $this->_view->url = $this->_url;
 
         if ($this->_mainConfig->get('js_combined', 'optimization') == true) {
             $this->_view->jsComponents = $this->_javascript->getCombined();

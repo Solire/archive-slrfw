@@ -5,7 +5,7 @@ if (stristr($_SERVER["HTTP_ACCEPT"], "application/xhtml+xml") && !$this->ajax) {
 } else {
     $contentType = "text/html; charset=utf-8";
 }
-?> 
+?>
 <!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo strtolower(SUF_VERSION); ?>" lang="<?php echo strtolower(SUF_VERSION); ?>">
     <head>
@@ -40,13 +40,13 @@ if ($this->seo->getUrlCanonical() != "") {
         <div data-role="page">
             <div data-role="header">
                 <h1>Solire</h1>
-                <a href="<?php echo $this->Url; ?>" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
-                <a href="<?php echo $this->Url; ?>" data-rel="back" data-iconpos="notext" data-icon="back"></a>
+                <a href="<?php echo $this->url; ?>" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
+                <a href="<?php echo $this->url; ?>" data-rel="back" data-iconpos="notext" data-icon="back"></a>
                 <div data-role="navbar" data-iconpos="left">
                     <ul>
                         <?php foreach ($this->rubriques as $key => $rubrique) {
                             ?>
-                            <li><a <?php echo isset($_GET["rub"]) && $rubrique->getMeta("rewriting") == $_GET["rub"] ? 'class="ui-btn-active ui-state-persist"' : ''; ?> href="<?php echo $this->Url; ?><?php echo $rubrique->getMeta('rewriting'); ?>.html" data-theme="c"><?php echo $rubrique->getMeta('titre'); ?></a></li>
+                            <li><a <?php echo isset($_GET["rub"]) && $rubrique->getMeta("rewriting") == $_GET["rub"] ? 'class="ui-btn-active ui-state-persist"' : ''; ?> href="<?php echo $this->url; ?><?php echo $rubrique->getMeta('rewriting'); ?>.html" data-theme="c"><?php echo $rubrique->getMeta('titre'); ?></a></li>
                         <?php } ?>
                     </ul>
                 </div>

@@ -178,4 +178,3 @@ class Page extends Main
 
 }
 
-// end class

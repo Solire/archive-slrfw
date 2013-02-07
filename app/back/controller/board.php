@@ -28,8 +28,8 @@ class Board extends Main
      * @return void
      */
     public function startAction() {
-        $this->_javascript->addLibrary("back/jquery/inettuts.js");
-        $this->_css->addLibrary("back/inettuts.css");
+        $this->_javascript->addLibrary("jquery/inettuts.js");
+        $this->_css->addLibrary("inettuts.css");
         $this->_view->action = "board";
 
         $this->_boardDatatable();

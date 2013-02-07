@@ -3,7 +3,7 @@
 namespace Slrfw;
 
 header('Content-Type: text/html; charset=utf-8');
-
+define('DS', DIRECTORY_SEPARATOR);
 /* = Session PHP
   ------------------------------- */
 session_name();
@@ -51,6 +51,8 @@ spl_autoload_register('Slrfw\autoload');
 /* = lancement du script
   ------------------------------- */
 try {
+    Library\FrontController::setApp('projet');
+    Library\FrontController::setApp('app');
     Library\FrontController::init();
     Library\FrontController::run();
 } catch (Library\Exception\Marvin $exc) {

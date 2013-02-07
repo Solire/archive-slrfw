@@ -35,6 +35,13 @@ class FrontController
     public static $envConfig;
 
     /**
+     * Liste des répertoires app à utiliser
+     *
+     * @var array
+     */
+    protected static $appDirs = array();
+
+    /**
      * Nom du controller utilisé
      *
      * @var string
@@ -47,6 +54,13 @@ class FrontController
      * @var string
      */
     public $application = '';
+
+    /**
+     * Dossier de app utilisé.
+     *
+     * @var string
+     */
+    public $app = '';
 
     /**
      * Nom de l'action utilisée
@@ -95,6 +109,11 @@ class FrontController
         $this->_dirs = self::$mainConfig->get('dirs');
         $this->_format = self::$mainConfig->get('format');
         $this->_debug = self::$mainConfig->get('debug');
+
+        /** Chargement du rep app par défaut **/
+        $count = count(self::$appDirs);
+        $this->app = self::$appDirs[$count - 1]['name'];
+        unset($count);
     }
 
     /**
@@ -145,6 +164,8 @@ class FrontController
 
         Registry::set('project-name', self::$mainConfig->get('name', 'project'));
         $emails = self::$envConfig->get('email');
+
+        Registry::set('basehref', self::$envConfig->get('url', 'base'));
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
@@ -231,12 +252,18 @@ class FrontController
      * Renvois le nom de la classe du controller
      *
      * @param string $controller Nom du controller
+     * @param string $app        Code du repertoire App à utiliser
      *
      * @return string
      */
-    protected function getClassName($controller = null)
+    protected function getClassName($controller = null, $app = null)
     {
-        $class = 'Slrfw\App\\' . $this->application . '\\Controller\\';
+        if (!empty($app)) {
+            $app = ucfirst($app);
+        } else {
+            $app = $this->app;
+        }
+        $class = 'Slrfw\\' . $app . '\\' . $this->application . '\\Controller\\';
         if (empty($controller)) {
             $class .= $this->controller;
         } else {
@@ -262,6 +289,7 @@ class FrontController
 
         $controller = false;
         /** Contrôle du controller **/
+        $rewritingMod = false;
         if (isset($_GET['controller']) && !empty($_GET['controller'])) {
             $url = strtolower($_GET['controller']);
             $arrSelect = explode('/', $url);
@@ -291,8 +319,7 @@ class FrontController
                 }
 
                 /** On test l'existence du dossier app répondant au nom $ctrl **/
-                $testPath = new Path($appDir . $ctrl, Path::SILENT);
-                if ($testPath->get()) {
+                if ($this->testApp($ctrl)) {
 
                     /** Erreur doublon */
                     if ($this->application == $ctrl) {
@@ -313,8 +340,7 @@ class FrontController
                 }
 
                 /** Test existence d'un controller **/
-                $class = $this->getClassName(ucfirst($ctrl));
-                if (class_exists($class)) {
+                if ($this->classExists($ctrl)) {
 
                     if ($controller === true) {
                         $this->addRewriting($ctrl);
@@ -357,6 +383,38 @@ class FrontController
     }
 
     /**
+     * Test si le morceau d'url est une application
+     *
+     * @param string $ctrl Morceau d'url
+     *
+     * @return boolean
+     */
+    private function testApp($ctrl)
+    {
+        foreach (self::$appDirs as $app) {
+            $testPath = new Path($app['dir'] . DS . $ctrl, Path::SILENT);
+            if ($testPath->get()) {
+                $this->app = $app['name'];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function classExists($ctrl)
+    {
+        foreach (self::$appDirs as $app) {
+            $class = $this->getClassName(ucfirst($ctrl), $app['name']);
+            if (class_exists($class)) {
+                $this->app = $app['name'];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Lance l'affichage de la page
      *
      * @param string $application Nom de l'api à utiliser
@@ -387,9 +445,9 @@ class FrontController
         }
         self::$singleApi = true;
 
-        $class = 'Slrfw\App\\' . $front->application . '\\Controller\\' . $front->controller;
+        $class = 'Slrfw\\' . $front->app . '\\' . $front->application
+               . '\\Controller\\' . $front->controller;
         $method = sprintf($front->getFormat('controller-action'), $front->action);
-
         if (!class_exists($class)) {
             $front->debug(self::CONTROLLER_CLASS_NOT_EXISTS, array($class));
             return false;
@@ -411,8 +469,11 @@ class FrontController
 
         $instance->start();
         $view = $instance->getView();
-        $viewDir = sprintf($front->getDir('views'), 'app/' . strtolower($front->application));
-        $view->setDir($viewDir);
+        foreach (self::$appDirs as $app) {
+            $viewDir = sprintf($front->getDir('views'), $app['dir']
+                     . DS . strtolower($front->application));
+            $view->setDir($viewDir);
+        }
         $view->setTemplate('main');
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
@@ -481,6 +542,23 @@ class FrontController
 
         return true;
     }
+
+    /**
+     * Enregistre un nouveau répertoire d'app
+     *
+     * @param string $name Nom du répertoire
+     *
+     * @return void
+     */
+    public static function setApp($name)
+    {
+        $name = strtolower($name);
+        self::$appDirs[] = array(
+            'name' => ucfirst($name),
+            'dir' => $name,
+        );
+    }
+
 
     /**
      * Renvois les valeurs par défaut propre à l'application

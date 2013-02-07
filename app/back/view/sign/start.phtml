@@ -5,10 +5,10 @@
         <meta name="ROBOTS" content="noindex, nofollow" />
         <meta name="GOOGLEBOT" content="noindex, nofollow" />
 
-        <base href="<?php echo $this->Url; ?>" />
+        <base href="<?php echo $this->url; ?>" />
 
         <link type="text/css" rel="stylesheet" media="screen" href="http://www.solire.fr/style_solire_fw/css/back/newstyle-1.1.css" />
-        <link rel="stylesheet" href="css/back/sticky.css" type="text/css" media="screen" title="" charset="utf-8" />
+        <link rel="stylesheet" href="css/sticky.css" type="text/css" media="screen" title="" charset="utf-8" />
         <style>
 
             @font-face {
@@ -64,7 +64,7 @@
                 color: #666666;
             }
 
-            .top-right, .top-left { 
+            .top-right, .top-left {
                 top: -3px;
             }
             .btn-a {
@@ -74,10 +74,10 @@
                 padding: 6px 18px;
                 position: relative;
             }
-            
+
         </style>
         <?php echo $this->javascript; ?>
-        <script type="text/javascript" src="js/back/jquery/vibrate.js"></script>
+        <script type="text/javascript" src="js/jquery/vibrate.js"></script>
         <script type="text/javascript">
 
             $(document).ready(function() {
@@ -90,14 +90,14 @@
                         spread: 15,
                         duration: 600
                     };
-                    
+
                     var tthis = $(this);
                     var ok = true;
                     var formu = tthis;
                     $.post(formu.attr('action'), formu.serialize(), function(data){
                         if(data.success) {
-                            $.sticky(data.message, "success")  
-                            $(formu).delay(800).queue(function(){ 
+                            $.sticky(data.message, "success")
+                            $(formu).delay(800).queue(function(){
 //                                $("#sign-in").unbind("submit")
 //                                formu.submit();
                                 document.location.href = formu.attr('action');
@@ -106,22 +106,22 @@
                             formu.parents("article:first").vibrate(conf);
                             // let's also display a notification
                             $.sticky(data.message, "error")
-			
+
                             // clear the fields to discourage brute forcing :)
                             $("#log").val("");
                             $("#pwd").val("");
                         }
-                        
-                            
-                    }, 'json' ); 
-                        
-        
-		
-                    
-		
-                    
+
+
+                    }, 'json' );
+
+
+
+
+
+
                 });
-	
+
             });
 
 

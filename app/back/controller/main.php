@@ -83,27 +83,27 @@ class Main extends \Slrfw\Library\Controller
         }
         define('BACK_ID_API', $this->_api['id']);
 
-        $this->_javascript->addLibrary('back/jquery/jquery-1.8.0.min.js');
-        $this->_javascript->addLibrary('back/jquery/jquery-ui-1.8.23.custom.min.js');
-        $this->_javascript->addLibrary('back/main.js');
-        $this->_javascript->addLibrary('back/jquery/jquery.cookie.js');
-        $this->_javascript->addLibrary('back/jquery/sticky.js');
-        $this->_javascript->addLibrary("back/jquery/jquery.livequery.min.js");
+        $this->_javascript->addLibrary('jquery/jquery-1.8.0.min.js');
+        $this->_javascript->addLibrary('jquery/jquery-ui-1.8.23.custom.min.js');
+        $this->_javascript->addLibrary('main.js');
+        $this->_javascript->addLibrary('jquery/jquery.cookie.js');
+        $this->_javascript->addLibrary('jquery/sticky.js');
+        $this->_javascript->addLibrary("jquery/jquery.livequery.min.js");
 
-        $this->_javascript->addLibrary('back/jquery/jquery.stickyPanel.min.js');
+        $this->_javascript->addLibrary('jquery/jquery.stickyPanel.min.js');
 
-        $this->_javascript->addLibrary('back/newstyle.js');
-        $this->_css->addLibrary('back/jquery-ui-1.8.7.custom.css');
+        $this->_javascript->addLibrary('newstyle.js');
+        $this->_css->addLibrary('jquery-ui-1.8.7.custom.css');
 
         $this->_css->addLibrary('jquery-ui/custom-theme/jquery-ui-1.8.22.custom.css');
 
         //Inclusion Bootstrap twitter
-        $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
-        $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');
-        $this->_css->addLibrary('back/bootstrap/bootstrap-responsive.min.css');
+        $this->_javascript->addLibrary('bootstrap/bootstrap.min.js');
+        $this->_css->addLibrary('bootstrap/bootstrap.min.css');
+        $this->_css->addLibrary('bootstrap/bootstrap-responsive.min.css');
 
         $this->_css->addLibrary('http://www.solire.fr/style_solire_fw/css/back/newstyle-1.3.css');
-        $this->_css->addLibrary('back/sticky.css');
+        $this->_css->addLibrary('sticky.css');
 
         $this->_view->site = Registry::get('project-name');
 
@@ -137,7 +137,7 @@ class Main extends \Slrfw\Library\Controller
 
         if (isset($_GET['id_version'])) {
             $id_version = $_GET['id_version'];
-            $url = '/' . Registry::get('baseroot') . 'back/' . $suffixApi;
+            $url = '/' . Registry::get('baseroot') . '' . $suffixApi;
             setcookie('id_version', $id_version, 0, $url);
             define('BACK_ID_VERSION', $id_version);
         } elseif (isset($_COOKIE['id_version'])
@@ -181,9 +181,8 @@ class Main extends \Slrfw\Library\Controller
         }
 
         if (!$this->_utilisateur->isConnected()
-            && isset($_GET['action'])
-            && isset($_GET['controller'])
-            && $_GET['controller'] . '/' . $_GET['action'] != 'sign/start'
+            && isset($this->noRedirect)
+            && $this->noRedirect === true
         ) {
             $this->simpleRedirect('sign/start.html', true);
         }
@@ -212,7 +211,7 @@ class Main extends \Slrfw\Library\Controller
         );
         $this->_view->breadCrumbs = array();
         $this->_view->breadCrumbs[] = array(
-            'label' => '<img src="img/back/gray_dark/home_12x12.png"> '
+            'label' => '<img src="img/gray_dark/home_12x12.png"> '
                     . $this->_view->site,
             'url' => './',
         );
