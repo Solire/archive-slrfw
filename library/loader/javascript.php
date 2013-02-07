@@ -41,10 +41,21 @@ class Javascript {
     }
 
 
+    /**
+     * Ajoute une librairie js à la page
+     *
+     * @param string  $path  Chemin absolu ou relatif vers le fichier
+     * @param boolean $local Active ou non le préfixage par js/
+     *
+     * @return void
+     */
     public function addLibrary($path, $local = true)
     {
-//        if(empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest')
-            $this->libraries[]["src"] = (substr($path, 0, 7) == 'http://' || substr($path, 0, 8) == 'https://' ? '' : 'js/') . $path;
+        if ($local === true) {
+            $this->libraries[]['src'] = (substr($path, 0, 7) == 'http://' || substr($path, 0, 8) == 'https://' ? '' : 'js/') . $path;
+        } else {
+            $this->libraries[]['src'] = $path;
+        }
     }
 
 }

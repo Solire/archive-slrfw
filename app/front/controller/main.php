@@ -65,8 +65,8 @@ class Main extends \Slrfw\Library\Controller {
             $this->_gabaritManager->setModePrevisualisation($_SESSION["mode_previsualisation"]);
 
             //Inclusion Bootstrap twitter
-            $this->_javascript->addLibrary('back/bootstrap/bootstrap.min.js');
-            $this->_css->addLibrary('back/bootstrap/bootstrap.min.css');
+            $this->_javascript->addLibrary('back/js/bootstrap/bootstrap.min.js', false);
+            $this->_css->addLibrary('back/css/bootstrap/bootstrap.min.css', 'screen', false);
 
             $this->_view->site = Registry::get('project-name');
             $this->_view->modePrevisualisation = $_SESSION["mode_previsualisation"];

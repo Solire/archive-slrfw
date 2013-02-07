@@ -46,13 +46,31 @@ class Css {
 
     }
 
-    public function addLibrary($path, $media = "screen")
+    /**
+     * Ajoute une librarie css
+     *
+     * @param string  $path  chemin absolu ou relatif du fichier
+     * @param string  $media media de la librarie
+     * @param boolean $local Active ou non le préfixage par css/
+     *
+     * @return void
+     */
+    public function addLibrary($path, $media = "screen", $local = true)
     {
-        if(empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
-            $this->libraries[] = array(
-                "src" => (substr($path, 0, 7) == 'http://' || substr($path, 0, 8) == 'https://' ? '' : 'css/') . $path,
-                "media" => $media,
-            );
+        if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+            || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest')
+        {
+            if ($local === true) {
+                $this->libraries[] = array(
+                    'src' => (substr($path, 0, 7) == 'http://' || substr($path, 0, 8) == 'https://' ? '' : 'css/') . $path,
+                    'media' => $media,
+                );
+            } else {
+                $this->libraries[] = array(
+                    'src' => $path,
+                    'media' => $media,
+                );
+            }
         }
     }
 }
