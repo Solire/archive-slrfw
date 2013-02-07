@@ -28,9 +28,9 @@ class Page extends Main
      */
     public function listeAction()
     {
-        $this->_javascript->addLibrary("back/liste.js");
-        $this->_javascript->addLibrary("back/jquery/jquery.ajaxqueue.js");
-        $this->_javascript->addLibrary("back/jquery/jquery.scrollTo-min.js");
+        $this->_javascript->addLibrary("liste.js");
+        $this->_javascript->addLibrary("jquery/jquery.ajaxqueue.js");
+        $this->_javascript->addLibrary("jquery/jquery.scrollTo-min.js");
 
         $gabaritsList = array();
         $query = "SELECT `gab_gabarit`.id, `gab_gabarit`.* FROM `gab_gabarit` WHERE `gab_gabarit`.`id_api` = " . $this->_api["id"];
@@ -97,36 +97,36 @@ class Page extends Main
      */
     public function displayAction()
     {
-        $this->_javascript->addLibrary('back/tiny_mce/tiny_mce.js');
+        $this->_javascript->addLibrary('tiny_mce/tiny_mce.js');
 
-        $this->_javascript->addLibrary('back/autocomplete.js');
-        $this->_javascript->addLibrary('back/plupload/plupload.full.min.js');
-        $this->_javascript->addLibrary('back/formgabarit.js');
-        $this->_javascript->addLibrary('back/jquery/jquery.tipsy.js');
-        $this->_javascript->addLibrary('back/jquery/jquery.qtip.min.js');
-        $this->_javascript->addLibrary('back/affichegabarit.js');
-        $this->_javascript->addLibrary('back/join-simple.js');
-        $this->_javascript->addLibrary('back/jquery/jquery.autogrow.js');
-        $this->_javascript->addLibrary('back/jquery/jquery.dataTables.min.js');
-        $this->_css->addLibrary('back/demo_table_jui.css');
-        $this->_javascript->addLibrary('back/jquery/jcrop/jquery.Jcrop.min.js');
-        $this->_css->addLibrary('back/jcrop/jquery.Jcrop.min.css');
+        $this->_javascript->addLibrary('autocomplete.js');
+        $this->_javascript->addLibrary('plupload/plupload.full.min.js');
+        $this->_javascript->addLibrary('formgabarit.js');
+        $this->_javascript->addLibrary('jquery/jquery.tipsy.js');
+        $this->_javascript->addLibrary('jquery/jquery.qtip.min.js');
+        $this->_javascript->addLibrary('affichegabarit.js');
+        $this->_javascript->addLibrary('join-simple.js');
+        $this->_javascript->addLibrary('jquery/jquery.autogrow.js');
+        $this->_javascript->addLibrary('jquery/jquery.dataTables.min.js');
+        $this->_css->addLibrary('demo_table_jui.css');
+        $this->_javascript->addLibrary('jquery/jcrop/jquery.Jcrop.min.js');
+        $this->_css->addLibrary('jcrop/jquery.Jcrop.min.css');
 
-        $this->_javascript->addLibrary('back/jquery/ui.spinner.min.js');
-        $this->_css->addLibrary('back/ui.spinner.css');
+        $this->_javascript->addLibrary('jquery/ui.spinner.min.js');
+        $this->_css->addLibrary('ui.spinner.css');
 
 
-        $this->_javascript->addLibrary('back/autocomplete_multi/jquery.tokeninput.js');
-        $this->_javascript->addLibrary('back/autocomplete_multi.js');
+        $this->_javascript->addLibrary('autocomplete_multi/jquery.tokeninput.js');
+        $this->_javascript->addLibrary('autocomplete_multi.js');
 
-        $this->_css->addLibrary('back/tipsy.css');
-        $this->_css->addLibrary('back/jquery.qtip.min.css');
-        $this->_css->addLibrary('back/autocomplete_multi/token-input.css');
-        $this->_css->addLibrary('back/autocomplete_multi/token-input-facebook.css');
+        $this->_css->addLibrary('tipsy.css');
+        $this->_css->addLibrary('jquery.qtip.min.css');
+        $this->_css->addLibrary('autocomplete_multi/token-input.css');
+        $this->_css->addLibrary('autocomplete_multi/token-input-facebook.css');
 
-        $this->_css->addLibrary('back/affichegabarit.css');
+        $this->_css->addLibrary('affichegabarit.css');
 
-        $this->_javascript->addLibrary('back/compareversion.js');
+        $this->_javascript->addLibrary('compareversion.js');
 
         $id_gab_page = isset($_GET['id_gab_page']) ? $_GET['id_gab_page'] : 0;
         $id_gabarit = isset($_GET['id_gabarit']) ? $_GET['id_gabarit'] : 1;

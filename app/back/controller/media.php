@@ -26,15 +26,15 @@ class Media extends Main {
 
         $extensionsImage = array("jpeg", "jpg", "png", "gif");
 
-        $this->_javascript->addLibrary("back/jquery/jquery.hotkeys.js");
-        $this->_javascript->addLibrary("back/jstree/jquery.jstree.js");
-        $this->_javascript->addLibrary("back/jquery/jquery.dataTables.min.js");
-        $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
-        $this->_javascript->addLibrary("back/listefichiers.js");
-        $this->_javascript->addLibrary("back/jquery/jquery.scroller-1.0.min.js");
+        $this->_javascript->addLibrary("jquery/jquery.hotkeys.js");
+        $this->_javascript->addLibrary("jstree/jquery.jstree.js");
+        $this->_javascript->addLibrary("jquery/jquery.dataTables.min.js");
+        $this->_javascript->addLibrary("plupload/plupload.full.min.js");
+        $this->_javascript->addLibrary("listefichiers.js");
+        $this->_javascript->addLibrary("jquery/jquery.scroller-1.0.min.js");
 
-        $this->_css->addLibrary("back/demo_table_jui.css");
-        $this->_css->addLibrary("back/jquery.scroller.css");
+        $this->_css->addLibrary("demo_table_jui.css");
+        $this->_css->addLibrary("jquery.scroller.css");
 
         $this->_view->breadCrumbs[] = array(
             "label" => "Gestion des fichiers",
@@ -83,7 +83,7 @@ class Media extends Main {
                 $file['height'] = $sizes[1];
             } else {
                 $file['class'] = 'vignette';
-                $file['path_mini'] = "img/back/filetype/$ext.png";
+                $file['path_mini'] = "img/filetype/$ext.png";
             }
 
 //            $file['poids'] = (round((100 * $file['taille']) / (8 * 1024)) / 100) . " Ko";
@@ -229,7 +229,7 @@ class Media extends Main {
 
         $id_gab_page = isset($_COOKIE['id_gab_page']) && $_COOKIE['id_gab_page'] ? $_COOKIE['id_gab_page'] : 0;
 
-        
+
         $newImageName = \Slrfw\Library\Tools::friendlyURL($_POST["image-name"]);
 
         /* Dimensions de recadrage */
@@ -276,7 +276,7 @@ class Media extends Main {
 
 
 
-        
+
             switch ($_POST["force-width"]) {
                 case "width":
                     $tw = $_POST["minwidth"];
@@ -297,18 +297,18 @@ class Media extends Main {
                     $th = false;
                     break;
             }
-            
-            
+
+
             if(intval($tw) <= 0) {
                 $tw = false;
             }
-            
+
             if(intval($th) <= 0) {
                 $th = false;
             }
-            
-            
-        
+
+
+
 
         if ($id_gab_page) {
             $this->_fileManager->crop($filepath, $ext, $targetDir, $target, $id_gab_page, 0, $vignetteDir, $apercuDir, $x, $y, $w, $h, $tw, $th);

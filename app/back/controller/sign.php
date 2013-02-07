@@ -20,7 +20,7 @@ namespace Slrfw\App\Back\Controller;
  */
 class Sign extends Main
 {
-
+    private $noRedirect = true;
     /**
      * Affichage du formulaire de connection
      *
@@ -28,7 +28,7 @@ class Sign extends Main
      */
     public function startAction()
     {
-        $this->_javascript->addLibrary('back/form.js');
+        $this->_javascript->addLibrary('form.js');
 
         $this->_view->main(false);
 
