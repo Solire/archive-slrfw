@@ -51,8 +51,8 @@ spl_autoload_register('Slrfw\autoload');
 /* = lancement du script
   ------------------------------- */
 try {
-    Library\FrontController::setApp('Projet', 'projet');
-    Library\FrontController::setApp('App', 'app');
+    Library\FrontController::setApp('projet');
+    Library\FrontController::setApp('app');
     Library\FrontController::init();
     Library\FrontController::run();
 } catch (Library\Exception\Marvin $exc) {
