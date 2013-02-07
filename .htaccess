@@ -27,6 +27,10 @@ RewriteRule ^doc/([a-zA-Z0-9-_]+)\.([a-z]+)                                 publ
 RewriteCond %{THE_REQUEST} !(flags)
 RewriteRule ((temp-)?([0-9]+))/(.+\.(jpg|jpeg|png|gif|pdf))$         public_html/medias/upload/$1/$4 [L]
 
+# Spécifique aux icones jquery & boostrap
+RewriteRule css/([a-zA-Z/0-9_\-\.]+\.png)$                           public_html/medias/css/$1 [L]
+RewriteRule css/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.png)$                 public_html/$1/css/$2 [L]
+
 RewriteRule css/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.css)$                 public_html/$1/css/$2 [L]
 RewriteRule ^css/([a-zA-Z/0-9_\-\.]+\.css)$                          public_html/medias/css/$1 [L]
 
