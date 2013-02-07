@@ -34,16 +34,16 @@ RewriteRule css/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.png)$                 public_html
 RewriteRule css/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.css)$                 public_html/$1/css/$2 [L]
 RewriteRule ^css/([a-zA-Z/0-9_\-\.]+\.css)$                          public_html/medias/css/$1 [L]
 
-RewriteRule js/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.js)$                    public_html/$1/js/$2 [L]
+RewriteRule js/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.js)$                    public_html/$1/js/$2 [L]
 RewriteRule ^js/([a-zA-Z/0-9_\-\.]+\.js)$                            public_html/medias/js/$1 [L]
 
-RewriteRule img/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$    public_html/$1/img/$2 [L]
+RewriteRule img/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$    public_html/$1/img/$2 [L]
 RewriteRule ^img/([a-zA-Z/0-9_\-\.]+\.(ico|gif|jpg|png))$            public_html/medias/img/$1 [L]
 
-RewriteRule swf/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.swf)$                  public_html/$1/swf/$2 [L]
+RewriteRule swf/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.swf)$                  public_html/$1/swf/$2 [L]
 RewriteRule ^swf/([a-zA-Z/0-9_\-\.]+\.swf)$                          public_html/medias/swf/$1 [L]
 
-RewriteRule font/([a-z]+)/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$  public_html/$1/font/$2 [L]
+RewriteRule font/_([a-z]+)/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$  public_html/$1/font/$2 [L]
 RewriteRule ^font/([a-zA-Z/0-9_\-\.]+\.(eot|svg|ttf|woff))$          public_html/medias/font/$1 [L]
 
 RewriteRule ^$                                               public_html/index.php?%{QUERY_STRING} [L]
