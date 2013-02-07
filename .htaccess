@@ -14,7 +14,7 @@ RewriteEngine on
 #
 RewriteRule ^robots.txt$											- [L]
 # Exception pour tiny_mce
-RewriteRule /tiny_mce/(.+)$  public_html/medias/js/back/tiny_mce/$1 [L]
+RewriteRule /tiny_mce/(.+)$  public_html/back/js/tiny_mce/$1 [L]
 
 RewriteRule ^sitemap.xml$								public_html/index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
 RewriteRule ^mobile/sitemap.xml$						public_html/index.php?controller=sitemap&action=start&application=mobile&%{QUERY_STRING} [L]
