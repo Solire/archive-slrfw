@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Front controller
@@ -138,7 +138,7 @@ class FrontController
     {
 
         /** Chargement de la configuration **/
-        self::$mainConfig = new Config('../config/main.ini');
+        self::$mainConfig = new Config('slrfw/config/main.ini');
 
         /** Detection de l'environnement **/
         $localHostnames = explode(',', self::$mainConfig->get('detect', 'development'));
@@ -148,7 +148,7 @@ class FrontController
             $env = 'online';
         }
 
-        self::$envConfig = new Config('../config/' . $env . '.ini');
+        self::$envConfig = new Config('projet/config/' . $env . '.ini');
 
 
         /* = Fichiers de configuration
@@ -166,6 +166,7 @@ class FrontController
         $emails = self::$envConfig->get('email');
 
         Registry::set('basehref', self::$envConfig->get('url', 'base'));
+        $serverUrl = self::$envConfig->get('url', 'base');
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
@@ -191,8 +192,7 @@ class FrontController
             Registry::set('email', $emails);
 
         } else {
-            $serverUrl = str_replace('solire-02', $_SERVER['SERVER_NAME']
-                       . ':' . $_SERVER['SERVER_PORT'], Registry::get('basehref'));
+            $serverUrl = str_replace('solire-02', $_SERVER['SERVER_NAME'], Registry::get('basehref'));
             Registry::set('url', $serverUrl);
             Registry::set('basehref', $serverUrl);
 
@@ -233,7 +233,7 @@ class FrontController
      * @param string $rewriting Parte de rewriting à ajouter
      *
      * @return void
-     * @uses Slrfw\Library\Controller->acceptRew Contrôle si le
+     * @uses Slrfw\Controller->acceptRew Contrôle si le
      * rewriting est accepté
      */
     private function addRewriting($rewriting)
@@ -241,7 +241,7 @@ class FrontController
         $className = $this->getClassName();
         $class = new $className();
         if ($class->acceptRew !== true) {
-            $exc = new \Slrfw\Library\Exception\HttpError('Erreur HTTP');
+            $exc = new \Slrfw\Exception\HttpError('Erreur HTTP');
             $exc->http(404, null);
             throw $exc;
         }
@@ -263,7 +263,7 @@ class FrontController
         } else {
             $app = $this->app;
         }
-        $class = 'Slrfw\\' . $app . '\\' . $this->application . '\\Controller\\';
+        $class = 'App\\' . $app . '\\' . $this->application . '\\Controller\\';
         if (empty($controller)) {
             $class .= $this->controller;
         } else {
@@ -445,7 +445,7 @@ class FrontController
         }
         self::$singleApi = true;
 
-        $class = 'Slrfw\\' . $front->app . '\\' . $front->application
+        $class = $front->app . '\\' . $front->application
                . '\\Controller\\' . $front->controller;
         $method = sprintf($front->getFormat('controller-action'), $front->action);
         if (!class_exists($class)) {
