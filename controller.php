@@ -150,26 +150,6 @@ class Controller
     public function shutdown()
     {
         $this->_view->url = $this->_url;
-
-        if ($this->_mainConfig->get('js_combined', 'optimization') == true) {
-            $this->_view->jsComponents = $this->_javascript->getCombined();
-        } else {
-            if ($this->_mainConfig->get('js_min', 'optimization') == true) {
-                $this->_view->jsComponents = $this->_javascript->getMinified();
-            } else {
-                $this->_view->jsComponents = $this->_javascript;
-            }
-        }
-
-        if ($this->_mainConfig->get('css_combined', 'optimization') == true) {
-            $this->_view->cssComponents = $this->_css->getCombined();
-        } else {
-            if ($this->_mainConfig->get('css_min', 'optimization') == true) {
-                $this->_view->cssComponents = $this->_css->getMinified();
-            } else {
-                $this->_view->cssComponents = $this->_css;
-            }
-        }
     }
 
     /**
