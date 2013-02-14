@@ -1,6 +1,6 @@
 <?php
 
-namespace Slrfw\Library\Datatable\Plugin;
+namespace Slrfw\Datatable\Plugin;
 
 
 require_once '../library/form/shinform.php';
@@ -18,7 +18,7 @@ class DatatableShinForm extends \ShinForm {
      *
      * @param string $configName
      * @param MyPDO $db
-     * @param \Slrfw\Library\Datatable\Datatable $oDatatable 
+     * @param \Slrfw\Datatable\Datatable $oDatatable 
      */
     public function __construct($db, $oDatatable) {
         $this->oDatatable = $oDatatable;

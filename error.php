@@ -9,7 +9,7 @@
  * @filesource
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Gestionnaire des erreurs

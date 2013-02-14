@@ -2,7 +2,7 @@
 
 namespace Slrfw\Model;
 
-use Slrfw\Library\Registry;
+use Slrfw\Registry;
 
 /**
  * Description of objectmanager

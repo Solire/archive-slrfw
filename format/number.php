@@ -9,7 +9,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library\Format;
+namespace Slrfw\Format;
 
 /**
  * Formatage des nombres

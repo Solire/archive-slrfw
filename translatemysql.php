@@ -1,6 +1,6 @@
 <?php
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * @version 2

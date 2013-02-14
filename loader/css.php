@@ -1,6 +1,6 @@
 <?php
 
-namespace Slrfw\Library\Loader;
+namespace Slrfw\Loader;
 
 /** @todo faire la présentation du code */
 

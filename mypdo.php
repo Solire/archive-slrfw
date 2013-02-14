@@ -7,7 +7,7 @@
  * @license Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Extention de PDO

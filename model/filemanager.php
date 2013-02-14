@@ -2,7 +2,7 @@
 
 namespace Slrfw\Model;
 
-use Slrfw\Library\Tools;
+use Slrfw\Tools;
 
 class fileManager extends manager {
 

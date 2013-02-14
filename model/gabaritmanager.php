@@ -9,7 +9,7 @@
 
 namespace Slrfw\Model;
 
-use \Slrfw\Library\Tools;
+use \Slrfw\Tools;
 
 /**
  * Description of gabaritmanager

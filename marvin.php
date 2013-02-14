@@ -9,7 +9,7 @@
  * @filesource
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 require_once 'external/geshi/geshi.php';
 

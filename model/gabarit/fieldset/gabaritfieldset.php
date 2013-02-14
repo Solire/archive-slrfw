@@ -118,7 +118,7 @@ abstract class GabaritFieldSet
                     . '_' . $this->versionId;
 
         if ($champ['typedonnee'] == 'DATE') {
-            $value = \Slrfw\Library\Tools::formate_date_nombre($value, '-', '/');
+            $value = \Slrfw\Tools::formate_date_nombre($value, '-', '/');
         }
 
         $type = strtolower($champ['type']);

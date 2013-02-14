@@ -8,7 +8,7 @@
  * @license    Open Source (GPL)
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Log : Classe de log par fichier ou mysql
@@ -158,7 +158,7 @@ class Log
         try {
             if ($objResult == false) {
                 $strError = $reqTable . ' : ' . mysql_error() . "\n";
-                throw new \Slrfw\Library\Exception\Log($strError);
+                throw new \Slrfw\Exception\Log($strError);
             }
         } catch (Exception $objExpetion) {
             $objExpetion->makeLogExeption();
@@ -241,7 +241,7 @@ class Log
                 $strError = 'Erreur d\'ouverture du fichier ' . $strFile
                           . ' en mode ' . $strMode . '!' . "\n"
                           . 'Vérifiez l\'existance et les droits sur vos fichiers...';
-                throw new \Slrfw\Library\Exception\Log($strError);
+                throw new \Slrfw\Exception\Log($strError);
             }
         } catch (Exception $objExpetion) {
             $objExpetion->makeLogExeption();
@@ -350,7 +350,7 @@ class Log
             }
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log($strDateTime . ' N\'est pas au bon format');
+                throw new \Slrfw\Exception\Log($strDateTime . ' N\'est pas au bon format');
             } catch (Exception $objExpetion) {
                 $objExpetion->makeLogExeption();
             }
@@ -487,7 +487,7 @@ class Log
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log(
+                throw new \Slrfw\Exception\Log(
                     'Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format'
                 );
             } catch (Exception $objExpetion) {
@@ -498,7 +498,7 @@ class Log
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log(
+                throw new \Slrfw\Exception\Log(
                     'Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format'
                 );
             } catch (Exception $objExpetion) {
@@ -540,7 +540,7 @@ class Log
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log(
+                throw new \Slrfw\Exception\Log(
                     'Date Ini : ' . $strDateTimeIni . ' N\'est pas au bon format'
                 );
             } catch (Exception $objExpetion) {
@@ -552,7 +552,7 @@ class Log
 
         } else {
             try {
-                throw new \Slrfw\Library\Exception\Log(
+                throw new \Slrfw\Exception\Log(
                     'Date End : ' . $strDateTimeEnd . ' N\'est pas au bon format'
                 );
             } catch (Exception $objExpetion) {

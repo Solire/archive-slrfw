@@ -1,9 +1,9 @@
 <?php
 
-namespace Slrfw\Library\Datatable;
+namespace Slrfw\Datatable;
 
-use Slrfw\Library\Loader;
-use Slrfw\Library\Tools;
+use Slrfw\Loader;
+use Slrfw\Tools;
 use Slrfw\Model\fileManager;
 
 /**
@@ -100,7 +100,7 @@ class Datatable {
     /**
      * Connexion à la base de données qui sera utilisé
      *
-     * @var \Slrfw\Library\MyPDO
+     * @var \Slrfw\MyPDO
      * @access protected
      */
     protected $_db;
@@ -204,7 +204,7 @@ class Datatable {
     /**
      *
      *
-     * @var \Slrfw\Library\Log
+     * @var \Slrfw\Log
      * @access protected
      */
     protected $_log;
@@ -302,7 +302,7 @@ class Datatable {
             $plugins = array();
             if (isset($this->config["plugins"])) {
                 foreach ($this->config["plugins"] as $plugin) {
-                    $pluginName = "\Slrfw\Library\Datatable\Plugin\Datatable" . $plugin;
+                    $pluginName = "\Slrfw\Datatable\Plugin\Datatable" . $plugin;
                     $plugins[$pluginName] = new $pluginName($this->_db, $this);
                 }
             }
@@ -755,7 +755,7 @@ class Datatable {
                      * Si le champ est un mot de passe on le fait passer
                      * par la fonction de préparation des mots de passes
                      */
-                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
+                    $values[$column['name']] = \Slrfw\Session::prepareMdp($_POST[$column['name']]);
                 } else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
                     if (isset($_POST[$column["name"]]) && $column["name"] != "") {
                         $ids = explode(",", $_POST[$column["name"]]);
@@ -847,7 +847,7 @@ class Datatable {
                      * Si le champ est un mot de passe on le fait passer
                      * par la fonction de préparation des mots de passes
                      */
-                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
+                    $values[$column['name']] = \Slrfw\Session::prepareMdp($_POST[$column['name']]);
                 } else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
                     if (isset($_POST[$column["name"]]) && $column["name"] != "") {
                         $ids = explode(",", $_POST[$column["name"]]);
@@ -1379,7 +1379,7 @@ class Datatable {
             if (isset($column["format"])) {
                 foreach ($column["format"] as $type => $params) {
                     $paramsFunc = array();
-                    $aColumnsFunctions[$keyCol][]["name"] = "\Slrfw\Library\Format\\" . ucfirst($type);
+                    $aColumnsFunctions[$keyCol][]["name"] = "\Slrfw\Format\\" . ucfirst($type);
                     $keyFunc = count($aColumnsFunctions[$keyCol]) - 1;
                     switch ($type) {
                         case "datetime":

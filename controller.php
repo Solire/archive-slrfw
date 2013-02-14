@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Base controller
@@ -206,7 +206,7 @@ class Controller
     /**
      * Renvois la vue
      *
-     * @return \Slrfw\Library\View
+     * @return \Slrfw\View
      */
     public function getView()
     {
@@ -335,11 +335,11 @@ class Controller
      * @param string $url       Url vers laquelle rediriger l'utilisateur
      *
      * @return void
-     * @uses Slrfw\Library\Exception\HttpError marque l'erreur HTTP
+     * @uses Slrfw\Exception\HttpError marque l'erreur HTTP
      */
     final public function redirectError($codeError = null, $url = null)
     {
-        $exc = new \Slrfw\Library\Exception\HttpError('Erreur HTTP');
+        $exc = new \Slrfw\Exception\HttpError('Erreur HTTP');
         if (!empty($codeError)) {
             $exc->http($codeError, $url);
         }
