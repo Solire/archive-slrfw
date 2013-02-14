@@ -88,12 +88,6 @@ class Controller
 
     /**
      *
-     * @var Project
-     */
-    protected $_project;
-
-    /**
-     *
      * @var TranslateMysql
      */
     protected $_translate = null;
@@ -130,7 +124,6 @@ class Controller
         $this->_translate = new TranslateMysql(ID_VERSION, ID_API, $this->_db);
         $this->_translate->addTranslation();
         $this->_seo = new Seo();
-        $this->_project = new Project($this->_mainConfig->get('name', 'project'));
         $this->_view = new View($this->_translate);
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
