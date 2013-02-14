@@ -130,6 +130,16 @@ class FrontController
     }
 
     /**
+     * Renvois le tableau des répertoires app
+     *
+     * @return array 
+     */
+    public static function getAppDirs()
+    {
+        return self::$appDirs;
+    }
+
+    /**
      * Initialise les données nécessaires pour FrontController
      *
      * @return void
