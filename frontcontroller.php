@@ -132,7 +132,7 @@ class FrontController
     /**
      * Renvois le tableau des répertoires app
      *
-     * @return array 
+     * @return array
      */
     public static function getAppDirs()
     {
@@ -151,7 +151,7 @@ class FrontController
         self::$mainConfig = new Config('slrfw/config/main.ini');
 
         /** Detection de l'environnement **/
-        $localHostnames = explode(',', self::$mainConfig->get('detect', 'development'));
+        $localHostnames = explode(',', self::$mainConfig->get('development', 'detect'));
         if (in_array($_SERVER['SERVER_NAME'], $localHostnames) === true) {
             $env = 'local';
         } else {
@@ -172,11 +172,11 @@ class FrontController
         $db = DB::factory(self::$envConfig->get('database'));
         Registry::set('db', $db);
 
-        Registry::set('project-name', self::$mainConfig->get('name', 'project'));
+        Registry::set('project-name', self::$mainConfig->get('project', 'name'));
         $emails = self::$envConfig->get('email');
 
-        Registry::set('basehref', self::$envConfig->get('url', 'base'));
-        $serverUrl = self::$envConfig->get('url', 'base');
+        Registry::set('basehref', self::$envConfig->get('base', 'url'));
+        $serverUrl = self::$envConfig->get('base', 'url');
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
@@ -544,9 +544,9 @@ class FrontController
             $baseSuffix = strtolower($this->application) . '/';
         }
 
-        Registry::set('base', self::$envConfig->get('url', 'base'));
-        Registry::set('basehref', self::$envConfig->get('url', 'base') . $baseSuffix);
-        Registry::set('baseroot', self::$envConfig->get('root', 'base'));
+        Registry::set('base', self::$envConfig->get('base', 'url'));
+        Registry::set('basehref', self::$envConfig->get('base', 'url') . $baseSuffix);
+        Registry::set('baseroot', self::$envConfig->get('base', 'root'));
 
 
 

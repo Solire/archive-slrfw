@@ -139,7 +139,7 @@ class Formulaire
     {
         $config = Registry::get('mainconfig');
         if (!is_array($iniPath)) {
-            $iniPath = $config->get('formulaire', 'dirs') . $iniPath;
+            $iniPath = $config->get('dirs', 'formulaire') . $iniPath;
             $iniPath = new Path($iniPath);
             $this->_architecture = parse_ini_file($iniPath->get(), true);
         } else {

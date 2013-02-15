@@ -26,12 +26,12 @@ class ShinForm {
     public function __construct($configName, $db, $configArray = null) {
         if ($configName != null) {
             $config = Registry::get('mainconfig');
-            include($config->get('formulaire', 'dirs') . $configName);
+            include($config->get('dirs', 'formulaire') . $configName);
             $this->_config = $config;
 
             $this->_buildValidate();
         }
-        
+
         if ($configArray != null) {
             $this->_config = $configArray;
 
@@ -78,7 +78,7 @@ class ShinForm {
      * Permet de tester les données d'un formulaire ou autre source de donnée
      * selon le fichier de configuration passé en paramètre de l'objet.
      * Documentation à venir ...
-     * 
+     *
      * @param type $data Valeurs à tester
      * @return boolean true en cas de succès (données validées)
      */
@@ -256,9 +256,9 @@ class ShinForm {
 
     /**
      * Permet de construire les requetes par rapport à la configuration
-     * 
+     *
      * @param boolean $execute Permet d'executer les requetes directement
-     * @return boolean Succes ou non de l'execution 
+     * @return boolean Succes ou non de l'execution
      */
     public function buildQueries($execute = true, $add = true) {
         $r = true;
@@ -675,7 +675,7 @@ class ShinForm {
                     }
                 }
             }
-            
+
             $functions[] = '
             function(form, validator){
                 var position = $(validator.invalidElements()[0]).position()
@@ -689,14 +689,14 @@ class ShinForm {
                 $scrollRel.animate({scrollTop: newTopPosition}, "slow", function() {
                     $(validator.invalidElements()[0]).focus();
                 });
-                
+
             }';
             $functionsKeys[] = '"[%functioninvalidHandler%]"';
             $form["validate"]["invalidHandler"] = "[%functioninvalidHandler%]";
             $form["validate"]["focusInvalid"] = false;
-            
-            
-            
+
+
+
 
             $form["validate"]["ignore"] = "";
 //            $form["validate"]["debug"] = true;
@@ -847,7 +847,7 @@ class ShinForm {
     }
 
     private function _validateFile() {
-        
+
     }
 
     private function _validateType($stringToValidate, $secureType, $params = null) {
