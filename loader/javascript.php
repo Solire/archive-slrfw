@@ -29,10 +29,8 @@ class Javascript
     /**
      * Chargement du gestionnaire de js
      */
-    public function __construct($base)
-    {
-        $this->base = $base;
-    }
+    public function __construct()
+    {}
 
     /**
      * Renvois la liste des librairies js

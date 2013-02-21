@@ -29,10 +29,8 @@ class Css
     /**
      * Chargement du gestionnaire de css
      */
-    public function __construct($base)
-    {
-        $this->base = $base;
-    }
+    public function __construct()
+    {}
 
     /**
      * Renvois la liste des librairies css
