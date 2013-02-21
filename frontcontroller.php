@@ -146,9 +146,8 @@ class FrontController
      */
     public function init()
     {
-
         /** Chargement de la configuration **/
-        self::$mainConfig = new Config('slrfw/config/main.ini');
+        self::$mainConfig = new Config('config/main.ini');
 
         /** Detection de l'environnement **/
         $localHostnames = explode(',', self::$mainConfig->get('development', 'detect'));
@@ -158,7 +157,7 @@ class FrontController
             $env = 'online';
         }
 
-        self::$envConfig = new Config('projet/config/' . $env . '.ini');
+        self::$envConfig = new Config('config/' . $env . '.ini');
 
 
         /* = Fichiers de configuration
@@ -273,7 +272,7 @@ class FrontController
         } else {
             $app = $this->app;
         }
-        $class = 'App\\' . $app . '\\' . $this->application . '\\Controller\\';
+        $class = $app . '\\' . $this->application . '\\Controller\\';
         if (empty($controller)) {
             $class .= $this->controller;
         } else {
@@ -306,7 +305,7 @@ class FrontController
             unset($url);
 
             $application = false;
-            $appDir = '../app/';
+//            $appDir = '../app/';
             $rewritingMod = false;
             foreach ($arrSelect as $ctrl) {
                 /**
@@ -527,15 +526,15 @@ class FrontController
         if (!defined('ID_API')) {
             define('ID_API', $apiId);
         }
-        $configPath = 'app_' . $this->application . '.ini';
+        $configPath = 'config/app_' . $this->application . '.ini';
         $configPath = strtolower($configPath);
+
         $path = new Path($configPath, Path::SILENT);
         if (!$path->get()) {
             return false;
         }
         $appConfig = new Config($path->get());
         Registry::set('appconfig', $appConfig);
-
 
         /** Url **/
         if ($this->application == 'Front') {
@@ -547,8 +546,6 @@ class FrontController
         Registry::set('base', self::$envConfig->get('base', 'url'));
         Registry::set('basehref', self::$envConfig->get('base', 'url') . $baseSuffix);
         Registry::set('baseroot', self::$envConfig->get('base', 'root'));
-
-
 
         return true;
     }
