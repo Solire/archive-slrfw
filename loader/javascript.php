@@ -1,40 +1,107 @@
 <?php
+/**
+ * Gestionnaire des fichiers js
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Dev <dave@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 
 namespace Slrfw\Loader;
 
-/** @todo faire la présentation du code */
+/**
+ * Gestionnaire des fichiers js
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Dev <dave@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
+class Javascript
+{
+    /**
+     * Liste des librairies js à intégrer
+     * @var array
+     */
+    private $libraries = array();
 
-class Javascript {
-
-    private $libraries;
-
-    public function __construct() {
-        $this->libraries = array();
+    /**
+     * Chargement du gestionnaire de js
+     */
+    public function __construct($base)
+    {
+        $this->base = $base;
     }
 
-    public function getLibraries() {
+    /**
+     * Renvois la liste des librairies js
+     *
+     * @return array
+     */
+    public function getLibraries()
+    {
         return $this->libraries;
     }
 
-    public function loadedLibraries() {
+    /**
+     * Renvois les clé de la liste des librairies
+     *
+     * @return array
+     * @deprecated ???
+     */
+    public function loadedLibraries()
+    {
         return array_keys($this->libraries);
     }
 
-    public function  __toString()
+
+    /**
+     * Renvois le chemin absolu vers la librairie en fonction des AppDirs
+     *
+     * @param string $filePath Chemin relatif de la librairie
+     *
+     * @return string
+     */
+    protected function getPath($filePath)
     {
-        $js = "";
-        foreach ($this->libraries as $lib) {
-            if (substr($lib["src"], 0, 7) != 'http://'
-                && substr($lib["src"], 0, 8) != 'https://'
-                && file_exists("./medias/" . $lib["src"])
-            ) {
-                $filemtime = "?" . filemtime("./medias/" . $lib["src"]);
+        $dirs = \Slrfw\FrontController::getAppDirs();
+
+        foreach ($dirs as $dir) {
+            $path = new \Slrfw\Path($dir['dir'] . DS . $filePath, \Slrfw\Path::SILENT);
+            if ($path->get()) {
+                return $dir['dir'] . DS . $filePath;
             }
-            else {
-                $filemtime = "";
+        }
+
+        return null;
+    }
+
+    /**
+     * Affiche le code html pour l'intégration des librairies JS
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $js = '';
+        foreach ($this->libraries as $lib) {
+            if (substr($lib['src'], 0, 7) != 'http://'
+                && substr($lib['src'], 0, 8) != 'https://'
+            ) {
+                $path = $this->getPath($lib['src']);
+
+                if (empty($path)) {
+                    $path = $lib['src'];
+                } else {
+                    $path .= '?' . filemtime($path);
+                }
+            } else {
+                $path = $lib['src'];
             }
 
-            $js .= '        <script src="' . $lib["src"] . $filemtime . '" type="text/javascript"></script>' . "\n";
+            $js .= '        <script src="' . $path
+                 . '" type="text/javascript"></script>' . "\n";
         }
 
         return $js;
@@ -49,14 +116,11 @@ class Javascript {
      *
      * @return void
      */
-    public function addLibrary($path, $local = true)
+    public function addLibrary($path)
     {
-        if ($local === true) {
-            $this->libraries[]['src'] = (substr($path, 0, 7) == 'http://' || substr($path, 0, 8) == 'https://' ? '' : 'js/') . $path;
-        } else {
-            $this->libraries[]['src'] = $path;
-        }
+            $this->libraries[] = array(
+                'src' => $path
+            );
     }
-
 }
 
