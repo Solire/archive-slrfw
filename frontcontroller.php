@@ -368,6 +368,7 @@ class FrontController
 
         if ($controller === false) {
             $this->controller = $this->getDefault('controller');
+            $this->classExists($this->controller);
         }
 
         if (isset($_GET['action']) && !empty($_GET['action'])) {
