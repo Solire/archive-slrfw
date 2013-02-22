@@ -536,17 +536,6 @@ class FrontController
         $appConfig = new Config($path->get());
         Registry::set('appconfig', $appConfig);
 
-        /** Url **/
-        if ($this->application == 'Front') {
-            $baseSuffix = '';
-        } else {
-            $baseSuffix = strtolower($this->application) . '/';
-        }
-
-        Registry::set('base', self::$envConfig->get('base', 'url'));
-        Registry::set('basehref', self::$envConfig->get('base', 'url') . $baseSuffix);
-        Registry::set('baseroot', self::$envConfig->get('base', 'root'));
-
         return true;
     }
 
