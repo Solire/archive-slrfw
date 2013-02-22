@@ -128,6 +128,8 @@ class Controller
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
         $this->_view->envConfig = Registry::get('envconfig');
+        $this->_view->css = $this->_css;
+        $this->_view->javascript = $this->_javascript;
         $this->_view->ajax = $this->_ajax;
 
         $this->_view->seo = $this->_seo;
