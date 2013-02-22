@@ -572,7 +572,7 @@ class Datatable
                 || $this->config["form"]["ajax"] == true)) {
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
-            $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
+            $this->_javascript->addLibrary("back/js/plupload/plupload.full.min.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/plupload_custom.js");
             $this->addRenderAction();
             if (isset($this->config["style"])

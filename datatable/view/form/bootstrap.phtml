@@ -31,7 +31,7 @@ if (isset($this->config["style"])
 <?php
 if (!isset($this->modeEdit) || $this->modeEdit == false) {
     ?>
-    <script src="js/back/tiny_mce/tiny_mce.js" type="text/javascript"></script>
+    <script src="app/back/js/tiny_mce/tiny_mce.js" type="text/javascript"></script>
     <div role="button" data-toggle="modal" href="#modal-<?php echo $this->name ?>" class="btn-a gradient-green">
         <a>Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>
     </div>
@@ -114,8 +114,8 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 if (!isset($this->modeEdit) || $this->modeEdit == false) {
     ?>
     <script type="text/javascript">
-                            
-                            
+
+
         function saveForm_<?php echo $this->nameConfig ?>($myForm, callback) {
             var $modal = $myForm.parents(".modal")
             if(typeof tinyMCE == "object")
@@ -140,51 +140,51 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                             nxt(); // continue the queue
                         })
                     }
-                                                                                   
-                                                                                                                                                                                                                            
-                                                                                                                                                                                                                            
+
+
+
                 })
-                                                                                                                                                                                                                                
+
             })
-        }        
-                            
-                            
+        }
+
+
         $().ready(function() {
-                                                                                                                
+
             $(".ui-select-load").livequery(function() {
                 $(this).selectLoad();
             })
-                                                                                
-                                        
-                                                                                                                                            
-                                                                                                                            
-                                            
-                                                                                                                            
+
+
+
+
+
+
             $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .btn-group > .edit-item").live("click", function(e) {
                 e.preventDefault();
                 var index = $(this).parents("tr:first").attr("id")
                 var $modalForm = $('<div class="modal fade" ></div>').appendTo("body")
                 $modalForm.load(
-                "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>&nomain=1&nojs=1&editRender&index=" + index + "&<?php echo $this->additionalParams ?>", 
+                "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>&nomain=1&nojs=1&editRender&index=" + index + "&<?php echo $this->additionalParams ?>",
                 function() {
                     $modalForm.modal().addClass('modal-big');
                     $modalForm.on('shown', function () {
                         initTinyMCE();
                         $modalForm.find('textarea.tiny').tinymce('enableOnly');
                     })
-                                                    
+
                 });
             })
-                                                                                                
-                                                                                                                                       
-                                                                                                                                                                                    
+
+
+
         });
-                                        
-                                        
-                                                        
-                                                        
+
+
+
+
         /* MULTI-AUTOCOMPLETE*/
-                                                            
+
         //Encode une chaîne
         function htmlentities(texte) {
             texte = texte.replace(/"/g,'&quot;'); // 34 22
@@ -459,10 +459,10 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                 });
             });
         });
-                                                        
-                                                        
-                                                        
-                                                        
+
+
+
+
         /* TinyMCE */
         var initTinyMCE = function () {
             tinyMCE.init({
@@ -495,20 +495,20 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                 theme_advanced_blockformats : "h3,h4,h5,h6",
 
                 //        external_image_list_url : "../media/autocomplete.html?tinyMCE"
-                                                    
-                                                    
+
+
                 relative_urls : true,
                 //        remove_script_host : false,
                 convert_urls : true,
                 document_base_url : "../../../../",
-                content_css : "css/back/style-tinymce.css",
+                content_css : "app/back/css/style-tinymce.css",
                 external_image_list_url : "back/media/autocomplete.html?tinyMCE",
-                external_link_list_url : "back/page/autocomplete-link.html"
-            });    
+                external_link_list_url : "back/page/autocompletelink.html"
+            });
         }
 
         initTinyMCE();
-                                                
+
         $().ready(function() {
             var tinyMethods = {
                 disable : function(){
@@ -540,7 +540,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                         tinyMethods['disable'].apply(this);
                     else
                         tinyMethods['enable'].apply(this);
-                                        		
+
                     //			tinyMCE.execCommand('mceToggleEditor',false,tinyId);
                 },
                 disableOnly : function(){
@@ -548,7 +548,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                     if(this.$el.attr('id')=='')
                         this.$el.attr('id', 'tempId');
                     var tinyId = this.$el.attr('id');
-                                        			
+
                     if(tinyMCE.getInstanceById(tinyId)){
                         tinyMethods['disable'].apply(this);
                         this.$el.addClass('tinymce-tmp-disabled');
@@ -566,7 +566,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                     this.$el.removeClass('tinymce-tmp-disabled');
                 }
             };
-                                        	
+
             $.tinymce = function(method, el){
                 var base=this;
                 base.$el = $(el);
@@ -574,7 +574,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
 
                 return tinyMethods[method].apply(this);
             }
-                                        	
+
             $.fn.tinymce = function(method){
                 var tab = [];
 
@@ -585,63 +585,63 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
             };
 
             $('textarea.tiny').tinymce('enable');
-                                                        
-        });        
-                                                        
-                                                                                                                                                                                       
+
+        });
+
+
     </script>
 
-    <link rel="stylesheet" href="css/back/autocomplete_multi/token-input-facebook.css" type="text/css" media="screen" title="" charset="utf-8" />
-    <script src="js/back/autocomplete_multi/jquery.tokeninput.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="app/back/css/autocomplete_multi/token-input-facebook.css" type="text/css" media="screen" title="" charset="utf-8" />
+    <script src="app/back/js/autocomplete_multi/jquery.tokeninput.js" type="text/javascript"></script>
 
 <?php } ?>
 
 
 <script type="text/javascript">
     $().ready(function() {
-        
-        
+
+
         $(".group-modal").detach().prependTo("body")
-        
-        
-        
+
+
+
         $(".datatable-form .btn-primary#add-<?php echo $this->name ?>").live("click", function(e) {
             e.preventDefault();
             var $myForm = $(this).parents("form");
             if(typeof $myForm.valid != "function" || $myForm.valid()) {
-                nbPlupload =  0 
+                nbPlupload =  0
                 $(".btn-file-upload").each(function() {
                     var idBtn = $(this).attr("id")
                     if (uploader[idBtn].files.length != 0) {
                         nbPlupload++
                     }
                 })
-                                                                                        
+
                 if (nbPlupload == 0) {
                     saveForm_<?php echo $this->nameConfig ?>($myForm)
                 } else {
                     $(".btn-file-upload").each(function() {
                         var idBtn = $(this).attr("id")
                         if (uploader[idBtn].files.length != 0) {
-                            uploader[idBtn].start();           
+                            uploader[idBtn].start();
                         }
                     })
                 }
             }
         })
-        
-        
+
+
         $(".btn-file-upload").each(function() {
             if ($(this).hasClass("plupload-loaded")) {
                 return true;
             }
             $(this).addClass("plupload-loaded")
-            
+
             var idBtn = $(this).attr("id")
             createUploader(idBtn)
             uploader[idBtn].bind('FileUploaded', function(up, file, info) {
                 nbPlupload--
-                                                                                                
+
                 $(file.div, '.progressbar').progressbar("destroy");
                 var response = $.parseJSON(info.response);
                 if(response.status != "error") {
@@ -650,13 +650,13 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
                     $("#" + infoField[1], $myForm).val(response.filename)
                     if(nbPlupload == 0)
                         saveForm_<?php echo $this->nameConfig ?>($myForm)
-                }                
-                                                                                                                    
+                }
+
                 uploader[idBtn].splice(0, 1);
-                                                                                                                    
+
             });
         })
-                                                
-        
+
+
     });
 </script>
