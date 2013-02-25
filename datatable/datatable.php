@@ -14,7 +14,8 @@ use Slrfw\Model\fileManager;
  * @package Datatable
  * @author shin
  */
-class Datatable {
+class Datatable
+{
 
     /**
      * Nom de la vue à utiliser
@@ -87,7 +88,7 @@ class Datatable {
      * @var string
      * @access protected
      */
-    protected $_configPath = "../config/datatable/";
+    protected $_configPath = "config/datatable/";
 
     /**
      * Nom du fichier de configuration qui sera utilisé
@@ -288,10 +289,10 @@ class Datatable {
      *
      * @return 	void
      */
-    public function start() {
-
-        if ($this->_configName != "") {
-            require($this->_configPath . $this->_configName . ".cfg.php");
+    public function start()
+    {
+        if ($this->_configName != '') {
+            include $this->_configPath . $this->_configName . '.cfg.php';
             $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->nameConfig = str_replace(array(".", "-"), "_", $this->_configName);
             $this->config = $config;
@@ -400,7 +401,7 @@ class Datatable {
     }
 
     protected function beforeRunAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -571,7 +572,7 @@ class Datatable {
                 || $this->config["form"]["ajax"] == true)) {
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
-            $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
+            $this->_javascript->addLibrary("back/js/plupload/plupload.full.min.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/plupload_custom.js");
             $this->addRenderAction();
             if (isset($this->config["style"])
@@ -788,7 +789,7 @@ class Datatable {
 
         $r = $this->_db->insert($sTable, $values);
         $insertId = $this->_db->lastInsertId();
-        
+
         if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["create"])) {
             $this->_log->logThis("Ajout de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . $insertId);
         }
@@ -799,7 +800,7 @@ class Datatable {
                 $this->_db->insert($queryAfterData["table"], $queryData);
             }
         }
-        
+
 
         $this->afterAddAction($insertId);
 
@@ -974,7 +975,7 @@ class Datatable {
         } else {
             $r = $this->_db->delete($sTable, implode(" AND ", $where));
         }
-        
+
         if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["delete"])) {
             $this->_log->logThis("Suppression de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . implode(" AND ", $where));
         }
@@ -1021,7 +1022,7 @@ class Datatable {
      * @return 	void
      */
     public function afterAddAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1032,7 +1033,7 @@ class Datatable {
      * @return 	void
      */
     public function afterEditAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1043,7 +1044,7 @@ class Datatable {
      * @return 	void
      */
     public function afterDeleteAction($row) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -2149,8 +2150,8 @@ class Datatable {
 
     /**
      * Renvoi le chargeur de fichier javascript
-     * 
-     * @return Javascript 
+     *
+     * @return Javascript
      */
     public function getJavascriptLoader() {
         return $this->_javascript;
@@ -2160,8 +2161,8 @@ class Datatable {
 
     /**
      * Renvoi le chargeur de fichier Css
-     * 
-     * @return Css 
+     *
+     * @return Css
      */
     public function getCssLoader() {
         return $this->_css;
@@ -2213,7 +2214,7 @@ class Datatable {
      * @return void
      */
     protected function addRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -2224,7 +2225,7 @@ class Datatable {
      * @return void
      */
     protected function editRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -2335,7 +2336,7 @@ class Datatable {
                     $queryAfterData = array();
                     $queryAfterData["table"] = $table;
                     $queryAfterData["table"] .= "
-                        INNER JOIN " . $column["from"]["table"] . " 
+                        INNER JOIN " . $column["from"]["table"] . "
                             ON " . $column["from"]["table"] . "." . $column["from"]["columns"][0]["name"] . " = `" . $column2["from"]["table"] . "`." . key($column["from"]["columns"][0]["from"]["index"]);
 
                     $queryAfterData["columns"] = $selectSqlArray;

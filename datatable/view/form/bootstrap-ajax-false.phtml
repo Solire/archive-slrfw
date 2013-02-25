@@ -33,13 +33,13 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             ' . $this->_javascript;
 }
 ?>
-<script src="js/back/tiny_mce/tiny_mce.js" type="text/javascript"></script>
+<script src="back/js/tiny_mce/tiny_mce.js" type="text/javascript"></script>
 
 <script type="text/javascript">
     var filesUploaded = []
-    
+
     $().ready(function() {
-        
+
         var addMsg = '';
         addMsg += '<div class="alert alert-success">'
         addMsg +=   '<?php echo ucfirst($this->config["table"]["title_item"]) ?> ajouté<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.'
@@ -48,7 +48,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
         addMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>" class="btn btn-large btn-primary">Retour à la liste</a>'
         addMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>&dt_action=formAddRender" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>'
         addMsg += '</p>'
-        
+
         var editMsg = '';
         editMsg += '<div class="alert alert-success">'
         editMsg +=   '<?php echo ucfirst($this->config["table"]["title_item"]) ?> modifié<?php echo $this->config["table"]["suffix_genre"] ?> avec succès.'
@@ -57,12 +57,12 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
         editMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>" class="btn btn-large btn-primary">Retour à la liste</a>'
         editMsg += '<a href="<?php echo $this->urlRaw; ?><?php echo strpos($this->urlRaw, "?") === false ? '?' : '&' ?><?php echo $this->additionalParams ?>&dt_action=formAddRender" class="btn btn-large">Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?></a>'
         editMsg += '</p>'
-        
+
         var myModal = {
             confirm : function (heading, question, cancelButtonTxt, okButtonTxt, callback) {
 
-                var confirmModal = 
-                    $('<div class="modal hide fade">' +    
+                var confirmModal =
+                    $('<div class="modal hide fade">' +
                     '<div class="modal-header">' +
                     '<a class="close" data-dismiss="modal" >&times;</a>' +
                     '<h3>' + heading +'</h3>' +
@@ -73,11 +73,11 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                     '</div>' +
 
                     '<div class="modal-footer">' +
-                    '<a href="#" class="btn" data-dismiss="modal">' + 
-                    cancelButtonTxt + 
+                    '<a href="#" class="btn" data-dismiss="modal">' +
+                    cancelButtonTxt +
                     '</a>' +
-                    '<a href="#" id="okButton" class="btn btn-danger">' + 
-                    okButtonTxt + 
+                    '<a href="#" id="okButton" class="btn btn-danger">' +
+                    okButtonTxt +
                     '</a>' +
                     '</div>' +
                     '</div>');
@@ -88,12 +88,12 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                     confirmModal.modal('hide');
                 });
 
-                confirmModal.modal('show');     
+                confirmModal.modal('show');
             },
             message : function (heading, message, closeButtonTxt, closeDelay) {
 
-                var messageModal = 
-                    $('<div class="modal hide fade">' +    
+                var messageModal =
+                    $('<div class="modal hide fade">' +
                     '<div class="modal-header">' +
                     '<a class="close" data-dismiss="modal" >&times;</a>' +
                     '<h3>' + heading +'</h3>' +
@@ -104,32 +104,32 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                     '</div>' +
 
                     '<div class="modal-footer">' +
-                    '<a href="#" id="closeButton" data-dismiss="modal" class="btn btn-primary">' + 
-                    closeButtonTxt + 
+                    '<a href="#" id="closeButton" data-dismiss="modal" class="btn btn-primary">' +
+                    closeButtonTxt +
                     '</a>' +
                     '</div>' +
                     '</div>');
-            
-                messageModal.modal('show');     
+
+                messageModal.modal('show');
                 if (closeDelay) {
                     messageModal.delay(closeDelay).queue(function(nxt) {
                         messageModal.modal("hide")
                         nxt(); // continue the queue
                     })
                 }
-               
+
             }
-                
-                
+
+
         }
-        
-        
+
+
         $(".ui-select-load").livequery(function() {
             $(this).selectLoad();
         })
-        
+
         var currentPlupload = ""
-        
+
         $.fn.createPlupload = function() {
             var idBtn = $(this).attr("id")
             createUploader(idBtn, true)
@@ -156,22 +156,22 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                                 }
                         })
                     })
-                }                
-                                                                                                                
-                
-                                                                                                                
+                }
+
+
+
             });
         };
-                                                    
+
         $(".btn-file-upload").livequery(function() {
             $(this).createPlupload()
         })
-        
+
         $(".nomodal-footer .btn-cancel").live("click", function(e) {
             e.preventDefault()
             // On recupere l'id de la row'
             var id = $(this).parents("tr:first").attr('id');
-                                                                
+
             var heading = 'Confirmation';
             var question = 'Attention, les données saisies seront perdues, malgré cela êtes-vous sûr de vouloir quitter cette page ? ';
             var cancelButtonTxt = 'Non';
@@ -183,20 +183,20 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
 
             myModal.confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
         });
-                                                                                                                            
-                                                                                                
+
+
         $(".nomodal-footer .btn-primary").live("click", function(e) {
             e.preventDefault();
             var $myForm = $(this).parents("form");
             if(typeof $myForm.valid != "function" || $myForm.valid()) {
-                nbPlupload =  0 
+                nbPlupload =  0
                 $(".btn-file-upload").each(function() {
                     var idBtn = $(this).attr("id")
                     if (uploader[idBtn].files.length != 0) {
                         nbPlupload++
                     }
                 })
-                                                                                        
+
                 if (nbPlupload == 0) {
                     saveForm($myForm, function() {
                         $myForm.hide(0, function() {
@@ -212,43 +212,43 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                     $(".btn-file-upload").each(function() {
                         var idBtn = $(this).attr("id")
                         if (uploader[idBtn].files.length != 0) {
-                            uploader[idBtn].start();           
+                            uploader[idBtn].start();
                         }
                     })
                 }
             }
         })
-                                                                                                
-        
-                                                                                                      
-                                                                                                                                                        
+
+
+
+
     });
-                                                
+
     function saveForm ($myForm, callback) {
         var $modal = $myForm.parents(".modal")
         if(typeof tinyMCE == "object")
             tinyMCE.triggerSave(true, true);
-        
+
         var data = $myForm.serialize()
         for(i in filesUploaded) {
             eval('var arrayData = {"' + i + '" : ' + JSON.stringify(filesUploaded[i]) + '}')
             data += "&" + $.param(arrayData);
         }
-        
-        
+
+
         $.post($myForm.attr("action"), data, function(response) {
             if (callback && typeof(callback) === "function") {
                 // execute the callback, passing parameters as necessary
                 callback(response);
             }
-                                                                                                                                                                                      
-                                                                                                                                                                                                            
+
+
         })
     }
-                            
-                            
+
+
     /* MULTI-AUTOCOMPLETE*/
-                                
+
     //Encode une chaîne
     function htmlentities(texte) {
         texte = texte.replace(/"/g,'&quot;'); // 34 22
@@ -520,10 +520,10 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             });
         });
     });
-                            
-                            
-                            
-                            
+
+
+
+
     /* TinyMCE */
     var initTinyMCE = function () {
         tinyMCE.init({
@@ -556,20 +556,20 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
             theme_advanced_blockformats : "h3,h4,h5,h6",
 
             //        external_image_list_url : "../media/autocomplete.html?tinyMCE"
-                        
-                        
+
+
             relative_urls : true,
             //        remove_script_host : false,
             convert_urls : true,
             document_base_url : "../../../../",
-            content_css : "css/back/style-tinymce.css",
+            content_css : "app/back/css/style-tinymce.css",
             external_image_list_url : "back/media/autocomplete.html?tinyMCE",
             external_link_list_url : "back/page/autocomplete-link.html"
-        });    
+        });
     }
 
     initTinyMCE();
-                    
+
     $().ready(function() {
         var tinyMethods = {
             disable : function(){
@@ -601,7 +601,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                     tinyMethods['disable'].apply(this);
                 else
                     tinyMethods['enable'].apply(this);
-            		
+
                 //			tinyMCE.execCommand('mceToggleEditor',false,tinyId);
             },
             disableOnly : function(){
@@ -609,7 +609,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                 if(this.$el.attr('id')=='')
                     this.$el.attr('id', 'tempId');
                 var tinyId = this.$el.attr('id');
-            			
+
                 if(tinyMCE.getInstanceById(tinyId)){
                     tinyMethods['disable'].apply(this);
                     this.$el.addClass('tinymce-tmp-disabled');
@@ -627,7 +627,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
                 this.$el.removeClass('tinymce-tmp-disabled');
             }
         };
-            	
+
         $.tinymce = function(method, el){
             var base=this;
             base.$el = $(el);
@@ -635,7 +635,7 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
 
             return tinyMethods[method].apply(this);
         }
-            	
+
         $.fn.tinymce = function(method){
             var tab = [];
 
@@ -646,11 +646,11 @@ if (!isset($_GET["nojs"]) || !$_GET["nojs"]) {
         };
 
         $('textarea.tiny').tinymce('enable');
-                            
-    });        
-                            
-                                                                                                                                                           
+
+    });
+
+
 </script>
 
-<link rel="stylesheet" href="css/back/autocomplete_multi/token-input-facebook.css" type="text/css" media="screen" title="" charset="utf-8" />
-<script src="js/back/autocomplete_multi/jquery.tokeninput.js" type="text/javascript"></script>
+<link rel="stylesheet" href="app/back/css/autocomplete_multi/token-input-facebook.css" type="text/css" media="screen" title="" charset="utf-8" />
+<script src="app/back/js/autocomplete_multi/jquery.tokeninput.js" type="text/javascript"></script>
