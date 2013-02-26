@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Model\Gabarit\Field;
+
 /**
  * Description of gabaritfield
  *
@@ -28,7 +30,7 @@ abstract class GabaritField
             unset($champ["params"]);
         }
         if ($db)	$this->db = $db;
-        else		$this->db = Slrfw\Registry::get("db");
+        else		$this->db = \Slrfw\Registry::get("db");
 
         $this->idGabPage = $id_gab_page;
         $this->uploadPath = $upload_path;

@@ -1,13 +1,14 @@
 <?php
 
-require_once 'gabarit/field/gabaritfield.php';
+namespace Slrfw\Model\Gabarit\Field\Join;
 
 /**
  * Description of JoinField
  *
  * @author shin
  */
-class JoinField extends GabaritField {
+class JoinField extends \Slrfw\Model\Gabarit\Field\GabaritField
+{
 
     protected $valueLabel;
     protected $gabarit = null;

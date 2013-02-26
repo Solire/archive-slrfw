@@ -1,13 +1,13 @@
 <?php
 
-require_once 'gabarit/field/gabaritfield.php';
+namespace Slrfw\Model\Gabarit\Field\Wysiwyg;
 
 /**
  * Description of text
  *
  * @author shin
  */
-class WysiwygField extends GabaritField
+class WysiwygField extends \Slrfw\Model\Gabarit\Field\GabaritField
 {
 
 }

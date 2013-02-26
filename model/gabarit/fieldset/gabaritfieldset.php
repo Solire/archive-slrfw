@@ -5,6 +5,8 @@
  * @author shin
  */
 
+namespace Slrfw\Model\Gabarit\FieldSet;
+
 /**
  * Description of gabaritfield
  *
@@ -122,8 +124,7 @@ abstract class GabaritFieldSet
         }
 
         $type = strtolower($champ['type']);
-        $classNameType = $type . 'field';
-        require_once 'gabarit/field/' . $type . '/' . $classNameType . '.php';
+        $classNameType = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\' . $type . 'field';
         $field = new $classNameType($champ, $label, $value, $id, $classes,
             $upload_path, $id_gab_page, $this->versionId);
 

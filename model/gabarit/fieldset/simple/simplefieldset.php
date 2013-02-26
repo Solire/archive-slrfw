@@ -1,13 +1,13 @@
 <?php
 
-require_once 'gabarit/fieldset/gabaritfieldset.php';
+namespace Slrfw\Model\Gabarit\FieldSet\Simple;
 
 /**
  * Description of text
  *
  * @author shin
  */
-class SimpleFieldSet extends GabaritFieldSet
+class SimpleFieldSet extends \Slrfw\Model\Gabarit\FieldSet\GabaritFieldSet
 {
     public function start()
     {

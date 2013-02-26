@@ -1,13 +1,13 @@
 <?php
 
-require_once 'gabarit/field/gabaritfield.php';
+namespace Slrfw\Model\Gabarit\Field\File;
 
 /**
  * Description of text
  *
  * @author shin
  */
-class FileField extends GabaritField
+class FileField extends \Slrfw\Model\Gabarit\Field\GabaritField
 {
     public function start() {
         parent::start();

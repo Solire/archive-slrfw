@@ -1,13 +1,13 @@
 <?php
 
-require_once 'gabarit/field/gabaritfield.php';
+namespace Slrfw\Model\Gabarit\Field\Autocomplete_multi;
 
 /**
  * Description of JoinField
  *
  * @author shin
  */
-class Autocomplete_multiField extends GabaritField
+class Autocomplete_multiField extends \Slrfw\Model\Gabarit\Field\GabaritField
 {
 
     protected $values;
