@@ -135,6 +135,20 @@ class gabarit
         return $this->_champs;
     }
 
+    public function getChamp($name, $bloc = false) {
+        foreach ($this->_champs as $champsGroup) {
+            if ($bloc) {
+                $champsGroup = array($champsGroup);
+            }
+            foreach ($champsGroup as $champ) {
+                if ($champ["name"] == $name) {
+                    return $champ;
+                }
+            }
+        }
+        return false;
+    }
+
     public function getJoins() {
         return $this->_joins;
     }
