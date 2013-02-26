@@ -90,6 +90,42 @@ class gabaritBloc
      * @param string $key
      * @return mixed
      */
+    public function getEditableAttributes($key, $id)
+    {
+        $field = $this->getGabarit()->getChamp($key, true);
+        if (!$field) {
+            return "";
+        }
+        $type = "";
+        switch ($field["type"]) {
+            case "WYSIWYG":
+                $type = "full";
+
+                break;
+            case "FILE":
+                $type = "image";
+
+                break;
+            case "TEXT":
+                $type = "simple";
+
+                break;
+
+            default:
+                break;
+        }
+        if ($type != "") {
+            return ' data-mercury="' . $type . '" id="champ' . $field["id"] . '-' . $id . '-' . $this->getGabarit()->getTable() . '" ';
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function getValue($i, $key = NULL)
     {
         if ($i < 0 || $i >= count($this->_values))

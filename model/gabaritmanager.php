@@ -1222,7 +1222,7 @@ class gabaritManager extends manager
      *
      * @return type
      */
-    protected function savePage($page, $donnees)
+    public function savePage($page, $donnees, $partialSave = false)
     {
         $updating = $donnees['id_gab_page'] > 0;
 
@@ -1248,6 +1248,11 @@ class gabaritManager extends manager
 
         foreach ($allchamps as $name_group => $champs) {
             foreach ($champs as $champ) {
+                if ($partialSave
+                        && !isset($donnees['champ' . $champ['id']])
+                ) {
+                    continue;
+                }
                 if ($champ['visible'] == 0) {
                     continue;
                 }
@@ -1310,8 +1315,12 @@ class gabaritManager extends manager
      *
      * @return boolean
      */
-    protected function saveBloc($bloc, $id_gab_page, $id_version, &$donnees)
-    {
+    public function saveBloc($bloc,
+            $id_gab_page,
+            $id_version,
+            &$donnees,
+            $partialSave = false
+    ) {
         $gabarit = $bloc->getGabarit();
         $table = $gabarit->getTable();
         $champs = $gabarit->getChamps();
@@ -1348,7 +1357,7 @@ class gabaritManager extends manager
 
         foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
             $ids_blocs[] = $this->saveBlocLine($table, $champs, $id_bloc,
-                $ordre, $donnees, $id_gab_page, $id_version);
+                $ordre, $donnees, $id_gab_page, $id_version, $partialSave);
             $ordre++;
         }
 
@@ -1380,22 +1389,31 @@ class gabaritManager extends manager
         $ordre,
         &$donnees,
         $id_gab_page,
-        $id_version
+        $id_version,
+        $partialSave = false
     ) {
-        $visible  = array_shift($donnees['visible']);
         $updating = ($id_bloc > 0);
+        if (!$partialSave) {
+            $visible  = array_shift($donnees['visible']);
 
-        if ($updating) {
-            $query  = 'UPDATE `' . $table . '` SET'
-                    . ' `ordre` = ' . $ordre . ','
-                    . ' `visible` = ' . $visible . ',';
+            if ($updating) {
+                $query  = 'UPDATE `' . $table . '` SET'
+                        . ' `ordre` = ' . $ordre . ','
+                        . ' `visible` = ' . $visible . ',';
+            } else {
+                $query  = 'INSERT INTO `' . $table . '` SET'
+                        . ' `id_gab_page` = ' . $id_gab_page . ','
+                        . ' `ordre` = ' . $ordre . ',';
+            }
         } else {
-            $query  = 'INSERT INTO `' . $table . '` SET'
-                    . ' `id_gab_page` = ' . $id_gab_page . ','
-                    . ' `ordre` = ' . $ordre . ',';
+            $query = 'UPDATE `' . $table . '` SET ';
         }
 
         foreach ($champs as $champ) {
+            if ($partialSave
+                    && !isset($donnees['champ' . $champ['id']])) {
+                continue;
+            }
             if ($champ['visible'] == 0) {
                 continue;
             }

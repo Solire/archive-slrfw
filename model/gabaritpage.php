@@ -168,6 +168,41 @@ class gabaritPage extends gabaritBloc {
 
     /**
      *
+     * @param string $key
+     * @return mixed
+     */
+    public function getEditableAttributes($key = NULL) {
+        $field = $this->getGabarit()->getChamp($key);
+        if (!$field) {
+            return "";
+        }
+        $type = "";
+        switch ($field["type"]) {
+            case "WYSIWYG":
+                $type = "full";
+
+                break;
+            case "FILE":
+                $type = "image";
+
+                break;
+            case "TEXT":
+                $type = "simple";
+
+                break;
+
+            default:
+                break;
+        }
+        if ($type != "") {
+            return ' data-mercury="' . $type . '" id="champ' . $field["id"] . '" ';
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     *
      * @return type
      */
     public function getBlocs($name = NULL) {
