@@ -1,5 +1,7 @@
 <?php
 
+namespace Slrfw\Form;
+
 /**
  * Description of shinform
  *
@@ -25,7 +27,7 @@ class ShinForm {
 
     public function __construct($configName, $db, $configArray = null) {
         if ($configName != null) {
-            $config = Registry::get('mainconfig');
+            $config = \Slrfw\Registry::get('mainconfig');
             include($config->get('dirs', 'formulaire') . $configName);
             $this->_config = $config;
 
