@@ -1,4 +1,12 @@
 <?php
+/**
+ * Datatable Class
+ *
+ * Créer un tableau avancé
+ *
+ * @package Datatable
+ * @author shin
+ */
 
 namespace Slrfw\Datatable;
 
@@ -997,18 +1005,19 @@ class Datatable
      */
     public function uploadAction() {
         if (isset($this->config["file"])) {
-            $this->_upload_path = $this->config["file"]["upload_path"];
-            $this->_upload_temp = $this->config["file"]["upload_temp"];
+            $this->_upload_path     = $this->config["file"]["upload_path"];
+            $this->_upload_temp     = $this->config["file"]["upload_temp"];
             $this->_upload_vignette = $this->config["file"]["upload_vignette"];
-            $this->_upload_apercu = $this->config["file"]["upload_apercu"];
+            $this->_upload_apercu   = $this->config["file"]["upload_apercu"];
         }
         $fileManager = new fileManager();
-        $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
-        $targetDir = "../" . $this->_upload_path;
-        $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_vignette;
-        $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+        $targetTmp      = $this->_upload_temp;
+        $targetDir      = $this->_upload_path;
+        $vignetteDir    = $this->_upload_vignette;
+        $apercuDir      = $this->_upload_apercu;
 
-        $json = $fileManager->upload($targetTmp, $targetDir, $vignetteDir, $apercuDir);
+        $json = $fileManager->upload($this->_upload_path, $targetTmp,
+            $targetDir, $vignetteDir, $apercuDir);
 
         $this->_view = "";
         $this->_response = json_encode($json);

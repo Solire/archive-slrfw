@@ -247,12 +247,11 @@ class gabaritPage extends gabaritBloc {
      *
      * @param string $action        adresse de l'action du formulaire
      * @param string $retour        adresse de retour
-     * @param string $upload_path   emplacement des images
      * @param array  $redirections  tableau des redirections
      *
      * @return string formulaire au format HTML
      */
-    public function getForm($action, $retour, $upload_path, $redirections = array())
+    public function getForm($action, $retour, $redirections = array())
     {
         $versionId          = $this->_version['id'];
 
@@ -292,7 +291,7 @@ class gabaritPage extends gabaritBloc {
      *
      * @return type
      */
-	public function buildForm($upload_path) {
+	public function buildForm() {
         $form   = '<input type="hidden" name="id_' . $this->_gabarit->getTable()
                 . '" value="' . (isset($this->_values['id']) ? $this->_values['id'] : '')
                 . '" />';
@@ -307,13 +306,13 @@ class gabaritPage extends gabaritBloc {
             foreach ($champs as $champ) {
                 $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
                 $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
-                $form .= $this->_buildChamp($champ, $value, $id, $upload_path, $id_gab_page);
+                $form .= $this->_buildChamp($champ, $value, $id, $id_gab_page);
             }
             $form .= '</div></fieldset>';
         }
 
         foreach ($this->_blocs as $blocName => $bloc) {
-            $form .=  $bloc->buildForm($upload_path, $id_gab_page,
+            $form .=  $bloc->buildForm($id_gab_page,
                 $this->_version['id']);
         }
 

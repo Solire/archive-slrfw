@@ -149,13 +149,12 @@ class gabaritBloc
     /**
      * Retourne l'élément d'un formulaire en HTML correspondant à ce bloc dynamique
      *
-     * @param string $upload_path
      * @param string $id_gab_page
      * @param int    $versionId
      *
      * @return string élément de formulaire en HTML
      */
-    public function buildForm($upload_path, $id_gab_page, $versionId)
+    public function buildForm($id_gab_page, $versionId)
     {
         $form = '';
 
@@ -169,7 +168,7 @@ class gabaritBloc
         }
 
         $classNameType = '\Slrfw\Model\Gabarit\Fieldset\\' . $type . '\\' . $type . 'fieldset';
-        $fieldset = new $classNameType($this, $upload_path, $id_gab_page, $versionId);
+        $fieldset = new $classNameType($this, $id_gab_page, $versionId);
         $fieldset->start();
         $form .= $fieldset;
 
@@ -184,12 +183,11 @@ class gabaritBloc
      * @param string $value       valeur du champ
      * @param string $idpage      chaîne à concatainer à l'attribut 'id' de
      * l'élément du formulaire
-     * @param string $upload_path nom du dossier où sont uploadés les images
      * @param int    $id_gab_page nom du dossier dans lequel sont les images
      *
      * @return string élément de formulaire en HTML
      */
-    protected function _buildChamp($champ, $value, $idpage, $upload_path, $id_gab_page)
+    protected function _buildChamp($champ, $value, $idpage, $id_gab_page)
     {
         $form = '';
 
@@ -207,7 +205,7 @@ class gabaritBloc
 
         $type = strtolower($champ['type']);
         $classNameType = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\' . $type . 'field';
-        $field = new $classNameType($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, 0);
+        $field = new $classNameType($champ, $label, $value, $id, $classes, $id_gab_page, 0);
         $field->start();
         $form .= $field;
 

@@ -17,13 +17,12 @@ abstract class GabaritField
     protected $label;
     protected $value;
     protected $idGabPage;
-    protected $uploadPath;
     protected $id;
     protected $versionId;
     protected $classes;
     protected $db;
 
-    public function __construct($champ, $label, $value, $id, $classes, $upload_path, $id_gab_page, $versionId, $db = null)
+    public function __construct($champ, $label, $value, $id, $classes, $id_gab_page, $versionId, $db = null)
     {
         if (isset($champ["params"])) {
             $this->params = $champ["params"];
@@ -33,7 +32,6 @@ abstract class GabaritField
         else		$this->db = \Slrfw\Registry::get("db");
 
         $this->idGabPage = $id_gab_page;
-        $this->uploadPath = $upload_path;
         $this->champ = $champ;
         $this->label = $label;
         $this->value = $value;

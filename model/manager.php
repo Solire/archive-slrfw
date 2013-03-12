@@ -16,13 +16,13 @@ class manager {
 
 	/**
 	 *
-	 * @var MyPDO
+	 * @var Slrfw\MyPDO
 	 */
 	protected $_db;
 
 	/**
 	 *
-	 * @param MyPDO $db
+	 * @param Slrfw\MyPDO $db
 	 */
 	public function __construct($db = null) {
 		if ($db)	$this->_db = $db;

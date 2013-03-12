@@ -56,9 +56,16 @@
                         }
 ?>
 
-                                <div<?php echo $noMetaTitre; ?> class="line">
-                                    <label for="titre-<?php echo $metaLang; ?>">Titre <span class="required">*</span> </label>
-                                    <input type="text" name="titre" id="titre-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['titre']) ? $this->_meta['titre'] : ''; ?>" class="<?php echo $this->_gabarit->getMeta_titre() ? 'form-controle form-oblig form-mix' : ''; ?>" />
+                                <div class="line form-line">
+                                    <div<?php echo $noMetaTitre; ?> class="line">
+                                        <label for="titre-<?php echo $metaLang; ?>">Titre <span class="required">*</span> </label>
+                                        <input type="text" name="titre" id="titre-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['titre']) ? $this->_meta['titre'] : ''; ?>" class="form-controle<?php echo $this->_gabarit->getMeta_titre() ? ' form-oblig form-mix' : ''; ?>" />
+                                    </div>
+
+                                    <div class="line form-other-line" style="display:none;">
+                                        <label class="form-other-flag"></label>
+                                        <input type="text" disabled="disabled" class="form-other-elmt" />
+                                    </div>
                                 </div>
 
 <?php
@@ -76,24 +83,52 @@
                                     <legend>Balise Meta</legend>
 
                                     <div style="display:none;">
-                                        <div class="line">
-                                            <label for="rewriting-<?php echo $metaLang; ?>">Rewriting<?php echo isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? ' <span class="required">*</span>' : ''; ?></label>
-                                            <input type="text" name="rewriting" id="rewriting-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['rewriting']) ? $this->_meta['rewriting'] : ''; ?>" class="<?php echo isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? 'form-controle form-oblig form-notnul' : ''; ?>" />
+                                        <div class="line form-line">
+                                            <div class="line">
+                                                <label for="rewriting-<?php echo $metaLang; ?>">Rewriting<?php echo isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? ' <span class="required">*</span>' : ''; ?></label>
+                                                <input type="text" name="rewriting" id="rewriting-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['rewriting']) ? $this->_meta['rewriting'] : ''; ?>" class="form-controle<?php echo isset($this->_meta['rewriting']) && $this->_meta['rewriting'] != "" ? ' form-oblig form-notnul' : ''; ?>" />
+                                            </div>
+
+                                            <div class="line form-other-line" style="display:none;">
+                                                <label class="form-other-flag"></label>
+                                                <input type="text" disabled="disabled" class="form-other-elmt" />
+                                            </div>
                                         </div>
 
-                                        <div class="line">
-                                            <label for="bal_title-<?php echo $metaLang; ?>">Title</label>
-                                            <input type="text" name="bal_title" id="bal_title-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_title']) ? $this->_meta['bal_title'] : ''; ?>" size="80" maxlength="80" />
+                                        <div class="line form-line">
+                                            <div class="line">
+                                                <label for="bal_title-<?php echo $metaLang; ?>">Title</label>
+                                                <input type="text" name="bal_title" id="bal_title-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_title']) ? $this->_meta['bal_title'] : ''; ?>" size="80" maxlength="80" class="form-controle" />
+                                            </div>
+
+                                            <div class="line form-other-line" style="display:none;">
+                                                <label class="form-other-flag"></label>
+                                                <input type="text" disabled="disabled" class="form-other-elmt" />
+                                            </div>
                                         </div>
 
-                                        <div class="line">
-                                            <label for="bal_descr-<?php echo $metaLang; ?>">Description</label>
-                                            <input type="text" name="bal_descr" id="bal_descr-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_descr']) ? $this->_meta['bal_descr'] : ''; ?>" size="80" maxlength="250" />
+                                        <div class="line form-line">
+                                            <div class="line">
+                                                <label for="bal_descr-<?php echo $metaLang; ?>">Description</label>
+                                                <input type="text" name="bal_descr" id="bal_descr-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_descr']) ? $this->_meta['bal_descr'] : ''; ?>" size="80" maxlength="250" class="form-controle" />
+                                            </div>
+
+                                            <div class="line form-other-line" style="display:none;">
+                                                <label class="form-other-flag"></label>
+                                                <input type="text" disabled="disabled" class="form-other-elmt" />
+                                            </div>
                                         </div>
 
-                                        <div class="line">
-                                            <label for="bal_key-<?php echo $metaLang; ?>">Keywords (<i>séparés par des ,</i>)</label>
-                                            <input type="text" name="bal_key" id="bal_key-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_key']) ? $this->_meta['bal_key'] : ''; ?>" size="80" maxlength="250" />
+                                        <div class="line form-line">
+                                            <div class="line">
+                                                <label for="bal_key-<?php echo $metaLang; ?>">Keywords (<i>séparés par des ,</i>)</label>
+                                                <input type="text" name="bal_key" id="bal_key-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['bal_key']) ? $this->_meta['bal_key'] : ''; ?>" size="80" maxlength="250" class="form-controle" />
+                                            </div>
+
+                                            <div class="line form-other-line" style="display:none;">
+                                                <label class="form-other-flag"></label>
+                                                <input type="text" disabled="disabled" class="form-other-elmt" />
+                                            </div>
                                         </div>
 
                                         <div class="line">
@@ -154,7 +189,7 @@
                                 foreach ($champs as $champ) {
                                     $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
                                         $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
-                                        echo $this->_buildChamp($champ, $value, $id, $upload_path, $metaId);
+                                        echo $this->_buildChamp($champ, $value, $id, $metaId);
                                 }
 ?>
                                     </div>
@@ -163,7 +198,7 @@
                             }
 
                             foreach ($this->_blocs as $bloc) {
-                                echo $bloc->buildForm($upload_path, $metaId, $this->getMeta('id_version'));
+                                echo $bloc->buildForm($metaId, $this->getMeta('id_version'));
                             }
 ?>
 

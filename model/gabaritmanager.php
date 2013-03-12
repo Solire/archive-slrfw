@@ -91,8 +91,9 @@ class gabaritManager extends manager
     ) {
         $page = new gabaritPage();
 
+        $visiblePrevisu = $visible;
         if ($this->modePrevisualisation) {
-            $visible = false;
+            $visiblePrevisu = false;
         }
 
         if ($id_gab_page) {
@@ -193,7 +194,7 @@ class gabaritManager extends manager
                 $page->setValues($values);
 
                 if ($join) {
-                    $this->getJoinsValues($page, $id_version, $id_api, $visible);
+                    $this->getJoinsValues($page, $id_version, $id_api, $visiblePrevisu);
                 }
 
                 $blocs = $page->getBlocs();
@@ -1315,11 +1316,12 @@ class gabaritManager extends manager
      *
      * @return boolean
      */
-    public function saveBloc($bloc,
-            $id_gab_page,
-            $id_version,
-            &$donnees,
-            $partialSave = false
+    public function saveBloc(
+        $bloc,
+        $id_gab_page,
+        $id_version,
+        &$donnees,
+        $partialSave = false
     ) {
         $gabarit = $bloc->getGabarit();
         $table = $gabarit->getTable();
@@ -1410,8 +1412,7 @@ class gabaritManager extends manager
         }
 
         foreach ($champs as $champ) {
-            if ($partialSave
-                    && !isset($donnees['champ' . $champ['id']])) {
+            if ($partialSave && !isset($donnees['champ' . $champ['id']])) {
                 continue;
             }
             if ($champ['visible'] == 0) {
