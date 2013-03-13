@@ -930,21 +930,24 @@ class gabaritManager extends manager
         $gabarit = $this->getGabarit($donnees['id_gabarit']);
         $api = $gabarit->getApi();
 
-        $query  = 'SELECT `id` FROM `version` WHERE id_api = ' . $api['id'];
+        if (isset($donnees['id_version'])) {
+            $versionId = $donnees['id_version'];
+        } else {
+            $versionId = BACK_ID_VERSION;
+        }
+
+        $query  = 'SELECT `id`'
+                . ' FROM `version`'
+                . ' WHERE id_api = ' . $api['id']
+                . ' ORDER BY `id` != ' . $versionId;
         $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
-        if (isset($donnees['id_version'])) {
-            $version = $donnees['id_version'];
-        } else {
-            $version = 1;
-        }
-
         if ($updating) {
-            $page = $this->getPage($version, $api['id'], $donnees['id_gab_page'], 0);
+            $page = $this->getPage($versionId, $api['id'], $donnees['id_gab_page'], 0);
         } else {
-            $page = $this->getPage($version, $api['id'], 0, $donnees['id_gabarit']);
+            $page = $this->getPage($versionId, $api['id'], 0, $donnees['id_gabarit']);
         }
 
         $id_gab_page = $this->saveMeta($page, $donnees);
@@ -953,7 +956,7 @@ class gabaritManager extends manager
             return null;
         }
 
-        $page = $this->getPage($version, $api['id'], $id_gab_page, 0);
+        $page = $this->getPage($versionId, $api['id'], $id_gab_page, 0);
 
         $this->savePage($page, $donnees);
 
@@ -963,7 +966,8 @@ class gabaritManager extends manager
                 $donnees);
         }
 
-        $newPage = $this->getPage($version, $api['id'], $page->getMeta('id'), 0);
+        $newPage = $this->getPage($versionId, $api['id'], $page->getMeta('id'), 0);
+
         return $newPage;
     }
 
@@ -1125,7 +1129,7 @@ class gabaritManager extends manager
                     . ' AND `id_gabarit` IN ('
                     . implode(', ', $gabaritsFromCurrentApi) . ')'
                     . ' AND `id_parent` = ' . $id_parent
-                    . ' AND `id_version` = 1';
+                    . ' AND `id_version` = ' . $donnees['id_version'];
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting',
                 $query);
 
@@ -1151,7 +1155,7 @@ class gabaritManager extends manager
                 $query .= '`id_gabarit` = ' . $page->getGabarit()->getId() . ','
                         . '`titre` = ' . $this->_db->quote($donnees['titre']) . ',';
 
-                if ($id_gab_page > 0 || $version['id'] > 1) {
+                if ($id_gab_page > 0) {
                     $query .= '`rewriting` = "",';
                 } else {
                     $query .= '`rewriting` = ' . $this->_db->quote($rewriting) . ',';

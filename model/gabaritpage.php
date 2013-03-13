@@ -260,7 +260,7 @@ class gabaritPage extends gabaritBloc {
                             : 0;
         $metaLang           = isset($this->_meta['id_version'])
                             ? $this->_meta['id_version']
-                            : 1;
+                            : BACK_ID_VERSION;
         $noMeta             = !$this->_gabarit->getMeta() || !$metaId
                             ? ' style="display: none;" '
                             : '';
