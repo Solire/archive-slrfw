@@ -3,14 +3,14 @@
 namespace Slrfw\Datatable\Plugin;
 
 
-require_once '../library/form/shinform.php';
+//require_once '../library/form/shinform.php';
 
 /**
  * Description of DatatableShinForm
  *
  * @author shinbuntu
  */
-class DatatableShinForm extends \ShinForm {
+class DatatableShinForm extends \Slrfw\Form\ShinForm {
 
     protected $oDatatable;
 
@@ -18,16 +18,16 @@ class DatatableShinForm extends \ShinForm {
      *
      * @param string $configName
      * @param MyPDO $db
-     * @param \Slrfw\Datatable\Datatable $oDatatable 
+     * @param \Slrfw\Datatable\Datatable $oDatatable
      */
     public function __construct($db, $oDatatable) {
         $this->oDatatable = $oDatatable;
         $configShinForm = $this->convertConfig();
         parent::__construct(null, $db, $configShinForm);
-        
+
         $this->_javascript = $this->oDatatable->getJavascriptLoader();
         $this->_css = $this->oDatatable->getCssLoader();
-//        
+//
         $this->_javascript->addLibrary("jquery/plugins/jquery.validate.js");
         $this->_javascript->addLibrary("jquery/plugins/additional-methods.js");
         $this->_css->addLibrary("back/jquery.validate.css");
@@ -47,22 +47,22 @@ class DatatableShinForm extends \ShinForm {
                 );
             }
         }
-        
+
         return $configShinForm;
     }
-    
+
     public function datatableAction() {
         return $this->getValidateJS();
     }
-    
+
     public function editFormRenderAction() {
         return $this->getValidateJS();
     }
-    
+
     public function formEditRenderAction() {
         return $this->getValidateJS();
     }
-    
+
     public function formAddRenderAction() {
         return $this->getValidateJS();
     }
