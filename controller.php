@@ -76,13 +76,13 @@ class Controller
 
     /**
      *
-     * @var Javascript
+     * @var Loader\Javascript
      */
     protected $_javascript;
 
     /**
      *
-     * @var Css
+     * @var Loader\Css
      */
     protected $_css;
 
