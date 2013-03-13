@@ -654,11 +654,11 @@ class fileManager extends manager {
         $query  = 'INSERT INTO `media_fichier` SET'
                 . ' `rewriting` = ' . $this->_db->quote($fileName) . ','
                 . ' `id_gab_page` = ' . $id_gab_page . ','
-                . ' `id_temp = ' . $id_temp . ','
-                . ' `taille = ' . $this->_db->quote($size) . ','
-                . ' `width = ' . $width . ','
-                . ' `height = ' . $height . ','
-                . ' `vignette = ' . $this->_db->quote($fileName) . ','
+                . ' `id_temp` = ' . $id_temp . ','
+                . ' `taille` = ' . $this->_db->quote($size) . ','
+                . ' `width` = ' . $width . ','
+                . ' `height` = ' . $height . ','
+                . ' `vignette` = ' . $this->_db->quote($fileName) . ','
                 . ' `date_crea` = NOW()';
         $this->_db->exec($query);
         return $this->_db->lastInsertId();
