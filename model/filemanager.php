@@ -504,24 +504,34 @@ class fileManager extends manager {
     /**
      * Redimensionne, recadre et insert une image liée à une page.
      *
-     * @param string $fileSource
-     * @param string $ext
-     * @param string $targetDir
-     * @param string $target
-     * @param int    $id_gab_page
-     * @param int    $id_temp
-     * @param string $vignetteDir
-     * @param string $apercuDir
-     * @param int    $x
-     * @param int    $y
-     * @param int    $w
-     * @param int    $h
-     * @param int    $targ_w
-     * @param int    $targ_h
+     * @param string    $uploadDir dossier principal d'upload (exemple :
+     * 'projet/upload')
+     * @param string    $fileSource  fichier a recadrer (exemple : '11/image.jpg',
+     * 'temp-12/picture.png')
+     * @param string    $ext         extension du fichier
+     * @param string    $targetDir   dossier où l'image recadrée sera enregistrée.
+     * @param string    $target      nom à donner au fichier recadré
+     * @param int       $id_gab_page identifiant de la page (si elle est en cours
+     * d'édition)
+     * @param int       $id_temp     identifiant temporaire de la page (si elle
+     * est en cours de création)
+     * @param string    $vignetteDir dossier ou enregistré la vignette de l'image
+     * recadrée
+     * @param string    $apercuDir   dossier ou enregistré l'apercu de l'image
+     * recadrée
+     * @param int       $x           abscisse du coin en haut à gauche
+     * @param int       $y           ordonnée du coin en haut à gauche
+     * @param int       $w           largeur du recadrage
+     * @param int       $h           hauteur du recadrage
+     * @param false|int $targ_w      largeur de l'image redimensionné ou false
+     * si pas de redimensionnement
+     * @param false|int $targ_h      hauteur de l'image redimensionné ou false
+     * si pas de redimensionnement
      *
      * @return array
      */
     public function crop(
+        $uploadDir,
         $fileSource,
         $ext,
         $targetDir,
@@ -537,11 +547,11 @@ class fileManager extends manager {
         $targ_w = false,
         $targ_h = false
     ) {
-        $destinationName = $targetDir . DS . $target;
-        $fileNameNew     = array_pop(explode('/', $destinationName));
-        $ext             = strtolower(array_pop(explode('.', $fileNameNew)));
+        $destinationName = $uploadDir . DS . $targetDir . DS . $target;
+        $fileNameNew     = $target;
+        $ext             = pathinfo($fileNameNew, PATHINFO_EXTENSION);
 
-        /* On cré et on enregistre l'image recadrée */
+        /** On créé et on enregistre l'image recadrée */
         if ($targ_w == false) {
             $targ_w = $w;
         }
@@ -550,13 +560,15 @@ class fileManager extends manager {
             $targ_h = $h;
         }
 
-        $src = $fileSource;
-        $img_r = call_user_func('imagecreatefrom' . self::$_extensions['image'][$ext], $src);
+        $src = $uploadDir . DS . $fileSource;
+        $img_r = call_user_func(
+            'imagecreatefrom' . self::$_extensions['image'][$ext], $src);
         $dst_r = imagecreatetruecolor($targ_w, $targ_h);
 
         /** Transparence */
         if ($ext == 'png' || $ext == 'gif') {
-            imagecolortransparent($dst_r, imagecolorallocatealpha($dst_r, 0, 0, 0, 127));
+            imagecolortransparent($dst_r, imagecolorallocatealpha($dst_r, 0, 0,
+                0, 127));
             imagealphablending($dst_r, false);
             imagesavealpha($dst_r, true);
         }
@@ -578,9 +590,9 @@ class fileManager extends manager {
 
         imagedestroy($dst_r);
 
-        $size = filesize($destinationName);
-        $sizes = getimagesize($destinationName);
-        $width = $sizes[0];
+        $size   = filesize($destinationName);
+        $sizes  = getimagesize($destinationName);
+        $width  = $sizes[0];
         $height = $sizes[1];
 
         $json = array(
@@ -596,49 +608,72 @@ class fileManager extends manager {
         /** On créé la vignette */
         $largeurmax = self::$_vignette['max-width'];
         $hauteurmax = self::$_vignette['max-height'];
-        $this->_vignette($targetDir . DS . $fileNameNew, $ext,
-            $vignetteDir . DS . $fileNameNew, $largeurmax, $hauteurmax);
+        $this->_vignette($uploadDir . DS . $targetDir . DS . $fileNameNew,
+            $ext, $uploadDir . DS . $vignetteDir . DS . $fileNameNew,
+            $largeurmax, $hauteurmax);
         $jsonrpc['minipath'] = $vignetteDir . DS . $fileNameNew;
 
         /** On créé l'apercu */
         $largeurmax = self::$_apercu['max-width'];
         $hauteurmax = self::$_apercu['max-height'];
-        $this->_vignette($targetDir . DS . $fileNameNew, $ext,
-            $apercuDir . DS . $fileNameNew, $largeurmax, $hauteurmax);
+        $this->_vignette($uploadDir . DS . $targetDir . DS . $fileNameNew,
+            $ext, $uploadDir . DS . $apercuDir . DS . $fileNameNew,
+            $largeurmax, $hauteurmax);
 
         /** On insert la ressource en base */
         $json['id'] = $this->_insertToMediaFile($json['filename'], $id_gab_page,
-            0, $json['size'], $json['width'], $json['height']);
+            $id_temp, $json['size'], $json['width'], $json['height']);
 
         return $json;
     }
 
     /**
+     * Insert un fichier (lié à une page) en base de donnée
      *
-     * @param type $fileNameNew
-     * @param type $id_gab_page
-     * @param type $id_temp
-     * @param type $size
-     * @param type $width
-     * @param type $height
+     * @param string $fileName    nom du fichier
+     * @param int    $id_gab_page identifiant de la page (si elle est en cours
+     * d'édition)
+     * @param int    $id_temp     identifiant temporaire de la page (si elle
+     * est en cours de création)
+     * @param int    $size        taille (en octets) du fichier
+     * @param int    $width       si le fichier est une image alors ceci est la
+     * largeur de l'image
+     * @param int    $height      si le fichier est une image alors ceci est la
+     * hauteur de l'image
      *
      * @return int
      */
-    private function _insertToMediaFile($fileNameNew, $id_gab_page, $id_temp,
-        $size, $width, $height
+    private function _insertToMediaFile(
+        $fileName,
+        $id_gab_page,
+        $id_temp,
+        $size,
+        $width,
+        $height
     ) {
-        $query = "INSERT INTO `media_fichier` (`rewriting`, `id_gab_page`, `id_temp`, `taille`, `width`, `height`, `vignette`, `date_crea`) VALUES ('$fileNameNew', $id_gab_page, $id_temp, '$size', $width, $height, '$fileNameNew', NOW())";
+        $query  = 'INSERT INTO `media_fichier` SET'
+                . ' `rewriting` = ' . $this->_db->quote($fileName) . ','
+                . ' `id_gab_page` = ' . $id_gab_page . ','
+                . ' `id_temp = ' . $id_temp . ','
+                . ' `taille = ' . $this->_db->quote($size) . ','
+                . ' `width = ' . $width . ','
+                . ' `height = ' . $height . ','
+                . ' `vignette = ' . $this->_db->quote($fileName) . ','
+                . ' `date_crea` = NOW()';
         $this->_db->exec($query);
         return $this->_db->lastInsertId();
     }
 
     /**
+     * Crée une version redimenssionnée d'une image
      *
-     * @param string $fileSource
-     * @param string $ext
-     * @param string $destinationName
-     * @param int $largeurmax
-     * @param int $hauteurmax
+     * @param string $fileSource      fichier à redimensionner
+     * @param string $ext             extension du fichier à redimensionner
+     * @param string $destinationName nom du fichier redimensionné
+     * @param int    $largeurmax      largeur maximum de l'image redimensionnée
+     * @param int    $hauteurmax      hauteur maximum de l'image redimensionnée
+     *
+     * @return bool
      */
     private function _vignette(
         $fileSource,
