@@ -174,9 +174,6 @@ class FrontController
         Registry::set('project-name', self::$mainConfig->get('project', 'name'));
         $emails = self::$envConfig->get('email');
 
-        Registry::set('basehref', self::$envConfig->get('base', 'url'));
-        $serverUrl = self::$envConfig->get('base', 'url');
-
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
         if (isset($_GET['version-force'])) {
@@ -192,41 +189,44 @@ class FrontController
             }
         }
 
-        if ($env != 'local') {
-            $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
-            Registry::set('url', 'http://www.' . $serverUrl . '/');
-            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
-
-
-            Registry::set('email', $emails);
-
-        } else {
-            $serverUrl = str_replace('solire-02', $_SERVER['SERVER_NAME'], Registry::get('basehref'));
-            Registry::set('url', $serverUrl);
-            Registry::set('basehref', $serverUrl);
-
-            /** Ajout d'un prefix au mail **/
-            if (isset($emails['prefix']) && $emails['prefix'] != '') {
-                $prefix = $emails['prefix'];
-                unset($emails['prefix']);
-                foreach ($emails as &$email) {
-                    $email = $prefix . $email;
-                }
+        /** Ajout d'un prefix au mail **/
+        if (isset($emails['prefix']) && $emails['prefix'] != '') {
+            $prefix = $emails['prefix'];
+            unset($emails['prefix']);
+            foreach ($emails as &$email) {
+                $email = $prefix . $email;
             }
-            Registry::set('email', $emails);
         }
+        Registry::set('email', $emails);
 
+        /**
+         * On verifie en base si le nom de domaine courant correspond
+         *  à une langue
+         **/
+        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
 
         $query = 'SELECT * '
                . 'FROM `version` '
                . 'WHERE `domaine` = "' . $serverUrl . '"';
         $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
+        /**
+         * Si aucune langue ne correspond
+         *  on prend la version FR
+         **/
         if (!isset($version['id'])) {
             $query = 'SELECT * '
                    . 'FROM `version` '
                    . 'WHERE `suf` LIKE ' . $db->quote($sufVersion);
             $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
+            $serverUrl = self::$envConfig->get('base', 'url');
+            Registry::set('url', $serverUrl);
+            Registry::set('basehref', $serverUrl);
+
+        } else {
+            Registry::set('url', 'http://www.' . $serverUrl . '/');
+            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
         }
 
 
