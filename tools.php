@@ -481,4 +481,3 @@ function iglob_DFS($path, $flags, $parent, $lvl, &$res) {
         }
 }
 
-?>

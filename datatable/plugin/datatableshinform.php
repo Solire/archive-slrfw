@@ -69,4 +69,3 @@ class DatatableShinForm extends \Slrfw\Form\ShinForm {
 
 }
 
-?>
