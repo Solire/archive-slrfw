@@ -174,21 +174,6 @@ class FrontController
         Registry::set('project-name', self::$mainConfig->get('project', 'name'));
         $emails = self::$envConfig->get('email');
 
-        /* = Permet de forcer une version (utile en dev ou recette)
-          ------------------------------- */
-        if (isset($_GET['version-force'])) {
-            $_SESSION['version-force'] = $_GET['version-force'];
-        }
-        if (isset($_SESSION['version-force'])) {
-            $sufVersion = $_SESSION['version-force'];
-        } else {
-            if (isset($_GET['version'])) {
-                $sufVersion = $_GET['version'];
-            } else {
-                $sufVersion = 'FR';
-            }
-        }
-
         /** Ajout d'un prefix au mail **/
         if (isset($emails['prefix']) && $emails['prefix'] != '') {
             $prefix = $emails['prefix'];
@@ -198,42 +183,6 @@ class FrontController
             }
         }
         Registry::set('email', $emails);
-
-        /**
-         * On verifie en base si le nom de domaine courant correspond
-         *  à une langue
-         **/
-        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
-
-        $query = 'SELECT * '
-               . 'FROM `version` '
-               . 'WHERE `domaine` = "' . $serverUrl . '"';
-        $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
-
-        /**
-         * Si aucune langue ne correspond
-         *  on prend la version FR
-         **/
-        if (!isset($version['id'])) {
-            $query = 'SELECT * '
-                   . 'FROM `version` '
-                   . 'WHERE `suf` LIKE ' . $db->quote($sufVersion);
-            $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
-
-            $serverUrl = self::$envConfig->get('base', 'url');
-            Registry::set('url', $serverUrl);
-            Registry::set('basehref', $serverUrl);
-
-        } else {
-            Registry::set('url', 'http://www.' . $serverUrl . '/');
-            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
-        }
-
-
-        Registry::set('analytics', $version['analytics']);
-        define('ID_VERSION', $version['id']);
-        define('SUF_VERSION', $version['suf']);
-
     }
 
     /**
@@ -454,6 +403,8 @@ class FrontController
             $front->setAppConfig();
         }
         self::$singleApi = true;
+        
+        $front->setVersion();
 
         $class = $front->app . '\\' . $front->application
                . '\\Controller\\' . $front->controller;
@@ -536,6 +487,89 @@ class FrontController
         }
         $appConfig = new Config($path->get());
         Registry::set('appconfig', $appConfig);
+
+        return true;
+    }
+    
+    /**
+     * Défini la version en cours de l'application
+     *
+     * Défini la constante ID_VERSION et SUF_VERSION
+     * Paramètre le basehref
+     *
+     * @return boolean
+     *
+     * @uses Registry
+     */
+    public function setVersion()
+    {
+        $db = Registry::get('db');
+        
+        /* = Permet de forcer une version (utile en dev ou recette)
+          ------------------------------- */
+        if (isset($_GET['version-force'])) {
+            $_SESSION['version-force'] = $_GET['version-force'];
+        }
+        if (isset($_SESSION['version-force'])) {
+            $sufVersion = $_SESSION['version-force'];
+        } else {
+            if (isset($_GET['version'])) {
+                $sufVersion = $_GET['version'];
+            } else {
+                $sufVersion = 'FR';
+            }
+        }
+
+        /**
+         * On verifie en base si le nom de domaine courant correspond
+         *  à une langue
+         **/
+        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+
+        $query = 'SELECT * '
+               . 'FROM `version` '
+               . 'WHERE  id_api = ' . intval(ID_API) . ' AND `domaine` = "' . $serverUrl . '"';
+        $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
+        /**
+         * Si aucune langue ne correspond
+         *  on prend la version FR
+         **/
+        if (!isset($version['id'])) {
+            $query = 'SELECT * '
+                   . 'FROM `version` '
+                   . 'WHERE id_api = ' . intval(ID_API) . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+            $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+            
+            /**
+             * Dans le cas d'un changement d'api
+             *  Si la langue en SESSION n'existe pas dans l'api
+             *  On récupère la version FR DE la nouvelle api
+             */
+            if (!isset($version['id'])) {
+                $sufVersion = "FR";
+                $query = 'SELECT * '
+                   . 'FROM `version` '
+                   . 'WHERE id_api = ' . intval(ID_API) . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+                $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+            }
+
+            $serverUrl = self::$envConfig->get('base', 'url');
+            Registry::set('url', $serverUrl);
+            Registry::set('basehref', $serverUrl);
+
+        } else {
+            Registry::set('url', 'http://www.' . $serverUrl . '/');
+            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
+        }
+
+
+        Registry::set('analytics', $version['analytics']);
+        
+        if (!defined('ID_VERSION')) {
+            define('ID_VERSION', $version['id']);
+            define('SUF_VERSION', $version['suf']);
+        }
 
         return true;
     }
