@@ -348,7 +348,7 @@ class Datatable
                 && isset($this->config["extra"]["show"]) && $this->config["extra"]["show"]
         ) {
             $columnActionButtons[] = '<button title="Voir" class="btn btn-primary show-item-no-ajax">
-                                        <img width="12" alt="Voir" src="img/back/white/magnifying_glass_12x12.png">
+                                        <img width="12" alt="Voir" src="app/back/img/white/magnifying_glass_12x12.png">
                                     </button>';
         }
 
@@ -358,7 +358,7 @@ class Datatable
                 || !isset($this->config["form"]["ajax"])
                 || $this->config["form"]["ajax"] == true)) {
             $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item">
-                                                <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier">
+                                                <img width="12" src="app/back/img/white/pen_alt_stroke_12x12.png" alt="Modifier">
                                             </button>';
         }
 
@@ -368,14 +368,14 @@ class Datatable
                 && isset($this->config["form"]["ajax"])
                 && $this->config["form"]["ajax"] == false) {
             $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item-no-ajax">
-                                                <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier" />
+                                                <img width="12" src="app/back/img/white/pen_alt_stroke_12x12.png" alt="Modifier" />
                                             </button>';
         }
 
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
             $columnActionButtons[] = '
-                <button title="Supprimer" class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="img/back/white/trash_stroke_16x16.png"></button>';
+                <button title="Supprimer" class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="app/back/img/white/trash_stroke_16x16.png"></button>';
         }
 
 
