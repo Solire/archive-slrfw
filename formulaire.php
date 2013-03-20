@@ -36,6 +36,12 @@ class Formulaire
      */
     private $_ordre = 'cgp';
 
+    /**
+     * Liste des plugins
+     *
+     * @var array
+     */
+    private $plugins;
 
     /**
      * tableau des paramètres du formulaire et de leurs options.
@@ -163,6 +169,11 @@ class Formulaire
 
             if (isset($this->_config['ordre'])) {
                 $this->_ordre = $this->_config['ordre'];
+            }
+
+            /** Récupération des plugin **/
+            if (isset($this->_config['plugins'])) {
+                $this->plugins = explode('|', $this->_config['plugins']);
             }
         }
 
@@ -300,6 +311,16 @@ class Formulaire
             if (isset($regles['egal'])) {
                 if ($this->_data[$name] != $this->_data[$regles['egal']]) {
                     $this->throwError($regles);
+                }
+            }
+        }
+
+        if (!empty($this->plugins)) {
+            foreach ($this->plugins as $plugin) {
+                if (in_array('Slrfw\Formulaire\PluginInterface', class_implements($plugin))) {
+                    $plugin::form($this->_data);
+                } else {
+                    $this->throwError(array('erreur' => 'plugin incompatible'));
                 }
             }
         }
