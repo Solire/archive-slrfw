@@ -7,6 +7,11 @@ namespace Slrfw;
  */
 class TranslateMysql
 {
+    /**
+     *
+     * @var TranslateMysql
+     */
+    private static $self;
 
     private $_translate = array();
     private $_locale = false;
@@ -30,6 +35,25 @@ class TranslateMysql
         $this->setLocale($locale);
         $this->setApi($idApi);
         $this->_db = $db;
+
+        self::$self = $this;
+    }
+
+    /**
+     * Traduit un message
+     *
+     * @param string $message Message à traduire
+     *
+     * @return string message traduit
+     * @throws Exception\Lib Si aucune instance de TranslateMysql n'est active
+     */
+    public static function trad($message)
+    {
+        if (empty(self::$self)) {
+            throw new Exception\Lib('Aucune traduction activée');
+        }
+
+        return self::$self->_($message);
     }
 
     /**
