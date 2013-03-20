@@ -80,12 +80,34 @@ final class Error
 
         self::setHeader($url);
 
-        $fileName = 'error/' . $code . '.phtml';
-        if (file_exists($fileName)) {
+        $fileName = self::getPath($code);
+        if ($fileName !== false) {
             include $fileName;
         } else {
-            include 'error/500.phtml';
+            include 'slrfw/error/500.phtml';
         }
+    }
+
+
+    /**
+     * Renvois le chemin vers la vue relative à l'erreur
+     *
+     * @param string $code code de l'erreur
+     *
+     * @return mixed Chemin vers le fichier ou false
+     */
+    private static function getPath($code)
+    {
+        $dirs = FrontController::getAppDirs();
+        foreach ($dirs as $dir) {
+            $path = $dir['dir'] . DS . 'error' . DS;
+            $path = new Path($path . $code . '.phtml', Path::SILENT);
+            if ($path->get()) {
+                return $path->get();
+            }
+        }
+
+        return false;
     }
 
     /**
