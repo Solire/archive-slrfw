@@ -136,6 +136,27 @@ class Message
     }
 
     /**
+     * Renvois le chemin vers la vue relative à l'erreur
+     *
+     * @param string $code code de l'erreur
+     *
+     * @return mixed Chemin vers le fichier ou false
+     */
+    private function getPath()
+    {
+        $dirs = FrontController::getAppDirs();
+        foreach ($dirs as $dir) {
+            $path = $dir['dir'] . DS . 'error' . DS . 'message.phtml';
+            $path = new Path($path, Path::SILENT);
+            if ($path->get()) {
+                return $path->get();
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Affiche le message en html
      *
      * @return void
@@ -143,9 +164,9 @@ class Message
      */
     private function displayHtml()
     {
-        $fileName = 'lib/message.phtml';
-        if (file_exists($fileName)) {
-            include $fileName;
+        $path = $this->getPath();
+        if ($path !== false) {
+            include $path;
         } else {
             throw new Exception\Lib('Le fichier message.phtml est absent');
         }
