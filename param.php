@@ -84,7 +84,7 @@ class Param
                 unset($foo);
             }
             $method = 'test' . ucwords($option);
-            if (!method_exists('Param', $method)) {
+            if (!method_exists(__CLASS__, $method)) {
                 return $this->error('erreur : ' . $method . ' n\'existe pas');
             }
 
