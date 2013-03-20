@@ -1,4 +1,12 @@
 <?php
+/**
+ * Lancement du framework
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     dev <dev@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 
 namespace Slrfw;
 
@@ -24,6 +32,5 @@ try {
 } catch (\Exception $exc) {
     $marvin = new Marvin('debug', $exc);
     $marvin->display();
-
-//    Error::run();
 }
+

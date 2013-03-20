@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Gestionnaire des fichiers de configurations
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Adrien <aimbert@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 namespace Slrfw;
 
 header('Content-Type: text/html; charset=utf-8');
@@ -19,8 +26,10 @@ require_once 'slrfw/path.php';
   ------------------------------- */
 /**
  * Chargement de classes dynamiquement
- * @package Library
+ *
  * @param string $name nom de la classe à charger
+ *
+ * @return void
  */
 function autoload($name)
 {
@@ -31,8 +40,9 @@ function autoload($name)
     $fullPath = $path->get();
 
     if ($fullPath) {
-        require_once $path->get();
+        include_once $path->get();
     }
 }
 
 spl_autoload_register('Slrfw\autoload');
+
