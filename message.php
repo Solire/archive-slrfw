@@ -139,7 +139,7 @@ class Message
      * Affiche le message en html
      *
      * @return void
-     * @throws LibException
+     * @throws Slrfw\Exception\Lib
      */
     private function displayHtml()
     {
@@ -147,7 +147,7 @@ class Message
         if (file_exists($fileName)) {
             include $fileName;
         } else {
-            throw new LibException('Le fichier message.phtml est absent');
+            throw new Exception\Lib('Le fichier message.phtml est absent');
         }
     }
 }
