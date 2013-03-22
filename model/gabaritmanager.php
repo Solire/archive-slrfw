@@ -1045,6 +1045,7 @@ class gabaritManager extends manager
 
             $query .= ' `bal_title`  = ' . $this->_db->quote($donnees['bal_title']) . ','
                     . ' `bal_key`    = ' . $this->_db->quote($donnees['bal_key']) . ','
+                    . ' `author`    = ' . $this->_db->quote($donnees['author']) . ','
                     . ' `bal_descr`	= ' . $this->_db->quote($donnees['bal_descr']) . ','
                     . ' `importance`	= ' . $donnees['importance'] . ','
                     . ' `date_modif`	= NOW(),';
@@ -1163,6 +1164,7 @@ class gabaritManager extends manager
 
                 $query .= '`bal_title` = ' . $this->_db->quote($donnees['bal_title']) . ','
                         . '`bal_key` = ' . $this->_db->quote($donnees['bal_key']) . ','
+                        . '`author` = ' . $this->_db->quote($donnees['author']) . ','
                         . '`bal_descr` = ' . $this->_db->quote($donnees['bal_descr']) . ',';
 
                 if (isset($donnees['no_index']) && $page->getMeta('id') != 1) {
@@ -1533,6 +1535,7 @@ class gabaritManager extends manager
                 'titre'      => $donnees['titre'],
                 'bal_title'  => $donnees['bal_title'],
                 'bal_key'    => $donnees['bal_key'],
+                'author'    => $donnees['author'],
                 'bal_descr'  => $donnees['bal_descr'],
             );
 
@@ -1544,6 +1547,7 @@ class gabaritManager extends manager
                 'titre'      => $donnees['titre'],
                 'bal_title'  => $donnees['bal_title'],
                 'bal_key'    => $donnees['bal_key'],
+                'author'    => $donnees['author'],
                 'bal_descr'  => $donnees['bal_descr'],
             );
 
