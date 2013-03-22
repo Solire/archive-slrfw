@@ -31,6 +31,12 @@ class Seo
      * @var string  url canonical of the page
      */
     private $_urlCanonical = '';
+    
+    /**
+     *
+     * @var string  Author of page
+     */
+    private $_author;
 
     /**
      *
@@ -199,6 +205,18 @@ class Seo
         return $this->_urlCanonical;
 
     }//end getDescription()
+    
+    
+    /**
+     * Get author of the page
+     *
+     * @return string
+     */
+    public function getAuthor()
+    {
+        return $this->_author;
+
+    }//end getAuthor()
 
 
     /**
@@ -226,7 +244,21 @@ class Seo
     {
         $this->_urlCanonical = $_urlCanonical;
 
-    }//end setDescription()
+    }//end setUrlCanonical()
+    
+    
+    /**
+     * Set author of the page
+     *
+     * @param string $_author author of the page
+     *
+     * @return void
+     */
+    public function setAuthor($_author)
+    {
+        $this->_author = $_author;
+
+    }//end setAuthor()
 
 
     /**
