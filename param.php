@@ -169,7 +169,7 @@ class Param
      */
     public function testIsMail()
     {
-        $mask = '#^[a-z0-9._-]+@[a-z0-9.-]{2,}[.][a-z0-9]{2,5}$#i';
+        $mask = '#^[a-z0-9._\-\+]+@[a-z0-9.-]{2,}[.][a-z0-9]{2,5}$#i';
         if (preg_match($mask, $this->_foo)) {
             return true;
         }
@@ -260,7 +260,6 @@ class Param
         return false;
     }
 
-
     /**
      * Test si le parametre ne contient que des chiffres
      *
@@ -270,6 +269,22 @@ class Param
     {
         $char = preg_replace('#([0-9]+)#', '', $this->_foo);
         if (!empty($char)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Test si le paramètre n'est pas une valeur de blocage
+     *
+     * @param string $value Valeur de blocage
+     *
+     * @return boolean
+     */
+    public function testNot($value)
+    {
+        if ($this->_foo == $value) {
             return false;
         }
 
