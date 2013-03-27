@@ -35,6 +35,13 @@ class FrontController
     public static $envConfig;
 
     /**
+     * Nom de l'application en cours d'utilisation
+     *
+     * @var string
+     */
+    public static $appName;
+
+    /**
      * Liste des répertoires app à utiliser
      *
      * @var array
@@ -254,7 +261,6 @@ class FrontController
             unset($url);
 
             $application = false;
-//            $appDir = '../app/';
             $rewritingMod = false;
             foreach ($arrSelect as $ctrl) {
                 /**
@@ -361,6 +367,13 @@ class FrontController
         return false;
     }
 
+    /**
+     * Contrôle l'existence d'une classe controller
+     *
+     * @param string $ctrl Nom de la classe
+     *
+     * @return boolean
+     */
     protected function classExists($ctrl)
     {
         foreach (self::$appDirs as $app) {
@@ -403,7 +416,7 @@ class FrontController
             $front->setAppConfig();
         }
         self::$singleApi = true;
-        
+
         $front->setVersion();
 
         $class = $front->app . '\\' . $front->application
@@ -422,6 +435,9 @@ class FrontController
                 return false;
             }
         }
+
+        /** Enregistrement de l'intitulé de l'application utilisée **/
+        self::$appName = $front->application;
 
         $instance = new $class();
 
@@ -490,7 +506,7 @@ class FrontController
 
         return true;
     }
-    
+
     /**
      * Défini la version en cours de l'application
      *
@@ -504,7 +520,7 @@ class FrontController
     public function setVersion()
     {
         $db = Registry::get('db');
-        
+
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
         if (isset($_GET['version-force'])) {
@@ -538,19 +554,21 @@ class FrontController
         if (!isset($version['id'])) {
             $query = 'SELECT * '
                    . 'FROM `version` '
-                   . 'WHERE id_api = ' . intval(ID_API) . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+                   . 'WHERE id_api = ' . intval(ID_API)
+                   . ' AND `suf` LIKE ' . $db->quote($sufVersion);
             $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
-            
+
             /**
              * Dans le cas d'un changement d'api
              *  Si la langue en SESSION n'existe pas dans l'api
              *  On récupère la version FR DE la nouvelle api
              */
             if (!isset($version['id'])) {
-                $sufVersion = "FR";
+                $sufVersion = 'FR';
                 $query = 'SELECT * '
                    . 'FROM `version` '
-                   . 'WHERE id_api = ' . intval(ID_API) . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+                   . 'WHERE id_api = ' . intval(ID_API)
+                   . ' AND `suf` LIKE ' . $db->quote($sufVersion);
                 $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
             }
 
@@ -565,7 +583,7 @@ class FrontController
 
 
         Registry::set('analytics', $version['analytics']);
-        
+
         if (!defined('ID_VERSION')) {
             define('ID_VERSION', $version['id']);
             define('SUF_VERSION', $version['suf']);
