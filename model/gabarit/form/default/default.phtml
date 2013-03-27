@@ -130,6 +130,18 @@
                                                 <input type="text" disabled="disabled" class="form-other-elmt" />
                                             </div>
                                         </div>
+                                        
+                                        <div class="line form-line">
+                                            <div class="line">
+                                                <label for="author-<?php echo $metaLang; ?>">Auteur Google +</label>
+                                                <input type="text" name="author" id="author-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['author']) ? $this->_meta['author'] : ''; ?>" size="80" maxlength="250" class="form-controle" />
+                                            </div>
+
+                                            <div class="line form-other-line" style="display:none;">
+                                                <label class="form-other-flag"></label>
+                                                <input type="text" disabled="disabled" class="form-other-elmt" />
+                                            </div>
+                                        </div>
 
                                         <div class="line">
                                             <label for="importance-<?php echo $metaLang; ?>">Importance (<i>de 0,1 à 0,9</i>)</label>
