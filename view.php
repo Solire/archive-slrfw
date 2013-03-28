@@ -23,13 +23,6 @@ class View
     private $_enable = true;
     private $_main = true;
 
-    /**
-     * Chemins vers la vue
-     *
-     * @var array
-     */
-    private $dirs = array();
-
     private $_format = null;
     private $_translate = null;
     private $_controller;
@@ -76,16 +69,6 @@ class View
     }
 
     /**
-     * Enregistrement des dossiers possible pour la vue
-     *
-     * @param string $dir Chemin vers la vue
-     */
-    public function setDir($dir)
-    {
-        $this->dirs[] = $dir;
-    }
-
-    /**
      * Renvois le chemin vers le fichier de vue
      *
      * @param string  $controller Nom du controller (peut être null, pour tester
@@ -93,7 +76,7 @@ class View
      * @param string  $action     Nom de l'action
      * @param boolean $format     Appliquer le formatage de l'action
      *
-     * @return boolean
+     * @return string|boolean
      */
     private function getpath($controller, $action, $format = true)
     {
@@ -107,14 +90,8 @@ class View
             $filePath = $action;
         }
 
-        foreach ($this->dirs as $dir) {
-            $path = new Path($dir . DS . $filePath, Path::SILENT);
-            if ($path->get()) {
-                return $path->get();
-            }
-        }
-
-        return false;
+        $dir = FrontController::$mainConfig->get('dirs', 'views');
+        return FrontController::search($dir . $filePath);
     }
 
     public function setFormat($format)
