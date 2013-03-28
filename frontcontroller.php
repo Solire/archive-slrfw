@@ -348,6 +348,28 @@ class FrontController
     }
 
     /**
+     * Cherche un fichier dans les applications
+     *
+     * @param string $path Chemin Chemin du dossier / fichier à chercher dans
+     * les applications
+     *
+     * @return string|boolean
+     */
+    final public static function search($path)
+    {
+        $path = DS . strtolower(self::$appName) . DS . $path;
+        foreach (self::$appDirs as $app) {
+            $fooPath = $app['dir'] . $path;
+            $testPath = new Path($fooPath, Path::SILENT);
+            if ($testPath->get() !== false) {
+                return $testPath->get();
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Test si le morceau d'url est une application
      *
      * @param string $ctrl Morceau d'url
