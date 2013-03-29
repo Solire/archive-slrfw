@@ -152,9 +152,6 @@ class Controller
     public function shutdown()
     {
         $this->_view->url = $this->_url;
-
-        /** Chargement des executions automatiques **/
-        $this->loadExec('shutdown');
     }
 
     /**
@@ -165,7 +162,7 @@ class Controller
      * @return void
      * @throws Exception\lib Si le type n'est pas cohérent
      */
-    private function loadExec($type)
+    final protected function loadExec($type)
     {
         if (!in_array($type, array('shutdown'))) {
             throw new Exception\lib('Type d\'execution incorrecte');
