@@ -1181,7 +1181,7 @@ class gabaritManager extends manager
                         . '`date_modif` = NOW(),'
                         . '`visible` = 0,'
                         . '`id_api` = ' . $api['id'] . ','
-                        . '`id_version` = ' . $version['id'];
+                        . '`id_version` = ' . $version;
 
                 $this->_db->exec($query);
 
@@ -1191,7 +1191,7 @@ class gabaritManager extends manager
             }
 
             $urlParent = '';
-            foreach ($this->getParents($id_parent, $version['id']) as $parent) {
+            foreach ($this->getParents($id_parent, $version) as $parent) {
                 $urlParent = $parent->getMeta('rewriting') . '/' . $urlParent;
             }
 
