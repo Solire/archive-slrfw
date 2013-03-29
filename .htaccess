@@ -14,8 +14,8 @@ RewriteRule ^robots.txt$ - [L]
 RewriteRule ^sitemap.xml$                                               index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
 
 # Images & documents ajoutés par l'utilisateur
-RewriteCond %{THE_REQUEST} !(flags)
-RewriteRule ((temp-)?([0-9]+))/(.+\.(jpg|jpeg|png|gif|pdf))$            medias/upload/$1/$4 [L]
+RewriteRule ^(projet/upload/|)((temp-|)[0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$    upload/$2/$4 [L]
+
 
 RewriteRule ^$                                                          index.php?%{QUERY_STRING} [L]
 RewriteRule ^(([a-zA-Z0-9\-]+).html)$                                   index.php?action=$2&%{QUERY_STRING} [L]
