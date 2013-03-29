@@ -1376,16 +1376,18 @@ class gabaritManager extends manager
             return true;
         }
 
-        foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
-            $ids_blocs[] = $this->saveBlocLine($table, $champs, $id_bloc,
-                $ordre, $donnees, $id_gab_page, $id_version, $partialSave);
-            $ordre++;
-        }
+        if (isset($donnees['id_' . $gabarit->getTable()])) {
+            foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
+                $ids_blocs[] = $this->saveBlocLine($table, $champs, $id_bloc,
+                    $ordre, $donnees, $id_gab_page, $id_version, $partialSave);
+                $ordre++;
+            }
 
-        $query  = 'UPDATE `' . $table . '` SET `suppr` = NOW()'
-                . ' WHERE `suppr` = 0 AND `id_gab_page` = ' . $id_gab_page
-                . ' AND `id` NOT IN (' . implode(',', $ids_blocs) . ')';
-        $this->_db->query($query);
+            $query  = 'UPDATE `' . $table . '` SET `suppr` = NOW()'
+                    . ' WHERE `suppr` = 0 AND `id_gab_page` = ' . $id_gab_page
+                    . ' AND `id` NOT IN (' . implode(',', $ids_blocs) . ')';
+            $this->_db->query($query);
+        }
 
         return true;
     }
