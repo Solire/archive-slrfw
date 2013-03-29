@@ -151,7 +151,7 @@ class FrontController
      *
      * @return void
      */
-    public function init()
+    public static function init()
     {
         /** Chargement de la configuration **/
         self::$mainConfig = new Config('config/main.ini');
