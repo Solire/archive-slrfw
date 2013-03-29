@@ -20,13 +20,27 @@ use \Slrfw\Tools;
  */
 class gabaritManager extends manager
 {
-
+    /**
+     * Tableau de mise en cache des versions.
+     * 
+     * @var array
+     */
+    protected $_versions = array();
+    
+    /**
+     * Tableau des identifiants des versions (utilisé lors de l'enregistrement
+     * des pages.
+     * 
+     * @var int[] 
+     */
+    protected $_versionsIds = array();
+    
     /**
      *
      * @var bool
      */
     protected $modePrevisualisation = false;
-
+    
     /**
      * Donne l'identifiant d'une page d'après son rewriting et l'identifiant.
      *
@@ -51,21 +65,20 @@ class gabaritManager extends manager
 
         return $this->_db->query($query)->fetchColumn();
     }
-
+    
     /**
-     * Retourne les infos sur un version contenu dans la BDD, en fonction
-     * de son identifiant.
+     * Récupère les informations de la version selon son id
+     *  Avec mise en cache
      *
-     * @param int $id_version identifiant de la version
-     *
+     * @param int $id_version
      * @return array
      */
-    public function getVersion($id_version)
-    {
-        $query = 'SELECT * FROM `version` WHERE `id` = ' . $id_version;
-        $data = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
-
-        return $data;
+    public function getVersion($id_version) {
+        if (!isset($this->_versions[$id_version])) {
+            $query = 'SELECT * FROM `version` WHERE `id` = ' . $id_version;
+            $this->_versions[$id_version] = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
+        }
+        return $this->_versions[$id_version];
     }
 
     /**
@@ -940,7 +953,7 @@ class gabaritManager extends manager
                 . ' FROM `version`'
                 . ' WHERE id_api = ' . $api['id']
                 . ' ORDER BY `id` != ' . $versionId;
-        $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+        $this->_versionsIds = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
@@ -1146,7 +1159,7 @@ class gabaritManager extends manager
             }
 
             $id_gab_page = 0;
-            foreach ($this->_versions as $version) {
+            foreach ($this->_versionsIds as $version) {
                 $query = 'INSERT INTO `gab_page` SET ';
 
                 if ($id_gab_page > 0) {
@@ -1302,7 +1315,7 @@ class gabaritManager extends manager
                 $this->_db->exec($queryTmp);
             }
         } else {
-            foreach ($this->_versions as $id_version) {
+            foreach ($this->_versionsIds as $id_version) {
                 $queryTmp = $query . '`id_version` = ' . $id_version;
 
                 $this->_db->exec($queryTmp);
@@ -1450,7 +1463,7 @@ class gabaritManager extends manager
             $this->_db->exec($queryTmp);
         } else {
             $id_bloc = 0;
-            foreach ($this->_versions as $id_version) {
+            foreach ($this->_versionsIds as $id_version) {
                 $queryTmp = $query . ' `id_version`  = ' . $id_version;
 
                 if ($id_bloc) {
@@ -1479,10 +1492,6 @@ class gabaritManager extends manager
      */
     public function previsu($donnees)
     {
-        $query = 'SELECT `id` FROM `version`';
-        $this->_versions = $this->_db->query($query)->fetchAll(
-            \PDO::FETCH_COLUMN);
-
         $updating = ($donnees['id_gab_page'] > 0);
 
         if (isset($donnees['id_version'])) {
