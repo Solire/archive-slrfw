@@ -246,8 +246,12 @@ class FrontController
     public function parseUrl()
     {
         /** Nom de l'application par défaut */
-        $this->application = 'Front';
+        $this->application = self::$mainConfig->get('project', 'defaultApp');
+        self::$appName = $this->application;
 
+        self::loadAppConfig();
+
+        /** On met la valeur par défaut pour pouvoir tester l'app par défaut **/
         $this->controller = $this->getDefault('controller');
 
         $this->rewriting = array();
@@ -299,6 +303,7 @@ class FrontController
                         continue;
                     }
                     $this->application = ucfirst($ctrl);
+                    self::$appName = $this->application;
                     $application = true;
                     continue;
                 }
@@ -319,7 +324,13 @@ class FrontController
                 $this->addRewriting($ctrl);
                 $rewritingMod = true;
             }
+
+            /** Si l'application à changé on charge sa configuration **/
+            if ($application === true) {
+                self::loadAppConfig();
+            }
         }
+
 
         if ($controller === false) {
             $this->controller = $this->getDefault('controller');
@@ -369,6 +380,19 @@ class FrontController
         return false;
     }
 
+    /**
+     * Charge la configuration relative à l'application
+     *
+     * @return void
+     */
+    final public static function loadAppConfig()
+    {
+        $confPath = self::search('conf.ini');
+        if (!empty($confPath)) {
+            $appConfig = new Config($confPath);
+            Registry::set('appconfig', $appConfig);
+        }
+    }
     /**
      * Test si le morceau d'url est une application
      *
@@ -425,8 +449,10 @@ class FrontController
             $front->parseUrl();
         } else {
             $front->application = $application;
+            self::$appName = $front->application;
             $front->controller = $controller;
             $front->action = $action;
+            self::loadAppConfig();
         }
         unset($application, $controller, $action);
 
@@ -458,8 +484,7 @@ class FrontController
             }
         }
 
-        /** Enregistrement de l'intitulé de l'application utilisée **/
-        self::$appName = $front->application;
+
 
         $instance = new $class();
 
@@ -518,8 +543,6 @@ class FrontController
         if (!$path->get()) {
             return false;
         }
-        $appConfig = new Config($path->get());
-        Registry::set('appconfig', $appConfig);
 
         return true;
     }
@@ -635,14 +658,8 @@ class FrontController
      */
     public function getDefault($key)
     {
-        $name = strtolower('app_' . $this->application);
-        $config = self::$mainConfig->get($name);
-
-        if (isset($config[$key . '-default'])) {
-            return $config[$key . '-default'];
-        }
-
-        return '';
+        $conf = Registry::get('appconfig');
+        return $conf->get('default', $key);
     }
 
     /**
