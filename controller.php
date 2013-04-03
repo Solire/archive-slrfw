@@ -78,7 +78,7 @@ class Controller
      *
      * @var Loader\Javascript
      */
-    protected $_javascript;
+    public $_javascript;
 
     /**
      *
