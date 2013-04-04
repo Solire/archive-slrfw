@@ -40,6 +40,12 @@ class gabaritPage extends gabaritBloc {
 
     /**
      *
+     * @var gabaritPage
+     */
+    private $_firstChild = null;
+
+    /**
+     *
      * @param array $meta
      */
     public function __construct() {
@@ -95,9 +101,12 @@ class gabaritPage extends gabaritBloc {
 
     /**
      *
-     * @param gabaritPage $child
+     * @param gabaritPage[] $children
      */
     public function setChildren($children) {
+        if (count($children) >  0) {
+            $this->_firstChild = $children[0];
+        }
         $this->_children= $children;
     }
 

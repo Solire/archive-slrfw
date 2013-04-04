@@ -22,25 +22,25 @@ class gabaritManager extends manager
 {
     /**
      * Tableau de mise en cache des versions.
-     * 
+     *
      * @var array
      */
     protected $_versions = array();
-    
+
     /**
      * Tableau des identifiants des versions (utilisé lors de l'enregistrement
      * des pages.
-     * 
-     * @var int[] 
+     *
+     * @var int[]
      */
     protected $_versionsIds = array();
-    
+
     /**
      *
      * @var bool
      */
     protected $modePrevisualisation = false;
-    
+
     /**
      * Donne l'identifiant d'une page d'après son rewriting et l'identifiant.
      *
@@ -65,7 +65,7 @@ class gabaritManager extends manager
 
         return $this->_db->query($query)->fetchColumn();
     }
-    
+
     /**
      * Récupère les informations de la version selon son id
      *  Avec mise en cache
@@ -723,8 +723,9 @@ class gabaritManager extends manager
      *
      * @param int    $id_version identifiant de la version
      * @param int    $id_api     identifiant de l'api
-     * @param int    $id_parent  identifiant de la page parente, si page les plus
-     * haute 0 si ce critère ne doit pas être pris en compte alors false
+     * @param int    $id_parent  identifiant de la page parente
+     * <br />si page les plus haute dans le plan du site : <b>0</b>
+     * <br />si ce critère ne doit pas être pris en compte : <b>false</b>
      * @param int    $id_gabarit identifiant(s) du/des gabarits
      * @param bool   $visible    si vrai uniquement les pages visibles
      * @param string $orderby    champ dans la bdd pour ordonner les pages
