@@ -197,6 +197,10 @@ class gabaritPage extends gabaritBloc {
                 break;
             case "TEXT":
                 $type = "simple";
+                
+                break;
+            case "TEXTAREA":
+                $type = "textarea";
 
                 break;
 
