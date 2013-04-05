@@ -232,7 +232,7 @@ class Datatable
 
 
         /* Augmentation de la limite des group_concat */
-        $this->_db->exec("SET GLOBAL group_concat_max_len = 100000;");
+        $this->_db->exec("SET SESSION group_concat_max_len = 100000;");
 
         if (isset($this->_get["json"])) {
             $this->_view = "json";
