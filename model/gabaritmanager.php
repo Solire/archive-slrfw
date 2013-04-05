@@ -933,6 +933,94 @@ class gabaritManager extends manager
     }
 
     /**
+     * Supprime une page (logiquement en bdd)
+     *
+     * @param int $id_version  identifiant de la version
+     * @param int $id_api      identifiant de l'api
+     * @param int $id_gab_page identifiant de la page
+     *
+     * @return bool
+     */
+    public function delete($id_gab_page)
+    {
+        $query  = 'UPDATE gab_page SET'
+                . ' suppr = 1,'
+                . ' date_modif = NOW()'
+                . ' WHERE id = ' . $id_gab_page;
+        return $this->_db->exec($query);
+    }
+
+    /**
+     * Rend visible / cache une page
+     *
+     * @param int $id_version  identifiant de la version
+     * @param int $id_api      identifiant de l'api
+     * @param int $id_gab_page identifiant de la page
+     * @param 0|1 $visible     <b>0</b> si on cache la page, <b>1</b> si on la
+     * rend visible
+     *
+     * @return bool
+     */
+    public function setVisible($id_version, $id_api, $id_gab_page, $visible)
+    {
+        $query  = 'UPDATE gab_page SET'
+                . ' visible = ' . $visible
+                . ' WHERE id = ' . $id_gab_page
+                . ' AND id_version = ' . $id_version
+                . ' AND id_api = ' . $id_api;
+        $this->_db->exec($query);
+
+        return $this->setVisibleParent($id_version, $id_api, $id_gab_page, $visible);
+    }
+
+    /**
+     * Met à jour la visibilité d'une page pour ses enfants (champ
+     * `visible_parent` en bdd)
+     *
+     * @param int $id_version identifiant de la version
+     * @param int $id_api     identifiant de l'api
+     * @param int $id_parent  identifiant de la page
+     * @param 0|1 $visible    <b>0</b> si on cache la page, <b>1</b> si on la
+     * rend visible
+     *
+     * @return true
+     */
+    public function setVisibleParent($id_version, $id_api, $id_parent, $visible)
+    {
+        $query  = 'SELECT visible, visible_parent'
+                . ' FROM gab_page'
+                . ' WHERE id = ' . $id_parent
+                . ' AND id_version = ' . $id_version
+                . ' AND id_api = ' . $id_api;
+        $page   = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
+        $query  = 'UPDATE gab_page SET visible_parent = ' . $visible
+                . ' WHERE id_parent = ' . $id_parent
+                . ' AND id_version = ' . $id_version
+                . ' AND id_api = ' . $id_api;
+        $this->_db->exec($query);
+
+        $query  = 'SELECT id'
+                . ' FROM gab_page'
+                . ' WHERE id_parent = ' . $id_parent
+                . ' AND id_version = ' . $id_version
+                . ' AND id_api = ' . $id_api;
+        $enfants = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+
+        if ($page['visible'] + $page['visible_parent'] >= 2) {
+            $visibleEnfant = 1;
+        } else {
+            $visibleEnfant = 0;
+        }
+
+        foreach ($enfants as $enfant) {
+            $this->setVisibleParent($id_version, $id_api, $enfant, $visibleEnfant);
+        }
+
+        return true;
+    }
+
+    /**
      * Sauve une page et ses blocs dynamique.
      *
      * @param array $donnees données à enregistrer
@@ -1126,6 +1214,13 @@ class gabaritManager extends manager
         } else {
             if (isset($donnees['id_parent']) && $donnees['id_parent']) {
                 $id_parent = $donnees['id_parent'];
+
+                $query  = 'SELECT id_version, (visible + visible_parent)'
+                        . ' FROM gab_page'
+                        . ' WHERE id = ' . $donnees['id_parent']
+                        . ' AND id_api = ' . $api['id'];
+                $visibles_parents = $this->_db->query($query)->fetchAll(
+                    \PDO::FETCH_UNIQUE | \PDO::FETCH_COLUMN);
             } else {
                 $id_parent = 0;
             }
@@ -1195,7 +1290,19 @@ class gabaritManager extends manager
                         . '`date_modif` = NOW(),'
                         . '`visible` = 0,'
                         . '`id_api` = ' . $api['id'] . ','
-                        . '`id_version` = ' . $version;
+                        . '`id_version` = ' . $version . ',';
+
+                if ($id_parent > 0) {
+                    if ($visibles_parents[$version] >= 2) {
+                        $visible_parent = 1;
+                    } else {
+                        $visible_parent = 0;
+                    }
+                } else {
+                    $visible_parent = 1;
+                }
+
+                $query .= '`visible_parent` = ' . $visible_parent;
 
                 $this->_db->exec($query);
 
