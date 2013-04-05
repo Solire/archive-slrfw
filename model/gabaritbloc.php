@@ -110,7 +110,10 @@ class gabaritBloc
                 $type = "simple";
 
                 break;
+            case "TEXTAREA":
+                $type = "textarea";
 
+                break;
             default:
                 break;
         }
