@@ -28,9 +28,9 @@ class DatatableShinForm extends \Slrfw\Form\ShinForm {
         $this->_javascript = $this->oDatatable->getJavascriptLoader();
         $this->_css = $this->oDatatable->getCssLoader();
 //
-        $this->_javascript->addLibrary("jquery/plugins/jquery.validate.js");
-        $this->_javascript->addLibrary("jquery/plugins/additional-methods.js");
-        $this->_css->addLibrary("back/jquery.validate.css");
+        $this->_javascript->addLibrary("app/back/js/datatable/jquery/jquery.validate.js");
+        $this->_javascript->addLibrary("app/back/js/datatable/jquery/additional-methods.js");
+        $this->_css->addLibrary("app/back/css/datatable/jquery.validate.css");
     }
 
     public function convertConfig() {
