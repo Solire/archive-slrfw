@@ -408,9 +408,9 @@ class Controller
      * @return string
      * @uses TranslateMysql
      */
-    public function _($string)
+    public function _($string, $aide = '')
     {
-        return $this->_translate->_($string);
+        return $this->_translate->_($string, $aide);
     }
 }
 

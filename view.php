@@ -43,9 +43,9 @@ class View
         $this->_translate = $translate;
     }
 
-    public function _($string)
+    public function _($string, $aide = '')
     {
-        return $this->_translate->_($string);
+        return $this->_translate->_($string, $aide);
     }
 
     public function enable($enable)

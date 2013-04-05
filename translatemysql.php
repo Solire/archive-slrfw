@@ -16,6 +16,7 @@ class TranslateMysql
     private $_translate = array();
     private $_locale = false;
     private $_api = 1;
+    private $_versions = array();
 
     /**
      *
@@ -61,15 +62,33 @@ class TranslateMysql
      * @param string $string mot à traduire
      * @return string mot traduit
      */
-    public function _($string)
+    public function _($string, $aide = '')
     {
-        if (isset($this->_translate[$this->_locale][$string]))
+        if (isset($this->_translate[$this->_locale][$string])) {
             return $this->_translate[$this->_locale][$string];
+        }
 
-        if (!self::DEBUG)
+        if (!self::DEBUG) {
             return $string;
-        $this->_db->exec('INSERT INTO traduction SET id_api =  ' . intval($this->_api) . ', cle = ' . $this->_db->quote($string) . ', valeur = ' . $this->_db->quote($string) . ', id_version =  ' . intval($this->_locale));
+        }
+
+        if (count($this->_versions) == 0) {
+            $query  = 'SELECT id FROM version';
+            $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+        }
+
+        foreach ($this->_versions as $versionId) {
+            $query  = 'INSERT INTO traduction SET'
+                    . ' id_version =  ' . $versionId . ','
+                    . ' id_api =  ' . intval($this->_api) . ','
+                    . ' cle = ' . $this->_db->quote($string) . ','
+                    . ' valeur = ' . $this->_db->quote($string) . ','
+                    . ' aide = ' . $this->_db->quote($aide);
+            $this->_db->exec($query);
+        }
+
         $this->_translate[$this->_locale][$string] = $string;
+
         return $string;
     }
 
