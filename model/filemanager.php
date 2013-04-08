@@ -92,24 +92,32 @@ class fileManager extends manager {
         $orderby = null,
         $sens = null
     ) {
-        $query = 'SELECT * FROM `media_fichier` WHERE `suppr` = 0';
+        $query = 'SELECT media_fichier.*, IF(id_version IS NULL, 0, 1) utilise '
+                . 'FROM `media_fichier` '
+                . 'LEFT JOIN media_fichier_utilise '
+                . 'ON `media_fichier`.rewriting = media_fichier_utilise.rewriting '
+                . 'WHERE `suppr` = 0 ';
 
         if ($id_gab_page)
-            $query .= ' AND `id_gab_page` = ' . $id_gab_page;
+            $query .= ' AND `media_fichier`.`id_gab_page` = ' . $id_gab_page;
 
         if ($id_temp)
             $query .= ' AND `id_temp` = ' . $id_temp;
 
         if ($search) {
             $search = '%' . $search . '%';
-            $query .= ' AND `rewriting` LIKE ' . $this->_db->quote($search);
+            $query .= ' AND `media_fichier`.`rewriting` LIKE ' . $this->_db->quote($search);
         }
+        
+        $query .= ' GROUP BY `media_fichier`.rewriting';
 
         if ($orderby) {
             $query .= ' ORDER BY `' . $orderby . '` ';
             if ($sens)
                 $query .= $sens;
         }
+        
+
 
         $files = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
