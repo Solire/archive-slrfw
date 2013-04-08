@@ -104,10 +104,12 @@ class gabaritManager extends manager
     ) {
         $page = new gabaritPage();
 
-        $visiblePrevisu = $visible;
-        if ($this->modePrevisualisation) {
-            $visiblePrevisu = false;
-        }
+        /**
+         * Visibilité pour le front.
+         * Même si le mode prévisu est activé, il ne faut pas montrer les
+         * blocs dynamique caché.
+         */
+        $visibleFront = $visible && !$this->modePrevisualisation;
 
         if ($id_gab_page) {
             $query  = 'SELECT *'
@@ -116,6 +118,12 @@ class gabaritManager extends manager
                     . ' AND `id_api` = ' . $id_api
                     . ' AND `id` = ' . $id_gab_page
                     . ' AND `suppr` = 0';
+
+            if ($visibleFront) {
+                $query .= ' AND `visible` = 1'
+                        . ' AND `visible_parent` = 1';
+            }
+
             $meta = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
             if (!$meta) {
@@ -207,7 +215,7 @@ class gabaritManager extends manager
                 $page->setValues($values);
 
                 if ($join) {
-                    $this->getJoinsValues($page, $id_version, $id_api, $visiblePrevisu);
+                    $this->getJoinsValues($page, $id_version, $id_api, $visibleFront);
                 }
 
                 $blocs = $page->getBlocs();
@@ -514,9 +522,7 @@ class gabaritManager extends manager
             $join = $this->getPage($id_version, $id_api, $joinField['value'], 0,
                 false, $visible);
 
-            if (!$visible || $join->getMeta('visible') > 0) {
-                $page->setValue($joinName, $join);
-            }
+            $page->setValue($joinName, $join);
         }
     }
 
@@ -565,7 +571,8 @@ class gabaritManager extends manager
                     . ' AND `suppr` = 0';
 
             if ($visible) {
-                $query .= ' AND `visible` = 1';
+                $query .= ' AND `visible` = 1'
+                        . ' AND `visible_parent` = 1';
             }
 
             $meta = $this->_db->query($query)->fetchAll(
@@ -771,7 +778,8 @@ class gabaritManager extends manager
                 . ' AND `p`.`id_api` = ' . $id_api;
 
         if ($visible) {
-            $query .= ' AND `p`.`visible` = 1';
+            $query .= ' AND `p`.`visible` = 1'
+                    . ' AND `p`.`visible_parent` = 1';
         }
 
         if ($id_parent !== false) {
