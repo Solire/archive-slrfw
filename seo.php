@@ -37,6 +37,12 @@ class Seo
      * @var string  Author of page
      */
     private $_author;
+    
+    /**
+     *
+     * @var string  Authorname of page
+     */
+    private $_authorName;
 
     /**
      *
@@ -217,6 +223,17 @@ class Seo
         return $this->_author;
 
     }//end getAuthor()
+    
+    /**
+     * Get authorName of the page
+     *
+     * @return string
+     */
+    public function getAuthorName()
+    {
+        return $this->_authorName;
+
+    }
 
 
     /**
@@ -259,6 +276,19 @@ class Seo
         $this->_author = $_author;
 
     }//end setAuthor()
+    
+    /**
+     * Set authorName of the page
+     *
+     * @param string $_authorName authorName of the page
+     *
+     * @return void
+     */
+    public function setAuthorName($_authorName)
+    {
+        $this->_authorName = $_authorName;
+
+    }
 
 
     /**
