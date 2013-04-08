@@ -1372,6 +1372,7 @@ class gabaritManager extends manager
         $table = $gabarit->getTable();
 
         $allchamps = $gabarit->getChamps();
+        $filesUsed = array();
         $champsExiste = count($allchamps);
 
         if ($updating) {
@@ -1402,6 +1403,10 @@ class gabaritManager extends manager
                     && $champ['type'] != 'TEXTAREA'
                 ) {
                     $value = str_replace('"', '&quot;', $value);
+                }
+                
+                if ($champ['typedonnee'] == 'FILE') {
+                    $filesUsed[] = $value;
                 }
 
                 if ($champ['typedonnee'] == 'DATE') {
@@ -1440,6 +1445,17 @@ class gabaritManager extends manager
 
                 $this->_db->exec($queryTmp);
             }
+                $id_gab_page = $this->_db->lastInsertId();
+        }
+        
+        $this->_db->exec("DELETE FROM `media_fichier_utilise` "
+                . "WHERE id_gab_page = $id_gab_page "
+                . "AND id_version = $id_version");
+        foreach ($filesUsed as $file) {
+            $this->_db->exec("INSERT into `media_fichier_utilise` "
+                    . "SET id_gab_page = $id_gab_page, "
+                    . "rewriting = " . $this->_db->quote($file) . ", "
+                    . "id_version = $id_version" );
         }
 
         return true;
@@ -1535,6 +1551,7 @@ class gabaritManager extends manager
         $id_version,
         $partialSave = false
     ) {
+        $filesUsed = array();
         $updating = ($id_bloc > 0);
         if (!$partialSave) {
             $visible  = array_shift($donnees['visible']);
@@ -1559,7 +1576,7 @@ class gabaritManager extends manager
             if ($champ['visible'] == 0) {
                 continue;
             }
-
+            
             $value = array_shift($donnees['champ' . $champ['id']]);
 
             if ($champ['type'] != 'WYSIWYG'
@@ -1567,6 +1584,11 @@ class gabaritManager extends manager
             ) {
                 $value = str_replace('"', '&quot;', $value);
             }
+            
+            if ($champ['typedonnee'] == 'FILE') {
+                $filesUsed[] = $value;
+            }
+
 
             if ($champ['typedonnee'] == 'DATE') {
                 $value = Tools::formate_date_nombre($value, '/', '-');
@@ -1599,6 +1621,13 @@ class gabaritManager extends manager
 
                 $id_bloc = $this->_db->lastInsertId();
             }
+        }
+        
+        foreach ($filesUsed as $file) {
+            $this->_db->exec("INSERT into `media_fichier_utilise` "
+                    . "SET id_gab_page = $id_gab_page, "
+                    . "rewriting = " . $this->_db->quote($file) . ", "
+                    . "id_version = $id_version" );
         }
 
         return $id_bloc;
