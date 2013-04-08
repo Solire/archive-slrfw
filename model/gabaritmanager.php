@@ -1144,6 +1144,10 @@ class gabaritManager extends manager
             if ($donnees['bal_title'] == '') {
                 $donnees['bal_title'] = $donnees['titre'];
             }
+            
+            if (!isset($donnees['author'])) {
+                $donnees['author'] = 0;
+            }
 
             $query .= ' `bal_title`  = ' . $this->_db->quote($donnees['bal_title']) . ','
                     . ' `bal_key`    = ' . $this->_db->quote($donnees['bal_key']) . ','
