@@ -134,7 +134,19 @@
                                         <div class="line form-line">
                                             <div class="line">
                                                 <label for="author-<?php echo $metaLang; ?>">Auteur Google +</label>
-                                                <input type="text" name="author" id="author-<?php echo $metaLang; ?>" value="<?php echo isset($this->_meta['author']) ? $this->_meta['author'] : ''; ?>" size="80" maxlength="250" class="form-controle" />
+                                                
+                                                <select name="author" id="author-<?php echo $metaLang; ?>">
+<?php
+                            foreach ($authors as $author) {
+                                $selected = isset($this->_meta['author']) && $this->_meta['author'] == $author["id"] ? true : false;
+?>
+                                                    <option <?php echo $selected ? 'selected="selected"' : ""; ?> value="<?php echo $author["id"]; ?>">
+                                                        <?php echo $author["nom_de_lauteur"]; ?>
+                                                    </option>
+<?php
+                            }
+?>
+                                                </select>
                                             </div>
 
                                             <div class="line form-other-line" style="display:none;">

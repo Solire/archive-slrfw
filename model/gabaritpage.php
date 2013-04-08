@@ -264,7 +264,7 @@ class gabaritPage extends gabaritBloc {
      *
      * @return string formulaire au format HTML
      */
-    public function getForm($action, $retour, $redirections = array())
+    public function getForm($action, $retour, $redirections = array(), $authors = array())
     {
         $versionId          = $this->_version['id'];
 
