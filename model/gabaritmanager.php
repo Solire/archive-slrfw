@@ -1152,7 +1152,7 @@ class gabaritManager extends manager
             if ($donnees['bal_title'] == '') {
                 $donnees['bal_title'] = $donnees['titre'];
             }
-            
+
             if (!isset($donnees['author'])) {
                 $donnees['author'] = 0;
             }
@@ -1283,6 +1283,10 @@ class gabaritManager extends manager
                     $query .= '`rewriting` = ' . $this->_db->quote($rewriting) . ',';
                 }
 
+                if (!isset($donnees['author'])) {
+                    $donnees['author'] = 0;
+                }
+
                 $query .= '`bal_title` = ' . $this->_db->quote($donnees['bal_title']) . ','
                         . '`bal_key` = ' . $this->_db->quote($donnees['bal_key']) . ','
                         . '`author` = ' . $this->_db->quote($donnees['author']) . ','
@@ -1404,7 +1408,7 @@ class gabaritManager extends manager
                 ) {
                     $value = str_replace('"', '&quot;', $value);
                 }
-                
+
                 if ($champ['typedonnee'] == 'FILE') {
                     $filesUsed[] = $value;
                 }
@@ -1447,7 +1451,7 @@ class gabaritManager extends manager
             }
                 $id_gab_page = $this->_db->lastInsertId();
         }
-        
+
         $this->_db->exec("DELETE FROM `media_fichier_utilise` "
                 . "WHERE id_gab_page = $id_gab_page "
                 . "AND id_version = $id_version");
@@ -1576,7 +1580,7 @@ class gabaritManager extends manager
             if ($champ['visible'] == 0) {
                 continue;
             }
-            
+
             $value = array_shift($donnees['champ' . $champ['id']]);
 
             if ($champ['type'] != 'WYSIWYG'
@@ -1584,7 +1588,7 @@ class gabaritManager extends manager
             ) {
                 $value = str_replace('"', '&quot;', $value);
             }
-            
+
             if ($champ['typedonnee'] == 'FILE') {
                 $filesUsed[] = $value;
             }
@@ -1622,7 +1626,7 @@ class gabaritManager extends manager
                 $id_bloc = $this->_db->lastInsertId();
             }
         }
-        
+
         foreach ($filesUsed as $file) {
             $this->_db->exec("INSERT into `media_fichier_utilise` "
                     . "SET id_gab_page = $id_gab_page, "
