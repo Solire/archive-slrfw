@@ -1454,36 +1454,10 @@ class gabaritManager extends manager
                 $id_gab_page = $this->_db->lastInsertId();
         }
 
+        $this->deleteUsedFile($id_version, $id_gab_page);
         $this->saveUsedFile($id_version, $id_gab_page, $filesUsed);
 
         return true;
-    }
-
-    /**
-     * Enregistre les fichiers utilisés.
-     *
-     * @param int   $id_version  identifiant de la version
-     * @param int   $id_gab_page identifiant de la page
-     * @param array $filesUsed   tableau des fichiers utilisés
-     *
-     * @return void
-     */
-    protected function saveUsedFile($id_version, $id_gab_page, $filesUsed)
-    {
-        $query  = 'DELETE FROM `media_fichier_utilise`'
-                . ' WHERE id_gab_page = ' . $id_gab_page
-                . ' AND id_version = ' . $id_version;
-        $this->_db->exec($query);
-
-        foreach ($filesUsed as $file) {
-            if ($file != '') {
-                $query  = 'INSERT into `media_fichier_utilise` SET'
-                        . ' id_gab_page = ' . $id_gab_page . ','
-                        . ' rewriting = ' . $this->_db->quote($file) . ','
-                        . ' id_version = ' . $id_version;
-                $this->_db->exec($query);
-            }
-        }
     }
 
     /**
@@ -1610,7 +1584,9 @@ class gabaritManager extends manager
                 $value = str_replace('"', '&quot;', $value);
             }
 
-            if ($champ['typedonnee'] == 'FILE') {
+            if ($champ['typedonnee'] == 'FILE'
+                && $value != ''
+            ) {
                 $filesUsed[] = $value;
             }
 
@@ -1648,14 +1624,47 @@ class gabaritManager extends manager
             }
         }
 
-        foreach ($filesUsed as $file) {
-            $this->_db->exec("INSERT into `media_fichier_utilise` "
-                    . "SET id_gab_page = $id_gab_page, "
-                    . "rewriting = " . $this->_db->quote($file) . ", "
-                    . "id_version = $id_version" );
-        }
+        $this->saveUsedFile($id_version, $id_gab_page, $filesUsed);
 
         return $id_bloc;
+    }
+
+    /**
+     * Supprime l'état utilisé de tous les fichiers
+     *
+     * @param int   $id_version  identifiant de la version
+     * @param int   $id_gab_page identifiant de la page
+     *
+     * @return void
+     */
+    protected function deleteUsedFile($id_version, $id_gab_page)
+    {
+        $query  = 'DELETE FROM `media_fichier_utilise`'
+                . ' WHERE id_gab_page = ' . $id_gab_page
+                . ' AND id_version = ' . $id_version;
+        $this->_db->exec($query);
+    }
+
+    /**
+     * Enregistre les fichiers utilisés
+     *
+     * @param int   $id_version  identifiant de la version
+     * @param int   $id_gab_page identifiant de la page
+     * @param array $filesUsed   tableau des fichiers utilisés
+     *
+     * @return void
+     */
+    protected function saveUsedFile($id_version, $id_gab_page, $filesUsed)
+    {
+        foreach ($filesUsed as $file) {
+            if ($file != '') {
+                $query  = 'INSERT IGNORE INTO `media_fichier_utilise` SET'
+                        . ' id_gab_page = ' . $id_gab_page . ','
+                        . ' rewriting = ' . $this->_db->quote($file) . ','
+                        . ' id_version = ' . $id_version;
+                $this->_db->exec($query);
+            }
+        }
     }
 
 
