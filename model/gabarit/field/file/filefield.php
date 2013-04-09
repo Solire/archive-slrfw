@@ -17,13 +17,13 @@ class FileField extends \Slrfw\Model\Gabarit\Field\GabaritField {
             $this->champ["aide"] .= '<div style="display:inline-block">';
             if ((isset($this->params["CROP.WIDTH.MIN"]) && intval($this->params["CROP.WIDTH.MIN"]) > 0)) {
                 $this->champ["aide"] .= '<dl class="dl-horizontal expected-width">
-                                    <dt style="width: 180px;">Largeur minimale attendue</dt>
+                                    <dt style="width: 180px;">Largeur</dt>
                                     <dd style="margin-left: 190px;"><span id="">' . $this->params["CROP.WIDTH.MIN"] . '</span>px</dd>
                                 </dl>';
             }
             if ((isset($this->params["CROP.HEIGHT.MIN"]) && intval($this->params["CROP.HEIGHT.MIN"]) > 0)) {
                 $this->champ["aide"] .= '<dl class="dl-horizontal expected-height">
-                                    <dt style="width: 180px;">Hauteur minimale attendue</dt>
+                                    <dt style="width: 180px;">Hauteur</dt>
                                     <dd style="margin-left: 190px;"><span id="">' . $this->params["CROP.HEIGHT.MIN"] . '</span>px</dd>
                                 </dl>';
             }
