@@ -1401,6 +1401,9 @@ class Datatable
                                     break;
 
                                 default:
+                                    $aColumnsFunctions[$keyCol][$keyFunc]["name"] .= "::" . $params["type"];
+                                    unset($params["type"]);
+                                    $paramsFunc = $params;
                                     break;
                             }
 

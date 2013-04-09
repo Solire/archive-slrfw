@@ -24,10 +24,19 @@ class DateTime {
     /**
      *  Renvoi un temps relatif entre maintenant et la date en paramètre
      * 
-     * @param int $timestamp
+     * @param int $timestampOrDate
+     * @param bool $modeDate 
      * @return string 
      */
-    static function RelativeTime($timestamp) {
+    static function RelativeTime($timestampOrDate, $modeDate = false) {
+        if ($modeDate) {
+            $timestamp = strtotime($timestampOrDate);
+            if ($timestamp == "") {
+                return;
+            }
+        } else {
+            $timestamp = $timestampOrDate;
+        }
         $difference = time() - $timestamp;
         $periods = array("seconde", "minute", "heure", "jour", "semaine",
             "mois", "année", "décennie");
