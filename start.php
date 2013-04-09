@@ -23,7 +23,7 @@ try {
 } catch (Exception\HttpError $exc) {
     if (current($exc->getHttp()) == '404') {
         header('HTTP/1.0 404 Not Found');
-        FrontController::run('front', 'error', 'error404');
+        FrontController::run('Front', 'Error', 'error404');
     } else {
         exit('ok');
         $marvin = new Marvin('debug', $exc);

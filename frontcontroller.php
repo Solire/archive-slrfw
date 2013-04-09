@@ -445,13 +445,20 @@ class FrontController
     {
         $front = self::getInstance();
 
-        if (empty($application) && empty($controller) && empty($actString)) {
+        if (empty($application) && empty($controller) && empty($action)) {
             $front->parseUrl();
         } else {
+            /** Chargement de l'application **/
             $front->application = $application;
             self::$appName = $front->application;
+
+            /** Chargement du controller **/
+            $front->classExists($controller);
             $front->controller = $controller;
+
+            /** Chargement de l'action **/
             $front->action = $action;
+
             self::loadAppConfig();
         }
         unset($application, $controller, $action);
@@ -468,7 +475,7 @@ class FrontController
         $front->setVersion();
 
         $class = $front->app . '\\' . $front->application
-               . '\\Controller\\' . $front->controller;
+               . '\\Controller\\' . ucfirst($front->controller);
         $method = sprintf($front->getFormat('controller-action'), $front->action);
         if (!class_exists($class)) {
             $front->debug(self::CONTROLLER_CLASS_NOT_EXISTS, array($class));
