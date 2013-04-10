@@ -425,23 +425,18 @@ class FrontController
     /**
      * Lance l'affichage de la page
      *
-     * @param string $application Nom de l'api à utiliser
      * @param string $controller  Nom du controller à lancer
      * @param string $action      Nom de l'action à lancer
      *
      * @return boolean
      */
-    public static function run($application = null, $controller = null, $action = null)
+    public static function run($controller = null, $action = null)
     {
         $front = self::getInstance();
 
         if (empty($application) && empty($controller) && empty($action)) {
             $front->parseUrl();
         } else {
-            /** Chargement de l'application **/
-            $front->application = $application;
-            self::$appName = $front->application;
-
             /** Chargement du controller **/
             $front->classExists($controller);
             $front->controller = $controller;
