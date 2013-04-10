@@ -224,10 +224,15 @@ class Datatable
      * Défini les chemins des ressources, la connexion à la base de données
      * ainsi que les paramètres GET de l'url et le nom du fichier de configuration
      */
-    public function __construct($get, $configName, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/", $log = null) {
+    public function __construct($get, $configPath, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/", $log = null) {
         $this->_db = $db;
         $this->_get = $get;
-        $this->_configName = $configName;
+        
+        $pathInfoConfig = pathinfo($configPath);
+        
+        $this->_configPath = $pathInfoConfig["dirname"];
+        $this->_configName = str_replace(".cfg", "", $pathInfoConfig["filename"]);
+        
         $this->_log = $log;
 
 
@@ -300,7 +305,7 @@ class Datatable
     public function start()
     {
         if ($this->_configName != '') {
-            include $this->_configPath . $this->_configName . '.cfg.php';
+            include $this->_configPath . DIRECTORY_SEPARATOR . $this->_configName . '.cfg.php';
             $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->nameConfig = str_replace(array(".", "-"), "_", $this->_configName);
             $this->config = $config;
