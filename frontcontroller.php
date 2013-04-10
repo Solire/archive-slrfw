@@ -155,17 +155,7 @@ class FrontController
     {
         /** Chargement de la configuration **/
         self::$mainConfig = new Config('config/main.ini');
-
-        /** Detection de l'environnement **/
-        $localHostnames = explode(',', self::$mainConfig->get('development', 'detect'));
-        if (in_array($_SERVER['SERVER_NAME'], $localHostnames) === true) {
-            $env = 'local';
-        } else {
-            $env = 'online';
-        }
-
-        self::$envConfig = new Config('config/' . $env . '.ini');
-
+        self::$envConfig = new Config('config/local.ini');
 
         /* = Fichiers de configuration
           ------------------------------- */
