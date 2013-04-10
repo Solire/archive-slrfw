@@ -34,42 +34,42 @@ class Formulaire
      *
      * @var string
      */
-    private $_ordre = 'cgp';
+    protected $_ordre = 'cgp';
 
     /**
      * Liste des plugins
      *
      * @var array
      */
-    private $plugins;
+    protected $plugins;
 
     /**
      * tableau des paramètres du formulaire et de leurs options.
      *
      * @var array
      */
-    private $_architecture;
+    protected $_architecture;
 
     /**
      * valeur --config dans le fichier de configuration du formulaire
      *
      * @var array
      */
-    private $_config;
+    protected $_config;
 
     /**
      * Données du formulaire
      *
      * @var array
      */
-    private $_data;
+    protected $_data;
 
     /**
      * toutes les données
      *
      * @var array
      */
-    private $_fullData;
+    protected $_fullData;
 
 
 
@@ -161,7 +161,7 @@ class Formulaire
      *
      * @return boolean
      */
-    private function parseArchi()
+    protected function parseArchi()
     {
         if (isset($this->_architecture['__config'])) {
             $this->_config = $this->_architecture['__config'];
@@ -398,7 +398,7 @@ class Formulaire
      *
      * @todo faire un tutorial expliquant le paramétrage des champs d'un formulaire
      */
-    private function throwError($regles)
+    protected function throwError($regles)
     {
         $error = null;
 
@@ -441,7 +441,7 @@ class Formulaire
      * @return array
      * @uses Formulaire::$_ordre
      */
-    private function catchData()
+    protected function catchData()
     {
         $datas = array(
             'g' => $_GET,
