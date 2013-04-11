@@ -84,7 +84,7 @@ class Controller
      *
      * @var Loader\Css
      */
-    protected $_css;
+    public $_css;
 
     /**
      *
