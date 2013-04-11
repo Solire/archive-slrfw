@@ -60,7 +60,7 @@ class Controller
      *
      * @var MyPDO
      */
-    protected $_db = null;
+    public $_db = null;
 
     /**
      *
