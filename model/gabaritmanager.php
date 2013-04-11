@@ -1283,10 +1283,6 @@ class gabaritManager extends manager
                     $query .= '`rewriting` = ' . $this->_db->quote($rewriting) . ',';
                 }
 
-                if (!isset($donnees['author'])) {
-                    $donnees['author'] = 0;
-                }
-
                 $query .= '`bal_title` = ' . $this->_db->quote($donnees['bal_title']) . ','
                         . '`bal_key` = ' . $this->_db->quote($donnees['bal_key']) . ','
                         . '`author` = ' . $this->_db->quote($donnees['author']) . ','
@@ -1729,7 +1725,7 @@ class gabaritManager extends manager
                 'titre'      => $donnees['titre'],
                 'bal_title'  => $donnees['bal_title'],
                 'bal_key'    => $donnees['bal_key'],
-                'author'    => $donnees['author'],
+                'author'     => $donnees['author'],
                 'bal_descr'  => $donnees['bal_descr'],
             );
 
@@ -1741,7 +1737,7 @@ class gabaritManager extends manager
                 'titre'      => $donnees['titre'],
                 'bal_title'  => $donnees['bal_title'],
                 'bal_key'    => $donnees['bal_key'],
-                'author'    => $donnees['author'],
+                'author'     => $donnees['author'],
                 'bal_descr'  => $donnees['bal_descr'],
             );
 
@@ -1817,7 +1813,9 @@ class gabaritManager extends manager
         $allvalues = array();
 
         foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
-            $values = array();
+            $values = array(
+                'id' => 0,
+            );
 
             $visible = array_shift($donnees['visible']);
 
