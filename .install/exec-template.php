@@ -10,10 +10,10 @@
 
 set_include_path(
     get_include_path()
-    . PATH_SEPARATOR . realpath('../../')
+    . PATH_SEPARATOR . realpath(pathinfo(__FILE__, PATHINFO_DIRNAME) . '/../../')
 );
 
-require '../init.php';
+require 'slrfw/init.php';
 
 \Slrfw\FrontController::init();
 
