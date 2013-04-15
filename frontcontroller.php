@@ -20,6 +20,12 @@ namespace Slrfw;
  */
 class FrontController
 {
+
+    /**
+     * Identifiant de version
+     */
+    const VERSION = '2.2.0';
+
     /**
      * Configuration principale du site
      *
@@ -425,8 +431,8 @@ class FrontController
     /**
      * Lance l'affichage de la page
      *
-     * @param string $controller  Nom du controller à lancer
-     * @param string $action      Nom de l'action à lancer
+     * @param string $controller Nom du controller à lancer
+     * @param string $action     Nom de l'action à lancer
      *
      * @return boolean
      */
