@@ -60,7 +60,7 @@ class Controller
      *
      * @var MyPDO
      */
-    protected $_db = null;
+    public $_db = null;
 
     /**
      *
@@ -84,7 +84,7 @@ class Controller
      *
      * @var Loader\Css
      */
-    protected $_css;
+    public $_css;
 
     /**
      *

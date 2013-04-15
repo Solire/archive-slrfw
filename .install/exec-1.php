@@ -19,5 +19,10 @@ require 'slrfw/init.php';
 
 $db = \Slrfw\Registry::get('db');
 
-/** Mettre script d'installation ici  **/
+$query = 'ALTER TABLE utilisateur ADD gabarit_niveau INT NOT NULL AFTER niveau ';
+$db->exec($query);
+
+$query = 'UPDATE utilisateur SET gabarit_niveau = 0;';
+$db->exec($query);
+
 

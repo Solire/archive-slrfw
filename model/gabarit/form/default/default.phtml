@@ -134,7 +134,8 @@
                                         <div class="line">
                                             <label for="author-<?php echo $metaLang; ?>">Auteur Google +</label>
 
-                                            <select namei="author" id="author-<?php echo $metaLang; ?>">
+                                            <select name="author" id="author-<?php echo $metaLang; ?>">
+                                                <option value="0">-------</option>
 <?php
                             foreach ($authors as $author) {
                                 $selected = isset($this->_meta['author']) && $this->_meta['author'] == $author["id"] ? true : false;
