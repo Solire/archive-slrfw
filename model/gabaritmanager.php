@@ -1254,16 +1254,25 @@ class gabaritManager extends manager
                     . ' AND `id_version` = ' . $donnees['id_version'];
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting',
                 $query);
-
-            $query  = 'SELECT MAX(`ordre`)'
+            
+            //Si niveau 0, on met l'ordre à MAX + 1 sinon MIN - 1
+            $type = "MIN";
+            if ($id_parent == 0)
+                $type = "MAX";
+                
+            $query  = 'SELECT ' . $type . '(`ordre`)'
                     . ' FROM `gab_page`'
                     . ' WHERE `id_api` = ' . $api['id']
                     . ' AND `id_parent` = ' . $id_parent;
             $ordre = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
-            if ($ordre) {
-                $ordre++;
+            if ($ordre !== false) {
+                if($type == "MAX") {
+                    $ordre++;
+                } else {
+                    $ordre--;
+                }
             } else {
-                $ordre = 1;
+                $ordre = 0;
             }
 
             $id_gab_page = 0;
@@ -1301,7 +1310,7 @@ class gabaritManager extends manager
                 $query .= '`canonical` = ' . $this->_db->quote($donnees['canonical']) . ','
                         . '`importance` = ' . $donnees['importance'] . ','
                         . '`id_parent` = ' . $id_parent . ', '
-                        . '`ordre` = ' . $ordre . ','
+                        . '`ordre` = ' . intval($ordre) . ','
                         . '`date_crea` = NOW(),'
                         . '`date_modif` = NOW(),'
                         . '`visible` = 0,'
