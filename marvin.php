@@ -9,7 +9,7 @@
  * @filesource
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 require_once 'external/geshi/geshi.php';
 
@@ -51,7 +51,7 @@ class Marvin
         } else {
             $this->exc = $error;
         }
-        $this->contact = $this->_config->get('mail', 'contact');
+        $this->contact = $this->_config->get('contact', 'mail');
         $this->headers = 'Content-type: text/html; charset=utf-8' . "\r\n"
                        . 'From: Marvin <marvin@solire.fr>' . "\r\n";
 

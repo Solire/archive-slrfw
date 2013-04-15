@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Base controller
@@ -54,13 +54,13 @@ class Controller
      *
      * @var View
      */
-    protected $_view = null;
+    public $_view = null;
 
     /**
      *
      * @var MyPDO
      */
-    protected $_db = null;
+    public $_db = null;
 
     /**
      *
@@ -76,21 +76,15 @@ class Controller
 
     /**
      *
-     * @var Javascript
+     * @var Loader\Javascript
      */
-    protected $_javascript;
+    public $_javascript;
 
     /**
      *
-     * @var Css
+     * @var Loader\Css
      */
-    protected $_css;
-
-    /**
-     *
-     * @var Project
-     */
-    protected $_project;
+    public $_css;
 
     /**
      *
@@ -130,11 +124,12 @@ class Controller
         $this->_translate = new TranslateMysql(ID_VERSION, ID_API, $this->_db);
         $this->_translate->addTranslation();
         $this->_seo = new Seo();
-        $this->_project = new Project($this->_mainConfig->get('name', 'project'));
         $this->_view = new View($this->_translate);
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
         $this->_view->envConfig = Registry::get('envconfig');
+        $this->_view->css = $this->_css;
+        $this->_view->javascript = $this->_javascript;
         $this->_view->ajax = $this->_ajax;
 
         $this->_view->seo = $this->_seo;
@@ -157,25 +152,51 @@ class Controller
     public function shutdown()
     {
         $this->_view->url = $this->_url;
+    }
 
-        if ($this->_mainConfig->get('js_combined', 'optimization') == true) {
-            $this->_view->jsComponents = $this->_javascript->getCombined();
-        } else {
-            if ($this->_mainConfig->get('js_min', 'optimization') == true) {
-                $this->_view->jsComponents = $this->_javascript->getMinified();
-            } else {
-                $this->_view->jsComponents = $this->_javascript;
-            }
+    /**
+     * Lance les executions automatiques
+     *
+     * @param string $type Type d'execution (shutdown pour le moment)
+     *
+     * @return void
+     * @throws Exception\lib Si le type n'est pas cohérent
+     */
+    final protected function loadExec($type)
+    {
+        if (!in_array($type, array('shutdown'))) {
+            throw new Exception\lib('Type d\'execution incorrecte');
         }
 
-        if ($this->_mainConfig->get('css_combined', 'optimization') == true) {
-            $this->_view->cssComponents = $this->_css->getCombined();
-        } else {
-            if ($this->_mainConfig->get('css_min', 'optimization') == true) {
-                $this->_view->cssComponents = $this->_css->getMinified();
-            } else {
-                $this->_view->cssComponents = $this->_css;
+        $dirs = FrontController::getAppDirs();
+        $config = FrontController::$mainConfig;
+        foreach ($dirs as $foo) {
+            $dir = $foo['dir'] . DS . strtolower(FrontController::$appName)
+                 . DS . $config->get('dirs', $type . 'Exec');
+            $path = new Path($dir, Path::SILENT);
+            if ($path->get() === false) {
+                continue;
             }
+
+            $dir = opendir($path->get());
+            while ($file = readdir($dir)) {
+                if ($file == '.' || $file == '..') {
+                    continue;
+                }
+
+                if (is_dir($path->get() . $file)) {
+                    continue;
+                }
+
+                $funcName = $foo['name'] . '\\' . FrontController::$appName . '\\'
+                          . str_replace(DS, '\\', $config->get('dirs', $type . 'Exec'))
+                          . pathinfo($file, PATHINFO_FILENAME);
+                if (!function_exists($funcName)) {
+                    include $path->get() . $file;
+                }
+                    $funcName($this);
+            }
+            closedir($dir);
         }
     }
 
@@ -206,7 +227,7 @@ class Controller
     /**
      * Renvois la vue
      *
-     * @return \Slrfw\Library\View
+     * @return \Slrfw\View
      */
     public function getView()
     {
@@ -335,11 +356,11 @@ class Controller
      * @param string $url       Url vers laquelle rediriger l'utilisateur
      *
      * @return void
-     * @uses Slrfw\Library\Exception\HttpError marque l'erreur HTTP
+     * @uses Slrfw\Exception\HttpError marque l'erreur HTTP
      */
     final public function redirectError($codeError = null, $url = null)
     {
-        $exc = new \Slrfw\Library\Exception\HttpError('Erreur HTTP');
+        $exc = new \Slrfw\Exception\HttpError('Erreur HTTP');
         if (!empty($codeError)) {
             $exc->http($codeError, $url);
         }
@@ -387,9 +408,9 @@ class Controller
      * @return string
      * @uses TranslateMysql
      */
-    public function _($string)
+    public function _($string, $aide = '')
     {
-        return $this->_translate->_($string);
+        return $this->_translate->_($string, $aide);
     }
 }
 

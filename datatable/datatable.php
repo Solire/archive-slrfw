@@ -1,9 +1,17 @@
 <?php
+/**
+ * Datatable Class
+ *
+ * Créer un tableau avancé
+ *
+ * @package Datatable
+ * @author shin
+ */
 
-namespace Slrfw\Library\Datatable;
+namespace Slrfw\Datatable;
 
-use Slrfw\Library\Loader;
-use Slrfw\Library\Tools;
+use Slrfw\Loader;
+use Slrfw\Tools;
 use Slrfw\Model\fileManager;
 
 /**
@@ -14,7 +22,8 @@ use Slrfw\Model\fileManager;
  * @package Datatable
  * @author shin
  */
-class Datatable {
+class Datatable
+{
 
     /**
      * Nom de la vue à utiliser
@@ -87,7 +96,7 @@ class Datatable {
      * @var string
      * @access protected
      */
-    protected $_configPath = "../config/datatable/";
+    protected $_configPath = "config/datatable/";
 
     /**
      * Nom du fichier de configuration qui sera utilisé
@@ -100,7 +109,7 @@ class Datatable {
     /**
      * Connexion à la base de données qui sera utilisé
      *
-     * @var \Slrfw\Library\MyPDO
+     * @var \Slrfw\MyPDO
      * @access protected
      */
     protected $_db;
@@ -204,7 +213,7 @@ class Datatable {
     /**
      *
      *
-     * @var \Slrfw\Library\Log
+     * @var \Slrfw\Log
      * @access protected
      */
     protected $_log;
@@ -215,15 +224,20 @@ class Datatable {
      * Défini les chemins des ressources, la connexion à la base de données
      * ainsi que les paramètres GET de l'url et le nom du fichier de configuration
      */
-    public function __construct($get, $configName, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/", $log = null) {
+    public function __construct($get, $configPath, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/", $log = null) {
         $this->_db = $db;
         $this->_get = $get;
-        $this->_configName = $configName;
+        
+        $pathInfoConfig = pathinfo($configPath);
+        
+        $this->_configPath = $pathInfoConfig["dirname"];
+        $this->_configName = str_replace(".cfg", "", $pathInfoConfig["filename"]);
+        
         $this->_log = $log;
 
 
         /* Augmentation de la limite des group_concat */
-        $this->_db->exec("SET GLOBAL group_concat_max_len = 100000;");
+        $this->_db->exec("SET SESSION group_concat_max_len = 100000;");
 
         if (isset($this->_get["json"])) {
             $this->_view = "json";
@@ -288,10 +302,10 @@ class Datatable {
      *
      * @return 	void
      */
-    public function start() {
-
-        if ($this->_configName != "") {
-            require($this->_configPath . $this->_configName . ".cfg.php");
+    public function start()
+    {
+        if ($this->_configName != '') {
+            include $this->_configPath . DIRECTORY_SEPARATOR . $this->_configName . '.cfg.php';
             $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->nameConfig = str_replace(array(".", "-"), "_", $this->_configName);
             $this->config = $config;
@@ -302,7 +316,7 @@ class Datatable {
             $plugins = array();
             if (isset($this->config["plugins"])) {
                 foreach ($this->config["plugins"] as $plugin) {
-                    $pluginName = "\Slrfw\Library\Datatable\Plugin\Datatable" . $plugin;
+                    $pluginName = "\Slrfw\Datatable\Plugin\Datatable" . $plugin;
                     $plugins[$pluginName] = new $pluginName($this->_db, $this);
                 }
             }
@@ -339,7 +353,7 @@ class Datatable {
                 && isset($this->config["extra"]["show"]) && $this->config["extra"]["show"]
         ) {
             $columnActionButtons[] = '<button title="Voir" class="btn btn-primary show-item-no-ajax">
-                                        <img width="12" alt="Voir" src="img/back/white/magnifying_glass_12x12.png">
+                                        <img width="12" alt="Voir" src="app/back/img/white/magnifying_glass_12x12.png">
                                     </button>';
         }
 
@@ -349,7 +363,7 @@ class Datatable {
                 || !isset($this->config["form"]["ajax"])
                 || $this->config["form"]["ajax"] == true)) {
             $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item">
-                                                <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier">
+                                                <img width="12" src="app/back/img/white/pen_alt_stroke_12x12.png" alt="Modifier">
                                             </button>';
         }
 
@@ -359,14 +373,14 @@ class Datatable {
                 && isset($this->config["form"]["ajax"])
                 && $this->config["form"]["ajax"] == false) {
             $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item-no-ajax">
-                                                <img width="12" src="img/back/white/pen_alt_stroke_12x12.png" alt="Modifier" />
+                                                <img width="12" src="app/back/img/white/pen_alt_stroke_12x12.png" alt="Modifier" />
                                             </button>';
         }
 
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
             $columnActionButtons[] = '
-                <button title="Supprimer" class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="img/back/white/trash_stroke_16x16.png"></button>';
+                <button title="Supprimer" class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="app/back/img/white/trash_stroke_16x16.png"></button>';
         }
 
 
@@ -400,7 +414,7 @@ class Datatable {
     }
 
     protected function beforeRunAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -571,7 +585,7 @@ class Datatable {
                 || $this->config["form"]["ajax"] == true)) {
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.selectload.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/jquery.tmpl.min.js");
-            $this->_javascript->addLibrary("back/plupload/plupload.full.min.js");
+            $this->_javascript->addLibrary("back/js/plupload/plupload.full.min.js");
             $this->_javascript->addLibrary($this->_jsPath . "jquery/plupload_custom.js");
             $this->addRenderAction();
             if (isset($this->config["style"])
@@ -755,7 +769,7 @@ class Datatable {
                      * Si le champ est un mot de passe on le fait passer
                      * par la fonction de préparation des mots de passes
                      */
-                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
+                    $values[$column['name']] = \Slrfw\Session::prepareMdp($_POST[$column['name']]);
                 } else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
                     if (isset($_POST[$column["name"]]) && $column["name"] != "") {
                         $ids = explode(",", $_POST[$column["name"]]);
@@ -788,7 +802,7 @@ class Datatable {
 
         $r = $this->_db->insert($sTable, $values);
         $insertId = $this->_db->lastInsertId();
-        
+
         if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["create"])) {
             $this->_log->logThis("Ajout de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . $insertId);
         }
@@ -799,7 +813,7 @@ class Datatable {
                 $this->_db->insert($queryAfterData["table"], $queryData);
             }
         }
-        
+
 
         $this->afterAddAction($insertId);
 
@@ -847,7 +861,7 @@ class Datatable {
                      * Si le champ est un mot de passe on le fait passer
                      * par la fonction de préparation des mots de passes
                      */
-                    $values[$column['name']] = \Slrfw\Library\Session::prepareMdp($_POST[$column['name']]);
+                    $values[$column['name']] = \Slrfw\Session::prepareMdp($_POST[$column['name']]);
                 } else if (isset($column["creable_field"]["type"]) && $column["creable_field"]["type"] == "multi-autocomplete") {
                     if (isset($_POST[$column["name"]]) && $column["name"] != "") {
                         $ids = explode(",", $_POST[$column["name"]]);
@@ -974,7 +988,7 @@ class Datatable {
         } else {
             $r = $this->_db->delete($sTable, implode(" AND ", $where));
         }
-        
+
         if ($this->_log && isset($this->config["log"]) && isset($this->config["log"]["delete"])) {
             $this->_log->logThis("Suppression de " . $sTable, $this->_utilisateur->get("id"), "<b>Id</b> : " . implode(" AND ", $where));
         }
@@ -996,18 +1010,19 @@ class Datatable {
      */
     public function uploadAction() {
         if (isset($this->config["file"])) {
-            $this->_upload_path = $this->config["file"]["upload_path"];
-            $this->_upload_temp = $this->config["file"]["upload_temp"];
+            $this->_upload_path     = $this->config["file"]["upload_path"];
+            $this->_upload_temp     = $this->config["file"]["upload_temp"];
             $this->_upload_vignette = $this->config["file"]["upload_vignette"];
-            $this->_upload_apercu = $this->config["file"]["upload_apercu"];
+            $this->_upload_apercu   = $this->config["file"]["upload_apercu"];
         }
         $fileManager = new fileManager();
-        $targetTmp = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_temp;
-        $targetDir = "../" . $this->_upload_path;
-        $vignetteDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_vignette;
-        $apercuDir = "../" . $this->_upload_path . DIRECTORY_SEPARATOR . $this->_upload_apercu;
+        $targetTmp      = $this->_upload_temp;
+        $targetDir      = $this->_upload_path;
+        $vignetteDir    = $this->_upload_vignette;
+        $apercuDir      = $this->_upload_apercu;
 
-        $json = $fileManager->upload($targetTmp, $targetDir, $vignetteDir, $apercuDir);
+        $json = $fileManager->upload($this->_upload_path, $targetTmp,
+            $targetDir, $vignetteDir, $apercuDir);
 
         $this->_view = "";
         $this->_response = json_encode($json);
@@ -1021,7 +1036,7 @@ class Datatable {
      * @return 	void
      */
     public function afterAddAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1032,7 +1047,7 @@ class Datatable {
      * @return 	void
      */
     public function afterEditAction($insertId) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1043,7 +1058,7 @@ class Datatable {
      * @return 	void
      */
     public function afterDeleteAction($row) {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -1379,7 +1394,7 @@ class Datatable {
             if (isset($column["format"])) {
                 foreach ($column["format"] as $type => $params) {
                     $paramsFunc = array();
-                    $aColumnsFunctions[$keyCol][]["name"] = "\Slrfw\Library\Format\\" . ucfirst($type);
+                    $aColumnsFunctions[$keyCol][]["name"] = "\Slrfw\Format\\" . ucfirst($type);
                     $keyFunc = count($aColumnsFunctions[$keyCol]) - 1;
                     switch ($type) {
                         case "datetime":
@@ -1391,6 +1406,9 @@ class Datatable {
                                     break;
 
                                 default:
+                                    $aColumnsFunctions[$keyCol][$keyFunc]["name"] .= "::" . $params["type"];
+                                    unset($params["type"]);
+                                    $paramsFunc = $params;
                                     break;
                             }
 
@@ -2149,8 +2167,8 @@ class Datatable {
 
     /**
      * Renvoi le chargeur de fichier javascript
-     * 
-     * @return Javascript 
+     *
+     * @return Javascript
      */
     public function getJavascriptLoader() {
         return $this->_javascript;
@@ -2160,8 +2178,8 @@ class Datatable {
 
     /**
      * Renvoi le chargeur de fichier Css
-     * 
-     * @return Css 
+     *
+     * @return Css
      */
     public function getCssLoader() {
         return $this->_css;
@@ -2213,7 +2231,7 @@ class Datatable {
      * @return void
      */
     protected function addRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -2224,7 +2242,7 @@ class Datatable {
      * @return void
      */
     protected function editRenderAction() {
-        
+
     }
 
     // --------------------------------------------------------------------
@@ -2335,7 +2353,7 @@ class Datatable {
                     $queryAfterData = array();
                     $queryAfterData["table"] = $table;
                     $queryAfterData["table"] .= "
-                        INNER JOIN " . $column["from"]["table"] . " 
+                        INNER JOIN " . $column["from"]["table"] . "
                             ON " . $column["from"]["table"] . "." . $column["from"]["columns"][0]["name"] . " = `" . $column2["from"]["table"] . "`." . key($column["from"]["columns"][0]["from"]["index"]);
 
                     $queryAfterData["columns"] = $selectSqlArray;

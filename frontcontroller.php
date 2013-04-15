@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Front controller
@@ -20,6 +20,12 @@ namespace Slrfw\Library;
  */
 class FrontController
 {
+
+    /**
+     * Identifiant de version
+     */
+    const VERSION = '2.2.0';
+
     /**
      * Configuration principale du site
      *
@@ -33,6 +39,13 @@ class FrontController
      * @var Config
      */
     public static $envConfig;
+
+    /**
+     * Nom de l'application en cours d'utilisation
+     *
+     * @var string
+     */
+    public static $appName;
 
     /**
      * Liste des répertoires app à utiliser
@@ -130,26 +143,25 @@ class FrontController
     }
 
     /**
+     * Renvois le tableau des répertoires app
+     *
+     * @return array
+     */
+    public static function getAppDirs()
+    {
+        return self::$appDirs;
+    }
+
+    /**
      * Initialise les données nécessaires pour FrontController
      *
      * @return void
      */
-    public function init()
+    public static function init()
     {
-
         /** Chargement de la configuration **/
-        self::$mainConfig = new Config('../config/main.ini');
-
-        /** Detection de l'environnement **/
-        $localHostnames = explode(',', self::$mainConfig->get('detect', 'development'));
-        if (in_array($_SERVER['SERVER_NAME'], $localHostnames) === true) {
-            $env = 'local';
-        } else {
-            $env = 'online';
-        }
-
-        self::$envConfig = new Config('../config/' . $env . '.ini');
-
+        self::$mainConfig = new Config('config/main.ini');
+        self::$envConfig = new Config('config/local.ini');
 
         /* = Fichiers de configuration
           ------------------------------- */
@@ -162,69 +174,18 @@ class FrontController
         $db = DB::factory(self::$envConfig->get('database'));
         Registry::set('db', $db);
 
-        Registry::set('project-name', self::$mainConfig->get('name', 'project'));
+        Registry::set('project-name', self::$mainConfig->get('project', 'name'));
         $emails = self::$envConfig->get('email');
 
-        Registry::set('basehref', self::$envConfig->get('url', 'base'));
-
-        /* = Permet de forcer une version (utile en dev ou recette)
-          ------------------------------- */
-        if (isset($_GET['version-force'])) {
-            $_SESSION['version-force'] = $_GET['version-force'];
-        }
-        if (isset($_SESSION['version-force'])) {
-            $sufVersion = $_SESSION['version-force'];
-        } else {
-            if (isset($_GET['version'])) {
-                $sufVersion = $_GET['version'];
-            } else {
-                $sufVersion = 'FR';
+        /** Ajout d'un prefix au mail **/
+        if (isset($emails['prefix']) && $emails['prefix'] != '') {
+            $prefix = $emails['prefix'];
+            unset($emails['prefix']);
+            foreach ($emails as &$email) {
+                $email = $prefix . $email;
             }
         }
-
-        if ($env != 'local') {
-            $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
-            Registry::set('url', 'http://www.' . $serverUrl . '/');
-            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
-
-
-            Registry::set('email', $emails);
-
-        } else {
-            $serverUrl = str_replace('solire-02', $_SERVER['SERVER_NAME']
-                       . ':' . $_SERVER['SERVER_PORT'], Registry::get('basehref'));
-            Registry::set('url', $serverUrl);
-            Registry::set('basehref', $serverUrl);
-
-            /** Ajout d'un prefix au mail **/
-            if (isset($emails['prefix']) && $emails['prefix'] != '') {
-                $prefix = $emails['prefix'];
-                unset($emails['prefix']);
-                foreach ($emails as &$email) {
-                    $email = $prefix . $email;
-                }
-            }
-            Registry::set('email', $emails);
-        }
-
-
-        $query = 'SELECT * '
-               . 'FROM `version` '
-               . 'WHERE `domaine` = "' . $serverUrl . '"';
-        $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
-
-        if (!isset($version['id'])) {
-            $query = 'SELECT * '
-                   . 'FROM `version` '
-                   . 'WHERE `suf` LIKE ' . $db->quote($sufVersion);
-            $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
-        }
-
-
-        Registry::set('analytics', $version['analytics']);
-        define('ID_VERSION', $version['id']);
-        define('SUF_VERSION', $version['suf']);
-
+        Registry::set('email', $emails);
     }
 
     /**
@@ -233,7 +194,7 @@ class FrontController
      * @param string $rewriting Parte de rewriting à ajouter
      *
      * @return void
-     * @uses Slrfw\Library\Controller->acceptRew Contrôle si le
+     * @uses Slrfw\Controller->acceptRew Contrôle si le
      * rewriting est accepté
      */
     private function addRewriting($rewriting)
@@ -241,7 +202,7 @@ class FrontController
         $className = $this->getClassName();
         $class = new $className();
         if ($class->acceptRew !== true) {
-            $exc = new \Slrfw\Library\Exception\HttpError('Erreur HTTP');
+            $exc = new \Slrfw\Exception\HttpError('Erreur HTTP');
             $exc->http(404, null);
             throw $exc;
         }
@@ -263,7 +224,7 @@ class FrontController
         } else {
             $app = $this->app;
         }
-        $class = 'Slrfw\\' . $app . '\\' . $this->application . '\\Controller\\';
+        $class = $app . '\\' . $this->application . '\\Controller\\';
         if (empty($controller)) {
             $class .= $this->controller;
         } else {
@@ -281,8 +242,12 @@ class FrontController
     public function parseUrl()
     {
         /** Nom de l'application par défaut */
-        $this->application = 'Front';
+        $this->application = self::$mainConfig->get('project', 'defaultApp');
+        self::$appName = $this->application;
 
+        self::loadAppConfig();
+
+        /** On met la valeur par défaut pour pouvoir tester l'app par défaut **/
         $this->controller = $this->getDefault('controller');
 
         $this->rewriting = array();
@@ -296,7 +261,6 @@ class FrontController
             unset($url);
 
             $application = false;
-            $appDir = '../app/';
             $rewritingMod = false;
             foreach ($arrSelect as $ctrl) {
                 /**
@@ -335,6 +299,7 @@ class FrontController
                         continue;
                     }
                     $this->application = ucfirst($ctrl);
+                    self::$appName = $this->application;
                     $application = true;
                     continue;
                 }
@@ -355,10 +320,17 @@ class FrontController
                 $this->addRewriting($ctrl);
                 $rewritingMod = true;
             }
+
+            /** Si l'application à changé on charge sa configuration **/
+            if ($application === true) {
+                self::loadAppConfig();
+            }
         }
+
 
         if ($controller === false) {
             $this->controller = $this->getDefault('controller');
+            $this->classExists($this->controller);
         }
 
         if (isset($_GET['action']) && !empty($_GET['action'])) {
@@ -383,6 +355,41 @@ class FrontController
     }
 
     /**
+     * Cherche un fichier dans les applications
+     *
+     * @param string $path Chemin Chemin du dossier / fichier à chercher dans
+     * les applications
+     *
+     * @return string|boolean
+     */
+    final public static function search($path)
+    {
+        $path = DS . strtolower(self::$appName) . DS . $path;
+        foreach (self::$appDirs as $app) {
+            $fooPath = $app['dir'] . $path;
+            $testPath = new Path($fooPath, Path::SILENT);
+            if ($testPath->get() !== false) {
+                return $testPath->get();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Charge la configuration relative à l'application
+     *
+     * @return void
+     */
+    final public static function loadAppConfig()
+    {
+        $confPath = self::search('conf.ini');
+        if (!empty($confPath)) {
+            $appConfig = new Config($confPath);
+            Registry::set('appconfig', $appConfig);
+        }
+    }
+    /**
      * Test si le morceau d'url est une application
      *
      * @param string $ctrl Morceau d'url
@@ -402,6 +409,13 @@ class FrontController
         return false;
     }
 
+    /**
+     * Contrôle l'existence d'une classe controller
+     *
+     * @param string $ctrl Nom de la classe
+     *
+     * @return boolean
+     */
     protected function classExists($ctrl)
     {
         foreach (self::$appDirs as $app) {
@@ -417,22 +431,26 @@ class FrontController
     /**
      * Lance l'affichage de la page
      *
-     * @param string $application Nom de l'api à utiliser
-     * @param string $controller  Nom du controller à lancer
-     * @param string $action      Nom de l'action à lancer
+     * @param string $controller Nom du controller à lancer
+     * @param string $action     Nom de l'action à lancer
      *
      * @return boolean
      */
-    public static function run($application = null, $controller = null, $action = null)
+    public static function run($controller = null, $action = null)
     {
         $front = self::getInstance();
 
-        if (empty($application) && empty($controller) && empty($actString)) {
+        if (empty($application) && empty($controller) && empty($action)) {
             $front->parseUrl();
         } else {
-            $front->application = $application;
+            /** Chargement du controller **/
+            $front->classExists($controller);
             $front->controller = $controller;
+
+            /** Chargement de l'action **/
             $front->action = $action;
+
+            self::loadAppConfig();
         }
         unset($application, $controller, $action);
 
@@ -445,8 +463,10 @@ class FrontController
         }
         self::$singleApi = true;
 
-        $class = 'Slrfw\\' . $front->app . '\\' . $front->application
-               . '\\Controller\\' . $front->controller;
+        $front->setVersion();
+
+        $class = $front->app . '\\' . $front->application
+               . '\\Controller\\' . ucfirst($front->controller);
         $method = sprintf($front->getFormat('controller-action'), $front->action);
         if (!class_exists($class)) {
             $front->debug(self::CONTROLLER_CLASS_NOT_EXISTS, array($class));
@@ -462,6 +482,8 @@ class FrontController
             }
         }
 
+
+
         $instance = new $class();
 
         /** Passage des paramètres de rewriting **/
@@ -469,11 +491,6 @@ class FrontController
 
         $instance->start();
         $view = $instance->getView();
-        foreach (self::$appDirs as $app) {
-            $viewDir = sprintf($front->getDir('views'), $app['dir']
-                     . DS . strtolower($front->application));
-            $view->setDir($viewDir);
-        }
         $view->setTemplate('main');
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
@@ -517,28 +534,98 @@ class FrontController
         if (!defined('ID_API')) {
             define('ID_API', $apiId);
         }
-        $configPath = 'app_' . $this->application . '.ini';
+        $configPath = 'config/app_' . $this->application . '.ini';
         $configPath = strtolower($configPath);
+
         $path = new Path($configPath, Path::SILENT);
         if (!$path->get()) {
             return false;
         }
-        $appConfig = new Config($path->get());
-        Registry::set('appconfig', $appConfig);
 
+        return true;
+    }
 
-        /** Url **/
-        if ($this->application == 'Front') {
-            $baseSuffix = '';
+    /**
+     * Défini la version en cours de l'application
+     *
+     * Défini la constante ID_VERSION et SUF_VERSION
+     * Paramètre le basehref
+     *
+     * @return boolean
+     *
+     * @uses Registry
+     */
+    public function setVersion()
+    {
+        $db = Registry::get('db');
+
+        /* = Permet de forcer une version (utile en dev ou recette)
+          ------------------------------- */
+        if (isset($_GET['version-force'])) {
+            $_SESSION['version-force'] = $_GET['version-force'];
+        }
+        if (isset($_SESSION['version-force'])) {
+            $sufVersion = $_SESSION['version-force'];
         } else {
-            $baseSuffix = strtolower($this->application) . '/';
+            if (isset($_GET['version'])) {
+                $sufVersion = $_GET['version'];
+            } else {
+                $sufVersion = 'FR';
+            }
         }
 
-        Registry::set('base', self::$envConfig->get('url', 'base'));
-        Registry::set('basehref', self::$envConfig->get('url', 'base') . $baseSuffix);
-        Registry::set('baseroot', self::$envConfig->get('root', 'base'));
+        /**
+         * On verifie en base si le nom de domaine courant correspond
+         *  à une langue
+         **/
+        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+
+        $query = 'SELECT * '
+               . 'FROM `version` '
+               . 'WHERE  id_api = ' . intval(ID_API) . ' AND `domaine` = "' . $serverUrl . '"';
+        $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
+        /**
+         * Si aucune langue ne correspond
+         *  on prend la version FR
+         **/
+        if (!isset($version['id'])) {
+            $query = 'SELECT * '
+                   . 'FROM `version` '
+                   . 'WHERE id_api = ' . intval(ID_API)
+                   . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+            $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
+            /**
+             * Dans le cas d'un changement d'api
+             *  Si la langue en SESSION n'existe pas dans l'api
+             *  On récupère la version FR DE la nouvelle api
+             */
+            if (!isset($version['id'])) {
+                $sufVersion = 'FR';
+                $query = 'SELECT * '
+                   . 'FROM `version` '
+                   . 'WHERE id_api = ' . intval(ID_API)
+                   . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+                $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+            }
+
+            $serverUrl = self::$envConfig->get('base', 'url');
+            Registry::set('url', $serverUrl);
+            Registry::set('basehref', $serverUrl);
+
+        } else {
+            Registry::set('url', 'http://www.' . $serverUrl . '/');
+            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
+        }
 
 
+        Registry::set('analytics', $version['analytics']);
+
+        if (!defined('ID_VERSION')) {
+            define('ID_VERSION', $version['id']);
+            define('SUF_VERSION', $version['suf']);
+        }
 
         return true;
     }
@@ -569,14 +656,8 @@ class FrontController
      */
     public function getDefault($key)
     {
-        $name = strtolower('app_' . $this->application);
-        $config = self::$mainConfig->get($name);
-
-        if (isset($config[$key . '-default'])) {
-            return $config[$key . '-default'];
-        }
-
-        return '';
+        $conf = Registry::get('appconfig');
+        return $conf->get('default', $key);
     }
 
     /**

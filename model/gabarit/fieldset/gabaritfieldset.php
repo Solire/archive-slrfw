@@ -5,6 +5,8 @@
  * @author shin
  */
 
+namespace Slrfw\Model\Gabarit\FieldSet;
+
 /**
  * Description of gabaritfield
  *
@@ -19,7 +21,6 @@ abstract class GabaritFieldSet
     protected $values;
     protected $valueLabel;
     protected $champsHTML;
-    protected $uploadPath;
     protected $idGabPage;
     protected $champs;
     protected $versionId;
@@ -29,21 +30,18 @@ abstract class GabaritFieldSet
      *
      * @param \Slrfw\Model\gabaritBloc $bloc        bloc pour lequel on désire
      * contruire le formulaire
-     * @param string                   $upload_path chemin où se situe les fichiers
-     * téléchargés
      * @param int                      $id_gab_page identifiant de la page
      * contenant le bloc
      * @param int                      $versionId   identifiant de la version
      *
      * @return void
      */
-    public function __construct($bloc, $upload_path, $id_gab_page, $versionId)
+    public function __construct($bloc, $id_gab_page, $versionId)
     {
         $this->gabarit    = $bloc->getGabarit();
         $this->values     = $bloc->getValues();
         $this->champs     = $bloc->getGabarit()->getChamps();
         $this->idGabPage  = $id_gab_page;
-        $this->uploadPath = $upload_path;
         $this->versionId  = $versionId;
     }
 
@@ -95,13 +93,12 @@ abstract class GabaritFieldSet
      * @param string $value       valeur du champ
      * @param string $idpage      identifiant à concatainer à l'attribut 'id' du
      * champ
-     * @param string $upload_path nom du dossier où sont uploadés les images.
      * @param int    $id_gab_page nom du dossier dans lequel sont les images.
      *
      * @return string
      */
     protected function _buildChamp(
-        $champ, $value, $idpage, $upload_path, $id_gab_page, $gabarit = null
+        $champ, $value, $idpage, $id_gab_page, $gabarit = null
     ) {
 
         $form = '';
@@ -118,14 +115,14 @@ abstract class GabaritFieldSet
                     . '_' . $this->versionId;
 
         if ($champ['typedonnee'] == 'DATE') {
-            $value = \Slrfw\Library\Tools::formate_date_nombre($value, '-', '/');
+            $value = \Slrfw\Tools::formate_date_nombre($value, '-', '/');
         }
 
         $type = strtolower($champ['type']);
-        $classNameType = $type . 'field';
-        require_once 'gabarit/field/' . $type . '/' . $classNameType . '.php';
+        $classNameType  = '\Slrfw\Model\Gabarit\Field\\'
+                        . $type . '\\' . $type . 'field';
         $field = new $classNameType($champ, $label, $value, $id, $classes,
-            $upload_path, $id_gab_page, $this->versionId);
+            $id_gab_page, $this->versionId);
 
         /**
          * Cas pour les bloc dyn de champ join avec un seul champs et de type
@@ -188,7 +185,7 @@ abstract class GabaritFieldSet
             }
 
             $champArray = $this->_buildChamp($champ, $value_champ, $id_champ,
-                $this->uploadPath, $this->idGabPage);
+                $this->idGabPage);
             $champHTML .= $champArray['html'];
 
             if ($first) {

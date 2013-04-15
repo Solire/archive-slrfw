@@ -7,7 +7,7 @@
  * @license Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Extention de PDO
@@ -175,6 +175,7 @@ class MyPDO extends \PDO
         $string = strtolower($string);
 
         /** Tout les caractères qui ne sont pas aplhanum sur copprimés. */
+        $string = preg_replace('#(\')#', ' ', $string);
         $string = preg_replace('#([^a-z0-9 \-]?)#', '', $string);
         $string = trim($string);
         $string = str_replace(' ', '-', $string);

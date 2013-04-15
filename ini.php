@@ -1,6 +1,6 @@
 <?php
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /** @todo faire la présentation du code */
 
@@ -109,4 +109,3 @@ class Ini
 
 }
 
-?>

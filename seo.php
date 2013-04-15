@@ -1,6 +1,6 @@
 <?php
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Manage SEO
@@ -31,6 +31,18 @@ class Seo
      * @var string  url canonical of the page
      */
     private $_urlCanonical = '';
+    
+    /**
+     *
+     * @var string  Author of page
+     */
+    private $_author;
+    
+    /**
+     *
+     * @var string  Authorname of page
+     */
+    private $_authorName;
 
     /**
      *
@@ -199,6 +211,29 @@ class Seo
         return $this->_urlCanonical;
 
     }//end getDescription()
+    
+    
+    /**
+     * Get author of the page
+     *
+     * @return string
+     */
+    public function getAuthor()
+    {
+        return $this->_author;
+
+    }//end getAuthor()
+    
+    /**
+     * Get authorName of the page
+     *
+     * @return string
+     */
+    public function getAuthorName()
+    {
+        return $this->_authorName;
+
+    }
 
 
     /**
@@ -226,7 +261,34 @@ class Seo
     {
         $this->_urlCanonical = $_urlCanonical;
 
-    }//end setDescription()
+    }//end setUrlCanonical()
+    
+    
+    /**
+     * Set author of the page
+     *
+     * @param string $_author author of the page
+     *
+     * @return void
+     */
+    public function setAuthor($_author)
+    {
+        $this->_author = $_author;
+
+    }//end setAuthor()
+    
+    /**
+     * Set authorName of the page
+     *
+     * @param string $_authorName authorName of the page
+     *
+     * @return void
+     */
+    public function setAuthorName($_authorName)
+    {
+        $this->_authorName = $_authorName;
+
+    }
 
 
     /**

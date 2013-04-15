@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /**
  * Gestionnaire des sessions
@@ -61,7 +61,7 @@ class Session
     public function __construct($sessionCode)
     {
         $config = Registry::get('mainconfig');
-        $format = $config->get('session', 'format');
+        $format = $config->get('format', 'session');
 
         if (empty($format)) {
             throw new Exception\Lib('Aucune configuration format des sessions');

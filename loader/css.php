@@ -1,45 +1,102 @@
 <?php
+/**
+ * Gestionnaire des fichiers css
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Dev <dave@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 
-namespace Slrfw\Library\Loader;
+namespace Slrfw\Loader;
 
-/** @todo faire la présentation du code */
+/**
+ * Gestionnaire des fichiers css
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Dev <dave@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
+class Css
+{
+    /**
+     * Liste des librairies css à intégrer
+     * @var array
+     */
+    private $libraries = array();
 
-class Css {
-
-    private $libraries;
-
+    /**
+     * Chargement du gestionnaire de css
+     */
     public function __construct()
-    {
-        $this->libraries = array();
-    }
+    {}
 
+    /**
+     * Renvois la liste des librairies css
+     *
+     * @return array
+     */
     public function getLibraries()
     {
         return $this->libraries;
     }
 
+    /**
+     * Renvois les clé de la liste des librairies
+     *
+     * @return array
+     * @deprecated ???
+     */
     public function loadedLibraries()
     {
         return array_keys($this->libraries);
     }
 
-    public function  __toString()
+    /**
+     * Renvois le chemin absolu vers la librairie en fonction des AppDirs
+     *
+     * @param string $filePath Chemin relatif de la librairie
+     *
+     * @return string
+     */
+    protected function getPath($filePath)
     {
-        $css = "";
-        foreach ($this->libraries as $lib) {
-            if (substr($lib["src"], 0, 7) != 'http://'
-                && substr($lib["src"], 0, 8) != 'https://'
-                && file_exists("./medias/" . $lib["src"])
-            ) {
-                $filemtime = "?" . filemtime("./medias/" . $lib["src"]);
+        $dirs = \Slrfw\FrontController::getAppDirs();
+
+        foreach ($dirs as $dir) {
+            $path = new \Slrfw\Path($dir['dir'] . DS . $filePath, \Slrfw\Path::SILENT);
+            if ($path->get()) {
+                return $dir['dir'] . DS . $filePath;
             }
-            else {
-                $filemtime = "";
+        }
+
+        return null;
+    }
+
+    /**
+     * Affiche le code html pour l'intégration des librairies css
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $css = '';
+        foreach ($this->libraries as $lib) {
+            if (substr($lib['src'], 0, 7) != 'http://'
+                && substr($lib['src'], 0, 8) != 'https://'
+            ) {
+                $path = $this->getPath($lib['src']);
+                if (!empty($path)) {
+                    $path .= '?' . filemtime($path);
+                }
+            } else {
+                $path = $lib['src'];
             }
 
-            $css   .= '        <link rel="stylesheet" href="' . $lib["src"]
-                    . $filemtime . '" type="text/css" media="' . $lib["media"]
-                    . '" title="" charset="utf-8" />' . "\n";
+            $css   .= '        <link rel="stylesheet" href="' . $path
+                    . '" type="text/css" media="' . $lib['media']
+                    . '" />' . "\n";
         }
 
         return $css;
@@ -55,22 +112,12 @@ class Css {
      *
      * @return void
      */
-    public function addLibrary($path, $media = "screen", $local = true)
+    public function addLibrary($path, $media = 'screen')
     {
-        if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
-            || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest')
-        {
-            if ($local === true) {
-                $this->libraries[] = array(
-                    'src' => (substr($path, 0, 7) == 'http://' || substr($path, 0, 8) == 'https://' ? '' : 'css/') . $path,
-                    'media' => $media,
-                );
-            } else {
-                $this->libraries[] = array(
-                    'src' => $path,
-                    'media' => $media,
-                );
-            }
-        }
+        $this->libraries[] = array(
+            'src' => $path,
+            'media' => $media,
+        );
     }
 }
+

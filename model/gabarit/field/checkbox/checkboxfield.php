@@ -1,13 +1,13 @@
 <?php
 
-require_once 'gabarit/field/gabaritfield.php';
+namespace Slrfw\Model\Gabarit\Field\CheckBox;
 
 /**
  * Description of text
  *
  * @author shin
  */
-class CheckBoxField extends GabaritField
+class CheckBoxField extends \Slrfw\Model\Gabarit\Field\GabaritField
 {
 
 }

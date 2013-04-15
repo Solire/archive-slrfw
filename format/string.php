@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library\Format;
+namespace Slrfw\Format;
 
 /**
  * Formatage de chaines de caractères

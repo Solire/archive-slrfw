@@ -1,6 +1,6 @@
 <?php
 
-namespace Slrfw\Library;
+namespace Slrfw;
 
 /** @todo faire la présentation du code */
 
@@ -381,7 +381,10 @@ class Tools {
      * @return string sous la forme dd-mm-YYYY resp. YYYY-mm-dd
      */
     static function formate_date_nombre($dateUS, $glueBefore = '-', $glueAfter = '-') {
-        return implode($glueAfter, array_reverse(explode($glueBefore, $dateUS)));
+        $heureUs = substr($dateUS, 10);
+        $dateUS = substr($dateUS, 0, 10);
+
+        return implode($glueAfter, array_reverse(explode($glueBefore, $dateUS))) . $heureUs;
     }
 
     static function regexAccents($chaine) {
@@ -481,4 +484,3 @@ function iglob_DFS($path, $flags, $parent, $lvl, &$res) {
         }
 }
 
-?>

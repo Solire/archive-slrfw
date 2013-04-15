@@ -8,7 +8,7 @@
  * @license    Solire http://www.solire.fr/
  */
 
-namespace Slrfw\Library\Exception;
+namespace Slrfw\Exception;
 
 /**
  * Les MarvinException seront traités par la classe Marvin
