@@ -10,12 +10,14 @@
 
 namespace Slrfw;
 
+define('TMP_DIR', realpath(pathinfo(__FILE__, PATHINFO_DIRNAME) . '/tmp/') . '/');
 set_include_path(
     get_include_path()
-    . PATH_SEPARATOR . realpath('../../')
+    . PATH_SEPARATOR . realpath(pathinfo(__FILE__, PATHINFO_DIRNAME) . '/../../')
+    . PATH_SEPARATOR . realpath(pathinfo(__FILE__, PATHINFO_DIRNAME))
 );
 
-require '../init.php';
+require 'slrfw/init.php';
 
 
 /**
@@ -50,7 +52,7 @@ key1 = toto
 key1 = toto
 
 END;
-        file_put_contents('test1.ini', $data);
+        file_put_contents(TMP_DIR . 'test1.ini', $data);
 
         $data = <<<END
 [section1]
@@ -63,7 +65,7 @@ key1 = tata
 key1 = tata
 
 END;
-        file_put_contents('test2.ini', $data);
+        file_put_contents(TMP_DIR . 'test2.ini', $data);
 
         $data = <<<END
 [section1]
@@ -74,7 +76,7 @@ var3 = result3
 key1 = {%section1:var3}suite
 
 END;
-        file_put_contents('testVar.ini', $data);
+        file_put_contents(TMP_DIR . 'testVar.ini', $data);
     }
 
     /**
@@ -85,9 +87,9 @@ END;
      */
     protected function tearDown()
     {
-        unlink('test1.ini');
-        unlink('test2.ini');
-        unlink('testVar.ini');
+        unlink(TMP_DIR . 'test1.ini');
+        unlink(TMP_DIR . 'test2.ini');
+        unlink(TMP_DIR . 'testVar.ini');
     }
 
     /**
@@ -109,7 +111,7 @@ END;
      */
     public function testGet()
     {
-        $conf = new Config('test1.ini');
+        $conf = new Config(TMP_DIR . 'test1.ini');
         $this->assertEquals($conf->get('section1', 'key1'), 'toto');
         $this->assertEquals($conf->get('section1'), array('key1' => 'toto'));
     }
@@ -122,7 +124,7 @@ END;
      */
     public function testVar()
     {
-        $conf = new Config('testVar.ini');
+        $conf = new Config(TMP_DIR . 'testVar.ini');
         $this->assertEquals($conf->get('section1', 'key1'), 'result3toto');
         $this->assertEquals($conf->get('section2', 'key1'), 'result3suite');
     }
@@ -135,8 +137,8 @@ END;
      */
     public function testSetExtends()
     {
-        $conf = new Config('test1.ini');
-        $conf->setExtends('test2.ini');
+        $conf = new Config(TMP_DIR . 'test1.ini');
+        $conf->setExtends(TMP_DIR . 'test2.ini');
 
         $this->assertEquals($conf->get('section1', 'key1'), 'toto');
         $this->assertEquals($conf->get('section1', 'key2'), 'tata');
