@@ -491,7 +491,6 @@ class FrontController
 
         $instance->start();
         $view = $instance->getView();
-        $view->setTemplate('main');
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();

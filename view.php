@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * Gestionnaire de vue
  *
@@ -29,40 +29,68 @@ class View
     private $_action;
 
     /**
-     * @var template
+     * Chargement d'une nouvelle vue
+     *
+     * @param TranslateMysql $translate Gestionnaire de traduction
      */
-    private $_Template = null;
-
-    /**
-     * @var String Nom du template
-     */
-    private $_TemplateName = null;
-
     public function __construct($translate)
     {
         $this->_translate = $translate;
     }
 
+    /**
+     * Alias à l'utilisation de translate
+     *
+     * @param string $string Chaine à traduire
+     * @param string $aide   ??
+     *
+     * @return string
+     * @todo
+     */
     public function _($string, $aide = '')
     {
         return $this->_translate->_($string, $aide);
     }
 
+    /**
+     * Activer ou désactiver la vue
+     *
+     * @param boolean $enable Vrai pour activer
+     *
+     * @return void
+     */
     public function enable($enable)
     {
         $this->_enable = $enable;
     }
 
+    /**
+     * Activer ou désactiver l'utilisation du main
+     *
+     * @param boolean $enable Vrai pour activer
+     *
+     * @return void
+     */
     public function main($enable)
     {
         $this->_main = $enable;
     }
 
+    /**
+     * Test si la vue est active
+     *
+     * @return boolean
+     */
     public function isEnabled()
     {
         return $this->_enable;
     }
 
+    /**
+     * Test si le main est actif
+     *
+     * @return boolean
+     */
     public function isIncludeMain()
     {
         return $this->_main;
@@ -94,14 +122,16 @@ class View
         return FrontController::search($dir . $filePath);
     }
 
+    /**
+     * Enregistre le template de format des actions
+     *
+     * @param string $format format des actions
+     *
+     * @return void
+     */
     public function setFormat($format)
     {
         $this->_format = $format;
-    }
-
-    public function setTemplate($Name)
-    {
-        $this->_TemplateName = $Name;
     }
 
     /**
@@ -136,12 +166,13 @@ class View
         return false;
     }
 
+    // @todo Documenter à quoi sert custom
     /**
      * Affiche la vue
      *
-     * @param string $controller Nom du controller
-     * @param string $action     Nom de l'action
-     * @param boolean $custom    ???
+     * @param string  $controller Nom du controller
+     * @param string  $action     Nom de l'action
+     * @param boolean $custom     ???
      *
      * @return void
      */
@@ -160,20 +191,12 @@ class View
         }
     }
 
-    public function setController($controller)
-    {
-        $this->_controller = $controller;
-    }
-
-    public function setAction($action)
-    {
-        $this->_action = $action;
-    }
-
     /**
      * Ajoute un fichier
      *
      * @param string $fileName Nom du fichier avec l'extension
+     *
+     * @return void
      */
     public function add($fileName)
     {
