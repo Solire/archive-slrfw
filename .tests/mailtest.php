@@ -133,6 +133,37 @@ END;
     }
 
     /**
+     * Exception lors du fichier manquant
+     *
+     * @return void
+     * @expectedException \Slrfw\Exception\Lib
+     * @expectedExceptionMessage Aucun fichier mail testjdjdhsydisdop
+     */
+    public function testNoFile()
+    {
+        $mail = new Mail('testjdjdhsydisdop');
+        $mail->to = 'dev@solire.fr';
+        $mail->subject = 'Test d\'envois ';
+
+        $mail->send();
+    }
+
+    /**
+     * Exception lors du fichier manquant
+     *
+     * @return void
+     * @expectedException \Slrfw\Exception\Lib
+     * @expectedExceptionMessage Information subject manquante
+     */
+    public function testNoConfig()
+    {
+        $mail = new Mail('test');
+        $mail->to = 'dev@solire.fr';
+
+        $mail->send();
+    }
+
+    /**
      * Chargement de nouvelles variables
      *
      * @return void
