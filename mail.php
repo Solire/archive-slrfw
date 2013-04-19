@@ -98,6 +98,7 @@ class Mail
      * @return void
      * @uses FrontController search
      * @uses Registry mainconfig
+     * @throws Exception\Lib Aucun fichier phtml trouvé
      */
     public function loadBody()
     {
@@ -105,6 +106,10 @@ class Mail
             $config = Registry::get('mainconfig');
             $path = $config->get('dirs', 'mail') . $this->codeName . '.phtml';
             $realPath = FrontController::search($path, false);
+
+            if (empty($realPath)) {
+                throw new Exception\Lib('Aucun fichier mail ' . $this->codeName);
+            }
 
             ob_start();
             include $realPath;
