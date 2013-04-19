@@ -104,7 +104,7 @@ class Mail
         if (!isset($this->body)) {
             $config = Registry::get('mainconfig');
             $path = $config->get('dirs', 'mail') . $this->codeName . '.phtml';
-            $realPath = FrontController::search($path);
+            $realPath = FrontController::search($path, false);
 
             ob_start();
             include $realPath;

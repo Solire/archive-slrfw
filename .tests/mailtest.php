@@ -43,16 +43,15 @@ class MailTest extends \PHPUnit_Framework_TestCase
         define('ID_VERSION', 1);
         define('ID_API', 1);
 
-        mkdir(TMP_DIR . 'front');
-        mkdir(TMP_DIR . 'front/mail');
+        mkdir(TMP_DIR . 'mail');
         $data = <<<END
 toto
 END;
-        file_put_contents(TMP_DIR . 'front/mail/test.phtml', $data);
+        file_put_contents(TMP_DIR . 'mail/test.phtml', $data);
         $data = <<<END
 <?php echo \$this->foo; ?>
 END;
-        file_put_contents(TMP_DIR . 'front/mail/test2.phtml', $data);
+        file_put_contents(TMP_DIR . 'mail/test2.phtml', $data);
 
 
         /** Fichier de configuration local contenant [mail] **/
@@ -93,10 +92,9 @@ END;
     {
         unlink(TMP_DIR . 'mail.ini');
         unlink(TMP_DIR . 'main.ini');
-        unlink(TMP_DIR . 'front/mail/test.phtml');
-        unlink(TMP_DIR . 'front/mail/test2.phtml');
-        rmdir(TMP_DIR . 'front/mail');
-        rmdir(TMP_DIR . 'front');
+        unlink(TMP_DIR . 'mail/test.phtml');
+        unlink(TMP_DIR . 'mail/test2.phtml');
+        rmdir(TMP_DIR . 'mail');
     }
 
     /**
