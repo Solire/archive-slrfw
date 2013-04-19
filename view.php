@@ -228,7 +228,7 @@ class View
             $path = new Path($strPath);
             $this->pathModePath = $path->get();
             $dir = pathinfo($strPath, PATHINFO_DIRNAME);
-            $pathMain = new Path($dir . 'main.phtml');
+            $pathMain = new Path($dir . DS . 'main.phtml');
             include $pathMain->get();
         }
     }
