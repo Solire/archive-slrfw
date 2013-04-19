@@ -16,11 +16,14 @@ define('DS', DIRECTORY_SEPARATOR);
 session_name();
 session_start();
 
+$dir = pathinfo(__FILE__, PATHINFO_DIRNAME);
+
 set_include_path(
     get_include_path()
-    . PATH_SEPARATOR . realpath('.')
-    . PATH_SEPARATOR . realpath('slrfw/external')
+    . PATH_SEPARATOR . realpath($dir)
+    . PATH_SEPARATOR . realpath($dir . '/external')
 );
+unset($dir);
 require_once 'slrfw/path.php';
 
 /* = Autoload
