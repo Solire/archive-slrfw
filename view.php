@@ -28,6 +28,21 @@ class View
     private $_controller;
     private $_action;
 
+
+    /**
+     * Gestion des vues par appel direct des fichiers
+     *
+     * @var boolean
+     */
+    private $pathMode = false;
+
+    /**
+     * Chemin absolu vers le fichier de contenu
+     *
+     * @var string
+     */
+    private $pathModePath;
+
     /**
      * Chargement d'une nouvelle vue
      *
@@ -141,7 +156,11 @@ class View
      */
     public function content()
     {
-        $path = $this->getpath($this->_controller, $this->_action);
+        if ($this->pathMode === true) {
+            $path = $this->pathModePath;
+        } else {
+            $path = $this->getpath($this->_controller, $this->_action);
+        }
         if ($path !== false) {
             include $path;
         }
@@ -188,6 +207,29 @@ class View
             }
         } else {
             $this->content();
+        }
+    }
+
+    /**
+     * Affichage directe d'une vue
+     *
+     * @param string  $strPath Chemin vers le fichier
+     * @param boolean $mainUse utilisation d'un main.phtml
+     *
+     * @return void
+     */
+    public function displayPath($strPath, $mainUse = false)
+    {
+        $this->pathMode = true;
+        if (!$mainUse) {
+            $path = new Path($strPath);
+            include $path->get();
+        } else {
+            $path = new Path($strPath);
+            $this->pathModePath = $path->get();
+            $dir = pathinfo($strPath, PATHINFO_DIRNAME);
+            $pathMain = new Path($dir . 'main.phtml');
+            include $pathMain->get();
         }
     }
 
