@@ -357,14 +357,19 @@ class FrontController
     /**
      * Cherche un fichier dans les applications
      *
-     * @param string $path Chemin Chemin du dossier / fichier à chercher dans
+     * @param string  $path    Chemin Chemin du dossier / fichier à chercher dans
      * les applications
+     * @param boolean $current Utiliser le nom de l'application courante
      *
      * @return string|boolean
      */
-    final public static function search($path)
+    final public static function search($path, $current = true)
     {
-        $path = DS . strtolower(self::$appName) . DS . $path;
+        if ($current === true) {
+            $path = DS . strtolower(self::$appName) . DS . $path;
+        } else {
+            $path = DS . $path;
+        }
         foreach (self::$appDirs as $app) {
             $fooPath = $app['dir'] . $path;
             $testPath = new Path($fooPath, Path::SILENT);
@@ -491,7 +496,6 @@ class FrontController
 
         $instance->start();
         $view = $instance->getView();
-        $view->setTemplate('main');
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();
