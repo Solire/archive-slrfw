@@ -41,6 +41,13 @@ class Mail
     private $view;
 
     /**
+     * utilisation du main.phtml
+     *
+     * @var boolean
+     */
+    private $mainUse = false;
+
+    /**
      * Chargement du gestionnaire de hook
      *
      * @param string $name Nom identifiant le type de gestionnaire de hook
@@ -65,6 +72,16 @@ class Mail
         foreach ($default as $key => $value) {
             $this->$key = $value;
         }
+    }
+
+    /**
+     * Active l'utilisation du main.phtml
+     *
+     * @return void
+     */
+    public function setMainUse()
+    {
+        $this->mainUse = true;
     }
 
     /**
@@ -112,7 +129,7 @@ class Mail
             }
 
             ob_start();
-            include $realPath;
+            $this->view->displayPath($realPath, $this->mainUse);
             $this->body = ob_get_clean();
         }
 

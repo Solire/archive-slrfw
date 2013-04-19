@@ -49,6 +49,10 @@ toto
 END;
         file_put_contents(TMP_DIR . 'mail/test.phtml', $data);
         $data = <<<END
+pre<?php \$this->content(); ?>end
+END;
+        file_put_contents(TMP_DIR . 'mail/main.phtml', $data);
+        $data = <<<END
 <?php echo \$this->foo; ?>
 END;
         file_put_contents(TMP_DIR . 'mail/test2.phtml', $data);
@@ -92,6 +96,7 @@ END;
     {
         unlink(TMP_DIR . 'mail.ini');
         unlink(TMP_DIR . 'main.ini');
+        unlink(TMP_DIR . 'mail/main.phtml');
         unlink(TMP_DIR . 'mail/test.phtml');
         unlink(TMP_DIR . 'mail/test2.phtml');
         rmdir(TMP_DIR . 'mail');
@@ -201,6 +206,19 @@ END;
         $mail = new Mail('test2');
         $mail->foo = 'bar';
         $this->assertEquals($mail->loadBody(), 'bar');
+    }
+
+    /**
+     * Chargement simple d'une vue
+     *
+     * @return void
+     */
+    public function testLoadBodyMain()
+    {
+        $mail = new Mail('test2');
+        $mail->foo = 'bar';
+        $mail->setMainUse();
+        $this->assertEquals($mail->loadBody(), 'prebarend');
     }
 
     /**
