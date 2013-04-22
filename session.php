@@ -69,13 +69,17 @@ class Session
 
         $sessionCode = sprintf($format, $sessionCode);
 
-        $this->config = $config->get($sessionCode);
-
-        if (empty($this->config)) {
+        $dir = $config->get('dirs', 'config') . $sessionCode;
+        $path = FrontController::search($dir);
+        unset($dir, $format);
+        if (empty($path)) {
             throw new Exception\Lib('Aucune configuration pour la session [' . $sessionCode . ']');
         }
 
+        $conf = new Config($path);
+        $this->config = $conf->get('core');
         $this->cookieName = $this->config['cookie'];
+        unset($conf);
 
         if (isset($_COOKIE[$this->cookieName]) && !empty($_COOKIE[$this->cookieName])) {
             $foo = explode('_', $_COOKIE[$this->cookieName]);
