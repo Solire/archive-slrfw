@@ -114,9 +114,11 @@ class Hook
             $baseDir = '';
         }
 
+        /** Chargement des hooks dispo **/
         $baseDir .= $this->codeName;
+        $hooks = array();
         foreach ($this->dirs as $dirInfo) {
-            $dir = $dirInfo['dir'] . $baseDir;
+            $dir = $dirInfo['dir'] . DS . $baseDir;
             $path = new Path($dir, Path::SILENT);
             if ($path->get() === false) {
                 continue;
@@ -138,12 +140,24 @@ class Hook
                 }
                 $funcName .= ucfirst($this->codeName)
                           . '\\' . pathinfo($file, PATHINFO_FILENAME);
-                if (!function_exists($funcName)) {
-                    include $path->get() . $file;
-                }
-                $funcName($this);
+
+                $foo = array();
+                $foo['funcName'] = $funcName;
+                $foo['path'] = $path->get() . $file;
+                $hooks[] = $foo;
+                unset($foo, $funcName, $file);
             }
             closedir($dir);
+            unset($dir, $path);
+        }
+
+        /** Lancement des hooks **/
+        for ($i = 0; $i < count($hooks); $i++) {
+            if (!function_exists($hooks[$i]['funcName'])) {
+                include $hooks[$i]['path'];
+            }
+
+            $hooks[$i]['funcName']($this);
         }
     }
 
