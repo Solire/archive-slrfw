@@ -113,6 +113,13 @@ class Controller
     public $acceptRew = false;
 
     /**
+     * Gestionnaire de hook de Slrfw
+     *
+     * @var Hook
+     */
+    public $hookManager;
+
+    /**
      * Fonction éxécutée avant l'execution de la fonction relative à la page en cours
      *
      * @return void
@@ -221,6 +228,12 @@ class Controller
         $this->_root = Registry::get('baseroot');
         $this->_db = Registry::get('db');
         $this->_log = Registry::get('log');
+
+
+        /** Mise en place du gestionnaire de hooks **/
+        $this->hookManager = new Hook('base');
+        $this->hookManager->setDirs(FrontController::getAppDirs());
+        $this->hookManager->setSubdirName($this->_mainConfig->get('dirs', 'hooks'));
     }
 
 
