@@ -162,6 +162,16 @@ class Config
     }
 
     /**
+     * Renvois le contenu du fichier de configuration
+     *
+     * @return array Tableau de la configuration
+     */
+    public function getAll()
+    {
+        return $this->config;
+    }
+
+    /**
      * Renvois la valeur d'un parametre de configuration
      *
      * @param string $section Code de la section
