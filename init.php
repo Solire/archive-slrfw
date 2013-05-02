@@ -47,3 +47,4 @@ function autoload($name)
 
 spl_autoload_register('Slrfw\autoload');
 
+$debug = false;
