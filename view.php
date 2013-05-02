@@ -28,41 +28,84 @@ class View
     private $_controller;
     private $_action;
 
-    /**
-     * @var template
-     */
-    private $_Template = null;
 
     /**
-     * @var String Nom du template
+     * Gestion des vues par appel direct des fichiers
+     *
+     * @var boolean
      */
-    private $_TemplateName = null;
+    private $pathMode = false;
 
+    /**
+     * Chemin absolu vers le fichier de contenu
+     *
+     * @var string
+     */
+    private $pathModePath;
+
+    /**
+     * Chargement d'une nouvelle vue
+     *
+     * @param TranslateMysql $translate Gestionnaire de traduction
+     */
     public function __construct($translate)
     {
         $this->_translate = $translate;
     }
 
+    /**
+     * Alias à l'utilisation de translate
+     *
+     * @param string $string Chaine à traduire
+     * @param string $aide   ??
+     *
+     * @return string
+     * @todo
+     */
     public function _($string, $aide = '')
     {
         return $this->_translate->_($string, $aide);
     }
 
+    /**
+     * Activer ou désactiver la vue
+     *
+     * @param boolean $enable Vrai pour activer
+     *
+     * @return void
+     */
     public function enable($enable)
     {
         $this->_enable = $enable;
     }
 
+    /**
+     * Activer ou désactiver l'utilisation du main
+     *
+     * @param boolean $enable Vrai pour activer
+     *
+     * @return void
+     */
     public function main($enable)
     {
         $this->_main = $enable;
     }
 
+    /**
+     * Test si la vue est active
+     *
+     * @return boolean
+     */
     public function isEnabled()
     {
         return $this->_enable;
     }
 
+    /**
+     * Test si le main est actif
+     *
+     * @return boolean
+     */
     public function isIncludeMain()
     {
         return $this->_main;
@@ -94,14 +137,16 @@ class View
         return FrontController::search($dir . $filePath);
     }
 
+    /**
+     * Enregistre le template de format des actions
+     *
+     * @param string $format format des actions
+     *
+     * @return void
+     */
     public function setFormat($format)
     {
         $this->_format = $format;
-    }
-
-    public function setTemplate($Name)
-    {
-        $this->_TemplateName = $Name;
     }
 
     /**
@@ -111,7 +156,11 @@ class View
      */
     public function content()
     {
-        $path = $this->getpath($this->_controller, $this->_action);
+        if ($this->pathMode === true) {
+            $path = $this->pathModePath;
+        } else {
+            $path = $this->getpath($this->_controller, $this->_action);
+        }
         if ($path !== false) {
             include $path;
         }
@@ -136,12 +185,13 @@ class View
         return false;
     }
 
+    // @todo Documenter à quoi sert custom
     /**
      * Affiche la vue
      *
-     * @param string $controller Nom du controller
-     * @param string $action     Nom de l'action
-     * @param boolean $custom    ???
+     * @param string  $controller Nom du controller
+     * @param string  $action     Nom de l'action
+     * @param boolean $custom     ???
      *
      * @return void
      */
@@ -160,20 +210,35 @@ class View
         }
     }
 
-    public function setController($controller)
+    /**
+     * Affichage directe d'une vue
+     *
+     * @param string  $strPath Chemin vers le fichier
+     * @param boolean $mainUse utilisation d'un main.phtml
+     *
+     * @return void
+     */
+    public function displayPath($strPath, $mainUse = false)
     {
-        $this->_controller = $controller;
-    }
-
-    public function setAction($action)
-    {
-        $this->_action = $action;
+        $this->pathMode = true;
+        if (!$mainUse) {
+            $path = new Path($strPath);
+            include $path->get();
+        } else {
+            $path = new Path($strPath);
+            $this->pathModePath = $path->get();
+            $dir = pathinfo($strPath, PATHINFO_DIRNAME);
+            $pathMain = new Path($dir . DS . 'main.phtml');
+            include $pathMain->get();
+        }
     }
 
     /**
      * Ajoute un fichier
      *
      * @param string $fileName Nom du fichier avec l'extension
+     *
+     * @return void
      */
     public function add($fileName)
     {
