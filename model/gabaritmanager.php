@@ -176,7 +176,7 @@ class gabaritManager extends manager
                     $idTemp   = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
                 }
 
-                array_reverse($idParents);
+                $idParents = array_reverse($idParents);
 
                 $parents = $this->getList($id_version, $id_api, 0, $idParents[0]);
 
