@@ -545,6 +545,8 @@ class gabaritManager extends manager
                 'values' => array(),
                 'table' => $joinField['params']['TABLE.NAME'],
                 'fieldId' => $joinField['params']['TABLE.FIELD.ID'],
+                'typeGabPage' => $joinField['params']['TYPE.GAB.PAGE'],
+
             );
 
             foreach ($page->getBlocs($name_bloc)->getValues() as $value) {
@@ -563,6 +565,28 @@ class gabaritManager extends manager
             if (count($joinField['values']) == 0) {
                 continue;
             }
+            
+            /**
+             * Cas des tables jointes sans gab_page
+             */
+            if ($joinField['typeGabPage'] == 0) {
+                $query  = 'SELECT `' . $joinField['table'] . '`.`' . $joinField['fieldId'] . '`,'
+                        . ' `' . $joinField['table'] . '`.*'
+                        . ' FROM `' . $joinField['table'] . '`'
+                        . ' WHERE `' . $joinField['table'] . '`.`' . $joinField['fieldId'] . '` IN (' . implode(',', $joinField['values']) . ')';
+                $values = $this->_db->query($query)->fetchAll(
+                    \PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+                
+                $blocsValues = $page->getBlocs($name_bloc)->getValues();
+                foreach ($blocsValues as $keyValue => $value) {
+                    $page->getBlocs($name_bloc)->setValue($keyValue, $values[$value[$joinName]], $joinName);
+                }
+                return;
+                
+            }
+            /**
+             * FIN Cas des tables jointes sans gab_page
+             */
 
             $query = 'SELECT `gab_page`.`id`, `gab_page`.*'
                     . ' FROM `gab_page`'

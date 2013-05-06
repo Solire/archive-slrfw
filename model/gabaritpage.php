@@ -12,37 +12,37 @@ class gabaritPage extends gabaritBloc {
      *
      * @var array
      */
-    private $_meta = array();
+    protected $_meta = array();
 
     /**
      *
      * @var array
      */
-    private $_version = array();
+    protected $_version = array();
 
     /**
      *
      * @var array
      */
-    private $_blocs = array();
+    protected $_blocs = array();
 
     /**
      *
      * @var array
      */
-    private $_parents = array();
+    protected $_parents = array();
 
     /**
      *
      * @var array
      */
-    private $_children = array();
+    protected $_children = array();
 
     /**
      *
      * @var gabaritPage
      */
-    private $_firstChild = null;
+    protected $_firstChild = null;
 
     /**
      *
