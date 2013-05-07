@@ -392,7 +392,7 @@ class fileManager extends manager {
                 /** Création de la vignette  */
                 $largeurmax = self::$_vignette['max-width'];
                 $hauteurmax = self::$_vignette['max-height'];
-                $this->_vignette(
+                $this->vignette(
                     $filePath, $ext,
                     $uploadDir . DS . $vignetteDir . DS . $fileNameNew,
                     $largeurmax, $hauteurmax
@@ -404,7 +404,7 @@ class fileManager extends manager {
                 /** Création de l'apercu  */
                 $largeurmax = self::$_apercu['max-width'];
                 $hauteurmax = self::$_apercu['max-height'];
-                $this->_vignette(
+                $this->vignette(
                     $filePath, $ext,
                     $uploadDir . DS . $apercuDir . DS . $fileNameNew,
                     $largeurmax, $hauteurmax
@@ -462,7 +462,7 @@ class fileManager extends manager {
             $apercuDir);
 
         if (isset($json['filename'])) {
-            $json['id'] = $this->_insertToMediaFile($json['filename'],
+            $json['id'] = $this->insertToMediaFile($json['filename'],
                 $id_gab_page, $id_temp, $json['size'], $json['width'],
                 $json['height']
             );
@@ -616,7 +616,7 @@ class fileManager extends manager {
         /** On créé la vignette */
         $largeurmax = self::$_vignette['max-width'];
         $hauteurmax = self::$_vignette['max-height'];
-        $this->_vignette($uploadDir . DS . $targetDir . DS . $fileNameNew,
+        $this->vignette($uploadDir . DS . $targetDir . DS . $fileNameNew,
             $ext, $uploadDir . DS . $vignetteDir . DS . $fileNameNew,
             $largeurmax, $hauteurmax);
         $jsonrpc['minipath'] = $vignetteDir . DS . $fileNameNew;
@@ -624,12 +624,12 @@ class fileManager extends manager {
         /** On créé l'apercu */
         $largeurmax = self::$_apercu['max-width'];
         $hauteurmax = self::$_apercu['max-height'];
-        $this->_vignette($uploadDir . DS . $targetDir . DS . $fileNameNew,
+        $this->vignette($uploadDir . DS . $targetDir . DS . $fileNameNew,
             $ext, $uploadDir . DS . $apercuDir . DS . $fileNameNew,
             $largeurmax, $hauteurmax);
 
         /** On insert la ressource en base */
-        $json['id'] = $this->_insertToMediaFile($json['filename'], $id_gab_page,
+        $json['id'] = $this->insertToMediaFile($json['filename'], $id_gab_page,
             $id_temp, $json['size'], $json['width'], $json['height']);
 
         return $json;
@@ -651,7 +651,7 @@ class fileManager extends manager {
      *
      * @return int
      */
-    private function _insertToMediaFile(
+    public function insertToMediaFile(
         $fileName,
         $id_gab_page,
         $id_temp,
@@ -683,7 +683,7 @@ class fileManager extends manager {
      *
      * @return bool
      */
-    private function _vignette(
+    public function vignette(
         $fileSource,
         $ext,
         $destinationName,
