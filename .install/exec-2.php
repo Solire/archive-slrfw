@@ -4,7 +4,7 @@
  *
  * @package    Slrfw
  * @subpackage Install
- * @author     Adrien <aimbert@solire.fr>
+ * @author     Stéphane <smonnot@solire.fr>
  * @license    Solire http://www.solire.fr/
  */
 
@@ -27,7 +27,7 @@ $query = "
     `code_champ_type`
     )
     VALUES (
-    'TYPE.GAB_PAGE', 'Jointure avec gab_page', '1', 'JOIN'
+    'TYPE.GAB.PAGE', 'Jointure avec gab_page', '1', 'JOIN'
     );
 ";
 $db->exec($query);
