@@ -607,9 +607,14 @@ class gabaritManager extends manager
             }
             /** On recupere les pages jointes. */
             $blocsValues = $page->getBlocs($name_bloc)->getValues();
-            foreach ($blocsValues as $keyValue => $value) {
+            for ($i =  0;$i < count($blocsValues); $i++) {
+                $keyValue = $i;
+                $value = $blocsValues[$keyValue];
                 if (!isset($meta[$value[$joinName]])) {
                     $page->getBlocs($name_bloc)->deleteValue($keyValue);
+                    unset($blocsValues[$i]);
+                    $blocsValues = array_values($blocsValues);
+                    $i--;
                     continue;
                 }
 
