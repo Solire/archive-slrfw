@@ -60,9 +60,12 @@ class JoinField extends \Slrfw\Model\Gabarit\Field\GabaritField
             $idField    = $this->params['TABLE.FIELD.ID'];
             $labelField = $this->params['TABLE.FIELD.LABEL'];
             $table      = $this->params['TABLE.NAME'];
+            $typeGabPage      = $this->params['TYPE.GAB.PAGE'];
 
             $filterVersion = '`' . $table . '`.id_version = ' . $this->versionId;
-            if (isset($_REQUEST['no_version']) && $_REQUEST['no_version'] == 1) {
+            if (isset($_REQUEST['no_version']) 
+                    && $_REQUEST['no_version'] == 1 
+                    || !$typeGabPage) {
                 $filterVersion = 1;
             }
             

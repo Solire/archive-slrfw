@@ -222,7 +222,7 @@ class fileManager extends manager {
         $chunk      = isset($_REQUEST["chunk"]) ? $_REQUEST["chunk"] : 0;
         $chunks     = isset($_REQUEST["chunks"]) ? $_REQUEST["chunks"] : 1;
         $fileName   = isset($_REQUEST["name"]) ? $_REQUEST["name"] : '';
-
+        $fileName = strtolower($fileName);
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
         $name = pathinfo($fileName, PATHINFO_FILENAME);
 
