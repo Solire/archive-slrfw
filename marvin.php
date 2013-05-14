@@ -67,11 +67,12 @@ class Marvin
             $this->title = '[' . $_SERVER['SERVER_NAME'] . '] ' . $this->title;
         }
 
+        $REQUEST = array_merge($_GET, $_POST, $_COOKIE, $_SERVER);
 
         /* = Chargement des données passées en paramètre de la page
           ------------------------------------------------- */
-        if (!empty($_REQUEST)) {
-            foreach ($_REQUEST as $key => $value) {
+        if (!empty($REQUEST)) {
+            foreach ($REQUEST as $key => $value) {
                 $loc = array();
 
                 if (isset($_GET[$key])) {
@@ -84,6 +85,10 @@ class Marvin
 
                 if (isset($_POST[$key])) {
                     $loc[] = 'POST';
+                }
+
+                if (isset($_SERVER[$key])) {
+                    $loc[] = 'SERVER';
                 }
 
                 $req = array();
