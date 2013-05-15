@@ -7,103 +7,165 @@ namespace Slrfw\Model;
  *
  * @author thomas
  */
-class gabaritPage extends gabaritBloc {
+class gabaritPage extends gabaritBloc
+{
     /**
+     * Est-ce que l'utilisateur est connecté
+     *
+     * @var bool
+     */
+    private $_connected = false;
+
+    /**
+     * Tableau des données meta de la page
      *
      * @var array
      */
-    private $_meta = array();
+    protected $_meta = array();
 
     /**
+     * Tableau des données de la version de la page
      *
      * @var array
      */
-    private $_version = array();
+    protected $_version = array();
 
     /**
+     * Tableau des blocs dynamiques de la page
      *
      * @var array
      */
-    private $_blocs = array();
+    protected $_blocs = array();
 
     /**
+     * Tableau des pages parentes
      *
      * @var array
      */
-    private $_parents = array();
+    protected $_parents = array();
 
     /**
+     * Tableau des pages enfants
      *
      * @var array
      */
-    private $_children = array();
+    protected $_children = array();
 
     /**
+     * Première page enfant
      *
      * @var gabaritPage
      */
-    private $_firstChild = null;
+    protected $_firstChild = null;
 
     /**
-     *
-     * @param array $meta
+     * Constructeur
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->_values = array();
     }
 
     /**
+     * Défini si l'utilisateur est connecté (utile en cas de middleoffice)
+     *
+     * @param bool $connected
+     *
+     * @return void
+     */
+    public function setConnected($connected)
+    {
+        $this->_connected = $connected;
+        foreach ($this->_blocs as $bloc) {
+            $bloc->setConnected($connected);
+        }
+    }
+
+    /**
+     * Setter des métas
      *
      * @param array $meta
      *
      * @return void
      */
-    public function setMeta($meta) {
+    public function setMeta($meta)
+    {
         $this->_meta = $meta;
         $this->_id = $meta['id'];
     }
 
-    public function setVersion($data) {
+    /**
+     * Setter de la version
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function setVersion($data)
+    {
         $this->_version = $data;
     }
 
     /**
+     * Setter des valeurs
      *
      * @param array $values
+     *
+     * @return void
      */
-    public function setValues($values) {
+    public function setValues($values)
+    {
         $this->_values = $values;
     }
 
     /**
+     * Setter d'une valeur
      *
      * @param array $values
+     *
+     * @return void
      */
-    public function setValue($key, $value) {
+    public function setValue($key, $value)
+    {
         $this->_values[$key] = $value;
     }
 
     /**
+     * Setter des blocs de la page
      *
-     * @param array $blocs tableau de page
+     * @param gabaritBloc[] $blocs tableau de page
+     *
+     * @return void
      */
-    public function setBlocs($blocs) {
+    public function setBlocs($blocs)
+    {
         $this->_blocs = $blocs;
+        foreach ($this->_blocs as $bloc) {
+            $bloc->setConnected($this->_connected);
+        }
     }
 
     /**
+     * Setter des pages parentes
      *
-     * @param array $parents
+     * @param gabaritPage[] $parents
+     *
+     * @return void
      */
-    public function setParents($parents) {
+    public function setParents($parents)
+    {
         $this->_parents = $parents;
     }
 
     /**
+     * Setter des pages enfants
      *
      * @param gabaritPage[] $children
+     *
+     * @return void
      */
-    public function setChildren($children) {
+    public function setChildren($children)
+    {
         if (count($children) >  0) {
             $this->_firstChild = $children[0];
         }
@@ -111,34 +173,42 @@ class gabaritPage extends gabaritBloc {
     }
 
     /**
+     * Getter des pages enfants
      *
      * @param gabaritPage $child
+     *
+     * @return gabaritPage[]
      */
-    public function getChildren() {
+    public function getChildren()
+    {
         return $this->_children;
     }
 
     /**
+     * Setter de la premiere page enfant
      *
      * @param gabaritPage $firstChild
+     *
+     * @return void
      */
-    public function setFirstChild($firstChild) {
+    public function setFirstChild($firstChild)
+    {
         $this->_firstChild = $firstChild;
     }
-
-    // GETTERS
 
     /**
      *
      * @param string $key
+     *
      * @return mixed
      */
-    public function getMeta($key = NULL) {
-        if ($key != NULL) {
+    public function getMeta($key = null)
+    {
+        if ($key != null) {
             if (is_array($this->_meta) && array_key_exists($key, $this->_meta))
                 return $this->_meta[$key];
 
-            return NULL;
+            return null;
         }
 
         return $this->_meta;
@@ -147,14 +217,16 @@ class gabaritPage extends gabaritBloc {
     /**
      *
      * @param string $key
+     *
      * @return mixed
      */
-    public function getVersion($key = NULL) {
-        if ($key != NULL) {
+    public function getVersion($key = null)
+    {
+        if ($key != null) {
             if (is_array($this->_version) && array_key_exists($key, $this->_version))
                 return $this->_version[$key];
 
-            return NULL;
+            return null;
         }
 
         return $this->_version;
@@ -163,10 +235,12 @@ class gabaritPage extends gabaritBloc {
     /**
      *
      * @param string $key
+     *
      * @return mixed
      */
-    public function getValues($key = NULL) {
-        if ($key == NULL)
+    public function getValues($key = null)
+    {
+        if ($key == null)
             return $this->_values;
 
         if (is_array($this->_values) && array_key_exists($key, $this->_values))
@@ -178,48 +252,53 @@ class gabaritPage extends gabaritBloc {
     /**
      *
      * @param string $key
-     * @return mixed
+     *
+     * @return string
      */
-    public function getEditableAttributes($key = NULL) {
+    public function getEditableAttributes($key)
+    {
+        if (!$this->_connected) {
+            return '';
+        }
+
         $field = $this->getGabarit()->getChamp($key);
         if (!$field) {
-            return "";
+            return '';
         }
-        $type = "";
-        switch ($field["type"]) {
-            case "WYSIWYG":
-                $type = "full";
 
-                break;
-            case "FILE":
-                $type = "image";
-
-                break;
-            case "TEXT":
-                $type = "simple";
-                
-                break;
-            case "TEXTAREA":
-                $type = "textarea";
-
+        $type = '';
+        switch ($field['type']) {
+            case 'WYSIWYG':
+                $type = 'full';
                 break;
 
-            default:
+            case 'FILE':
+                $type = 'image';
+                break;
+
+            case 'TEXT':
+                $type = 'simple';
+                break;
+
+            case 'TEXTAREA':
+                $type = 'textarea';
                 break;
         }
-        if ($type != "") {
+
+        if ($type != '') {
             return ' data-mercury="' . $type . '" id="champ' . $field["id"] . '" ';
-        } else {
-            return "";
         }
+
+        return '';
     }
 
     /**
      *
      * @return type
      */
-    public function getBlocs($name = NULL) {
-        if ($name == NULL || !isset ($this->_blocs[$name]))
+    public function getBlocs($name = null)
+    {
+        if ($name == null || !isset ($this->_blocs[$name]))
             return $this->_blocs;
 
         return $this->_blocs[$name];
@@ -230,7 +309,8 @@ class gabaritPage extends gabaritBloc {
      * @param int $id_gabarit
      * @return gabaritPage
      */
-    public function getParent($i) {
+    public function getParent($i)
+    {
         if (array_key_exists($i, $this->_parents))
             return $this->_parents[$i];
 
@@ -242,7 +322,8 @@ class gabaritPage extends gabaritBloc {
      * @param int $id_gabarit
      * @return gabaritPage
      */
-    public function getParents() {
+    public function getParents()
+    {
         return $this->_parents;
     }
 
@@ -251,7 +332,8 @@ class gabaritPage extends gabaritBloc {
      *
      * @return gabaritPage
      */
-    public function getFirstChild(){
+    public function getFirstChild()
+    {
         return $this->_firstChild;
     }
 
@@ -264,8 +346,12 @@ class gabaritPage extends gabaritBloc {
      *
      * @return string formulaire au format HTML
      */
-    public function getForm($action, $retour, $redirections = array(), $authors = array())
-    {
+    public function getForm(
+        $action,
+        $retour,
+        $redirections = array(),
+        $authors = array()
+    ) {
         $versionId          = $this->_version['id'];
 
         $metaId             = isset($this->_meta['id'])
@@ -304,7 +390,8 @@ class gabaritPage extends gabaritBloc {
      *
      * @return type
      */
-	public function buildForm() {
+	public function buildForm()
+    {
         $form   = '<input type="hidden" name="id_' . $this->_gabarit->getTable()
                 . '" value="' . (isset($this->_values['id']) ? $this->_values['id'] : '')
                 . '" />';
@@ -331,5 +418,4 @@ class gabaritPage extends gabaritBloc {
 
 		return $form;
 	}
-
 }

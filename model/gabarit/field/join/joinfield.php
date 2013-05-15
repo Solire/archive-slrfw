@@ -60,13 +60,20 @@ class JoinField extends \Slrfw\Model\Gabarit\Field\GabaritField
             $idField    = $this->params['TABLE.FIELD.ID'];
             $labelField = $this->params['TABLE.FIELD.LABEL'];
             $table      = $this->params['TABLE.NAME'];
+            $typeGabPage      = $this->params['TYPE.GAB.PAGE'];
 
             $filterVersion = '`' . $table . '`.id_version = ' . $this->versionId;
-            if (isset($_REQUEST['no_version']) && $_REQUEST['no_version'] == 1) {
+            if (isset($_REQUEST['no_version']) 
+                    && $_REQUEST['no_version'] == 1 
+                    || !$typeGabPage) {
                 $filterVersion = 1;
             }
-
+            
+            $gabPageSelect = '';
+            $additionnalFields = '';
             if (substr($labelField, 0, 9) == 'gab_page.') {
+                $additionnalFields = ", gab_page.visible";
+                $gabPageSelect = ', (gab_page.visible AND gab_page.visible_parent) visible';
                 $gabPageJoin    = ' INNER JOIN gab_page'
                                 . ' ON gab_page.suppr = 0'
                                 . ' AND gab_page.id = `' . $table . '`.' . $idField
@@ -77,16 +84,16 @@ class JoinField extends \Slrfw\Model\Gabarit\Field\GabaritField
                 $labelField = '`' . $table . '`.`' . $this->params['TABLE.FIELD.LABEL'] . '`';
             }
 
-            $sql    = 'SELECT ' . $labelField . ' label,'
-                    . ' (gab_page.visible AND gab_page.visible_parent) visible'
+            $sql    = 'SELECT ' . $labelField . ' label' . $additionnalFields
+                    . $gabPageSelect
                     . ' FROM `' . $table . '`'
                     . $gabPageJoin
                     . ' WHERE ' . $filterVersion
-                    . ' AND `' . $table . '`.`$idField` = ' . $this->value;
-            $values = $this->db->query($sql)->fetch(\PDO::FETCH_COLUMN);
-            $this->valueLabel = $values['label'];
+                    . ' AND `' . $table . '`.`' . $idField . '` = ' . $this->value;
+            $values = $this->db->query($sql)->fetch(\PDO::FETCH_ASSOC);
+            $this->valueLabel = $values["label"];
 
-            if ($values['visible'] == 0) {
+            if (isset($values['visible']) && $values['visible'] == 0) {
                 $this->classes .= ' translucide';
             }
         }

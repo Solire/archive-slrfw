@@ -26,10 +26,20 @@ try {
         FrontController::run('Error', 'error404');
     } else {
         $marvin = new Marvin('debug', $exc);
-        $marvin->display();
+        if ($debug) {
+            $marvin->display();
+        } else {
+            $marvin->send();
+        }
+        Error::run();
     }
 } catch (\Exception $exc) {
     $marvin = new Marvin('debug', $exc);
-    $marvin->display();
+    if ($debug) {
+        $marvin->display();
+    } else {
+        $marvin->send();
+    }
+    Error::run();
 }
 
