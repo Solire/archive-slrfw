@@ -87,6 +87,18 @@ class gabaritBloc
 
     /**
      *
+     * @param string $key
+     * @return mixed
+     */
+    public function deleteValue($i)
+    {
+        unset($this->_values[$i]);
+        $this->_values = array_values($this->_values);
+        return ;
+    }
+
+    /**
+     *
      * @return gabarit
      */
     public function getGabarit()
@@ -214,7 +226,7 @@ class gabaritBloc
      *
      * @return string élément de formulaire en HTML
      */
-    protected function _buildChamp($champ, $value, $idpage, $id_gab_page)
+    protected function _buildChamp($champ, $value, $idpage, $id_gab_page, $id_version = 1)
     {
         $form = '';
 
@@ -232,7 +244,7 @@ class gabaritBloc
 
         $type = strtolower($champ['type']);
         $classNameType = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\' . $type . 'field';
-        $field = new $classNameType($champ, $label, $value, $id, $classes, $id_gab_page, 0);
+        $field = new $classNameType($champ, $label, $value, $id, $classes, $id_gab_page, $id_version);
         $field->start();
         $form .= $field;
 

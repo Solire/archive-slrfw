@@ -51,14 +51,17 @@ class Session
     /**
      * Initialise une session de type $sessionCode
      *
-     * @param type $sessionCode Code d'identification du type de sessions
+     * @param string $sessionCode Code d'identification du type de sessions
+     * @param string $appName     Nom de l'application ayant le fichier de
+     * configuration de la sessions, laisser vide pour prendre l'application
+     * courante
      *
      * @return boolean
      * @throws LibException
      * @config main [format] session Format du bloc session dans la config main
      * @uses Session->regen()
      */
-    public function __construct($sessionCode)
+    public function __construct($sessionCode, $appName = null)
     {
         $config = Registry::get('mainconfig');
         $format = $config->get('format', 'session');
@@ -69,13 +72,22 @@ class Session
 
         $sessionCode = sprintf($format, $sessionCode);
 
-        $this->config = $config->get($sessionCode);
-
-        if (empty($this->config)) {
+        if (empty($appName)) {
+            $dir = $config->get('dirs', 'config') . $sessionCode;
+            $path = FrontController::search($dir);
+        } else {
+            $dir = $appName . DS . $config->get('dirs', 'config') . $sessionCode;
+            $path = FrontController::search($dir, false);
+        }
+        unset($dir, $format);
+        if (empty($path)) {
             throw new Exception\Lib('Aucune configuration pour la session [' . $sessionCode . ']');
         }
 
+        $conf = new Config($path);
+        $this->config = $conf->get('core');
         $this->cookieName = $this->config['cookie'];
+        unset($conf);
 
         if (isset($_COOKIE[$this->cookieName]) && !empty($_COOKIE[$this->cookieName])) {
             $foo = explode('_', $_COOKIE[$this->cookieName]);

@@ -579,7 +579,8 @@ class Datatable
 
         /* Formulaire de création AJAX ONLY */
         if (isset($this->config["extra"])
-                && isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]
+                && (isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]
+                || isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
                 && (!isset($this->config["form"])
                 || !isset($this->config["form"]["ajax"])
                 || $this->config["form"]["ajax"] == true)) {

@@ -604,20 +604,41 @@ class gabaritManager extends manager
             if (!$meta) {
                 continue;
             }
+            
+            if ($joinField["table"] == "gab_page") {
+                $values = array();
+                foreach ($meta as $id_gab_page => $m) {
+                    $gabarit    = $this->getGabarit($m['id_gabarit']);
 
-            $query  = 'SELECT `' . $joinField['table'] . '`.`id_gab_page`,'
-                    . ' `' . $joinField['table'] . '`.*'
-                    . ' FROM `' . $joinField['table'] . '`'
-                    . ' WHERE `id_gab_page` IN (' . implode(',', array_keys($meta)) . ')'
-                    . ' AND `' . $joinField['table'] . '`.`id_version` = ' . $id_version;
+                    $query  = "SELECT * FROM `" . $gabarit->getTable() . "`"
+                            . " WHERE `id_gab_page` = " . $id_gab_page
+                            . " AND `id_version` = " . $id_version;
 
-            $values = $this->_db->query($query)->fetchAll(
-                \PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+                    $value = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
+                    $values[$id_gab_page] = $value;
+                }
+            }
+            else {
+                $query  = 'SELECT `' . $joinField['table'] . '`.`id_gab_page`,'
+                        . ' `' . $joinField['table'] . '`.*'
+                        . ' FROM `' . $joinField['table'] . '`'
+                        . ' WHERE `id_gab_page` IN (' . implode(',', array_keys($meta)) . ')'
+                        . ' AND `' . $joinField['table'] . '`.`id_version` = ' . $id_version;
+
+                $values = $this->_db->query($query)->fetchAll(
+                    \PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
+            }
             /** On recupere les pages jointes. */
             $blocsValues = $page->getBlocs($name_bloc)->getValues();
-            foreach ($blocsValues as $keyValue => $value) {
+            for ($i =  0;$i < count($blocsValues); $i++) {
+                $keyValue = $i;
+                $value = $blocsValues[$keyValue];
                 if (!isset($meta[$value[$joinName]])) {
+                    $page->getBlocs($name_bloc)->deleteValue($keyValue);
+                    unset($blocsValues[$i]);
+                    $blocsValues = array_values($blocsValues);
+                    $i--;
                     continue;
                 }
 
@@ -643,9 +664,9 @@ class gabaritManager extends manager
                         . ' AND `suppr` = 0';
                 $parentsMeta = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
                 foreach ($parentsMeta as $parentMeta) {
-                    if (!isset($meta[$value[$joinName]])) {
-                        continue;
-                    }
+//                    if (!isset($meta[$value[$joinName]])) {
+//                        continue;
+//                    }
 
                     if ($parentMeta['id_parent'] != 0) {
                         $parents[] = $parentMeta['id_parent'];

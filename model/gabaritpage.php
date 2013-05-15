@@ -406,7 +406,7 @@ class gabaritPage extends gabaritBloc
             foreach ($champs as $champ) {
                 $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
                 $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
-                $form .= $this->_buildChamp($champ, $value, $id, $id_gab_page);
+                $form .= $this->_buildChamp($champ, $value, $id, $id_gab_page, $id);
             }
             $form .= '</div></fieldset>';
         }

@@ -55,7 +55,13 @@ class Config
 
         /** Extends **/
         if (isset($config['extends'])) {
-            $this->setExtends($config['extends']);
+            if (!is_array($config['extends'])) {
+                $this->setExtends($config['extends']);
+            } else {
+                foreach ($config['extends'] as $path) {
+                    $this->setExtends($path);
+                }
+            }
         }
 
         $this->parseVar();
@@ -153,6 +159,16 @@ class Config
                 }
             }
         }
+    }
+
+    /**
+     * Renvois le contenu du fichier de configuration
+     *
+     * @return array Tableau de la configuration
+     */
+    public function getAll()
+    {
+        return $this->config;
     }
 
     /**
