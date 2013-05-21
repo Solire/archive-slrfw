@@ -43,6 +43,11 @@ class View
         $this->_translate = $translate;
     }
 
+    public function setTranslate($translate)
+    {
+        $this->_translate = $translate;
+    }
+
     public function _($string, $aide = '')
     {
         return $this->_translate->_($string, $aide);

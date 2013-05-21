@@ -11,18 +11,18 @@ class TranslateMysql
      *
      * @var TranslateMysql
      */
-    private static $self;
+    protected static $self;
 
-    private $_translate = array();
-    private $_locale = false;
-    private $_api = 1;
-    private $_versions = array();
+    protected $_translate = array();
+    protected $_locale = false;
+    protected $_api = 1;
+    protected $_versions = array();
 
     /**
      *
      * @var MyPDO
      */
-    private $_db = null;
+    protected $_db = null;
 
     /**
      * Langue par d�faut
@@ -133,7 +133,7 @@ class TranslateMysql
         }
     }
 
-    private function _loadTranslationData($locale)
+    protected function _loadTranslationData($locale)
     {
         $translateData = $this->_db->query("SELECT cle, valeur FROM traduction WHERE id_api = " . intval($this->_api) . " AND id_version = " . intval($locale))->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_COLUMN);
         foreach ($translateData as $key => $value) {
@@ -145,7 +145,7 @@ class TranslateMysql
      * Gestion des erreurs
      * @param string $Message
      */
-    private static function error($Message)
+    protected static function error($Message)
     {
         if (self::DEBUG)
             throw new \Exception($Message, 0);
