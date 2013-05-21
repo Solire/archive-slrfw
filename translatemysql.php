@@ -1,9 +1,20 @@
 <?php
+/**
+ * Traduction des textes statiques
+ *
+ * @package    Slrfw
+ * @author     Stéphane <smonnot@solire.fr>
+ * @license    Solire http://www.solire.fr/
+ */
 
 namespace Slrfw;
 
 /**
- * @version 2
+ * Traduction des textes statiques
+ *
+ * @package    Slrfw
+ * @author     Stéphane <smonnot@solire.fr>
+ * @license    Solire http://www.solire.fr/
  */
 class TranslateMysql
 {
@@ -25,9 +36,8 @@ class TranslateMysql
     protected $_db = null;
 
     /**
-     * Langue par d�faut
+     * Langue par défaut
      */
-
     const DEFAULT_LANG = 1;
     const DEBUG = true;
 
@@ -58,9 +68,11 @@ class TranslateMysql
     }
 
     /**
+     * Traduit un message
      *
-     * @param string $string mot à traduire
-     * @return string mot traduit
+     * @param string $string message à traduire
+     *
+     * @return string message traduit
      */
     public function _($string, $aide = '')
     {
@@ -96,6 +108,8 @@ class TranslateMysql
      * Choix de la langue utilisée.
      *
      * @param string $locale
+     *
+     * @return void
      */
     public function setLocale($locale)
     {
@@ -106,6 +120,8 @@ class TranslateMysql
      * Choix de l'api utilisée.
      *
      * @param string $idApi
+     *
+     * @return void
      */
     public function setApi($idApi)
     {
@@ -114,41 +130,28 @@ class TranslateMysql
 
     /**
      * charge les translations de la base
+     *
+     * @return void
      */
     public function addTranslation()
     {
-
-
         $this->_loadTranslationData($this->_locale);
-
-        if (isset($this->_translate[$this->_locale])) {
-            foreach ($this->_translate[$this->_locale] as $Key => $Value) {
-                if (!preg_match("/^([0-9\,\.]+) (.+)/", $Key, $Foo))
-                    continue;
-                $this->_translateMask[$this->_locale][$Foo[2]][$Foo[1]] = $Value;
-                unset($this->_translate[$this->_locale][$Key]);
-            }
-        } else {
-            $this->_translate[$this->_locale] = array();
-        }
-    }
-
-    protected function _loadTranslationData($locale)
-    {
-        $translateData = $this->_db->query("SELECT cle, valeur FROM traduction WHERE id_api = " . intval($this->_api) . " AND id_version = " . intval($locale))->fetchAll(\PDO::FETCH_UNIQUE | \PDO::FETCH_COLUMN);
-        foreach ($translateData as $key => $value) {
-            $this->_translate[$locale][$key] = $value;
-        }
     }
 
     /**
-     * Gestion des erreurs
-     * @param string $Message
+     * Chargement des traductions d'une version donnée
+     *
+     * @param int $locale identifiant de la version
+     *
+     * @return void
      */
-    protected static function error($Message)
+    protected function _loadTranslationData($locale)
     {
-        if (self::DEBUG)
-            throw new \Exception($Message, 0);
+        $query  = 'SELECT cle, valeur'
+                . ' FROM traduction'
+                . ' WHERE id_api = ' . $this->_api
+                . ' AND id_version = ' . $locale;
+        $this->_translate[$locale] = $this->_db->query($query)->fetchAll(
+            \PDO::FETCH_UNIQUE | \PDO::FETCH_COLUMN);
     }
-
 }

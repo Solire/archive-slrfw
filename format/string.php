@@ -20,11 +20,11 @@ namespace Slrfw\Format;
  */
 class String
 {
-    const ALL = 1;
-    const NUMERIC = 2;
-    const ALPHA = 3;
-    const ALPHALOWER = 4;
-    const ALPHAUPPER = 5;
+    const RANDOM_ALL = 1;
+    const RANDOM_NUMERIC = 2;
+    const RANDOM_ALPHA = 3;
+    const RANDOM_ALPHALOWER = 4;
+    const RANDOM_ALPHAUPPER = 5;
 
     /**
      * Tableau des caractère accentué
@@ -67,28 +67,31 @@ class String
      *
      * @return string
      */
-    public static function random($strLen, $type = self::ALL)
+    public static function random($strLen, $type = self::RANDOM_ALL)
     {
         $string = '';
         switch ($type) {
-            case self::NUMERIC :
+            case self::RANDOM_NUMERIC :
                 $chaine = '0123456789';
                 break;
 
-            case self::ALPHA :
-                $chaine = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            case self::RANDOM_ALPHA :
+                $chaine = 'abcdefghijklmnopqrstuvwxyz'
+                        . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
                 break;
 
-            case self::ALPHALOWER :
+            case self::RANDOM_ALPHALOWER :
                 $chaine = 'abcdefghijklmnopqrstuvwxyz';
                 break;
 
-            case self::ALPHAUPPER :
+            case self::RANDOM_ALPHAUPPER :
                 $chaine = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
                 break;
 
             default :
-                $chaine = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                $chaine = 'abcdefghijklmnopqrstuvwxyz'
+                        . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                        . '0123456789';
                 break;
         }
 
