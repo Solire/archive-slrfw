@@ -9,6 +9,12 @@ namespace Slrfw\Model;
  */
 class gabaritBloc
 {
+    /**
+     * Est-ce que l'utilisateur est connecté
+     *
+     * @var bool
+     */
+    private $_connected = false;
 
     /**
      *
@@ -22,9 +28,22 @@ class gabaritBloc
      */
     protected $_values = array();
 
+    /**
+     * Constructeur
+     */
     public function __construct()
-    {
+    {}
 
+    /**
+     * Défini si l'utilisateur est connecté (utile en cas de middleoffice)
+     *
+     * @param bool $connected
+     *
+     * @return void
+     */
+    public function setConnected($connected)
+    {
+        $this->_connected = $connected;
     }
 
     /**
@@ -65,7 +84,7 @@ class gabaritBloc
 
         return $this->_values[$i][$key] = $value;
     }
-    
+
     /**
      *
      * @param string $key
@@ -104,36 +123,41 @@ class gabaritBloc
      */
     public function getEditableAttributes($key, $id)
     {
+        if (!$this->_connected) {
+            return '';
+        }
+
         $field = $this->getGabarit()->getChamp($key, true);
         if (!$field) {
-            return "";
+            return '';
         }
-        $type = "";
-        switch ($field["type"]) {
-            case "WYSIWYG":
-                $type = "full";
 
+        $type = '';
+        switch ($field['type']) {
+            case 'WYSIWYG':
+                $type = 'full';
                 break;
-            case "FILE":
-                $type = "image";
 
+            case 'FILE':
+                $type = 'image';
                 break;
-            case "TEXT":
-                $type = "simple";
 
+            case 'TEXT':
+                $type = 'simple';
                 break;
-            case "TEXTAREA":
-                $type = "textarea";
 
-                break;
-            default:
+            case 'TEXTAREA':
+                $type = 'textarea';
                 break;
         }
-        if ($type != "") {
-            return ' title="' . $field["label"] . '" data-smallipop=true data-mercury="' . $type . '" id="champ' . $field["id"] . '-' . $id . '-' . $this->getGabarit()->getTable() . '" ';
-        } else {
-            return "";
+
+        if ($type != '') {
+            $string = ' data-mercury="' . $type . '" id="champ' . $field["id"]
+                    . '-' . $id . '-' . $this->getGabarit()->getTable() . '" ';
+            return $string;
         }
+
+        return '';
     }
 
     /**

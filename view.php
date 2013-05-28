@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 /**
  * Gestionnaire de vue
@@ -49,6 +50,16 @@ class View
      * @param TranslateMysql $translate Gestionnaire de traduction
      */
     public function __construct($translate)
+    {
+        $this->_translate = $translate;
+    }
+
+    /**
+     * Chanegement de la classe de traduction
+     *
+     * @param TranslateMysql $translate
+     */
+    public function setTranslate($translate)
     {
         $this->_translate = $translate;
     }
@@ -263,4 +274,3 @@ class View
         }
     }
 }
-

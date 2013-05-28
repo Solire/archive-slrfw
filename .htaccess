@@ -1,26 +1,39 @@
 SetEnv PHP_VER 5_3
 SetEnv MAGIC_QUOTES 0
 
+# ------------------------------------------------------------------------------
+# | Forcer le www. au début des Urls                                           |
+# ------------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} !=localhost
+    RewriteCond %{HTTP_HOST} !^solire.+$ [NC]
+    RewriteCond %{HTTP_HOST} !^www\..+$ [NC]
+    RewriteRule ^ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
 <files *.ini>
 order deny,allow
 deny from all
 </files>
 
-RewriteEngine on
+<IfModule mod_rewrite.c>
+    RewriteEngine on
 
-RewriteRule ^robots.txt$ - [L]
+    RewriteRule ^robots.txt$ - [L]
 
-# Sitemap(s)
-RewriteRule ^sitemap.xml$                                               index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
+    # Sitemap(s)
+    RewriteRule ^sitemap.xml$                                               index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
 
-# Images & documents ajoutés par l'utilisateur
-RewriteRule ^(projet/upload/|)((temp-|)[0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$    upload/$2/$4 [L]
+    # Images & documents ajoutés par l'utilisateur
+    RewriteRule ^(projet/upload/|)((temp-|)[0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$    upload/$2/$4 [L]
 
 
-RewriteRule ^$                                                          index.php?%{QUERY_STRING} [L]
-RewriteRule ^(([a-zA-Z0-9\-]+).html)$                                   index.php?action=$2&%{QUERY_STRING} [L]
-RewriteRule ^([a-zA-Z0-9/\-]+)/$                                        index.php?controller=$1&%{QUERY_STRING} [L]
-RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$                   index.php?controller=$1&action=$2&%{QUERY_STRING} [L]
+    RewriteRule ^$                                                          index.php?%{QUERY_STRING} [L]
+    RewriteRule ^(([a-zA-Z0-9\-]+).html)$                                   index.php?action=$2&%{QUERY_STRING} [L]
+    RewriteRule ^([a-zA-Z0-9/\-]+)/$                                        index.php?controller=$1&%{QUERY_STRING} [L]
+    RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$                   index.php?controller=$1&action=$2&%{QUERY_STRING} [L]
+</IfModule>
 
 # ----------------------------------------------------------------------
 # Gzip compression
