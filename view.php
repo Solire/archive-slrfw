@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 /**
  * Gestionnaire de vue
