@@ -108,7 +108,7 @@ class fileManager extends manager {
             $search = '%' . $search . '%';
             $query .= ' AND `media_fichier`.`rewriting` LIKE ' . $this->_db->quote($search);
         }
-        
+
         $query .= ' GROUP BY `media_fichier`.rewriting';
 
         if ($orderby) {
@@ -116,7 +116,7 @@ class fileManager extends manager {
             if ($sens)
                 $query .= $sens;
         }
-        
+
 
 
         $files = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
@@ -203,18 +203,6 @@ class fileManager extends manager {
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
 
-        if (!file_exists($uploadDir . DS . $targetDir)) {
-            $this->createFolder($uploadDir . DS . $targetDir);
-        }
-
-        if (!file_exists($uploadDir . DS . $vignetteDir)) {
-            $this->createFolder($uploadDir . DS . $vignetteDir);
-        }
-
-        if (!file_exists($uploadDir . DS . $apercuDir)) {
-            $this->createFolder($uploadDir . DS . $apercuDir);
-        }
-
         /** 5 minutes execution time */
         @set_time_limit(5 * 60);
 
@@ -225,6 +213,20 @@ class fileManager extends manager {
         $fileName = strtolower($fileName);
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
         $name = pathinfo($fileName, PATHINFO_FILENAME);
+
+        if ($chunk == $chunks - 1) {
+            if (!file_exists($uploadDir . DS . $targetDir)) {
+                $this->createFolder($uploadDir . DS . $targetDir);
+            }
+
+            if (!file_exists($uploadDir . DS . $vignetteDir)) {
+                $this->createFolder($uploadDir . DS . $vignetteDir);
+            }
+
+            if (!file_exists($uploadDir . DS . $apercuDir)) {
+                $this->createFolder($uploadDir . DS . $apercuDir);
+            }
+        }
 
         /** Clean the fileName for security reasons */
         $name = $this->_db->rewrit($name);
