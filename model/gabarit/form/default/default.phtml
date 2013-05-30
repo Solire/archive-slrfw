@@ -223,7 +223,11 @@
                                 <div class="buttonfixed">
                                     <div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>
                                     <div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>
+                                    <?php
+                                        if ($this->_gabarit->getView()) {
+                                    ?>
                                     <div class="btn-a gradient-green cb fl"><a href="#" class="formprev">Prévisualiser</a></div>
+                                    <?php } ?>
                                     <div class="btn-a gradient-green cb fl back-to-list">
                                         <a href="<?php echo $retour . ($metaId ? '?id_gab_page=' . $metaId : ''); ?>">Retour</a>
                                     </div>
