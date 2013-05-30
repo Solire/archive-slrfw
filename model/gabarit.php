@@ -110,6 +110,10 @@ class gabarit
     public function getExtension() {
         return $this->_data['extension'];
     }
+    
+    public function getView() {
+        return $this->_data['view'];
+    }
 
     public function get301_editable() {
         return $this->_data['301_editable'];
