@@ -20,7 +20,12 @@ require 'slrfw/init.php';
 $db = \Slrfw\Registry::get('db');
 
 $query = "
-    ALTER TABLE `gab_gabarit` ADD `view` BOOLEAN NOT NULL DEFAULT '1'
+    ALTER TABLE `gab_gabarit` ADD `view` BOOLEAN NOT NULL DEFAULT '1';
+";
+$db->exec($query);
+
+$query = "
+    UPDATE `gab_gabarit` SET `view` = '0' WHERE `gab_gabarit`.`id` =2;
 ";
 $db->exec($query);
 
