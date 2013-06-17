@@ -382,6 +382,29 @@ class FrontController
     }
 
     /**
+     * Cherche une classe
+     *
+     * @param string  $className nom de la classe, avec les namespace
+     *
+     * @return string|boolean
+     */
+    final public static function searchClass($className)
+    {
+        $path = str_replace('\\', DS, $className);
+        $path = DS . strtolower($path) . '.php';
+
+        foreach (self::$appDirs as $app) {
+            $fooPath = $app['dir'] . $path;
+            $testPath = new Path($fooPath, Path::SILENT);
+            if ($testPath->get() !== false) {
+                return $app['name'] . '\\' . $className;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Charge la configuration relative à l'application
      *
      * @return void
