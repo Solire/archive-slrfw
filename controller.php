@@ -369,6 +369,21 @@ class Controller
     }
 
     /**
+     * La page est en ajax
+     *
+     * Désactive la vue et contrôle le fait que l'appel soit bien de l'ajax
+     *
+     * @return void
+     */
+    final protected function onlyAjax()
+    {
+        $this->_view->enable(false);
+        if (!$this->_ajax) {
+            $this->redirectError(405);
+        }
+    }
+
+    /**
      * Enregistrement des paramètres de rewriting
      *
      * @param array $rew Rewriting contenu dans les "/"
