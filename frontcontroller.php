@@ -51,7 +51,7 @@ class FrontController
      * Id api utilisé par page du front
      * @var int
      */
-    public static $idApiRew = null;
+    public static $idApiRew = 1;
 
     /**
      * Liste des répertoires app à utiliser
