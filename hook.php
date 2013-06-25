@@ -132,7 +132,7 @@ class Hook
                           . '\\' . pathinfo($file, PATHINFO_FILENAME);
 
                 $foo = array();
-                $foo['funcName'] = $funcName;
+                $foo['className'] = $funcName;
                 $foo['path'] = $path->get() . $file;
                 $hooks[$file] = $foo;
                 unset($foo, $funcName, $file);
@@ -143,11 +143,13 @@ class Hook
 
         /** Lancement des hooks **/
         foreach ($hooks as $hook) {
-            if (!function_exists($hook['funcName'])) {
+            if (!class_exists($hook['className'])) {
                 include $hook['path'];
             }
 
-            $hook['funcName']($this);
+            $foo = new $hook['className'];
+            $foo->run($this);
+
         }
     }
 

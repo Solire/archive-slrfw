@@ -62,8 +62,10 @@ class HookTest extends \PHPUnit_Framework_TestCase
         $data = <<<END
 <?php
 namespace App\Hook\Toto;
-function monHook(\$env) {
-    throw new \Slrfw\Exception\User('ToutVaBien');
+class MonHook {
+    function run(\$env) {
+        throw new \Slrfw\Exception\User('ToutVaBien');
+    }
 }
 END;
         file_put_contents(TMP_DIR . 'hook' . DS . 'toto/monhook.php', $data);
@@ -71,8 +73,10 @@ END;
         $data = <<<END
 <?php
 namespace App\Hook\Data;
-function data(\$env) {
-    throw new \Slrfw\Exception\User(\$env->message);
+class Data {
+    function run(\$env) {
+        throw new \Slrfw\Exception\User(\$env->message);
+    }
 }
 END;
         file_put_contents(TMP_DIR . 'hook' . DS . 'data/data.php', $data);
@@ -81,8 +85,10 @@ END;
         $data = <<<END
 <?php
 namespace App\Hook\Sub\Toto;
-function monHook(\$env) {
-    throw new \Slrfw\Exception\User('ToutVaBienSub');
+class MonHook {
+    function run(\$env) {
+        throw new \Slrfw\Exception\User('ToutVaBienSub');
+    }
 }
 END;
         file_put_contents(TMP_DIR . 'hook' . DS . 'sub/toto/monhook.php', $data);
@@ -90,8 +96,10 @@ END;
         $data = <<<END
 <?php
 namespace App\Hook\Enreg;
-function monHook(&\$env) {
-    \$env->toto = 8;
+class MonHook {
+    function run(\$env) {
+        \$env->toto = 8;
+    }
 }
 END;
         file_put_contents(TMP_DIR . 'hook' . DS . 'enreg/monhook.php', $data);
