@@ -127,8 +127,8 @@
 
 
     <div class="<?php echo isset($this->noModal) ? $this->noModal : ''; ?>modal-footer">
-        <a data-dismiss="modal" class="btn btn-cancel" aria-hidden="true" href="#">Annuler</a>
-        <a class="btn btn-primary" id="add-<?php echo $this->name ?>" href="#"><?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?></a>
+        <a data-dismiss="modal" class="btn btn-small btn-default btn-cancel" aria-hidden="true" href="#"><i class="icon-remove"></i> Annuler</a>
+        <a class="btn  btn-small btn-primary btn-success" id="add-<?php echo $this->name ?>" href="#"><i class="icon-ok"></i> <?php echo (isset($this->modeEdit) && $this->modeEdit ? 'Modifier' : 'Ajouter') ?></a>
     </div>
 
 </form>

@@ -69,9 +69,7 @@
         #tableau-<?php echo $this->name ?> table a { text-decoration: underline; }
         #tableau-<?php echo $this->name ?> table tr  >  td { border: 0px;text-align: left;vertical-align: top;  }
         #tableau-<?php echo $this->name ?> table tr  >  td:first-child {  padding-left: 50px;width: 100px;  }
-        #myDatatable-<?php echo $this->name ?> .btn {
-            font-weight: bold;
-        }
+        
         #tableau-<?php echo $this->name ?> table  >  tbody {
             border-top: 0px dotted #333333;
         }
@@ -449,6 +447,10 @@
         var anOpen_<?php echo $this->name ?>2 = [];
         var anOpen_<?php echo $this->name ?>2Id = [];
 
+
+
+
+        
         // get visible columns
         $.fn.getColumnsShown = function(dTable)
         {
@@ -568,12 +570,13 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
 
 
 
-                $('#tableau-<?php echo $this->name ?> tbody td img.detail').live( 'click', function () {
+                $('#tableau-<?php echo $this->name ?> tbody td a.detail').live( 'click', function (e) {
+                    e.preventDefault()
                     var nTr = $(this).parents('tr:first')[0];
                     var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
                     if ( i === -1 ) {
                         /* Open this row */
-                        this.src = "<?php echo $this->_imgPath; ?>details_close.png";
+                        $("i", this).addClass("icon-minus").removeClass("icon-plus")
                         var odd="even";
                         if ($(nTr).hasClass("odd")) {
                             odd = "odd";
@@ -616,13 +619,13 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                             $(this).bind('click', function() {
                                 var j = $.inArray(this, anOpen_<?php echo $this->name ?>2);
                                 if ( j === -1 ) {
-                                    this.src = "<?php echo $this->_imgPath; ?>details_close.png";
+                                    $("i", this).addClass("icon-minus").removeClass("icon-plus")
                                     anOpen_<?php echo $this->name ?>2.push( this );
                                     anOpen_<?php echo $this->name ?>2Id.push( $(this).attr("id") );
                                     loadAjax($(this).parent().find(".ajax-on-click"), $(nTr).attr("id"));
                                     $(this).parent().find(".ajax-on-click").slideDown();
                                 } else {
-                                    this.src = "<?php echo $this->_imgPath; ?>details_open.png";
+                                    $("i", this).addClass("icon-plus").removeClass("icon-minus")
                                     anOpen_<?php echo $this->name ?>2.splice( j, 1 );
                                     anOpen_<?php echo $this->name ?>2Id.splice( j, 1 );
                                     $(this).parent().find(".ajax-on-click").slideUp();
@@ -632,7 +635,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                     }
                     else {
                         /* This row is already open - close it */
-                        this.src = "<?php echo $this->_imgPath; ?>details_open.png";
+                        $("i", this).addClass("icon-plus").removeClass("icon-minus")
                         $('div.innerDetails', $(nTr).next()[0]).slideUp( function () {
                             oTable_<?php echo $this->name ?>.fnClose( nTr );
                             anOpen_<?php echo $this->name ?>.splice( i, 1 );
@@ -1122,10 +1125,10 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
                 '</div>' +
 
                 '<div class="modal-footer">' +
-                '<a href="#" class="btn" data-dismiss="modal">' +
+                '<a href="#" class="btn btn-small btn-default" data-dismiss="modal"><i class="icon-remove"></i> ' +
                 cancelButtonTxt +
                 '</a>' +
-                '<a href="#" id="okButton" class="btn btn-danger">' +
+                '<a href="#" id="okButton" class="btn btn btn-small btn-danger"><i class="icon-ok"></i> ' +
                 okButtonTxt +
                 '</a>' +
                 '</div>' +
@@ -1139,26 +1142,28 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
 
             confirmModal.modal('show');
         },
-        message : function (heading, message, closeButtonTxt, closeDelay) {
-
+        message : function (heading, message, closeButtonTxt, closeDelay, widthAuto) {
+            var appendClass = ""
+            if(widthAuto) {
+                appendClass = " modal-auto-width";
+            }
             var messageModal =
-                $('<div class="modal hide fade">' +
+                $('<div class="modal hide fade' + appendClass +'">' +
                 '<div class="modal-header">' +
                 '<a class="close" data-dismiss="modal" >&times;</a>' +
-                '<h3>' + heading +'</h3>' +
+                '<h3>' + heading + '</h3>' +
                 '</div>' +
-
                 '<div class="modal-body">' +
-                '<p>' + message + '</p>' +
                 '</div>' +
-
                 '<div class="modal-footer">' +
-                '<a href="#" id="closeButton" data-dismiss="modal" class="btn btn-primary">' +
+                '<a href="#" id="closeButton" data-dismiss="modal" class="btn  btn-small btn-primary">' +
                 closeButtonTxt +
                 '</a>' +
                 '</div>' +
                 '</div>');
-
+            var message = $.type(message) === "string" ? '<p>' + message + '</p>' : message ;
+            messageModal.find(".modal-body").append(message)
+            messageModal.appendTo("body")
             messageModal.modal('show');
             if (closeDelay) {
                 messageModal.delay(closeDelay).queue(function(nxt) {
@@ -1184,3 +1189,57 @@ if (isset($this->config["table"]["fixedheader"]) && $this->config["table"]["fixe
 
 
 </div>
+<script type="text/javascript">
+$.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallback, bStandingRedraw )
+    {
+        if ( sNewSource !== undefined && sNewSource !== null ) {
+            oSettings.sAjaxSource = sNewSource;
+        }
+
+        // Server-side processing should just call fnDraw
+        if ( oSettings.oFeatures.bServerSide ) {
+            this.fnDraw();
+            return;
+        }
+
+        this.oApi._fnProcessingDisplay( oSettings, true );
+        var that = this;
+        var iStart = oSettings._iDisplayStart;
+        var aData = [];
+
+        this.oApi._fnServerParams( oSettings, aData );
+
+        oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aData, function(json) {
+            /* Clear the old information from the table */
+            that.oApi._fnClearTable( oSettings );
+
+            /* Got the data - add it to the table */
+            var aData =  (oSettings.sAjaxDataProp !== "") ?
+                that.oApi._fnGetObjectDataFn( oSettings.sAjaxDataProp )( json ) : json;
+
+            for ( var i=0 ; i<aData.length ; i++ )
+            {
+                that.oApi._fnAddData( oSettings, aData[i] );
+            }
+
+            oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+
+            that.fnDraw();
+
+            if ( bStandingRedraw === true )
+            {
+                oSettings._iDisplayStart = iStart;
+                that.oApi._fnCalculateEnd( oSettings );
+                that.fnDraw( false );
+            }
+
+            that.oApi._fnProcessingDisplay( oSettings, false );
+
+            /* Callback user function - for event handlers etc */
+            if ( typeof fnCallback == 'function' && fnCallback !== null )
+            {
+                fnCallback( oSettings );
+            }
+        }, oSettings );
+    };
+</script>

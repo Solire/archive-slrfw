@@ -14,7 +14,7 @@
                     <legend><?php echo $this->valueLabel; ?></legend>
 
                     <div>
-                        <div class="line">
+                        <div class="line" style="display:none;">
                             <label for="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>">Visible</label>
                             <input type="checkbox" id="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>" class="changevisible"<?php echo (isset($value['visible']) && $value['visible'] ? ' checked="checked"' : '') ?> />
                             <input type="hidden" value="<?php echo (isset($value['visible']) && $value['visible'] ? 1 : 0) ?>" name="visible[]" />
@@ -26,16 +26,22 @@
                             <?php echo $this->champsHTML; ?>
                         </div>
                     </div>
-
-                    <div style="clear:both;">
-                        <div class="btn-a gradient-blue fr"><a href="#" class="delBloc" <?php echo ( count($this->values) > 1 ? '' : ' style="display: none;"' ) ?>>
-                            <img src="app/back/img/white/trash_stroke_16x16.png" border="0" alt="supprimer"/></a></div>
-                        <div class="btn-a gradient-blue"><a href="#" class="sort-move"><img src="app/back/img/deplacer.png" alt="Déplacer" /></a></div>
+                    
+                    
+                    <div style="float:left; margin-left:8px;">
+                        <div class="btn-toolbar">
+                            <div class="btn-group btn-bloc-action">
+                                <a href="#" class="btn btn-small btn-info sort-move" title="Déplacer"><i class="icon-retweet"></i></a>
+                                <a href="#" class="btn btn-small btn-info btn-changevisible" title="Visible sur le site"><i class="<?php echo (isset($value['visible']) && $value['visible'] ? 'icon-eye-open' : 'icon-eye-close translucide') ?>"></i></a>
+                                <a href="#" class="btn btn-small btn-warning delBloc <?php echo ( count($this->values) > 1 ? '' : 'to-remove' ) ?>" title="Supprimer" <?php echo ( count($this->values) > 1 ? '' : ' style="display: inline-bloc;"' ) ?>><i class="icon-trash"></i></a>
+                            </div>
+                        </div>
                     </div>
+             
                 </fieldset>
 <?php
     }
 ?>
-                <div class="buttonright"><div class="btn-a gradient-blue"><a class="addBloc" href="#">Ajouter un bloc</a></div></div>
+                <a class="btn btn-small btn-info addBloc" style="float:right;" href="#"><i class="icon-plus"></i> Ajouter un bloc</a>
             </div>
         </fieldset>
