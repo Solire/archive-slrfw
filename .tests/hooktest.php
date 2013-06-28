@@ -53,37 +53,56 @@ class HookTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        mkdir(TMP_DIR . 'toto');
-        mkdir(TMP_DIR . 'sub');
-        mkdir(TMP_DIR . 'sub/toto');
+        mkdir(TMP_DIR . 'hook');
+        mkdir(TMP_DIR . 'hook' . DS . 'toto');
+        mkdir(TMP_DIR . 'hook' . DS . 'data');
+        mkdir(TMP_DIR . 'hook' . DS . 'enreg');
+        mkdir(TMP_DIR . 'hook' . DS . 'sub');
+        mkdir(TMP_DIR . 'hook' . DS . 'sub/toto');
         $data = <<<END
 <?php
-namespace App\Toto;
-function monHook(\$env) {
-    throw new \Slrfw\Exception\User('ToutVaBien');
+namespace App\Hook\Toto;
+class MonHook {
+    function run(\$env) {
+        throw new \Slrfw\Exception\User('ToutVaBien');
+    }
 }
 END;
-        file_put_contents(TMP_DIR . 'toto/monhook.php', $data);
+        file_put_contents(TMP_DIR . 'hook' . DS . 'toto/monhook.php', $data);
 
         $data = <<<END
 <?php
-namespace App\Data;
-function data(\$env) {
-    throw new \Slrfw\Exception\User(\$env->message);
+namespace App\Hook\Data;
+class Data {
+    function run(\$env) {
+        throw new \Slrfw\Exception\User(\$env->message);
+    }
 }
 END;
-        mkdir(TMP_DIR . 'data');
-        file_put_contents(TMP_DIR . 'data/data.php', $data);
+        file_put_contents(TMP_DIR . 'hook' . DS . 'data/data.php', $data);
 
 
         $data = <<<END
 <?php
-namespace App\Sub\Toto;
-function monHook(\$env) {
-    throw new \Slrfw\Exception\User('ToutVaBienSub');
+namespace App\Hook\Sub\Toto;
+class MonHook {
+    function run(\$env) {
+        throw new \Slrfw\Exception\User('ToutVaBienSub');
+    }
 }
 END;
-        file_put_contents(TMP_DIR . 'sub/toto/monhook.php', $data);
+        file_put_contents(TMP_DIR . 'hook' . DS . 'sub/toto/monhook.php', $data);
+
+        $data = <<<END
+<?php
+namespace App\Hook\Enreg;
+class MonHook {
+    function run(\$env) {
+        \$env->toto = 8;
+    }
+}
+END;
+        file_put_contents(TMP_DIR . 'hook' . DS . 'enreg/monhook.php', $data);
     }
 
     /**
@@ -94,13 +113,16 @@ END;
      */
     public static function tearDownAfterClass()
     {
-        unlink(TMP_DIR . 'toto/monhook.php');
-        rmdir(TMP_DIR . 'toto');
-        unlink(TMP_DIR . 'data/data.php');
-        rmdir(TMP_DIR . 'data');
-        unlink(TMP_DIR . 'sub/toto/monhook.php');
-        rmdir(TMP_DIR . 'sub/toto');
-        rmdir(TMP_DIR . 'sub');
+        unlink(TMP_DIR . 'hook' . DS . 'toto/monhook.php');
+        rmdir(TMP_DIR . 'hook' . DS . 'toto');
+        unlink(TMP_DIR . 'hook' . DS . 'data/data.php');
+        rmdir(TMP_DIR . 'hook' . DS . 'data');
+        unlink(TMP_DIR . 'hook' . DS . 'enreg/monhook.php');
+        rmdir(TMP_DIR . 'hook' . DS . 'enreg');
+        unlink(TMP_DIR . 'hook' . DS . 'sub/toto/monhook.php');
+        rmdir(TMP_DIR . 'hook' . DS . 'sub/toto');
+        rmdir(TMP_DIR . 'hook' . DS . 'sub');
+        rmdir(TMP_DIR . 'hook');
     }
 
     /**
@@ -112,7 +134,7 @@ END;
      */
     public function testConstructErrorConfig()
     {
-        $hook = new Hook('test');
+        $hook = new Hook();
         $hook->exec('toto');
     }
 
@@ -125,7 +147,7 @@ END;
      */
     public function testHookToto()
     {
-        $hook = new Hook('test');
+        $hook = new Hook();
         $hook->setDirs(self::$dirs);
 
         $hook->exec('toto');
@@ -140,7 +162,7 @@ END;
      */
     public function testHookSubToto()
     {
-        $hook = new Hook('test');
+        $hook = new Hook();
         $hook->setDirs(self::$dirs);
         $hook->setSubdirName('sub');
 
@@ -148,7 +170,7 @@ END;
     }
 
     /**
-     * Contrôle d'une bonne construction du hook avec sous répertoire
+     * Contrôle du passage des variables
      *
      * @return void
      * @expectedException Slrfw\Exception\User
@@ -156,13 +178,30 @@ END;
      */
     public function testHookData()
     {
-        $hook = new Hook('test');
+        $hook = new Hook();
         $hook->setDirs(self::$dirs);
 
         $hook->message = 'dataOk';
         $this->assertEquals($hook->message, 'dataOk');
 
         $hook->exec('data');
+    }
+
+    /**
+     * Contrôle du passage des variables
+     *
+     * @return void
+     */
+    public function testHookDataSave()
+    {
+        $hook = new Hook();
+        $hook->setDirs(self::$dirs);
+
+        $hook->toto = array('toto' => 6);
+        $this->assertEquals($hook->toto, array('toto' => 6));
+
+        $hook->exec('enreg');
+        $this->assertEquals($hook->toto, 8);
     }
 }
 

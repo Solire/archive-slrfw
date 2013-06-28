@@ -49,21 +49,12 @@ class Hook
     protected $codeName;
 
     /**
-     * Nom identifiant le gestionnaire de hook
-     *
-     * @var string
-     */
-    protected $hookLibName;
-
-
-    /**
      * Chargement du gestionnaire de hook
      *
-     * @param string $name Nom identifiant le type de gestionnaire de hook
      */
-    public function __construct($name)
+    public function __construct()
     {
-        $this->hookLibName = $name;
+        $this->dirs = FrontController::getAppDirs();
     }
 
     /**
@@ -118,12 +109,11 @@ class Hook
         $baseDir .= $this->codeName;
         $hooks = array();
         foreach ($this->dirs as $dirInfo) {
-            $dir = $dirInfo['dir'] . DS . $baseDir;
+            $dir = $dirInfo['dir'] . DS . 'hook' . DS . $baseDir;
             $path = new Path($dir, Path::SILENT);
             if ($path->get() === false) {
                 continue;
             }
-
             $dir = opendir($path->get());
             while ($file = readdir($dir)) {
                 if ($file == '.' || $file == '..') {
@@ -134,7 +124,7 @@ class Hook
                     continue;
                 }
 
-                $funcName = $dirInfo['name'] . '\\';
+                $funcName = $dirInfo['name'] . '\\Hook\\';
                 if (!empty($this->subDir)) {
                     $funcName .= ucfirst($this->subDir) . '\\';
                 }
@@ -142,9 +132,9 @@ class Hook
                           . '\\' . pathinfo($file, PATHINFO_FILENAME);
 
                 $foo = array();
-                $foo['funcName'] = $funcName;
+                $foo['className'] = $funcName;
                 $foo['path'] = $path->get() . $file;
-                $hooks[] = $foo;
+                $hooks[$file] = $foo;
                 unset($foo, $funcName, $file);
             }
             closedir($dir);
@@ -152,12 +142,14 @@ class Hook
         }
 
         /** Lancement des hooks **/
-        for ($i = 0; $i < count($hooks); $i++) {
-            if (!function_exists($hooks[$i]['funcName'])) {
-                include $hooks[$i]['path'];
+        foreach ($hooks as $hook) {
+            if (!class_exists($hook['className'])) {
+                include $hook['path'];
             }
 
-            $hooks[$i]['funcName']($this);
+            $foo = new $hook['className'];
+            $foo->run($this);
+
         }
     }
 

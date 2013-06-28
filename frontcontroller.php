@@ -48,6 +48,12 @@ class FrontController
     public static $appName;
 
     /**
+     * Id api utilisé par page du front
+     * @var int
+     */
+    public static $idApiRew = 1;
+
+    /**
      * Liste des répertoires app à utiliser
      *
      * @var array
@@ -298,6 +304,15 @@ class FrontController
                         $rewritingMod = true;
                         continue;
                     }
+
+                    $conf = self::loadAppConfig($ctrl);
+                    $idApi = $conf->get('fx', 'idApi');
+                    if (!empty($idApi)) {
+                        self::$idApiRew = $idApi;
+                        unset($forceIdApi, $conf);
+                        continue;
+                    }
+
                     $this->application = ucfirst($ctrl);
                     self::$appName = $this->application;
                     $application = true;
@@ -407,15 +422,25 @@ class FrontController
     /**
      * Charge la configuration relative à l'application
      *
-     * @return void
+     * @return \Slrfw\Config|null
      */
-    final public static function loadAppConfig()
+    final public static function loadAppConfig($test = null)
     {
-        $confPath = self::search('conf.ini');
+        if (empty($test)) {
+            $confPath = self::search('conf.ini');
+        } else {
+            $confPath = self::search($test . DS . 'conf.ini', false);
+        }
         if (!empty($confPath)) {
             $appConfig = new Config($confPath);
-            Registry::set('appconfig', $appConfig);
+            if (empty($test)) {
+                Registry::set('appconfig', $appConfig);
+            }
+
+            return $appConfig;
         }
+
+        return null;
     }
     /**
      * Test si le morceau d'url est une application
