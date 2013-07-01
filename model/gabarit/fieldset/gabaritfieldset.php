@@ -137,6 +137,9 @@ abstract class GabaritFieldSet
         $form .= $field;
         if ($type == 'join') {
             $valueLabel = $field->getValueLabel();
+            if($valueLabel == '') {
+                $valueLabel =  'Bloc en cours de création';
+            }
         } else {
             if($value != '') {
                 if (\mb_strlen($value, 'UTF-8') > 50) {
@@ -145,7 +148,7 @@ abstract class GabaritFieldSet
                     $valueLabel = $value;
                 }
             } else {
-                $valueLabel =  'Nouvel élément';
+                $valueLabel =  'Bloc en cours de création';
             }
         }
 
