@@ -1474,8 +1474,26 @@ class gabaritManager extends manager
                                 . $this->_db->quote($value) . ',';
                 }
 
-                $query .= '`' . $champ['name'] . '` = '
-                        . $this->_db->quote($value) . ',';
+                switch ($champ['type']) {
+                    case "GMAP":
+                        $lat = $donnees['champ' . $champ['id'] . "_lat"][0];
+                        $lng = $donnees['champ' . $champ['id'] . "_lng"][0];
+                        $zoom = $donnees['champ' . $champ['id'] . "_zoom"][0];
+                        $query .= '`' . $champ['name'] . '_lat` = '
+                                    . $this->_db->quote($lat) . ',';
+                        $query .= '`' . $champ['name'] . '_lng` = '
+                                    . $this->_db->quote($lng) . ',';
+                        $query .= '`' . $champ['name'] . '_zoom` = '
+                                    . $this->_db->quote($zoom) . ',';
+                        break;
+
+                    default:
+                        $query .= '`' . $champ['name'] . '` = '
+                                    . $this->_db->quote($value) . ',';
+                        break;
+                }
+                
+                
             }
         }
 
@@ -1645,8 +1663,24 @@ class gabaritManager extends manager
                 $value = Tools::formate_date_nombre($value, '/', '-');
             }
 
-            $query .= '`' . $champ['name'] . '` = '
-                    . $this->_db->quote($value) . ',';
+            switch ($champ['type']) {
+                case "GMAP":
+                    $lat = array_shift($donnees['champ' . $champ['id'] . "_lat"]);
+                    $lng = array_shift($donnees['champ' . $champ['id'] . "_lng"]);
+                    $zoom = array_shift($donnees['champ' . $champ['id'] . "_zoom"]);
+                    $query .= '`' . $champ['name'] . '_lat` = '
+                                . $this->_db->quote($lat) . ',';
+                    $query .= '`' . $champ['name'] . '_lng` = '
+                                . $this->_db->quote($lng) . ',';
+                    $query .= '`' . $champ['name'] . '_zoom` = '
+                                . $this->_db->quote($zoom) . ',';
+                    break;
+
+                default:
+                    $query .= '`' . $champ['name'] . '` = '
+                                . $this->_db->quote($value) . ',';
+                    break;
+            }
         }
 
 

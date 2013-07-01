@@ -390,7 +390,7 @@ class gabaritPage extends gabaritBloc
      *
      * @return type
      */
-	public function buildForm()
+    public function buildForm()
     {
         $form   = '<input type="hidden" name="id_' . $this->_gabarit->getTable()
                 . '" value="' . (isset($this->_values['id']) ? $this->_values['id'] : '')

@@ -205,7 +205,24 @@
                                     <div<?php echo $metaId ? ' style="display:none;"' : ''; ?>>
 <?php
                                 foreach ($champs as $champ) {
-                                    $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
+                                    if($champ["type"] == "GMAP") {
+                                        if(isset($this->_values[$champ['name'] . "_lat"])) {
+                                            $value = array(
+                                                "lat"          =>  $this->_values[$champ['name'] . "_lat"],
+                                                "lng"         =>  $this->_values[$champ['name'] . "_lng"],
+                                                "zoom"     =>  $this->_values[$champ['name'] . "_zoom"],
+                                            );
+                                        } else {
+                                            $value = array(
+                                                "lat"          =>  "",
+                                                "lng"         =>  "",
+                                                "zoom"     =>  "",
+                                            );
+                                        }
+                                    } else {
+                                        $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
+                                    }
+                                    
                                         $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
                                         echo $this->_buildChamp($champ, $value, $id, $metaId);
                                 }
