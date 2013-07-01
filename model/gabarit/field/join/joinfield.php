@@ -53,6 +53,10 @@ class JoinField extends \Slrfw\Model\Gabarit\Field\GabaritField
      * @return void
      */
     private function autocomplete() {
+        //Valeur par défaut
+        if($this->value == "" && $this->params['VALUE.DEFAULT'] != "")
+            $this->value = $this->params['VALUE.DEFAULT'];
+
         if ($this->value > 0) {
             /**
              * on recupere la valeur label pour lafficher dans le champ
