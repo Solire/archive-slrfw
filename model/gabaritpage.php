@@ -380,7 +380,14 @@ class gabaritPage extends gabaritBloc
         $allchamps = $this->_gabarit->getChamps();
 
         ob_start();
-        include __DIR__ . "/gabarit/form/default/default.phtml";
+        $customForm = \Slrfw\FrontController::search("model/gabarit/form/default/default.phtml");
+
+        if($customForm !== false) {
+            include $customForm;
+        } else {
+            include __DIR__ . "/gabarit/form/default/default.phtml";
+        }
+        
         $form = ob_get_clean();
 
 		return $form;
