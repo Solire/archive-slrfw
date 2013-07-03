@@ -399,7 +399,8 @@ class FrontController
     /**
      * Cherche une classe
      *
-     * @param string  $className nom de la classe, avec les namespace
+     * @param string  $className nom de la classe, avec les namespace, qui sera
+     * préfixé par le nom de l'app
      *
      * @return string|boolean
      */

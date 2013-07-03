@@ -93,6 +93,7 @@ class gabaritManager extends manager
      * @param bool $visible     si oui uniquement les blocs visibles seront récupérés
      *
      * @return boolean|\Slrfw\Model\gabaritPage
+     * @hook gabarit/ <table>Page A la fin du chargement de la page
      */
     public function getPage(
         $id_version,
@@ -235,6 +236,15 @@ class gabaritManager extends manager
             }
         }
 
+        $hook = new \Slrfw\Hook();
+        $hook->setSubdirName('gabarit');
+
+        $hook->page = $page;
+        $hook->idGabPage = $id_gab_page;
+        $hook->visible = $visible;
+
+        $hook->exec($gabarit->getName() . 'Page');
+
         return $page;
     }
 
@@ -347,6 +357,7 @@ class gabaritManager extends manager
      * @param int     $id_gab_page identifiant de la page 0 sinon
      *
      * @return gabaritBloc tableau associatif des blocs dynamiques
+     * @hook Gabarit/ <blocType>Bloc A la fin d'un chargement d'un bloc
      */
     public function getBlocs($gabarit)
     {
@@ -384,6 +395,8 @@ class gabaritManager extends manager
         }
 
         $blocs = array();
+        $hook = new \Slrfw\Hook();
+        $hook->setSubdirName('gabarit');
         foreach ($rows as $row) {
             $gabarit_bloc = new gabarit($row);
 
@@ -428,6 +441,18 @@ class gabaritManager extends manager
 
             $gabarit_bloc->setChamps($champs);
             $gabarit_bloc->setJoins($joins);
+
+
+            if (!empty($row['type'])) {
+
+                $hook->bloc = $gabarit_bloc;
+
+                /** Execution du hook **/
+                $hook->exec($row['type'] . 'Bloc');
+
+                $gabarit_bloc = $hook->bloc;
+            }
+
 
             if (class_exists('\Slrfw\Model\Personnalise\\' . $table)) {
                 $className = '\Slrfw\Model\Personnalise\\' . $table;
@@ -565,7 +590,7 @@ class gabaritManager extends manager
             if (count($joinField['values']) == 0) {
                 continue;
             }
-            
+
             /**
              * Cas des tables jointes sans gab_page
              */
@@ -576,13 +601,13 @@ class gabaritManager extends manager
                         . ' WHERE `' . $joinField['table'] . '`.`' . $joinField['fieldId'] . '` IN (' . implode(',', $joinField['values']) . ')';
                 $values = $this->_db->query($query)->fetchAll(
                     \PDO::FETCH_UNIQUE | \PDO::FETCH_ASSOC);
-                
+
                 $blocsValues = $page->getBlocs($name_bloc)->getValues();
                 foreach ($blocsValues as $keyValue => $value) {
                     $page->getBlocs($name_bloc)->setValue($keyValue, $values[$value[$joinName]], $joinName);
                 }
                 return;
-                
+
             }
             /**
              * FIN Cas des tables jointes sans gab_page
@@ -604,7 +629,7 @@ class gabaritManager extends manager
             if (!$meta) {
                 continue;
             }
-            
+
             if ($joinField["table"] == "gab_page") {
                 $values = array();
                 foreach ($meta as $id_gab_page => $m) {
@@ -1299,12 +1324,12 @@ class gabaritManager extends manager
                     . ' AND `id_version` = ' . $donnees['id_version'];
             $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting',
                 $query);
-            
+
             //Si niveau 0, on met l'ordre à MAX + 1 sinon MIN - 1
             $type = "MIN";
             if ($id_parent == 0)
                 $type = "MAX";
-                
+
             $query  = 'SELECT ' . $type . '(`ordre`)'
                     . ' FROM `gab_page`'
                     . ' WHERE `id_api` = ' . $api['id']
@@ -1492,8 +1517,8 @@ class gabaritManager extends manager
                                     . $this->_db->quote($value) . ',';
                         break;
                 }
-                
-                
+
+
             }
         }
 
