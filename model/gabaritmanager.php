@@ -1436,10 +1436,12 @@ class gabaritManager extends manager
     /**
      * Enregistre les données propre d'une page.
      *
-     * @param gabaritPage $page    la page
-     * @param array       $donnees les données à enregistrer
+     * @param gabaritPage $page         la page
+     * @param array       $donnees     les données à enregistrer
+     * @param boolean     $partialSave Ne sauvegarde que les champs présents
      *
      * @return type
+     * @hook gabarit/ <gabaritName>Save A la fin de l'enregistrement
      */
     public function savePage($page, $donnees, $partialSave = false)
     {
@@ -1550,6 +1552,14 @@ class gabaritManager extends manager
         $this->deleteUsedFile($id_version, $id_gab_page);
         $this->saveUsedFile($id_version, $id_gab_page, $filesUsed);
 
+
+        $hook = new \Slrfw\Hook();
+        $hook->setSubdirName('gabarit');
+
+        $hook->data = $donnees;
+        $hook->page = $page;
+        $hook->exec($gabarit->getName() . 'Save');
+
         return true;
     }
 
@@ -1560,8 +1570,10 @@ class gabaritManager extends manager
      * @param int         $id_gab_page identifiant de la page parente du bloc
      * @param int         $id_version  identifiant de la version
      * @param array       &$donnees    données à enregistrer
+     * @param boolean     $partialSave Ne sauvegarde que les champs présents
      *
      * @return boolean
+     * @hook gabarit/ <gabaritName>Bloc A la fin de l'enregistrement
      */
     public function saveBloc(
         $bloc,
@@ -1616,6 +1628,17 @@ class gabaritManager extends manager
                     . ' AND `id` NOT IN (' . implode(',', $ids_blocs) . ')';
             $this->_db->query($query);
         }
+
+
+        $hook = new \Slrfw\Hook();
+        $hook->setSubdirName('gabarit');
+
+        $hook->data = $donnees;
+        $hook->idGabPage = $id_gab_page;
+        $hook->idVersion = $id_version;
+        $hook->tableName = $table;
+        $hook->exec($gabarit->getName() . 'Bloc');
+
 
         return true;
     }
