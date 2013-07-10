@@ -309,12 +309,13 @@ class FrontController
                     $idApi = $conf->get('fx', 'idApi');
                     if (!empty($idApi)) {
                         self::$idApiRew = $idApi;
-                        unset($forceIdApi, $conf);
+                        unset($idApi, $conf);
                         continue;
                     }
 
                     $this->application = ucfirst($ctrl);
                     self::$appName = $this->application;
+                    $this->app = $this->application;
                     $application = true;
                     continue;
                 }
@@ -455,7 +456,6 @@ class FrontController
         foreach (self::$appDirs as $app) {
             $testPath = new Path($app['dir'] . DS . $ctrl, Path::SILENT);
             if ($testPath->get()) {
-                $this->app = $app['name'];
                 return true;
             }
         }
