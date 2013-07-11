@@ -17,6 +17,7 @@ namespace Slrfw;
  * @subpackage Core
  * @author     Adrien <aimbert@solire.fr>
  * @license    Solire http://www.solire.fr/
+ * @see        http://solire-02/wiki/index.php/Hook Documentation
  */
 class Hook
 {
@@ -60,9 +61,13 @@ class Hook
     /**
      * Chargement de la liste des répertoires dans lesqueslles se trouve les hooks
      *
-     * @param array $dirs Liste des répertoires
+     * Utilisé principalement dans le cadre des tests, les répertoires des App
+     * sont chargés par défaut lors de la construction de l'objet.
+     *
+     * @param array $dirs Liste des répertoires avec le plus bas niveau en premier
      *
      * @return void
+     * @link http://solire-02/wiki/index.php/Hook#Organisation 
      */
     public function setDirs(array $dirs)
     {
