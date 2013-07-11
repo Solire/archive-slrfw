@@ -54,7 +54,7 @@ class Hook
      */
     public function __construct()
     {
-        $this->dirs = FrontController::getAppDirs();
+        $this->dirs = array_reverse(FrontController::getAppDirs(), true);
     }
 
     /**
