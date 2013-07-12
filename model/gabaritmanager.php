@@ -93,7 +93,7 @@ class gabaritManager extends manager
      * @param bool $visible     si oui uniquement les blocs visibles seront récupérés
      *
      * @return boolean|\Slrfw\Model\gabaritPage
-     * @hook gabarit/ <table>Page A la fin du chargement de la page
+     * @hook gabarit/ <gabaritName>Page A la fin du chargement de la page
      */
     public function getPage(
         $id_version,
