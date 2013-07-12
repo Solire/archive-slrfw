@@ -183,9 +183,8 @@ class Formulaire
             $this->plugins = explode('|', $this->_config['plugins']);
         }
 
-        echo '<pre>' . print_r($this->_config, true) . '</pre>';
         /* = Suppression d'_exemple
-          `------------------------------------------------- */
+        `------------------------------------------------- */
         if (isset($this->_architecture['_exemple'])) {
             unset($this->_architecture['_exemple']);
         }
