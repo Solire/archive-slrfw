@@ -152,6 +152,7 @@ class Formulaire
             $iniPath = new Path($iniPath);
             $architecture = new Config($iniPath->get());
             $this->_architecture = $architecture->getAll();
+            $this->_config = $architecture->getConfig();
             unset($architecture);
         } else {
             $this->_architecture = $iniPath;
@@ -168,20 +169,21 @@ class Formulaire
      */
     protected function parseArchi()
     {
-        if (isset($this->_architecture['__config'])) {
-            $this->_config = $this->_architecture['__config'];
-            unset($this->_architecture['__config']);
-
-            if (isset($this->_config['ordre'])) {
-                $this->_ordre = $this->_config['ordre'];
-            }
-
-            /** Récupération des plugin **/
-            if (isset($this->_config['plugins'])) {
-                $this->plugins = explode('|', $this->_config['plugins']);
-            }
+        if (isset($this->_architecture[\Slrfw\Config::KEY_CONF])) {
+            $this->_config = $this->_architecture[\Slrfw\Config::KEY_CONF];
+            unset($this->_architecture[\Slrfw\Config::KEY_CONF]);
         }
 
+        if (isset($this->_config['ordre'])) {
+            $this->_ordre = $this->_config['ordre'];
+        }
+
+        /** Récupération des plugin **/
+        if (isset($this->_config['plugins'])) {
+            $this->plugins = explode('|', $this->_config['plugins']);
+        }
+
+        echo '<pre>' . print_r($this->_config, true) . '</pre>';
         /* = Suppression d'_exemple
           `------------------------------------------------- */
         if (isset($this->_architecture['_exemple'])) {
