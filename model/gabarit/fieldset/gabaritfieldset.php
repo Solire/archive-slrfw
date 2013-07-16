@@ -64,10 +64,20 @@ abstract class GabaritFieldSet
      */
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    /**
+     * Retourne le formulaire pour le champ
+     *
+     * @return string
+     */
+    public function toString()
+    {
         $rc = new \ReflectionClass(get_class($this));
-        $view = $this->view;
         $fileName   = dirname($rc->getFileName()) . DIRECTORY_SEPARATOR
-                    . 'view/' . $view . '.phtml';
+                    . 'view/' . $this->view . '.phtml';
+
         return $this->output($fileName);
     }
 
@@ -119,8 +129,15 @@ abstract class GabaritFieldSet
         }
 
         $type = strtolower($champ['type']);
-        $classNameType  = '\Slrfw\Model\Gabarit\Field\\'
-                        . $type . '\\' . $type . 'field';
+
+        $classNameType = 'Gabarit\\Field\\' . ucfirst($type) . '\\'
+                       . ucfirst($type) . 'Field';
+        $classNameType = \Slrfw\FrontController::searchClass($classNameType);
+
+        if ($classNameType === false) {
+            $classNameType  = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\'
+                            . $type . 'field';
+        }
         $field = new $classNameType($champ, $label, $value, $id, $classes,
             $id_gab_page, $this->versionId);
 
@@ -134,7 +151,7 @@ abstract class GabaritFieldSet
             $field->start();
         }
 
-        $form .= $field;
+        $form .= $field->toString();
         if ($type == 'join') {
             $valueLabel = $field->getValueLabel();
             if($valueLabel == '') {

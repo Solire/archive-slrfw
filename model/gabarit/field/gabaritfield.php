@@ -125,10 +125,19 @@ abstract class GabaritField
      */
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    /**
+     * Renvoi le code HTML
+     *
+     * @return string
+     */
+    public function toString()
+    {
         $rc = new \ReflectionClass(get_class($this));
-        $view = $this->view;
         $viewFile   = dirname($rc->getFileName()) . DIRECTORY_SEPARATOR
-                    . 'view/' . $view . '.phtml';
+                    . 'view/' . $this->view . '.phtml';
         return $this->output($viewFile);
     }
 

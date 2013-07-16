@@ -201,7 +201,7 @@ class gabaritBloc
 
         $type = 'Defaut';
 
-        /** Récupération du type bloc si présent **/
+        /** Récupération du type.phtml bloc si présent **/
         $blocType = $this->_gabarit->getData('type');
         if (!empty($blocType)) {
             $type = $blocType;
@@ -222,7 +222,7 @@ class gabaritBloc
 
         $fieldset = new $className($this, $idGabPage, $versionId);
         $fieldset->start();
-        $form .= $fieldset;
+        $form .= $fieldset->toString();
 
         return $form;
     }
