@@ -67,7 +67,7 @@ class Hook
      * @param array $dirs Liste des répertoires avec le plus bas niveau en premier
      *
      * @return void
-     * @link http://solire-02/wiki/index.php/Hook#Organisation 
+     * @link http://solire-02/wiki/index.php/Hook#Organisation
      */
     public function setDirs(array $dirs)
     {
@@ -150,6 +150,12 @@ class Hook
         foreach ($hooks as $hook) {
             if (!class_exists($hook['className'])) {
                 include $hook['path'];
+            }
+
+            $interfaces = class_implements($hook['className']);
+
+            if (empty($interfaces) || !in_array('Slrfw\HookInterface', $interfaces)) {
+                throw new \Slrfw\Exception\Lib('Hook au mauvais format');
             }
 
             $foo = new $hook['className'];

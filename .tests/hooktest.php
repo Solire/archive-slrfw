@@ -64,13 +64,14 @@ class HookTest extends \PHPUnit_Framework_TestCase
         mkdir(TMP_DIR . 'hook');
         mkdir(TMP_DIR . 'hook' . DS . 'toto');
         mkdir(TMP_DIR . 'hook' . DS . 'data');
+        mkdir(TMP_DIR . 'hook' . DS . 'nointer');
         mkdir(TMP_DIR . 'hook' . DS . 'enreg');
         mkdir(TMP_DIR . 'hook' . DS . 'sub');
         mkdir(TMP_DIR . 'hook' . DS . 'sub/toto');
         $data = <<<END
 <?php
 namespace App\Hook\Toto;
-class MonHook {
+class MonHook implements \Slrfw\HookInterface {
     function run(\$env) {
         throw new \Slrfw\Exception\User('ToutVaBien');
     }
@@ -81,19 +82,29 @@ END;
         $data = <<<END
 <?php
 namespace App\Hook\Data;
-class Data {
+class Data implements \Slrfw\HookInterface {
     function run(\$env) {
         throw new \Slrfw\Exception\User(\$env->message);
     }
 }
 END;
         file_put_contents(TMP_DIR . 'hook' . DS . 'data/data.php', $data);
+        $data = <<<END
+<?php
+namespace App\Hook\NoInter;
+class Data {
+    function run(\$env) {
+            echo 'ok';
+    }
+}
+END;
+        file_put_contents(TMP_DIR . 'hook' . DS . 'nointer/data.php', $data);
 
 
         $data = <<<END
 <?php
 namespace App\Hook\Sub\Toto;
-class MonHook {
+class MonHook implements \Slrfw\HookInterface {
     function run(\$env) {
         throw new \Slrfw\Exception\User('ToutVaBienSub');
     }
@@ -104,7 +115,7 @@ END;
         $data = <<<END
 <?php
 namespace App\Hook\Enreg;
-class MonHook {
+class MonHook implements \Slrfw\HookInterface {
     function run(\$env) {
         \$env->toto = 8;
     }
@@ -124,7 +135,9 @@ END;
         unlink(TMP_DIR . 'hook' . DS . 'toto/monhook.php');
         rmdir(TMP_DIR . 'hook' . DS . 'toto');
         unlink(TMP_DIR . 'hook' . DS . 'data/data.php');
+        unlink(TMP_DIR . 'hook' . DS . 'nointer/data.php');
         rmdir(TMP_DIR . 'hook' . DS . 'data');
+        rmdir(TMP_DIR . 'hook' . DS . 'nointer');
         unlink(TMP_DIR . 'hook' . DS . 'enreg/monhook.php');
         rmdir(TMP_DIR . 'hook' . DS . 'enreg');
         unlink(TMP_DIR . 'hook' . DS . 'sub/toto/monhook.php');
@@ -201,6 +214,21 @@ END;
     }
 
     /**
+     * Vérification du contrôle de la présence de l'interface
+     *
+     * @return void
+     * @expectedException Slrfw\Exception\Lib
+     * @expectedExceptionMessage Hook au mauvais format
+     */
+    public function testNoInterfaceError()
+    {
+        $hook = new Hook();
+        $hook->setDirs(self::$dirs);
+
+        $hook->exec('nointer');
+    }
+
+    /**
      * Contrôle du passage des variables
      *
      * @return void
@@ -235,7 +263,7 @@ END;
         $data = <<<END
 <?php
 namespace Surch\Hook\Toto;
-class MonHook {
+class MonHook implements \Slrfw\HookInterface {
     function run(\$env) {
         throw new \Slrfw\Exception\User('ToutVaBienSurch');
     }
