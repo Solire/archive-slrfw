@@ -3,9 +3,9 @@
  * Gestionnaire des hooks
  *
  * @package    Slrfw
- * @subpackage Core
+ * @subpackage Hook
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -14,9 +14,9 @@ namespace Slrfw;
  * Gestionnaire des hooks
  *
  * @package    Slrfw
- * @subpackage Core
+ * @subpackage Hook
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  * @see        http://solire-02/wiki/index.php/Hook Documentation
  */
 class Hook

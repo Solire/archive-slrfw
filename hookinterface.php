@@ -2,30 +2,31 @@
 /**
  * Interface pour les hooks
  *
- * @package    Vel
+ * @package    Slrfw
  * @subpackage Hook
- * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @author     Adrien <aimbert@solire.fr>
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
 
 /**
- * Chargement des filtres
+ * Interface des classes de hook
  *
- * @package    Vel
+ * @package    Slrfw
  * @subpackage Hook
- * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @author     Adrien <aimbert@solire.fr>
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 interface HookInterface
 {
     /**
-    * Chargement des filtres
+    * Fonction exécutée lors du chargement du hook
     *
-    * @param \Slrfw\Hook $env
+    * @param \Slrfw\Hook $env Objet contenant les variables d'environnement
     *
     * @return void
     */
     public function run($env);
 }
+

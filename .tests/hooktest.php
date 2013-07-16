@@ -2,10 +2,10 @@
 /**
  * Tests unitaires sur Hook
  *
- * @package    Library
+ * @package    Slrfw
  * @subpackage Test
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -23,10 +23,10 @@ require 'slrfw/init.php';
 /**
  * Tests unitaires sur Hook
  *
- * @package    Library
+ * @package    Slrfw
  * @subpackage Test
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class HookTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,6 +36,11 @@ class HookTest extends \PHPUnit_Framework_TestCase
      */
     protected $object;
 
+    /**
+     * Liste de dossiers de test
+     *
+     * @var array
+     */
     public static $dirs;
 
     /**
