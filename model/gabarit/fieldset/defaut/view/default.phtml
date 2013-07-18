@@ -1,10 +1,7 @@
-
         <fieldset>
             <legend><?php echo $this->gabarit->getLabel(); ?></legend>
-
             <div style="display:none;" class="sort-box">
                 <div style="background-color: white; padding: 0px 5px; font-size: 11px; display: block; margin-top: -25px;" class="expand-collapse fr"><a style="font-size:11px" href="#" class="expand disabled">Tout déplier</a> / <a style="font-size:11px" href="#" class="collapse">Tout replier</a></div>
-
 <?php
     foreach ($this->values as $value) {
 
@@ -26,8 +23,6 @@
                             <?php echo $this->champsHTML; ?>
                         </div>
                     </div>
-                    
-                    
                     <div style="float:left; margin-left:8px;">
                         <div class="btn-toolbar">
                             <div class="btn-group btn-bloc-action">
@@ -37,11 +32,10 @@
                             </div>
                         </div>
                     </div>
-             
                 </fieldset>
 <?php
     }
 ?>
-                <a class="btn btn-small btn-info addBloc" style="float:right;" href="#"><i class="icon-plus"></i> Ajouter un bloc</a>
+                <a class="btn btn-small btn-info addBloc" style="float:right;" href="#"><i class="icon-plus"></i>Ajouter un bloc "<?php echo $this->gabarit->getLabel(); ?>"</a>
             </div>
         </fieldset>

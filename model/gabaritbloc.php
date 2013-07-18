@@ -188,12 +188,12 @@ class gabaritBloc
     /**
      * Retourne l'élément d'un formulaire en HTML correspondant à ce bloc dynamique
      *
-     * @param string $id_gab_page
+     * @param string $idGabPage
      * @param int    $versionId
      *
      * @return string élément de formulaire en HTML
      */
-    public function buildForm($id_gab_page, $versionId)
+    public function buildForm($idGabPage, $versionId)
     {
         $form = '';
 
@@ -201,15 +201,28 @@ class gabaritBloc
 
         $type = 'Defaut';
 
+        /** Récupération du type.phtml bloc si présent **/
+        $blocType = $this->_gabarit->getData('type');
+        if (!empty($blocType)) {
+            $type = $blocType;
+        }
+
         if (count($champs) == 1 && $champs[0]['type'] == 'JOIN'
             && $champs[0]['params']['VIEW'] == 'simple') {
             $type = strtolower('simple');
         }
 
-        $classNameType = '\Slrfw\Model\Gabarit\Fieldset\\' . $type . '\\' . $type . 'fieldset';
-        $fieldset = new $classNameType($this, $id_gab_page, $versionId);
+        $className = 'Gabarit\\Fieldset\\' . ucfirst($type) . '\\' . ucfirst($type);
+        $className = \Slrfw\FrontController::searchClass($className);
+
+
+        if ($className === false) {
+            $className = '\Slrfw\Model\Gabarit\Fieldset\\' . $type . '\\' . $type . 'fieldset';
+        }
+
+        $fieldset = new $className($this, $idGabPage, $versionId);
         $fieldset->start();
-        $form .= $fieldset;
+        $form .= $fieldset->toString();
 
         return $form;
     }

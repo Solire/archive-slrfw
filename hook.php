@@ -3,9 +3,9 @@
  * Gestionnaire des hooks
  *
  * @package    Slrfw
- * @subpackage Core
+ * @subpackage Hook
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -14,9 +14,10 @@ namespace Slrfw;
  * Gestionnaire des hooks
  *
  * @package    Slrfw
- * @subpackage Core
+ * @subpackage Hook
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @see        http://solire-02/wiki/index.php/Hook Documentation
  */
 class Hook
 {
@@ -54,15 +55,19 @@ class Hook
      */
     public function __construct()
     {
-        $this->dirs = FrontController::getAppDirs();
+        $this->dirs = array_reverse(FrontController::getAppDirs(), true);
     }
 
     /**
      * Chargement de la liste des répertoires dans lesqueslles se trouve les hooks
      *
-     * @param array $dirs Liste des répertoires
+     * Utilisé principalement dans le cadre des tests, les répertoires des App
+     * sont chargés par défaut lors de la construction de l'objet.
+     *
+     * @param array $dirs Liste des répertoires avec le plus bas niveau en premier
      *
      * @return void
+     * @link http://solire-02/wiki/index.php/Hook#Organisation
      */
     public function setDirs(array $dirs)
     {
@@ -145,6 +150,12 @@ class Hook
         foreach ($hooks as $hook) {
             if (!class_exists($hook['className'])) {
                 include $hook['path'];
+            }
+
+            $interfaces = class_implements($hook['className']);
+
+            if (empty($interfaces) || !in_array('Slrfw\HookInterface', $interfaces)) {
+                throw new \Slrfw\Exception\Lib('Hook au mauvais format');
             }
 
             $foo = new $hook['className'];
