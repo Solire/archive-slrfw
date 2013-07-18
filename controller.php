@@ -313,6 +313,7 @@ class Controller
                     . 'WHERE id_version = ' . ID_VERSION . ' '
                     . ' AND id_api = ' . ID_API . ' '
                     . ' AND old LIKE ' . $this->_db->quote($urlToTest) . ' '
+                    . '     OR IF(LOCATE("http://", old) > 0, SUBSTRING(REPLACE(old,"http://","") FROM LOCATE("/", REPLACE(old,"http://","")) + 1), old) LIKE ' . $this->_db->quote($urlToTest) . ''
                     . 'LIMIT 1';
             $redirection301 = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
             if ($redirection301) {
