@@ -14,6 +14,12 @@ namespace Slrfw\Model\Gabarit\FieldSet;
  */
 abstract class GabaritFieldSet
 {
+    /**
+     * Affichage oui / non du bloc
+     *
+     * @var boolean
+     */
+    protected $display = true;
 
     protected $view = 'default';
 
@@ -90,6 +96,10 @@ abstract class GabaritFieldSet
      */
     public function output($file)
     {
+        if ($this->display === false) {
+            return null;
+        }
+
         ob_start();
         include($file);
         $output = ob_get_clean();
