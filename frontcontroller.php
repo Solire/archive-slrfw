@@ -498,12 +498,7 @@ class FrontController
         $instance->shutdown();
 
         if ($view->isEnabled()) {
-            try {
-                $view->display($front->controller, $front->action, false);
-            } catch (\Exception $exc) {
-                $front->debug(self::VIEW_FILE_NOT_EXISTS, array($view));
-                return false;
-            }
+            $view->display($front->controller, $front->action, false);
         }
 
         return true;
