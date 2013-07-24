@@ -1618,6 +1618,9 @@ class gabaritManager extends manager
 
         if (isset($donnees['id_' . $gabarit->getTable()])) {
             foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
+                if ($id_bloc === 'ANNULE') {
+                    continue;
+                }
                 $ids_blocs[] = $this->saveBlocLine($table, $champs, $id_bloc,
                     $ordre, $donnees, $id_gab_page, $id_version, $partialSave);
                 $ordre++;
