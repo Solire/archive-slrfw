@@ -140,7 +140,7 @@ abstract class GabaritFieldSet
 
         $type = strtolower($champ['type']);
 
-        $classNameType = 'Gabarit\\Field\\' . ucfirst($type) . '\\'
+        $classNameType = 'Model\\Gabarit\\Field\\' . ucfirst($type) . '\\'
                        . ucfirst($type) . 'Field';
         $classNameType = \Slrfw\FrontController::searchClass($classNameType);
 
