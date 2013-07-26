@@ -48,6 +48,12 @@ class FrontController
     public static $appName;
 
     /**
+     * Id api utilisé par page du front
+     * @var int
+     */
+    public static $idApiRew = 1;
+
+    /**
      * Liste des répertoires app à utiliser
      *
      * @var array
@@ -298,8 +304,18 @@ class FrontController
                         $rewritingMod = true;
                         continue;
                     }
+
+                    $conf = self::loadAppConfig($ctrl);
+                    $idApi = $conf->get('fx', 'idApi');
+                    if (!empty($idApi)) {
+                        self::$idApiRew = $idApi;
+                        unset($idApi, $conf);
+                        continue;
+                    }
+
                     $this->application = ucfirst($ctrl);
                     self::$appName = $this->application;
+                    $this->app = $this->application;
                     $application = true;
                     continue;
                 }
@@ -357,14 +373,19 @@ class FrontController
     /**
      * Cherche un fichier dans les applications
      *
-     * @param string $path Chemin Chemin du dossier / fichier à chercher dans
+     * @param string  $path    Chemin Chemin du dossier / fichier à chercher dans
      * les applications
+     * @param boolean $current Utiliser le nom de l'application courante
      *
      * @return string|boolean
      */
-    final public static function search($path)
+    final public static function search($path, $current = true)
     {
-        $path = DS . strtolower(self::$appName) . DS . $path;
+        if ($current === true) {
+            $path = DS . strtolower(self::$appName) . DS . $path;
+        } else {
+            $path = DS . $path;
+        }
         foreach (self::$appDirs as $app) {
             $fooPath = $app['dir'] . $path;
             $testPath = new Path($fooPath, Path::SILENT);
@@ -377,17 +398,51 @@ class FrontController
     }
 
     /**
+     * Cherche une classe
+     *
+     * @param string  $className nom de la classe, avec les namespace, qui sera
+     * préfixé par le nom de l'app
+     *
+     * @return string|boolean
+     */
+    final public static function searchClass($className)
+    {
+        $path = str_replace('\\', DS, $className);
+        $path = DS . strtolower($path) . '.php';
+
+        foreach (self::$appDirs as $app) {
+            $fooPath = $app['dir'] . $path;
+            $testPath = new Path($fooPath, Path::SILENT);
+            if ($testPath->get() !== false) {
+                return $app['name'] . '\\' . $className;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Charge la configuration relative à l'application
      *
-     * @return void
+     * @return \Slrfw\Config|null
      */
-    final public static function loadAppConfig()
+    final public static function loadAppConfig($test = null)
     {
-        $confPath = self::search('conf.ini');
+        if (empty($test)) {
+            $confPath = self::search('conf.ini');
+        } else {
+            $confPath = self::search($test . DS . 'conf.ini', false);
+        }
         if (!empty($confPath)) {
             $appConfig = new Config($confPath);
-            Registry::set('appconfig', $appConfig);
+            if (empty($test)) {
+                Registry::set('appconfig', $appConfig);
+            }
+
+            return $appConfig;
         }
+
+        return null;
     }
     /**
      * Test si le morceau d'url est une application
@@ -401,7 +456,6 @@ class FrontController
         foreach (self::$appDirs as $app) {
             $testPath = new Path($app['dir'] . DS . $ctrl, Path::SILENT);
             if ($testPath->get()) {
-                $this->app = $app['name'];
                 return true;
             }
         }
@@ -491,7 +545,6 @@ class FrontController
 
         $instance->start();
         $view = $instance->getView();
-        $view->setTemplate('main');
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();

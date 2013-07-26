@@ -153,6 +153,13 @@ class Message
             }
         }
 
+        /** utilisation du message.phtml présent dans slrfw **/
+        $path = pathinfo(__FILE__, PATHINFO_DIRNAME) . DS . 'error/message.phtml';
+        $path = new Path($path, Path::SILENT);
+        if ($path->get()) {
+            return $path->get();
+        }
+
         return false;
     }
 

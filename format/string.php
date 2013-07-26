@@ -68,5 +68,20 @@ class String
         }
         return $string;
     }
+    
+    /**
+     * Construit une url propre à partir d'une chaine de caractere,
+     * @param string $string la chaine de base à transformer.
+     * @param string $charReplacement caractere de remplacement.
+     * @return string La chaine transfomée.
+     */
+    static function friendlyURL($string, $charReplacement = "-") {
+        $string = preg_replace("`\[.*\]`U", "", $string);
+        $string = preg_replace('`&(amp;)?#?[a-z0-9]+;`i', $charReplacement, $string);
+        $string = htmlentities($string, ENT_COMPAT, 'utf-8');
+        $string = preg_replace("`&([a-z])?(acute|uml|circ|grave|ring|cedil|slash|tilde|caron|lig|quot|rsquo);`i", "\\1", $string);
+        $string = preg_replace(array("`[^a-z0-9]`i", "`[$charReplacement]+`"), $charReplacement, $string);
+        return strtolower(trim($string, $charReplacement));
+    }
 }
 

@@ -344,6 +344,7 @@ class Datatable
 
         $columnAction[0] = array(
             "width" => "93px",
+            "sorting" => false,
             "content" => '<div class="btn-group">',
             "show" => true,
             "title" => "Action",
@@ -352,9 +353,9 @@ class Datatable
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["show"]) && $this->config["extra"]["show"]
         ) {
-            $columnActionButtons[] = '<button title="Voir" class="btn btn-primary show-item-no-ajax">
-                                        <img width="12" alt="Voir" src="app/back/img/white/magnifying_glass_12x12.png">
-                                    </button>';
+            $columnActionButtons[] = '
+                <a href="#" class="btn btn-small btn-info show-item-no-ajax" title="Visualiser"><i class="icon-eye-open"></i></a>
+                ';
         }
 
         if (isset($this->config["extra"])
@@ -362,9 +363,9 @@ class Datatable
                 && (!isset($this->config["form"])
                 || !isset($this->config["form"]["ajax"])
                 || $this->config["form"]["ajax"] == true)) {
-            $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item">
-                                                <img width="12" src="app/back/img/white/pen_alt_stroke_12x12.png" alt="Modifier">
-                                            </button>';
+            $columnActionButtons[] = '
+                <a href="#" class="btn btn-small btn-info edit-item" title="Modifier"><i class="icon-pencil"></i></a>
+                ';
         }
 
         if (isset($this->config["extra"])
@@ -372,15 +373,16 @@ class Datatable
                 && isset($this->config["form"])
                 && isset($this->config["form"]["ajax"])
                 && $this->config["form"]["ajax"] == false) {
-            $columnActionButtons[] = '<button title="Modifier" class="btn btn-success edit-item-no-ajax">
-                                                <img width="12" src="app/back/img/white/pen_alt_stroke_12x12.png" alt="Modifier" />
-                                            </button>';
+            $columnActionButtons[] = '
+                <a href="#" class="btn btn-small btn-info edit-item-no-ajax" title="Modifier"><i class="icon-pencil"></i></a>
+                ';
         }
 
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["deletable"]) && $this->config["extra"]["deletable"]) {
             $columnActionButtons[] = '
-                <button title="Supprimer" class="btn btn-danger delete-item"><img alt="Supprimer" width="12" src="app/back/img/white/trash_stroke_16x16.png"></button>';
+                <a href="#" class="btn btn-small btn-warning btn-info delete-item" title="Supprimer"><i class="icon-trash"></i></a>
+                ';
         }
 
 
@@ -579,7 +581,8 @@ class Datatable
 
         /* Formulaire de création AJAX ONLY */
         if (isset($this->config["extra"])
-                && isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]
+                && (isset($this->config["extra"]["creable"]) && $this->config["extra"]["creable"]
+                || isset($this->config["extra"]["editable"]) && $this->config["extra"]["editable"])
                 && (!isset($this->config["form"])
                 || !isset($this->config["form"]["ajax"])
                 || $this->config["form"]["ajax"] == true)) {
@@ -1424,6 +1427,9 @@ class Datatable
                                     break;
 
                                 default:
+                                    $aColumnsFunctions[$keyCol][$keyFunc]["name"] .= "::" . $params["type"];
+                                    unset($params["type"]);
+                                    $paramsFunc = $params;
                                     break;
                             }
 
@@ -2100,7 +2106,7 @@ class Datatable
 
                         if (isset($aColumnsDetails[$aColRawKey]) && $aColumnsDetails[$aColRawKey]) {
                             if ($row[$currentId] != "") {
-                                $row[0] = '<img class="detail" src="' . $this->_imgPath . 'details_open.png">';
+                                $row[0] = '<a href="#" class="btn btn-default btn-small detail" title="Visualiser"><i class="icon-plus"></i></a>';
                                 break;
                             }
                         }

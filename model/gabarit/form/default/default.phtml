@@ -6,7 +6,7 @@
                                 <input type="hidden" name="id_temp" />
 
 <?php
-                            if ($this->_gabarit->getIdParent() > 0) {
+                            if ($this->_gabarit->getIdParent() > 0 && (is_a($this->getParent(0), "\Slrfw\Model\gabaritPage") || !$this->getMeta('id'))) {
 ?>
                                 <div class="line">
                                     <label for="id_parent"><?php echo $this->_gabarit->getGabaritParent("label"); ?></label>
@@ -182,12 +182,12 @@
                                                 <div class="line">
                                                     <label for="301-<?php echo $metaLang; ?>">Url</label>
                                                     <input type="text" name="301[]" id="301-<?php echo $metaLang; ?>" value="<?php echo $redirection; ?>" class=""  />
-                                                    <div class="btn-a gradient-blue fr 301-remove<?php echo count($redirections) == 1 ? ' translucide' : ''; ?>" style="margin-right: 220px"><span class="ui-icon white ui-icon-minusthick"></span></div>
+                                                    <a href="#" class="btn btn-small btn-info disabled fr 301-remove<?php echo count($redirections) == 1 ? ' translucide' : ''; ?>" style="margin-right: 200px" title="Retirer"><i class="icon-minus"></i></a>
                                                 </div>
 <?php
                             }
 ?>
-                                                <div class="btn-a gradient-blue fr 301-add" style="margin-right: 223px"><span class="ui-icon white ui-icon-plusthick"> Ajout une URL</span></div>
+                                                <a href="#" class="btn btn-small btn-info fr 301-add" style="margin-right: 200px" title="Ajout une URL"><i class="icon-plus"></i></a>
                                             </div>
 
                                         </fieldset>
@@ -205,7 +205,24 @@
                                     <div<?php echo $metaId ? ' style="display:none;"' : ''; ?>>
 <?php
                                 foreach ($champs as $champ) {
-                                    $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
+                                    if($champ["type"] == "GMAP") {
+                                        if(isset($this->_values[$champ['name'] . "_lat"])) {
+                                            $value = array(
+                                                "lat"          =>  $this->_values[$champ['name'] . "_lat"],
+                                                "lng"         =>  $this->_values[$champ['name'] . "_lng"],
+                                                "zoom"     =>  $this->_values[$champ['name'] . "_zoom"],
+                                            );
+                                        } else {
+                                            $value = array(
+                                                "lat"          =>  "",
+                                                "lng"         =>  "",
+                                                "zoom"     =>  "",
+                                            );
+                                        }
+                                    } else {
+                                        $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
+                                    }
+
                                         $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
                                         echo $this->_buildChamp($champ, $value, $id, $metaId);
                                 }
@@ -220,14 +237,21 @@
                             }
 ?>
 
+
+
                                 <div class="buttonfixed">
-                                    <div class="btn-a gradient-green cb fl"><a href="#" class="formajaxsubmit">Valider</a></div>
-                                    <div class="btn-a gradient-green cb fl"><a href="#" class="uploader_popup">Fichiers</a></div>
-                                    <div class="btn-a gradient-green cb fl"><a href="#" class="formprev">Prévisualiser</a></div>
-                                    <div class="btn-a gradient-green cb fl back-to-list">
-                                        <a href="<?php echo $retour . ($metaId ? '?id_gab_page=' . $metaId : ''); ?>">Retour</a>
+                                    <div class="btn-group btn-group-vertical">
+                                        <a title="Valider" class="btn btn-small btn-success formajaxsubmit" href="#"><i class="icon-ok"></i> Valider</a><br /><br />
+                                        <a title="Importer" class="btn btn-small btn-success uploader_popup" href="#"><i class="icon-folder-open"></i> Importer</a><br /><br />
+                                        <?php
+                                            if ($this->_gabarit->getView()) {
+                                        ?>
+                                        <a title="Prévisualiser" class="btn btn-small btn-success formprev" href="#"><i class="icon-camera"></i> Prévisualiser</a><br /><br />
+                                        <?php } ?>
+                                        <a title="Quitter" class="btn btn-warning  btn-small back-to-list" href="<?php echo $retour . ($metaId ? '?id_gab_page=' . $metaId : ''); ?>"><i class="icon-warning-sign"></i> Quitter</a>
                                     </div>
                                 </div>
+
                             </form>
 
 

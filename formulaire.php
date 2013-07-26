@@ -137,17 +137,23 @@ class Formulaire
      * ;; Valeurs Possible : string (nom du champs)
      * egal = "code"
      *
-     * @param array|string $iniPath Array contenant l'architecture ou le chemin du .ini
+     * @param array|string $iniPath  Array contenant l'architecture ou le chemin du .ini
+     * @param boolean      $complete Si le chemin est absolu
      *
      * @config main [dirs] "formulaire" Chemin du dossier des .ini d'architecture
      */
-    public function __construct($iniPath)
+    public function __construct($iniPath, $complete = false)
     {
         $config = Registry::get('mainconfig');
         if (!is_array($iniPath)) {
-            $iniPath = $config->get('dirs', 'formulaire') . $iniPath;
+            if (!$complete) {
+                $iniPath = $config->get('dirs', 'formulaire') . $iniPath;
+            }
             $iniPath = new Path($iniPath);
-            $this->_architecture = parse_ini_file($iniPath->get(), true);
+            $architecture = new Config($iniPath->get());
+            $this->_architecture = $architecture->getAll();
+            $this->_config = $architecture->getConfig();
+            unset($architecture);
         } else {
             $this->_architecture = $iniPath;
         }
@@ -163,22 +169,22 @@ class Formulaire
      */
     protected function parseArchi()
     {
-        if (isset($this->_architecture['__config'])) {
-            $this->_config = $this->_architecture['__config'];
-            unset($this->_architecture['__config']);
+        if (isset($this->_architecture[\Slrfw\Config::KEY_CONF])) {
+            $this->_config = $this->_architecture[\Slrfw\Config::KEY_CONF];
+            unset($this->_architecture[\Slrfw\Config::KEY_CONF]);
+        }
 
-            if (isset($this->_config['ordre'])) {
-                $this->_ordre = $this->_config['ordre'];
-            }
+        if (isset($this->_config['ordre'])) {
+            $this->_ordre = $this->_config['ordre'];
+        }
 
-            /** Récupération des plugin **/
-            if (isset($this->_config['plugins'])) {
-                $this->plugins = explode('|', $this->_config['plugins']);
-            }
+        /** Récupération des plugin **/
+        if (isset($this->_config['plugins'])) {
+            $this->plugins = explode('|', $this->_config['plugins']);
         }
 
         /* = Suppression d'_exemple
-          `------------------------------------------------- */
+        `------------------------------------------------- */
         if (isset($this->_architecture['_exemple'])) {
             unset($this->_architecture['_exemple']);
         }

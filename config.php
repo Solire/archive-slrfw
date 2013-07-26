@@ -38,6 +38,13 @@ class Config
     private $config = null;
 
     /**
+     * Tableau de paramétrage du fichier de configuration
+     *
+     * @var array
+     */
+    private $headerConfig;
+
+    /**
      * Charge un nouveau fichier de configuration
      *
      * @param string $iniFile Chemin vers le fichier de configuration
@@ -50,15 +57,31 @@ class Config
         $iniPath = new Path($iniFile);
         $this->config = parse_ini_file($iniPath->get(), true);
 
-        $config = $this->get(self::KEY_CONF);
+        $this->headerConfig = $config = $this->get(self::KEY_CONF);
         unset($this->config[self::KEY_CONF]);
 
         /** Extends **/
         if (isset($config['extends'])) {
-            $this->setExtends($config['extends']);
+            if (!is_array($config['extends'])) {
+                $this->setExtends($config['extends']);
+            } else {
+                foreach ($config['extends'] as $path) {
+                    $this->setExtends($path);
+                }
+            }
         }
 
         $this->parseVar();
+    }
+
+    /**
+     * Renvois la section de configuration du .ini
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->headerConfig;
     }
 
     /**
@@ -153,6 +176,16 @@ class Config
                 }
             }
         }
+    }
+
+    /**
+     * Renvois le contenu du fichier de configuration
+     *
+     * @return array Tableau de la configuration
+     */
+    public function getAll()
+    {
+        return $this->config;
     }
 
     /**

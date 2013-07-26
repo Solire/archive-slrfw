@@ -380,7 +380,14 @@ class gabaritPage extends gabaritBloc
         $allchamps = $this->_gabarit->getChamps();
 
         ob_start();
-        include __DIR__ . "/gabarit/form/default/default.phtml";
+        $customForm = \Slrfw\FrontController::search('model/gabarit/form/default/default.phtml');
+
+        if($customForm !== false) {
+            include $customForm;
+        } else {
+            include __DIR__ . "/gabarit/form/default/default.phtml";
+        }
+
         $form = ob_get_clean();
 
 		return $form;
@@ -390,7 +397,7 @@ class gabaritPage extends gabaritBloc
      *
      * @return type
      */
-	public function buildForm()
+    public function buildForm()
     {
         $form   = '<input type="hidden" name="id_' . $this->_gabarit->getTable()
                 . '" value="' . (isset($this->_values['id']) ? $this->_values['id'] : '')
@@ -406,7 +413,7 @@ class gabaritPage extends gabaritBloc
             foreach ($champs as $champ) {
                 $value = isset($this->_values[$champ['name']]) ? $this->_values[$champ['name']] : '';
                 $id = isset($this->_meta['id_version']) ? $this->_meta['id_version'] : '';
-                $form .= $this->_buildChamp($champ, $value, $id, $id_gab_page);
+                $form .= $this->_buildChamp($champ, $value, $id, $id_gab_page, $id);
             }
             $form .= '</div></fieldset>';
         }

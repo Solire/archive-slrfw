@@ -4,7 +4,7 @@
  *
  * @package    Slrfw
  * @subpackage Install
- * @author     Stéphane <smonnot@solire.fr>
+ * @author     Adrien <aimbert@solire.fr>
  * @license    Solire http://www.solire.fr/
  */
 
@@ -19,17 +19,9 @@ require 'slrfw/init.php';
 
 $db = \Slrfw\Registry::get('db');
 
-$query = "
-    INSERT INTO `gab_champ_param` (
-    `code` ,
-    `name` ,
-    `default_value` ,
-    `code_champ_type`
-    )
-    VALUES (
-    'TYPE.GAB.PAGE', 'Jointure avec gab_page', '1', 'JOIN'
-    );
-";
+/** Mettre script d'installation ici  **/
+
+
+$query = 'ALTER TABLE `gab_bloc` ADD `type` VARCHAR( 12 ) NOT NULL AFTER `id_gabarit` ';
+
 $db->exec($query);
-
-

@@ -14,6 +14,12 @@ namespace Slrfw\Model\Gabarit\FieldSet;
  */
 abstract class GabaritFieldSet
 {
+    /**
+     * Affichage oui / non du bloc
+     *
+     * @var boolean
+     */
+    protected $display = true;
 
     protected $view = 'default';
 
@@ -64,10 +70,20 @@ abstract class GabaritFieldSet
      */
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    /**
+     * Retourne le formulaire pour le champ
+     *
+     * @return string
+     */
+    public function toString()
+    {
         $rc = new \ReflectionClass(get_class($this));
-        $view = $this->view;
         $fileName   = dirname($rc->getFileName()) . DIRECTORY_SEPARATOR
-                    . 'view/' . $view . '.phtml';
+                    . 'view/' . $this->view . '.phtml';
+
         return $this->output($fileName);
     }
 
@@ -80,6 +96,10 @@ abstract class GabaritFieldSet
      */
     public function output($file)
     {
+        if ($this->display === false) {
+            return null;
+        }
+
         ob_start();
         include($file);
         $output = ob_get_clean();
@@ -119,8 +139,15 @@ abstract class GabaritFieldSet
         }
 
         $type = strtolower($champ['type']);
-        $classNameType  = '\Slrfw\Model\Gabarit\Field\\'
-                        . $type . '\\' . $type . 'field';
+
+        $classNameType = 'Model\\Gabarit\\Field\\' . ucfirst($type) . '\\'
+                       . ucfirst($type) . 'Field';
+        $classNameType = \Slrfw\FrontController::searchClass($classNameType);
+
+        if ($classNameType === false) {
+            $classNameType  = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\'
+                            . $type . 'field';
+        }
         $field = new $classNameType($champ, $label, $value, $id, $classes,
             $id_gab_page, $this->versionId);
 
@@ -134,9 +161,12 @@ abstract class GabaritFieldSet
             $field->start();
         }
 
-        $form .= $field;
+        $form .= $field->toString();
         if ($type == 'join') {
             $valueLabel = $field->getValueLabel();
+            if($valueLabel == '') {
+                $valueLabel =  'Bloc en cours de création';
+            }
         } else {
             if($value != '') {
                 if (\mb_strlen($value, 'UTF-8') > 50) {
@@ -145,7 +175,7 @@ abstract class GabaritFieldSet
                     $valueLabel = $value;
                 }
             } else {
-                $valueLabel =  'Nouvel élément';
+                $valueLabel =  'Bloc en cours de création';
             }
         }
 

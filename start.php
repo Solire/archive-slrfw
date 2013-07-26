@@ -31,7 +31,7 @@ try {
         } else {
             $marvin->send();
         }
-        Error::run();
+        Error::http($exc->getHttp());
     }
 } catch (\Exception $exc) {
     $marvin = new Marvin('debug', $exc);

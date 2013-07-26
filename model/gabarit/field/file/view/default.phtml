@@ -2,11 +2,14 @@
     <label for="<?php echo $this->id; ?>">
         <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
     </label>
+    <div class="input-append">
     <input data-min-width="<?php  echo $this->params["CROP.WIDTH.MIN"]; ?>" data-min-height="<?php  echo $this->params["CROP.HEIGHT.MIN"]; ?>" type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" />
+        <a title="Prévisualisation" <?php echo $this->value != '' ? '' : 'style="display:none;"'?> href="<?php echo ($this->value ? $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="btn previsu"><i class="icon-camera"></i></a>
+        <a title="Recadrer" <?php echo $this->isImage ? '' : 'style="display:none;"'?>  class="btn  crop" href="#"><i class="icon-fullscreen"></i></a>
+    </div>
 
     <input type="hidden" class="extensions" value="<?php  echo $this->params["EXTENSIONS.ALLOW"]; ?>" />
 
-    <div title="Prévisualisation" class="btn-a gradient-blue" <?php echo $this->value != '' ? '' : 'style="display:none;"'?>><a class="previsu" href="<?php echo ($this->value ? $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="previsu"><img src="app/back/img/voir.png" alt="Prévisualisation"></a></div>
-
-    <div  title="Recadrer" class="btn-a gradient-blue" <?php echo $this->isImage ? '' : 'style="display:none;"'?>><a class="crop" href="#"><img alt="Recadrer" src="app/back/img/crop.png"></a></div>
+    
+    
 </div>

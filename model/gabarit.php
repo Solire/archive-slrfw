@@ -91,6 +91,23 @@ class gabarit
         return $this->_data['deletable'];
     }
 
+
+    /**
+     * Renvois une variable de $_data
+     *
+     * @param string $name Nom de la variable à renvoyer
+     *
+     * @return mixed
+     */
+    public function getData($name)
+    {
+        if (isset($this->_data[$name])) {
+            return $this->_data[$name];
+        }
+
+        return null;
+    }
+
     public function getSortable() {
         return $this->_data['sortable'];
     }
@@ -109,6 +126,10 @@ class gabarit
 
     public function getExtension() {
         return $this->_data['extension'];
+    }
+
+    public function getView() {
+        return $this->_data['view'];
     }
 
     public function get301_editable() {

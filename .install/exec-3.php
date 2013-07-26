@@ -20,15 +20,12 @@ require 'slrfw/init.php';
 $db = \Slrfw\Registry::get('db');
 
 $query = "
-    INSERT INTO `gab_champ_param` (
-    `code` ,
-    `name` ,
-    `default_value` ,
-    `code_champ_type`
-    )
-    VALUES (
-    'TYPE.GAB.PAGE', 'Jointure avec gab_page', '1', 'JOIN'
-    );
+    ALTER TABLE `gab_gabarit` ADD `view` BOOLEAN NOT NULL DEFAULT '1';
+";
+$db->exec($query);
+
+$query = "
+    UPDATE `gab_gabarit` SET `view` = '0' WHERE `gab_gabarit`.`id` =2;
 ";
 $db->exec($query);
 
