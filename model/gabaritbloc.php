@@ -212,7 +212,7 @@ class gabaritBloc
             $type = strtolower('simple');
         }
 
-        $className = 'Gabarit\\Fieldset\\' . ucfirst($type) . '\\' . ucfirst($type);
+        $className = 'Model\\Gabarit\\Fieldset\\' . ucfirst($type) . '\\' . ucfirst($type);
         $className = \Slrfw\FrontController::searchClass($className);
 
 
