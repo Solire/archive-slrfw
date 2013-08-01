@@ -357,7 +357,6 @@ class gabaritManager extends manager
      * @param int     $id_gab_page identifiant de la page 0 sinon
      *
      * @return gabaritBloc tableau associatif des blocs dynamiques
-     * @hook Gabarit/ <blocType>Bloc A la fin d'un chargement d'un bloc
      */
     public function getBlocs($gabarit)
     {
@@ -395,8 +394,6 @@ class gabaritManager extends manager
         }
 
         $blocs = array();
-        $hook = new \Slrfw\Hook();
-        $hook->setSubdirName('gabarit');
         foreach ($rows as $row) {
             $gabarit_bloc = new gabarit($row);
 
@@ -443,17 +440,6 @@ class gabaritManager extends manager
             $gabarit_bloc->setJoins($joins);
 
 
-            if (!empty($row['type'])) {
-
-                $hook->bloc = $gabarit_bloc;
-
-                /** Execution du hook **/
-                $hook->exec($row['type'] . 'Bloc');
-
-                $gabarit_bloc = $hook->bloc;
-            }
-
-
             if (class_exists('\Slrfw\Model\Personnalise\\' . $table)) {
                 $className = '\Slrfw\Model\Personnalise\\' . $table;
                 $bloc = new $className();
@@ -486,31 +472,49 @@ class gabaritManager extends manager
 
     /**
      * Retourne les lignes des infos de la table générée à partir d'un bloc
-     * <br />et de la page parente.
+     *  et de la page parente.
      *
-     * @param gabarit $bloc        bloc
-     * @param int     $id_gab_page identifiant de la page parente.
-     * @param int     $id_version  identifiant de la version.
-     * @param bool    $visible     si faux on récupère les blocs visibles ou non,
-     * <br />si vrai on récupère uniquement les blocs visibles.
+     * @param gabaritBloc $bloc        bloc
+     * @param int         $idGabPage identifiant de la page parente.
+     * @param int         $idVersion  identifiant de la version.
+     * @param bool        $visible     si faux on récupère les blocs visibles ou non,
+     *  si vrai on récupère uniquement les blocs visibles.
      *
      * @return array
+     * @hook Gabarit/ <blocType>BlocGet A la fin d'un chargement d'un bloc
      */
-    public function getBlocValues($bloc, $id_gab_page, $id_version, $visible = false)
+    public function getBlocValues($bloc, $idGabPage, $idVersion, $visible = false)
     {
-        $query = 'SELECT *'
-                . ' FROM `' . $bloc->getGabarit()->getTable() . '`'
-                . ' WHERE `id_gab_page` = ' . $id_gab_page
-                . ' AND `suppr` = 0'
-                . ' AND `id_version` = ' . $id_version;
+        $query = 'SELECT * '
+                . 'FROM `' . $bloc->getGabarit()->getTable() . '` '
+                . 'WHERE `id_gab_page` = ' . $idGabPage . ' '
+                . ' AND `suppr` = 0 '
+                . ' AND `id_version` = ' . $idVersion . ' ';
 
         if ($visible) {
-            $query .= ' AND `visible` = 1';
+            $query .= ' AND `visible` = 1 ';
         }
 
-        $query .= ' ORDER BY `ordre`';
+        $query .= 'ORDER BY `ordre` ';
 
-        return $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+        $values = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+
+        $type = $bloc->getGabarit()->getData('type');
+        if (!empty($type)) {
+            $hook = new \Slrfw\Hook();
+            $hook->setSubdirName('gabarit');
+
+            $hook->bloc = $bloc;
+            $hook->idGabPage = $idGabPage;
+            $hook->values = $values;
+
+            $hook->exec($type . 'BlocGet');
+
+            $values = $hook->values;
+        }
+        unset($type);
+
+        return $values;
     }
 
     /**
