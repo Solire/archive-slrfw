@@ -42,6 +42,18 @@ class gabaritManager extends manager
     protected $modePrevisualisation = false;
 
     /**
+     * Nom de la classe gabaritPage utilisé par défaut
+     */
+    const DEFAULT_GABARIT_CLASS = '\Slrfw\Model\GabaritPage';
+
+    /**
+     * Nom de la classe à utiliser pour charger les gabarits page
+     *
+     * @var string
+     */
+    private $gabaritClassName = self::DEFAULT_GABARIT_CLASS;
+
+    /**
      * Donne l'identifiant d'une page d'après son rewriting et l'identifiant.
      *
      * @param int    $id_version identifiant de la version
@@ -82,6 +94,34 @@ class gabaritManager extends manager
     }
 
     /**
+     * Spécifie la classe à utiliser dans le chargement des pages
+     *
+     * @param string $className Nom de la classe avec les namespaces. Si null
+     * passé, le nom de la classe est remis à la valeur par défaut.
+     *
+     * @return boolean Vrais si la classe à été enregistrée comme class à utiliser
+     * pour le gabaritPage
+     * @throws \Slrfw\Exception\Lib Lorsqu'aucune classe n'est trouvée
+     */
+    public function setPageClass($className)
+    {
+        /** Enregistrement de la valeur par défaut si null **/
+        if ($className === null) {
+            $this->gabaritClassName = self::DEFAULT_GABARIT_CLASS;
+            return true;
+        }
+
+        $classNameOff = \Slrfw\FrontController::searchClass($className);
+
+        if (!empty($classNameOff)) {
+            $this->gabaritClassName = $classNameOff;
+            return true;
+        }
+
+        throw new \Slrfw\Exception\Lib('Aucune classe trouvée ' . $className);
+    }
+
+    /**
      * Retourne un objet page à partir de l'identifiant de la page
      * <br />ou un objet page vide à partir de l'idenfiant du gabarit
      *
@@ -103,7 +143,7 @@ class gabaritManager extends manager
         $join = false,
         $visible = false
     ) {
-        $page = new gabaritPage();
+        $page = new $this->gabaritClassName();
 
         /**
          * Visibilité pour le front.
