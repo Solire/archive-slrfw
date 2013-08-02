@@ -5,7 +5,7 @@
  * @package    Slrfw
  * @subpackage Core
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -16,7 +16,7 @@ namespace Slrfw;
  * @package    Slrfw
  * @subpackage Core
  * @author     Adrien <aimbert@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class Config
 {
@@ -50,7 +50,7 @@ class Config
      * @param string $iniFile Chemin vers le fichier de configuration
      *
      * @return void
-     * @uses Path Contrôle du chemin du fichier
+     * @uses \Slrfw\Path Contrôle du chemin du fichier
      */
     public function __construct($iniFile)
     {
@@ -62,12 +62,13 @@ class Config
 
         /** Extends **/
         if (isset($config['extends'])) {
-            if (!is_array($config['extends'])) {
-                $this->setExtends($config['extends']);
-            } else {
-                foreach ($config['extends'] as $path) {
-                    $this->setExtends($path);
-                }
+            $extends = $config['extends'];
+            if (!is_array($extends)) {
+                $extends = array($extends);
+            }
+
+            foreach ($config['extends'] as $path) {
+                $this->setExtends($path);
             }
         }
 
@@ -117,9 +118,9 @@ class Config
                 && is_array ( $merged [$key] )
             ) {
                 $merged [$key] = $this->arrayMerge($merged [$key], $value);
-            } else {
-                $merged [$key] = $value;
+                continue;
             }
+            $merged [$key] = $value;
         }
 
         return $merged;

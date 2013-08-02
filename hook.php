@@ -121,11 +121,7 @@ class Hook
             }
             $dir = opendir($path->get());
             while ($file = readdir($dir)) {
-                if ($file == '.' || $file == '..') {
-                    continue;
-                }
-
-                if (is_dir($path->get() . $file)) {
+                if ($file == '.' || $file == '..' || is_dir($path->get() . $file)) {
                     continue;
                 }
 
