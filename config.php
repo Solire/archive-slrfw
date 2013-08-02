@@ -67,7 +67,7 @@ class Config
                 $extends = array($extends);
             }
 
-            foreach ($config['extends'] as $path) {
+            foreach ($extends as $path) {
                 $this->setExtends($path);
             }
         }
