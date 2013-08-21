@@ -398,6 +398,16 @@ class Controller
     }
 
     /**
+     * Renvois les informations de rewriting courante
+     *
+     * @return array
+     */
+    final public function getRewriting()
+    {
+        return $this->rew;
+    }
+
+    /**
      * Test si les valeurs du tableau sont dans les paramètres de la page
      *
      * @param array $inputs Liste des valeurs à contrôler
