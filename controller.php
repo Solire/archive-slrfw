@@ -288,7 +288,7 @@ class Controller
      */
     public function check301()
     {
-        $url = str_replace('/' . Registry::get('baseroot'), '', $_SERVER['REQUEST_URI']);
+        $url = preg_replace('`^/' . Registry::get('baseroot') . '`', '', $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
         $urlsToTest[] = $url;
 
