@@ -288,7 +288,7 @@ class Controller
      */
     public function check301()
     {
-        $url = str_replace('/' . Registry::get('baseroot'), '', $_SERVER['REQUEST_URI']);
+        $url = preg_replace("`^/" . Registry::get('baseroot') . "`", "", $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
         $urlsToTest[] = $url;
 
@@ -313,17 +313,16 @@ class Controller
                     . 'WHERE id_version = ' . ID_VERSION . ' '
                     . ' AND id_api = ' . ID_API . ' '
                     . ' AND old LIKE ' . $this->_db->quote($urlToTest) . ' '
-                    . '     OR IF(LOCATE("http://", old) > 0, SUBSTRING(REPLACE(old,"http://","") FROM LOCATE("/", REPLACE(old,"http://","")) + 1), old) LIKE ' . $this->_db->quote($urlToTest) . ''
                     . 'LIMIT 1';
             $redirection301 = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
-            if ($redirection301) {
+            if ($redirection301 !== false) {
                 $keyChange = $key;
                 $urlPartRedirect = $urlToTest;
                 break;
             }
         }
 
-        if ($redirection301) {
+        if ($redirection301 !== false) {
             $samePart = array_slice($urlPartsReverse, 0, $keyChange);
             $redirection301 .= implode('/', $samePart);
             $redirection301 = $this->_url . $redirection301;
