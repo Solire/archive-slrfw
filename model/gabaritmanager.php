@@ -29,7 +29,7 @@ class gabaritManager extends manager
 
     /**
      * Tableau des identifiants des versions (utilisé lors de l'enregistrement
-     * des pages.
+     * des pages.)
      *
      * @var int[]
      */
@@ -187,57 +187,7 @@ class gabaritManager extends manager
         $gabarit->setGabaritParent($parentData);
 
         if (!$id_gab_page && $gabarit->getIdParent() > 0) {
-            $parents = array();
-
-            /** Si le gabarit parent est lui-même son propre parent */
-            if ($parentData['id_parent'] == $parentData['id']) {
-                $parents = $this->getList($id_version, $id_api, 0,
-                    $parentData['id']);
-
-                foreach ($parents as $parent) {
-                    $enfants = $this->getList($id_version, $id_api,
-                        $parent->getMeta('id'), $parentData['id']);
-                    $parent->setChildren($enfants);
-
-                    foreach ($enfants as $enfant) {
-                        $ptenfants = $this->getList($id_version, $id_api,
-                            $enfant->getMeta('id'), $parentData['id']);
-                        $enfant->setChildren($ptenfants);
-                    }
-                }
-
-            } else {
-                $idParents = array();
-
-                $idTemp  = $parentData['id'];
-
-                while ($idTemp > 0) {
-                    $idParents[] = $idTemp;
-                    $query  = 'SELECT `id_parent` FROM `gab_gabarit` WHERE `id` = ' . $idTemp;
-                    $idTemp   = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
-                }
-
-                $idParents = array_reverse($idParents);
-
-                $parents = $this->getList($id_version, $id_api, 0, $idParents[0]);
-
-                if (isset($idParents[1])) {
-                    foreach ($parents as $parent) {
-                        $enfants = $this->getList($id_version, $id_api,
-                            $parent->getMeta('id'), $idParents[1]);
-                        $parent->setChildren($enfants);
-
-                        if (isset($idParents[2])) {
-                            foreach ($enfants as $enfant) {
-                                $ptenfants = $this->getList($id_version, $id_api,
-                                    $enfant->getMeta('id'), $idParents[2]);
-                                $enfant->setChildren($ptenfants);
-                            }
-                        }
-                    }
-                }
-            }
-
+            $parents = $this->getParentsPotentiels($id_version, $id_api, $parentData);
             $gabarit->setParents($parents);
         }
 
@@ -286,6 +236,85 @@ class gabaritManager extends manager
         $hook->exec($gabarit->getName() . 'Page');
 
         return $page;
+    }
+
+    /**
+     * Renvoi les pages parentes potentiels pour une page en création
+     *
+     * @param int   $id_version identifiant de la version
+     * @param int   $id_api     identifiant de l'api
+     * @param array $parentData parents potentiels
+     *
+     * @return array
+     */
+    public function getParentsPotentiels($id_version, $id_api, $parentData)
+    {
+        $parents = array();
+
+        /**
+         * Si le gabarit parent est lui-même son propre parent
+         */
+        if ($parentData['id_parent'] == $parentData['id']) {
+            $parents = $this->getList($id_version, $id_api, 0,
+                $parentData['id']);
+
+            foreach ($parents as $parent) {
+                $enfants = $this->getList($id_version, $id_api,
+                    $parent->getMeta('id'), $parentData['id']);
+                $parent->setChildren($enfants);
+
+                if (count($enfants) == 0) {
+                    $firstChlid = $this->getFirstChild($id_version,
+                        $parent->getMeta('id'), false);
+                    $parent->setFirstChild($firstChlid);
+                }
+
+                foreach ($enfants as $enfant) {
+                    $ptenfants = $this->getList($id_version, $id_api,
+                        $enfant->getMeta('id'), $parentData['id']);
+                    $enfant->setChildren($ptenfants);
+
+                    if (count($ptenfants) == 0) {
+                        $firstChlid = $this->getFirstChild($id_version,
+                            $enfant->getMeta('id'), false);
+
+                        $enfant->setFirstChild($firstChlid);
+                    }
+                }
+            }
+        } else {
+            $idParents = array();
+
+            $idTemp  = $parentData['id'];
+
+            while ($idTemp > 0) {
+                $idParents[] = $idTemp;
+                $query  = 'SELECT `id_parent` FROM `gab_gabarit` WHERE `id` = ' . $idTemp;
+                $idTemp   = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
+            }
+
+            $idParents = array_reverse($idParents);
+
+            $parents = $this->getList($id_version, $id_api, 0, $idParents[0]);
+
+            if (isset($idParents[1])) {
+                foreach ($parents as $parent) {
+                    $enfants = $this->getList($id_version, $id_api,
+                        $parent->getMeta('id'), $idParents[1]);
+                    $parent->setChildren($enfants);
+
+                    if (isset($idParents[2])) {
+                        foreach ($enfants as $enfant) {
+                            $ptenfants = $this->getList($id_version, $id_api,
+                                $enfant->getMeta('id'), $idParents[2]);
+                            $enfant->setChildren($ptenfants);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $parents;
     }
 
     /**
@@ -1027,17 +1056,21 @@ class gabaritManager extends manager
      * @param int $id_version identifiant de la version
      * @param int $id_parent  identifiant de la page parente
      *
-     * @return gabaritPage|null
+     * @return gabaritPage
      */
-    public function getFirstChild($id_version, $id_parent = 0)
+    public function getFirstChild($id_version, $id_parent = 0, $visible = true)
     {
+        if ($this->modePrevisualisation) {
+            $visible = false;
+        }
+
         $query  = 'SELECT *'
                 . ' FROM `gab_page`'
                 . ' WHERE `id_parent` = ' . $id_parent
                 . ' AND `suppr` = 0'
                 . ' AND `id_version` = ' . $id_version;
 
-        if (!$this->modePrevisualisation) {
+        if ($visible) {
             $query .= ' AND `visible` = 1';
         }
 
@@ -1846,7 +1879,6 @@ class gabaritManager extends manager
         }
     }
 
-
     /**
      * Permet de prévisualiser une page
      *
@@ -2032,4 +2064,3 @@ class gabaritManager extends manager
         return true;
     }
 }
-

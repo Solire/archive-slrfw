@@ -10,10 +10,6 @@ use Slrfw\Registry;
  * @author thomas
  */
 class manager {
-
-	const LOAD_BY_ID = 1;
-	const LOAD_BY_REWRITING = 2;
-
 	/**
 	 *
 	 * @var Slrfw\MyPDO
@@ -24,8 +20,11 @@ class manager {
 	 *
 	 * @param Slrfw\MyPDO $db
 	 */
-	public function __construct($db = null) {
-		if ($db)	$this->_db = $db;
-		else		$this->_db = Registry::get("db");
+	public function __construct(Slrfw\MyPDO $db = null) {
+		if ($db) {
+            $this->_db = $db;
+        } else {
+            $this->_db = Registry::get("db");
+        }
 	}
 }

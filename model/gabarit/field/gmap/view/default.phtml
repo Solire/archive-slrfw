@@ -3,13 +3,15 @@
         <label for="<?php echo $this->id; ?>">
             <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
         </label>
-        
-        
-        <div id="<?php echo $this->id; ?>" class="gmap"><div style="height: 250px;width: 500px;" class="gmap-component"></div></div>
 
-        <input type="hidden" style="" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="" value="<?php echo $this->value; ?>" />
-        <input type="hidden" style="" name="champ<?php echo $this->champ['id']; ?>_lat[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>_lat gmap_lat" value="<?php echo $this->value["lat"]; ?>" />
-        <input type="hidden" style="" name="champ<?php echo $this->champ['id']; ?>_lng[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>_lng gmap_lng" value="<?php echo $this->value["lng"]; ?>" />
-        <input type="hidden" style="" name="champ<?php echo $this->champ['id']; ?>_zoom[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>_zoom gmap_zoom" value="<?php echo $this->value["zoom"]; ?>" />
+
+        <div id="<?php echo $this->id; ?>" class="gmap" style="padding:0; width:885px; background-color:red;">
+            <div style="width:885px; height:500px;" class="gmap-component"></div>
+        </div>
+
+        <input type="hidden" name="champ<?php echo $this->champ['id']; ?>[]" value="" />
+        <input type="hidden" name="champ<?php echo $this->champ['id']; ?>_lat[]" class="gmap_lat" value="<?php echo $this->value["lat"]; ?>" />
+        <input type="hidden" name="champ<?php echo $this->champ['id']; ?>_lng[]" class="gmap_lng" value="<?php echo $this->value["lng"]; ?>" />
+        <input type="hidden" name="champ<?php echo $this->champ['id']; ?>_zoom[]" class="gmap_zoom" value="<?php echo $this->value["zoom"]; ?>" />
     </div>
 </div>
