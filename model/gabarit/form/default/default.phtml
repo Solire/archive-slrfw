@@ -20,35 +20,67 @@
 <?php
                                 } else {
 ?>
-                                    <select name="id_parent" id="id_parent-1"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent()) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
-                                        <option value="0">---</option>
 <?php
+                                    $nbChoixParents = 0;
+                                    ob_start();
                                     foreach ($this->_gabarit->getParents() as $p) {
+
+                                        $child = $p->getFirstChild();
+
                                         $disabled = '';
-                                        if (count($p->getChildren()) > 0) {
+                                        if ($child
+                                            && $child->getMeta('id_gabarit') != $this->_gabarit->getId()
+                                        ) {
                                             $disabled = ' disabled="disabled"';
+                                        } else {
+                                            $nbChoixParents++;
                                         }
 ?>
                                         <option value="<?php echo $p->getMeta('id'); ?>"<?php echo $disabled; ?> class="option1"><?php echo $p->getMeta('titre'); ?></option>
 <?php
                                         foreach ($p->getChildren() as $q) {
+
+                                            $child = $q->getFirstChild();
+
                                             $disabled = '';
-                                            if (count($q->getChildren()) > 0) {
-                                                $disabled = ' disabled="disabled"';
+                                            if ($child) {
+                                                if ($child->getMeta('id_gabarit') != $this->_gabarit->getId()) {
+                                                    $disabled = ' disabled="disabled"';
+                                                }
+                                            } else {
+                                                $nbChoixParents++;
                                             }
 ?>
                                         <option value="<?php echo $q->getMeta('id'); ?>"<?php echo $disabled; ?> class="option2"><?php echo $q->getMeta('titre'); ?></option>
 <?php
                                             foreach ($q->getChildren() as $r) {
+                                                $nbChoixParents++;
 ?>
-                                        <option value="<?php echo $r->getMeta('id'); ?>" class="option3"><?php echo $r->getMeta('titre'); ?></option>
+                                        <option value="<?php echo $r->getMeta('id'); ?>" class="option3"><?php echo $r->getMeta('titre'); ?> <?php echo $r->getMeta('id_gabarit'); ?></option>
 <?php
                                             }
                                         }
                                     }
+                                    $parentsOptions = ob_get_clean();
+
+                                    if ($nbChoixParents > 0) {
+?>
+                                    <select name="id_parent" id="id_parent-1"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent()) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
+                                        <option value="0">---</option>
+<?php
+                                        echo $parentsOptions;
 ?>
                                     </select>
 <?php
+                                    } else {
+?>
+                                    <select name="id_parent">
+<?php
+                                        echo $parentsOptions;
+?>
+                                    </select>
+<?php
+                                    }
                                 }
 ?>
                                 </div>
