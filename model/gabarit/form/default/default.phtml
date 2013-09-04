@@ -6,10 +6,12 @@
                                 <input type="hidden" name="id_temp" />
 
 <?php
-                            if ($this->_gabarit->getIdParent() > 0 && (is_a($this->getParent(0), "\Slrfw\Model\gabaritPage") || !$this->getMeta('id'))) {
+                            if ($this->_gabarit->getIdParent() > 0
+                                && (is_a($this->getParent(0), "\Slrfw\Model\gabaritPage") || !$this->getMeta('id'))
+                            ) {
 ?>
                                 <div class="line">
-                                    <label for="id_parent"><?php echo $this->_gabarit->getGabaritParent("label"); ?></label>
+                                    <label for="id_parent"><?php echo $this->_gabarit->getGabaritParent("label"); ?> <span class="required">*</span></label>
 <?php
                                 if ($this->getMeta('id')) {
 ?>
@@ -63,9 +65,9 @@
                                     }
                                     $parentsOptions = ob_get_clean();
 
-                                    if ($nbChoixParents > 0) {
+                                    if ($nbChoixParents > 1 || $nbChoixParents == 0) {
 ?>
-                                    <select name="id_parent" id="id_parent-1"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent()) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
+                                    <select name="id_parent" id="id_parent-<?php echo $metaLang; ?>"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent()) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
                                         <option value="0">---</option>
 <?php
                                         echo $parentsOptions;
@@ -74,7 +76,7 @@
 <?php
                                     } else {
 ?>
-                                    <select name="id_parent">
+                                    <select name="id_parent" id="id_parent-<?php echo $metaLang; ?>"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent()) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
 <?php
                                         echo $parentsOptions;
 ?>
