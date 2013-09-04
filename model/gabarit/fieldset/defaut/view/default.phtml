@@ -4,6 +4,13 @@
                 <div style="background-color: white; padding: 0px 5px; font-size: 11px; display: block; margin-top: -25px;" class="expand-collapse fr"><a style="font-size:11px" href="#" class="expand disabled">Tout déplier</a> / <a style="font-size:11px" href="#" class="collapse">Tout replier</a></div>
 <?php
     foreach ($this->values as $value) {
+        if (count($this->values) == 1
+            && (!isset($value['id']) || $value['id'] == 0)
+        ) {
+            $visible = true;
+        } else {
+            $visible = $value['visible'];
+        }
 
         $this->_buildChamps($value);
 ?>
@@ -13,11 +20,11 @@
                     <div>
                         <div class="line" style="display:none;">
                             <label for="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>">Visible</label>
-                            <input type="checkbox" id="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>" class="changevisible"<?php echo (isset($value['visible']) && $value['visible'] ? ' checked="checked"' : '') ?> />
+                            <input type="checkbox" id="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>" class="changevisible"<?php echo $visible ? ' checked="checked"' : ''; ?> />
                             <input type="hidden" value="<?php echo (isset($value['visible']) && $value['visible'] ? 1 : 0) ?>" name="visible[]" />
                         </div>
 
-                        <div<?php echo (isset($value['visible']) && $value['visible'] ? '' : ' class="translucide"') ?>>
+                        <div<?php echo $visible ? '' : ' class="translucide"'; ?>>
                             <input type="hidden" name="id_<?php echo $this->gabarit->getTable() . '[]" value="' . (isset($value['id']) ? $value['id'] : '') ?>" />
 
                             <?php echo $this->champsHTML; ?>
@@ -27,7 +34,7 @@
                         <div class="btn-toolbar">
                             <div class="btn-group btn-bloc-action">
                                 <a href="#" class="btn btn-small btn-info sort-move <?php echo ( count($this->values) > 1 ? '' : 'to-remove' ) ?>" title="Déplacer" <?php echo ( count($this->values) > 1 ? '' : ' style="display: inline-bloc;"' ) ?>><i class="icon-retweet"></i></a>
-                                <a href="#" class="btn btn-small btn-info btn-changevisible" title="Visible sur le site"><i class="<?php echo (isset($value['visible']) && $value['visible'] ? 'icon-eye-open' : 'icon-eye-close translucide') ?>"></i></a>
+                                <a href="#" class="btn btn-small btn-info btn-changevisible" title="Visible sur le site"><i class="<?php echo $visible ? 'icon-eye-open' : 'icon-eye-close translucide'; ?>"></i></a>
                                 <a href="#" class="btn btn-small btn-warning delBloc <?php echo ( count($this->values) > 1 ? '' : 'to-remove' ) ?>" title="Supprimer" <?php echo ( count($this->values) > 1 ? '' : ' style="display: inline-bloc;"' ) ?>><i class="icon-trash"></i></a>
                             </div>
                         </div>
