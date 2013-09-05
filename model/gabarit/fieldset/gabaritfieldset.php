@@ -162,21 +162,19 @@ abstract class GabaritFieldSet
         }
 
         $form .= $field->toString();
-        if ($type == 'join') {
+        if (method_exists($field, 'getValueLabel')) {
             $valueLabel = $field->getValueLabel();
             if($valueLabel == '') {
                 $valueLabel =  'Bloc en cours de création';
             }
-        } else {
-            if($value != '') {
-                if (\mb_strlen($value, 'UTF-8') > 50) {
-                    $valueLabel = \mb_substr($value, 0, 50, 'UTF-8') . '&hellip;';
-                } else {
-                    $valueLabel = $value;
-                }
+        } elseif ($value != '') {
+            if (\mb_strlen($value, 'UTF-8') > 50) {
+                $valueLabel = \mb_substr($value, 0, 50, 'UTF-8') . '&hellip;';
             } else {
-                $valueLabel =  'Bloc en cours de création';
+                $valueLabel = $value;
             }
+        } else {
+            $valueLabel =  'Bloc en cours de création';
         }
 
         return array(
