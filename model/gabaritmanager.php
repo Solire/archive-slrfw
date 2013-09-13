@@ -1557,6 +1557,8 @@ class gabaritManager extends manager
                 }
 
                 $value = $donnees['champ' . $champ['id']][0];
+                $value = trim($value);
+
                 if ($champ['type'] != 'WYSIWYG'
                     && $champ['type'] != 'TEXTAREA'
                 ) {
@@ -1773,6 +1775,8 @@ class gabaritManager extends manager
             }
 
             $value = array_shift($donnees['champ' . $champ['id']]);
+
+            $value = trim($value);
 
             if ($champ['type'] != 'WYSIWYG'
                 && $champ['type'] != 'TEXTAREA'
