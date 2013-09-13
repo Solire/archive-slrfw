@@ -161,6 +161,7 @@ class Controller
      *
      * @return void
      * @throws Exception\lib Si le type n'est pas cohérent
+     * @deprecated since version 3.0
      */
     final protected function loadExec($type)
     {
