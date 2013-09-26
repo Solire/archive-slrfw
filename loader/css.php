@@ -87,8 +87,15 @@ class Css
                 && substr($lib['src'], 0, 8) != 'https://'
             ) {
                 $path = $this->getPath($lib['src']);
-                if (!empty($path)) {
-                    $path .= '?' . filemtime($path);
+                if (empty($path)) {
+                    $path  = $lib['src'];
+                } else {
+                    $fileInfo  = pathinfo($path);
+
+                    $filemtime = filemtime($path);
+
+                    $path = $fileInfo['dirname'] . '/' . $fileInfo['filename']
+                          . '.' . $filemtime . '.css';
                 }
             } else {
                 $path = $lib['src'];

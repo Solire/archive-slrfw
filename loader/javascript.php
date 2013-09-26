@@ -90,9 +90,14 @@ class Javascript
                 $path = $this->getPath($lib['src']);
 
                 if (empty($path)) {
-                    $path = $lib['src'];
+                    $path  = $lib['src'];
                 } else {
-                    $path .= '?' . filemtime($path);
+                    $fileInfo  = pathinfo($path);
+
+                    $filemtime = filemtime($path);
+
+                    $path = $fileInfo['dirname'] . '/' . $fileInfo['filename']
+                          . '.' . $filemtime . '.js';
                 }
             } else {
                 $path = $lib['src'];
