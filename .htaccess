@@ -25,6 +25,9 @@ deny from all
     # Sitemap(s)
     RewriteRule ^sitemap.xml$                                               index.php?controller=sitemap&action=start&%{QUERY_STRING} [L]
 
+    # Controle cache js et css
+    RewriteRule ^(.+)\.[0-9]{10,}(\.js|\.css)$ $1$2 [L]
+
     # Images & documents ajoutés par l'utilisateur
     RewriteRule ^(projet/upload/|)((temp-|)[0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$    upload/$2/$4 [L]
 
