@@ -21,7 +21,7 @@
                         <div class="line" style="display:none;">
                             <label for="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>">Visible</label>
                             <input type="checkbox" id="visible-<?php echo $this->gabarit->getId() . '-' . (isset($value['id']) ? $value['id'] : 0) . '-' . (isset($value['id_version']) ? $value['id_version'] : 1) ?>" class="changevisible"<?php echo $visible ? ' checked="checked"' : ''; ?> />
-                            <input type="hidden" value="<?php echo (isset($value['visible']) && $value['visible'] ? 1 : 0) ?>" name="visible[]" />
+                            <input type="hidden" value="<?php echo $visible ? 1 : 0; ?>" name="visible[]" />
                         </div>
 
                         <div<?php echo $visible ? '' : ' class="translucide"'; ?>>
