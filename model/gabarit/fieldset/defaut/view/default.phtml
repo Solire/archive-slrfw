@@ -34,7 +34,7 @@
                         <div class="btn-toolbar">
                             <div class="btn-group btn-bloc-action">
                                 <a href="#" class="btn btn-small btn-info sort-move <?php echo ( count($this->values) > 1 ? '' : 'to-remove' ) ?>" title="Déplacer" <?php echo ( count($this->values) > 1 ? '' : ' style="display: inline-bloc;"' ) ?>><i class="icon-retweet"></i></a>
-                                <a href="#" class="btn btn-small btn-info btn-changevisible" title="Visible sur le site"><i class="<?php echo $visible ? 'icon-eye-open' : 'icon-eye-close translucide'; ?>"></i></a>
+                                <a href="#" class="btn btn-small btn-changevisible<?php echo $visible ? ' btn-success' : ' btn-default'; ?>" title="Visible sur le site"><i class="<?php echo $visible ? 'icon-eye-open' : 'icon-eye-close'; ?>"></i></a>
                                 <a href="#" class="btn btn-small btn-warning delBloc <?php echo ( count($this->values) > 1 ? '' : 'to-remove' ) ?>" title="Supprimer" <?php echo ( count($this->values) > 1 ? '' : ' style="display: inline-bloc;"' ) ?>><i class="icon-trash"></i></a>
                             </div>
                         </div>
