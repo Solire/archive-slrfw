@@ -394,6 +394,25 @@ class gabaritPage extends gabaritBloc
 	}
 
     /**
+     * Inclut le sélecteur des parents
+     *
+     * @return void
+     */
+    public function selectParents()
+    {
+        $path = '/gabarit/form/default/selectparents.phtml';
+
+        $customForm = \Slrfw\FrontController::search('model' . $path, false);
+
+        if ($customForm !== false) {
+            include $customForm;
+        } else {
+            include __DIR__ . $path;
+        }
+    }
+
+    /**
+     *
      *
      * @return type
      */
