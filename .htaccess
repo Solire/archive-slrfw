@@ -1,5 +1,17 @@
+# ------------------------------------------------------------------------------
+# | Configuration PHP                                                          |
+# ------------------------------------------------------------------------------
 SetEnv PHP_VER 5_3
 SetEnv MAGIC_QUOTES 0
+
+# ------------------------------------------------------------------------------
+# | Paramétrage htpasswd                                                       |
+# ------------------------------------------------------------------------------
+#AuthName "Espace de recette"
+#AuthType Basic
+#AuthUserFile "/var/www/.htpasswd"
+#Require valid-user
+
 
 # ------------------------------------------------------------------------------
 # | Forcer le www. au début des Urls                                           |
@@ -12,11 +24,17 @@ SetEnv MAGIC_QUOTES 0
     RewriteRule ^ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </IfModule>
 
+# ------------------------------------------------------------------------------
+# | blocage de l'accès des fichiers .ini                                       |
+# ------------------------------------------------------------------------------
 <files *.ini>
 order deny,allow
 deny from all
 </files>
 
+# ------------------------------------------------------------------------------
+# | rewriting                                                                  |
+# ------------------------------------------------------------------------------
 <IfModule mod_rewrite.c>
     RewriteEngine on
 
@@ -31,17 +49,15 @@ deny from all
     # Images & documents ajoutés par l'utilisateur
     RewriteRule ^(projet/upload/|)((temp-|)[0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$    upload/$2/$4 [L]
 
-
     RewriteRule ^$                                                          index.php?%{QUERY_STRING} [L]
     RewriteRule ^(([a-zA-Z0-9\-]+).html)$                                   index.php?action=$2&%{QUERY_STRING} [L]
     RewriteRule ^([a-zA-Z0-9/\-]+)/$                                        index.php?controller=$1&%{QUERY_STRING} [L]
     RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$                   index.php?controller=$1&action=$2&%{QUERY_STRING} [L]
 </IfModule>
 
-# ----------------------------------------------------------------------
-# Gzip compression
-# ----------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# | Gzip compression                                                           |
+# ------------------------------------------------------------------------------
 <IfModule mod_deflate.c>
 
     # Force deflate for mangled headers developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/
@@ -86,19 +102,9 @@ deny from all
 
 
 
-# ----------------------------------------------------------------------
-# Expires headers (for better cache control)
-# ----------------------------------------------------------------------
-
-# These are pretty far-future expires headers.
-# They assume you control versioning with cachebusting query params like
-#   <script src="application.js?20100608">
-# Additionally, consider that outdated proxies may miscache
-#   www.stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring/
-
-# If you don't use filenames to version, lower the CSS  and JS to something like
-#   "access plus 1 week" or so.
-
+# ------------------------------------------------------------------------------
+# | Gestion de la mise en cache                                                |
+# ------------------------------------------------------------------------------
 <IfModule mod_expires.c>
     ExpiresActive on
 
