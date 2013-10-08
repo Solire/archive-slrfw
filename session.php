@@ -192,7 +192,6 @@ class Session
         return $mdp;
     }
 
-
     /**
      * "Sale" et fait un sha256 du mot de passe
      *
@@ -369,6 +368,71 @@ class Session
     public function __get($name)
     {
         return $this->user[$name];
+    }
+
+    /**
+     * Met à jour une clé de sécurité en BDD et la renvoi
+     *
+     * @param string $login identifiant de l'utilisateur
+     *
+     * @return boolean|string false si l'identifiant n'existe pas en BDD.
+     */
+    public function genKey($login)
+    {
+        $db = Registry::get('db');
+
+        $query = $db->prepare($this->config['queryLogin']);
+        $query->bindValue(':login', $login, \PDO::PARAM_STR);
+        $query->execute();
+        $user = $query->fetch(\PDO::FETCH_ASSOC);
+
+        if ($user) {
+            $cle    = self::makePass(32);
+            $cleBdd = self::prepareMdp($cle);
+
+            $query = $db->prepare($this->config['queryNewKey']);
+            $query->bindValue(':key', $cleBdd, \PDO::PARAM_STR);
+            $query->bindValue(':id', $user['id'], \PDO::PARAM_INT);
+            $query->execute();
+
+            return $cle;
+        }
+
+        return false;
+    }
+
+    /**
+     * Vérifie la clé de sécurité et génère un nouveau mot de passe qui est renvoyé
+     *
+     * @param string $cle   clé de vérification
+     * @param string $login identifiant de l'utilisateur
+     *
+     * @return boolean|string false si le couple clé / identifiant ne fonctionne pas
+     * sinon le nouveau mot de passe
+     */
+    public function newPassword($cle, $login)
+    {
+        $db = Registry::get('db');
+
+        $query = $db->prepare($this->config['queryKey']);
+        $query->bindValue(':login', $login, \PDO::PARAM_STR);
+        $query->bindValue(':key', self::prepareMdp($cle), \PDO::PARAM_STR);
+        $query->execute();
+        $user = $query->fetch(\PDO::FETCH_ASSOC);
+
+        if ($user) {
+            $mdp    = self::makePass(8);
+            $mdpBdd = self::prepareMdp($mdp);
+
+            $query = $db->prepare($this->config['queryNewPass']);
+            $query->bindValue(':pass', $mdpBdd, \PDO::PARAM_STR);
+            $query->bindValue(':id', $user['id'], \PDO::PARAM_INT);
+            $query->execute();
+
+            return $mdp;
+        }
+
+        return false;
     }
 }
 
