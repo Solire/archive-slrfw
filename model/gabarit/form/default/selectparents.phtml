@@ -34,8 +34,18 @@
                 } else {
                     $nbChoixParents++;
                 }
+
+                $enfants = '';
+                $nbEnfants = $p->getMeta('nbre_enfants');
+                if ($nbEnfants > 0) {
+                    $enfants = ' (contient ' . $nbEnfants . ' enfant';
+                    if ($nbEnfants > 1) {
+                        $enfants .= 's';
+                    }
+                    $enfants .= ')';
+                }
 ?>
-                                        <option value="<?php echo $p->getMeta('id'); ?>"<?php echo $disabled; ?> class="option1"><?php echo $p->getMeta('titre'); ?></option>
+                                        <option value="<?php echo $p->getMeta('id'); ?>"<?php echo $disabled; ?> class="option1"><?php echo $p->getMeta('titre') . $enfants; ?></option>
 <?php
                 foreach ($p->getChildren() as $q) {
 
@@ -52,8 +62,18 @@
                     } else {
                         $nbChoixParents++;
                     }
+
+                    $enfants = '';
+                    $nbEnfants = $q->getMeta('nbre_enfants');
+                    if ($nbEnfants > 0) {
+                        $enfants = ' contient ' . $nbEnfants . ' enfant';
+                        if ($nbEnfants > 1) {
+                            $enfants .= 's';
+                        }
+                        $enfants .= ')';
+                    }
 ?>
-                                        <option value="<?php echo $q->getMeta('id'); ?>"<?php echo $disabled; ?> class="option2"><?php echo $q->getMeta('titre'); ?></option>
+                                        <option value="<?php echo $q->getMeta('id'); ?>"<?php echo $disabled; ?> class="option2"><?php echo $q->getMeta('titre') . $enfants; ?></option>
 <?php
                     foreach ($q->getChildren() as $r) {
 
@@ -67,8 +87,18 @@
                         } else {
                             $nbChoixParents++;
                         }
+
+                        $enfants = '';
+                        $nbEnfants = $r->getMeta('nbre_enfants');
+                        if ($nbEnfants > 0) {
+                            $enfants = ' contient ' . $nbEnfants . ' enfant';
+                            if ($nbEnfants > 1) {
+                                $enfants .= 's';
+                            }
+                            $enfants .= ')';
+                        }
 ?>
-                                        <option value="<?php echo $r->getMeta('id'); ?>"<?php echo $disabled; ?> class="option3"><?php echo $r->getMeta('titre'); ?></option>
+                                        <option value="<?php echo $r->getMeta('id'); ?>"<?php echo $disabled; ?> class="option3"><?php echo $r->getMeta('titre') . $enfants; ?></option>
 <?php
                     }
                 }
