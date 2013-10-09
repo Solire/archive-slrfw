@@ -38,7 +38,7 @@
                 $enfants = '';
                 $nbEnfants = $p->getMeta('nbre_enfants');
                 if ($nbEnfants > 0) {
-                    $enfants = ' (contient ' . $nbEnfants . ' enfant';
+                    $enfants = ' (comporte ' . $nbEnfants . ' contenu';
                     if ($nbEnfants > 1) {
                         $enfants .= 's';
                     }
@@ -66,7 +66,7 @@
                     $enfants = '';
                     $nbEnfants = $q->getMeta('nbre_enfants');
                     if ($nbEnfants > 0) {
-                        $enfants = ' contient ' . $nbEnfants . ' enfant';
+                        $enfants = ' (comporte ' . $nbEnfants . ' contenu';
                         if ($nbEnfants > 1) {
                             $enfants .= 's';
                         }
@@ -91,7 +91,7 @@
                         $enfants = '';
                         $nbEnfants = $r->getMeta('nbre_enfants');
                         if ($nbEnfants > 0) {
-                            $enfants = ' contient ' . $nbEnfants . ' enfant';
+                            $enfants = ' (comporte ' . $nbEnfants . ' contenu';
                             if ($nbEnfants > 1) {
                                 $enfants .= 's';
                             }
