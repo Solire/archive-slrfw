@@ -91,7 +91,9 @@ class gabaritPage extends gabaritBloc
     public function setMeta($meta)
     {
         $this->_meta = $meta;
-        $this->_id = $meta['id'];
+        if (isset($meta['id'])) {
+            $this->_id = $meta['id'];
+        }
     }
 
     /**
@@ -205,8 +207,11 @@ class gabaritPage extends gabaritBloc
     public function getMeta($key = null)
     {
         if ($key != null) {
-            if (is_array($this->_meta) && array_key_exists($key, $this->_meta))
+            if (is_array($this->_meta)
+                && isset($this->_meta[$key])
+            ) {
                 return $this->_meta[$key];
+            }
 
             return null;
         }
@@ -223,8 +228,11 @@ class gabaritPage extends gabaritBloc
     public function getVersion($key = null)
     {
         if ($key != null) {
-            if (is_array($this->_version) && array_key_exists($key, $this->_version))
+            if (is_array($this->_version)
+                && isset($this->_version[$key])
+            ) {
                 return $this->_version[$key];
+            }
 
             return null;
         }
@@ -240,13 +248,17 @@ class gabaritPage extends gabaritBloc
      */
     public function getValues($key = null)
     {
-        if ($key == null)
-            return $this->_values;
+        if ($key != null) {
+            if (is_array($this->_values)
+                && isset($this->_values[$key])
+            ) {
+                return $this->_values[$key];
+            }
 
-        if (is_array($this->_values) && array_key_exists($key, $this->_values))
-            return $this->_values[$key];
+            return '';
+        }
 
-        return '';
+        return $this->_values;
     }
 
     /**
@@ -385,7 +397,7 @@ class gabaritPage extends gabaritBloc
         if ($customForm !== false) {
             include $customForm;
         } else {
-            include __DIR__ . "/gabarit/form/default/default.phtml";
+            include __DIR__ . '/gabarit/form/default/default.phtml';
         }
 
         $form = ob_get_clean();
