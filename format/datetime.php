@@ -338,5 +338,23 @@ class DateTime
 
         return $ladate;
     }
+
+    /**
+     * Transforme une date au format sql dans un autre format, format francais
+     * jj/mm/yyyy par défaut
+     *
+     * @param string $dateSql date au format sql
+     * @param string $format  format de sortie accepté par date()
+     *
+     * @return string
+     *
+     * @link http://php.net/manual/en/function.date.php documentaion pour
+     * paramètre $format
+     */
+    static public function sql($dateSql, $format = 'd/m/Y')
+    {
+        $date = new \DateTime($dateSql);
+        return $date->format($format);
+    }
 }
 
