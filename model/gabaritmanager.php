@@ -765,28 +765,36 @@ class gabaritManager extends manager
              * Si on a des parents pour une des valeurs d'un bloc
              */
             $parentsPage = array();
+            $parentsMeta = array();
             if (count($parents) > 0) {
                 $parentsUnique = array_unique($parents);
+
                 unset($parents);
                 $parents = array();
                 $query  = 'SELECT * FROM `gab_page`'
                         . ' WHERE `id_version` = ' . $id_version
                         . ' AND `id` IN (' . implode(', ', $parentsUnique) . ')'
                         . ' AND `suppr` = 0';
-                $parentsMeta = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
-                foreach ($parentsMeta as $parentMeta) {
+                $parentTmp = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+                $parentsMeta = array_merge($parentsMeta, $parentTmp);
+
+                foreach ($parentTmp as $parentMeta) {
                     if ($parentMeta['id_parent'] != 0) {
                         $parents[] = $parentMeta['id_parent'];
                     }
 
-                    $parentsPage[$parentMeta['id']] = new gabaritPage();
-                    $parentsPage[$parentMeta['id']]->setMeta($parentMeta);
+                    $pageTmp = new gabaritPage();
+                    $pageTmp->setMeta($parentMeta);
+                    $parentsPage[$parentMeta['id']] = $pageTmp;
                 }
+
 
                 /**
                  * Si on a des grands parents
                  */
                 $parentsUnique2 = array_unique(array_merge($parentsUnique, $parents));
+                unset($parents);
+                $parents = array();
 
                 /**
                  * Si on a des grandparents qu'on avait pas recuperer
@@ -797,11 +805,45 @@ class gabaritManager extends manager
                             . ' AND `id` IN (' . implode(', ', $parentsUnique2) . ')'
                             . ' AND `suppr` = 0';
                     $parentTmp = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+                    $parentsMeta = array_merge($parentsMeta, $parentTmp);
 
-                    $parentsMeta2 = array_merge($parentsMeta, $parentTmp);
-                    foreach ($parentsMeta2 as $parentMeta2) {
-                        $parentsPage[$parentMeta2['id']] = new gabaritPage();
-                        $parentsPage[$parentMeta2['id']]->setMeta($parentMeta2);
+                    foreach ($parentTmp as $parentMeta) {
+                        if ($parentMeta['id_parent'] != 0) {
+                            $parents[] = $parentMeta['id_parent'];
+                        }
+
+                        $pageTmp = new gabaritPage();
+                        $pageTmp->setMeta($parentMeta);
+                        $parentsPage[$parentMeta['id']] = $pageTmp;
+                    }
+
+                    /**
+                     * Si on a des grands grands parents
+                     */
+                    $parentsUnique3 = array_unique(array_merge($parentsUnique2, $parents));
+                    unset($parents);
+                    $parents = array();
+
+                    /**
+                     * Si on a des grandparents qu'on avait pas recuperer
+                     */
+                    if (count($parentsUnique3) > count($parentsUnique2)) {
+                        $query  = 'SELECT * FROM `gab_page`'
+                                . ' WHERE `id_version` = ' . $id_version
+                                . ' AND `id` IN (' . implode(', ', $parentsUnique3) . ')'
+                                . ' AND `suppr` = 0';
+                        $parentTmp = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+
+                        $parentsMeta2 = array_merge($parentsMeta, $parentTmp);
+                        foreach ($parentTmp as $parentMeta) {
+                            if ($parentMeta['id_parent'] != 0) {
+                                $parents[] = $parentMeta['id_parent'];
+                            }
+
+                            $pageTmp = new gabaritPage();
+                            $pageTmp->setMeta($parentMeta);
+                            $parentsPage[$parentMeta['id']] = $pageTmp;
+                        }
                     }
                 }
 
@@ -823,14 +865,26 @@ class gabaritManager extends manager
                     }
 
                     if ($pageJoin->getMeta('id_parent') > 0) {
-                        $parents[] = $parentsPage[$pageJoin->getMeta('id_parent')];
+                        $id_tmp     = $pageJoin->getMeta('id_parent');
+                        $parent_tmp = $parentsPage[$id_tmp];
+                        $parents[]  = $parent_tmp;
 
                         /**
                          * Si on a un grand parent
                          */
-                        $id_tmp = $pageJoin->getMeta('id_parent');
-                        if ($parentsPage[$id_tmp]->getMeta('id_parent') > 0) {
-                            $parents[] = $parentsPage[$parentsPage[$id_tmp]->getMeta('id_parent')];
+                        if ($parent_tmp->getMeta('id_parent') > 0) {
+                            $id_tmp     = $parent_tmp->getMeta('id_parent');
+                            $parent_tmp = $parentsPage[$id_tmp];
+                            $parents[]  = $parent_tmp;
+
+                            /**
+                             * Si on a un grand grand parent
+                             */
+                            if ($parent_tmp->getMeta('id_parent') > 0) {
+                                $id_tmp     = $parent_tmp->getMeta('id_parent');
+                                $parent_tmp = $parentsPage[$id_tmp];
+                                $parents[]  = $parent_tmp;
+                            }
                         }
                     }
 
@@ -2092,3 +2146,4 @@ class gabaritManager extends manager
         return true;
     }
 }
+
