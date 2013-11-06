@@ -364,32 +364,37 @@ class gabaritPage extends gabaritBloc
         $redirections = array(),
         $authors = array()
     ) {
-        $versionId          = $this->_version['id'];
+        $this->view = array();
 
-        $metaId             = isset($this->_meta['id'])
-                            ? $this->_meta['id']
-                            : 0;
-        $metaLang           = isset($this->_meta['id_version'])
-                            ? $this->_meta['id_version']
-                            : BACK_ID_VERSION;
-        $noMeta             = !$this->_gabarit->getMeta() || !$metaId
-                            ? ' style="display: none;" '
-                            : '';
-        $noMetaTitre        = !$this->_gabarit->getMeta_titre()
-                            ? ' style="display: none;" '
-                            : '';
-        $noRedirections301  = !$this->_gabarit->get301_editable()
-                            ? ';display: none'
-                            : '';
-        $parentSelect       = '';
+        $this->view['action']            = $action;
+        $this->view['retour']            = $retour;
+        $this->view['authors']           = $authors;
 
-        $api = $this->_gabarit->getApi();
+        if (count($redirections) == 0) {
+            $this->view['redirections']  = array("");
+        } else {
+            $this->view['redirections']  = $redirections;
+        }
 
-        $redirections   = count($redirections) == 0
-                        ? array("")
-                        : $redirections;
-
-        $allchamps = $this->_gabarit->getChamps();
+        $this->view['versionId']         = $this->_version['id'];
+        $this->view['metaId']            = isset($this->_meta['id'])
+            ? $this->_meta['id']
+            : 0;
+        $this->view['metaLang']          = isset($this->_meta['id_version'])
+            ? $this->_meta['id_version']
+            : BACK_ID_VERSION;
+        $this->view['noMeta']            = !$this->_gabarit->getMeta() || !$this->view['metaId']
+            ? ' style="display: none;" '
+            : '';
+        $this->view['noMetaTitre']       = !$this->_gabarit->getMeta_titre()
+            ? ' style="display: none;" '
+            : '';
+        $this->view['noRedirections301'] = !$this->_gabarit->get301_editable()
+            ? ';display: none'
+            : '';
+        $this->view['parentSelect']      = '';
+        $this->view['allchamps']         = $this->_gabarit->getChamps();
+        $this->view['api']               = $this->_gabarit->getApi();
 
         ob_start();
         $customForm = \Slrfw\FrontController::search('model/gabarit/form/default/default.phtml', false);
