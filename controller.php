@@ -288,7 +288,8 @@ class Controller
      */
     public function check301()
     {
-        $url = preg_replace('`^/' . Registry::get('baseroot') . '`', '', $_SERVER['REQUEST_URI']);
+        $pattern = '`^/' . $this->_envConfig->get('base', 'root') . '`';
+        $url = preg_replace($pattern, '', $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
         $urlsToTest[] = $url;
 
@@ -315,14 +316,14 @@ class Controller
                     . ' AND old LIKE ' . $this->_db->quote($urlToTest) . ' '
                     . 'LIMIT 1';
             $redirection301 = $this->_db->query($query)->fetch(\PDO::FETCH_COLUMN);
-            if ($redirection301) {
+            if ($redirection301 !== false) {
                 $keyChange = $key;
                 $urlPartRedirect = $urlToTest;
                 break;
             }
         }
 
-        if ($redirection301) {
+        if ($redirection301 !== false) {
             $samePart = array_slice($urlPartsReverse, 0, $keyChange);
             $redirection301 .= implode('/', $samePart);
             $redirection301 = $this->_url . $redirection301;
@@ -342,7 +343,7 @@ class Controller
 
         $urlRedirect301 = $this->check301();
 
-        if ($urlRedirect301) {
+        if ($urlRedirect301 !== false) {
             $this->redirectError(301, $urlRedirect301);
         } else {
             $this->redirectError(404);

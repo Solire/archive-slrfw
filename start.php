@@ -25,13 +25,7 @@ try {
         header('HTTP/1.0 404 Not Found');
         FrontController::run('Error', 'error404');
     } else {
-        $marvin = new Marvin('debug', $exc);
-        if ($debug) {
-            $marvin->display();
-        } else {
-            $marvin->send();
-        }
-        Error::run();
+        Error::http($exc->getHttp());
     }
 } catch (\Exception $exc) {
     $marvin = new Marvin('debug', $exc);
