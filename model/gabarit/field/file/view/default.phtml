@@ -2,14 +2,12 @@
     <label for="<?php echo $this->id; ?>">
         <span><?php echo $this->label; ?> <?php echo in_array('form-oblig', explode(" ", $this->classes)) ? '<span class="required">*</span> ' : '' ; ?></span>
     </label>
+
     <div class="input-append">
-    <input data-min-width="<?php  echo $this->params["CROP.WIDTH.MIN"]; ?>" data-min-height="<?php  echo $this->params["CROP.HEIGHT.MIN"]; ?>" type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" />
+        <input data-min-width="<?php  echo $this->params["CROP.WIDTH.MIN"]; ?>" data-min-height="<?php  echo $this->params["CROP.HEIGHT.MIN"]; ?>" type="text" name="champ<?php echo $this->champ['id']; ?>[]" id="<?php echo $this->id; ?>" class="<?php echo $this->classes; ?>" value="<?php echo $this->value; ?>" data-visuel-id="<?php echo $this->champ['id']; ?>" />
         <a title="Prévisualisation" <?php echo $this->value != '' ? '' : 'style="display:none;"'?> href="<?php echo ($this->value ? $this->idGabPage . DIRECTORY_SEPARATOR . $this->value : '') ?>" target="_blank" class="btn previsu"><i class="icon-camera"></i></a>
         <a title="Recadrer" <?php echo $this->isImage ? '' : 'style="display:none;"'?>  class="btn  crop" href="#"><i class="icon-fullscreen"></i></a>
     </div>
 
     <input type="hidden" class="extensions" value="<?php  echo $this->params["EXTENSIONS.ALLOW"]; ?>" />
-
-    
-    
 </div>

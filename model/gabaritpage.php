@@ -91,7 +91,9 @@ class gabaritPage extends gabaritBloc
     public function setMeta($meta)
     {
         $this->_meta = $meta;
-        $this->_id = $meta['id'];
+        if (isset($meta['id'])) {
+            $this->_id = $meta['id'];
+        }
     }
 
     /**
@@ -205,8 +207,11 @@ class gabaritPage extends gabaritBloc
     public function getMeta($key = null)
     {
         if ($key != null) {
-            if (is_array($this->_meta) && array_key_exists($key, $this->_meta))
+            if (is_array($this->_meta)
+                && isset($this->_meta[$key])
+            ) {
                 return $this->_meta[$key];
+            }
 
             return null;
         }
@@ -223,8 +228,11 @@ class gabaritPage extends gabaritBloc
     public function getVersion($key = null)
     {
         if ($key != null) {
-            if (is_array($this->_version) && array_key_exists($key, $this->_version))
+            if (is_array($this->_version)
+                && isset($this->_version[$key])
+            ) {
                 return $this->_version[$key];
+            }
 
             return null;
         }
@@ -240,13 +248,17 @@ class gabaritPage extends gabaritBloc
      */
     public function getValues($key = null)
     {
-        if ($key == null)
-            return $this->_values;
+        if ($key != null) {
+            if (is_array($this->_values)
+                && isset($this->_values[$key])
+            ) {
+                return $this->_values[$key];
+            }
 
-        if (is_array($this->_values) && array_key_exists($key, $this->_values))
-            return $this->_values[$key];
+            return '';
+        }
 
-        return '';
+        return $this->_values;
     }
 
     /**
@@ -352,40 +364,45 @@ class gabaritPage extends gabaritBloc
         $redirections = array(),
         $authors = array()
     ) {
-        $versionId          = $this->_version['id'];
+        $this->view = array();
 
-        $metaId             = isset($this->_meta['id'])
-                            ? $this->_meta['id']
-                            : 0;
-        $metaLang           = isset($this->_meta['id_version'])
-                            ? $this->_meta['id_version']
-                            : BACK_ID_VERSION;
-        $noMeta             = !$this->_gabarit->getMeta() || !$metaId
-                            ? ' style="display: none;" '
-                            : '';
-        $noMetaTitre        = !$this->_gabarit->getMeta_titre()
-                            ? ' style="display: none;" '
-                            : '';
-        $noRedirections301  = !$this->_gabarit->get301_editable()
-                            ? ';display: none'
-                            : '';
-        $parentSelect       = '';
+        $this->view['action']            = $action;
+        $this->view['retour']            = $retour;
+        $this->view['authors']           = $authors;
 
-        $api = $this->_gabarit->getApi();
+        if (count($redirections) == 0) {
+            $this->view['redirections']  = array("");
+        } else {
+            $this->view['redirections']  = $redirections;
+        }
 
-        $redirections   = count($redirections) == 0
-                        ? array("")
-                        : $redirections;
-
-        $allchamps = $this->_gabarit->getChamps();
+        $this->view['versionId']         = $this->_version['id'];
+        $this->view['metaId']            = isset($this->_meta['id'])
+            ? $this->_meta['id']
+            : 0;
+        $this->view['metaLang']          = isset($this->_meta['id_version'])
+            ? $this->_meta['id_version']
+            : BACK_ID_VERSION;
+        $this->view['noMeta']            = !$this->_gabarit->getMeta() || !$this->view['metaId']
+            ? ' style="display: none;" '
+            : '';
+        $this->view['noMetaTitre']       = !$this->_gabarit->getMeta_titre()
+            ? ' style="display: none;" '
+            : '';
+        $this->view['noRedirections301'] = !$this->_gabarit->get301_editable()
+            ? ';display: none'
+            : '';
+        $this->view['parentSelect']      = '';
+        $this->view['allchamps']         = $this->_gabarit->getChamps();
+        $this->view['api']               = $this->_gabarit->getApi();
 
         ob_start();
-        $customForm = \Slrfw\FrontController::search('model/gabarit/form/default/default.phtml');
+        $customForm = \Slrfw\FrontController::search('model/gabarit/form/default/default.phtml', false);
 
-        if($customForm !== false) {
+        if ($customForm !== false) {
             include $customForm;
         } else {
-            include __DIR__ . "/gabarit/form/default/default.phtml";
+            include __DIR__ . '/gabarit/form/default/default.phtml';
         }
 
         $form = ob_get_clean();
@@ -394,6 +411,25 @@ class gabaritPage extends gabaritBloc
 	}
 
     /**
+     * Inclut le sélecteur des parents
+     *
+     * @return void
+     */
+    public function selectParents()
+    {
+        $path = '/gabarit/form/default/selectparents.phtml';
+
+        $customForm = \Slrfw\FrontController::search('model' . $path, false);
+
+        if ($customForm !== false) {
+            include $customForm;
+        } else {
+            include __DIR__ . $path;
+        }
+    }
+
+    /**
+     *
      *
      * @return type
      */

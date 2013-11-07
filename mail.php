@@ -1,6 +1,6 @@
 <?php
 /**
- * Gestionnaire des hooks
+ * Gestionnaire de mails
  *
  * @package    Slrfw
  * @subpackage Core
@@ -11,7 +11,7 @@
 namespace Slrfw;
 
 /**
- * Gestionnaire des hooks
+ * Gestionnaire de mails
  *
  * @package    Slrfw
  * @subpackage Core
@@ -48,15 +48,15 @@ class Mail
     private $mainUse = false;
 
     /**
-     * Chargement du gestionnaire de hook
+     * Création d'un nouveau mail
      *
-     * @param string $name Nom identifiant le type de gestionnaire de hook
+     * @param string $name Nom identifiant la vue utilisée
      *
      * @uses Registry envconfig
      * @uses Registry db
      * @uses View
      * @uses TranslateMysql
-     * @uses Db
+     * @uses DB
      */
     public function __construct($name)
     {
@@ -91,9 +91,11 @@ class Mail
      */
     public function send()
     {
+        /** Désolé c'est brutal **/
         $dir = pathinfo(__FILE__, PATHINFO_DIRNAME);
         include_once $dir . '/external/Zend/Mail.php';
         unset($dir);
+
         $mail = new \Zend_Mail('utf-8');
 
         $mail->setBodyHtml($this->loadBody())
@@ -125,7 +127,11 @@ class Mail
             $realPath = FrontController::search($path, false);
 
             if (empty($realPath)) {
-                throw new Exception\Lib('Aucun fichier mail ' . $this->codeName);
+                $realPath = FrontController::search($path);
+
+                if (empty($realPath)) {
+                    throw new Exception\Lib('Aucun fichier mail ' . $this->codeName);
+                }
             }
 
             ob_start();

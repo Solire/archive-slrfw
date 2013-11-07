@@ -1,5 +1,17 @@
+# ------------------------------------------------------------------------------
+# | Configuration PHP                                                          |
+# ------------------------------------------------------------------------------
 SetEnv PHP_VER 5_3
 SetEnv MAGIC_QUOTES 0
+
+# ------------------------------------------------------------------------------
+# | Paramétrage htpasswd                                                       |
+# ------------------------------------------------------------------------------
+#AuthName "Espace de recette"
+#AuthType Basic
+#AuthUserFile "/var/www/.htpasswd"
+#Require valid-user
+
 
 # ------------------------------------------------------------------------------
 # | Forcer le www. au début des Urls                                           |
@@ -12,11 +24,17 @@ SetEnv MAGIC_QUOTES 0
     RewriteRule ^ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </IfModule>
 
+# ------------------------------------------------------------------------------
+# | blocage de l'accès des fichiers .ini                                       |
+# ------------------------------------------------------------------------------
 <files *.ini>
 order deny,allow
 deny from all
 </files>
 
+# ------------------------------------------------------------------------------
+# | rewriting                                                                  |
+# ------------------------------------------------------------------------------
 <IfModule mod_rewrite.c>
     RewriteEngine on
 
@@ -31,20 +49,18 @@ deny from all
     # Images & documents ajoutés par l'utilisateur
     RewriteRule ^(projet/upload/|)((temp-|)[0-9]+)/(.+\.(jpg|jpeg|png|gif|pdf))$    upload/$2/$4 [L]
 
-
     RewriteRule ^$                                                          index.php?%{QUERY_STRING} [L]
     RewriteRule ^(([a-zA-Z0-9\-]+).html)$                                   index.php?action=$2&%{QUERY_STRING} [L]
     RewriteRule ^([a-zA-Z0-9/\-]+)/$                                        index.php?controller=$1&%{QUERY_STRING} [L]
     RewriteRule ^([a-zA-Z0-9/\-]+)/([a-zA-Z0-9\-]+).html$                   index.php?controller=$1&action=$2&%{QUERY_STRING} [L]
 </IfModule>
 
-# ----------------------------------------------------------------------
-# Gzip compression
-# ----------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# | Gzip compression                                                           |
+# ------------------------------------------------------------------------------
 <IfModule mod_deflate.c>
-
-    # Force deflate for mangled headers developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/
+    # Force compression for mangled headers.
+    # http://developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping
     <IfModule mod_setenvif.c>
         <IfModule mod_headers.c>
             SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
@@ -52,53 +68,36 @@ deny from all
         </IfModule>
     </IfModule>
 
-    # HTML, TXT, CSS, JavaScript, JSON, XML, HTC:
-    <IfModule filter_module>
-        FilterDeclare   COMPRESS
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $text/html
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $text/css
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $text/plain
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $text/xml
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $text/x-component
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/javascript
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/json
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/xml
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/xhtml+xml
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/rss+xml
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/atom+xml
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/vnd.ms-fontobject
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $image/svg+xml
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $application/x-font-ttf
-        FilterProvider  COMPRESS  DEFLATE resp=Content-Type $font/opentype
-        FilterChain     COMPRESS
-        FilterProtocol  COMPRESS  DEFLATE change=yes;byteranges=no
-    </IfModule>
-
-    <IfModule !mod_filter.c>
-        # Legacy versions of Apache
-        AddOutputFilterByType DEFLATE text/html text/plain text/css application/json
-        AddOutputFilterByType DEFLATE application/javascript
-        AddOutputFilterByType DEFLATE text/xml application/xml text/x-component
-        AddOutputFilterByType DEFLATE application/xhtml+xml application/rss+xml application/atom+xml
-        AddOutputFilterByType DEFLATE image/svg+xml application/vnd.ms-fontobject application/x-font-ttf font/opentype
+    # Compress all output labeled with one of the following MIME-types
+    # (for Apache versions below 2.3.7, you don't need to enable `mod_filter`
+    #  and can remove the `<IfModule mod_filter.c>` and `</IfModule>` lines
+    #  as `AddOutputFilterByType` is still in the core directives).
+    <IfModule mod_filter.c>
+        AddOutputFilterByType DEFLATE application/atom+xml \
+                                      application/javascript \
+                                      application/json \
+                                      application/rss+xml \
+                                      application/vnd.ms-fontobject \
+                                      application/x-font-ttf \
+                                      application/x-web-app-manifest+json \
+                                      application/xhtml+xml \
+                                      application/xml \
+                                      font/opentype \
+                                      image/svg+xml \
+                                      image/x-icon \
+                                      text/css \
+                                      text/html \
+                                      text/plain \
+                                      text/x-component \
+                                      text/xml
     </IfModule>
 </IfModule>
 
 
 
-# ----------------------------------------------------------------------
-# Expires headers (for better cache control)
-# ----------------------------------------------------------------------
-
-# These are pretty far-future expires headers.
-# They assume you control versioning with cachebusting query params like
-#   <script src="application.js?20100608">
-# Additionally, consider that outdated proxies may miscache
-#   www.stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring/
-
-# If you don't use filenames to version, lower the CSS  and JS to something like
-#   "access plus 1 week" or so.
-
+# ------------------------------------------------------------------------------
+# | Gestion de la mise en cache                                                |
+# ------------------------------------------------------------------------------
 <IfModule mod_expires.c>
     ExpiresActive on
 
