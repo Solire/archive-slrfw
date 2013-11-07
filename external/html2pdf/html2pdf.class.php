@@ -1316,7 +1316,8 @@ if (!defined('__CLASS_HTML2PDF__')) {
             if (count($infos)<2) {
                 // if the test is activ => exception
                 if ($this->_testIsImage) {
-                    throw new HTML2PDF_exception(6, $src);
+                    return false;
+//                    throw new HTML2PDF_exception(6, $src);
                 }
 
                 // else, display a gray rectangle
