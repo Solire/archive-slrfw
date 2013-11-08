@@ -108,7 +108,7 @@
 
             if ($nbChoixParents > 1
                 || $nbChoixParents == 0
-                || $min == 0
+                || ($min == 0 && $this->_gabarit->getIdParent() == $this->_gabarit->getId())
             ) {
 ?>
                                     <select name="id_parent" id="id_parent-<?php echo $this->view['metaLang']; ?>"<?php if ($this->_gabarit->getId() != $this->_gabarit->getIdParent() || $min > 0) { echo ' class="form-controle form-oblig form-notnul"'; } ?>>
