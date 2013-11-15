@@ -1258,7 +1258,11 @@ class gabaritManager extends manager
      *
      * @param array $donnees données à enregistrer
      *
-     * @return gabaritPage|null
+     * @return gabaritPage|false|null Retourne<ul>
+     * <li>gabaritPage crée ou réelement modifiée</li>
+     * <li>FALSE si aucune modification n'est apparue</li>
+     * <li>NULL si l'identifiant de page ou de gabarit n'est pas valide</li>
+     * </ul>
      */
     public function save($donnees)
     {
@@ -1275,20 +1279,41 @@ class gabaritManager extends manager
                 . ' FROM `version`'
                 . ' WHERE id_api = ' . $api['id']
                 . ' ORDER BY `id` != ' . $versionId;
-        $this->_versionsIds = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
+        $this->_versionsIds = $this->_db->query($query)->fetchAll(
+            \PDO::FETCH_COLUMN);
 
         $updating = ($donnees['id_gab_page'] > 0);
 
         if ($updating) {
-            $page = $this->getPage($versionId, $api['id'], $donnees['id_gab_page'], 0);
+            $page = $this->getPage(
+                $versionId,
+                $api['id'],
+                $donnees['id_gab_page'],
+                0
+            );
         } else {
-            $page = $this->getPage($versionId, $api['id'], 0, $donnees['id_gabarit']);
+            $page = $this->getPage(
+                $versionId,
+                $api['id'],
+                0,
+                $donnees['id_gabarit']
+            );
         }
 
-        $id_gab_page = $this->saveMeta($page, $donnees);
-
-        if (!$id_gab_page) {
+        if (!$page) {
             return null;
+        }
+
+        $res = $this->saveMeta($page, $donnees);
+
+        if ($updating > 0) {
+            $id_gab_page = $donnees['id_gab_page'];
+
+            if ($res === false) {
+                return false;
+            }
+        } else {
+            $id_gab_page = $res;
         }
 
         $page = $this->getPage($versionId, $api['id'], $id_gab_page, 0);
@@ -1324,23 +1349,33 @@ class gabaritManager extends manager
      * @param gabaritPage $page    page
      * @param array       $donnees données à enregistrer
      *
-     * @return int
+     * @return int|boolean
      */
     protected function saveMeta($page, $donnees)
     {
         $updating = $donnees['id_gab_page'] > 0;
 
-        //On recupere les ids de gabarits pour l'api courante
+        /**
+         * On recupere les ids de gabarits pour l'api courante
+         */
         $api    = $page->getGabarit()->getApi();
         $query  = 'SELECT `gab_gabarit`.id FROM `gab_gabarit`'
                 . ' WHERE `gab_gabarit`.`id_api` = ' . $api['id'];
         $gabaritsFromCurrentApi = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_COLUMN);
 
-        // Insertion dans la table `gab_page`.
+        $modif = false;
+
         if ($updating) {
-            //Cas d'une page qui n'a pas été traduite
+            /**
+             * Mise a jour d'une page
+             */
+
             if ($page->getMeta('rewriting') == '') {
+                /**
+                 * Cas d'une page qui n'a pas été traduite
+                 */
+
                 if ($donnees['rewriting'] == '') {
                     if ($page->getVersion('exotique') > 0) {
                         $titre_rew = $donnees['titre_rew'];
@@ -1363,8 +1398,9 @@ class gabaritManager extends manager
                     . ' AND `id_parent` = ' . $page->getMeta('id_parent')
                     . ' AND `id_version` = ' . $page->getMeta('id_version')
                     . ' AND `id` != ' . $page->getMeta('id');
-            $rewriting = $this->_db->rewrit($titre_rew, 'gab_page', 'rewriting',
-                $query);
+            $rewriting = $this->_db->rewrit(
+                $titre_rew, 'gab_page', 'rewriting', $query
+            );
 
             $query = 'UPDATE `gab_page` SET'
                     . ' `titre`      = ' . $this->_db->quote($donnees['titre']) . ',';
@@ -1400,7 +1436,10 @@ class gabaritManager extends manager
                     . ' WHERE `id` = ' . $page->getMeta('id')
                     . ' AND `id_version` = ' . $page->getMeta('id_version');
 
-            $this->_db->query($query);
+            $modfiTmp = $this->_db->exec($query);
+            if (!$modif && $modfiTmp > 0) {
+                $modif = true;
+            }
 
             $urlParent = '';
             $parents = $this->getParents($page->getMeta('id_parent'),
@@ -1425,7 +1464,7 @@ class gabaritManager extends manager
                         . ' WHERE `new` = ' . $this->_db->quote($newUrl)
                         . ' AND `id_version` = ' . $page->getMeta('id_version')
                         . ' AND `id_api` = ' . $api['id'];
-            $this->_db->query($query2Del);
+            $this->_db->exec($query2Del);
 
             /** On insert toutes les urls dans le bloc redirection 301 */
             $queries2 = array();
@@ -1444,11 +1483,18 @@ class gabaritManager extends manager
             }
 
             foreach ($queries2 as $query2) {
-                $this->_db->query($query2);
+                $modfiTmp = $this->_db->exec($query2);
+                if (!$modif && $modfiTmp > 0) {
+                    $modif = true;
+                }
             }
 
-            return $page->getMeta('id');
+            return $modif;
         } else {
+            /**
+             * Insertion dans la table `gab_page`.
+             */
+
             if (isset($donnees['id_parent']) && $donnees['id_parent']) {
                 $id_parent = $donnees['id_parent'];
 
@@ -1567,7 +1613,9 @@ class gabaritManager extends manager
 
             $donnees['301'] = array_unique($donnees['301']);
 
-            /** On insert toutes les urls dans le bloc redirection 301 */
+            /**
+             * On insert toutes les urls dans le bloc redirection 301
+             */
             $queries2 = array();
             foreach ($donnees['301'] as $redirect301) {
                 $oldUrl = $redirect301;
@@ -1581,7 +1629,7 @@ class gabaritManager extends manager
             }
 
             foreach ($queries2 as $query2) {
-                $this->_db->query($query2);
+                $this->_db->exec($query2);
             }
 
             return $id_gab_page;
@@ -1595,7 +1643,8 @@ class gabaritManager extends manager
      * @param array       $donnees     les données à enregistrer
      * @param boolean     $partialSave Ne sauvegarde que les champs présents
      *
-     * @return type
+     * @return boolean Retourne TRUE si le contenu de la page a été modifié,
+     * FALSE sinon.
      * @hook gabarit/ <gabaritName>Save A la fin de l'enregistrement
      */
     public function savePage($page, $donnees, $partialSave = false)
@@ -1676,10 +1725,10 @@ class gabaritManager extends manager
                                     . $this->_db->quote($value) . ',';
                         break;
                 }
-
-
             }
         }
+
+        $modif = false;
 
         if ($updating) {
             if ($champsExiste) {
@@ -1688,27 +1737,36 @@ class gabaritManager extends manager
                                 . substr($query, 0, -1) . ' ' . $where;
                 }
 
-                $this->_db->query($queryTmp);
+                $tmpModif = $this->_db->exec($queryTmp);
+                if (!$modif && $tmpModif > 0) {
+                    $modif = true;
+                }
 
                 if ($queryT != '') {
                     $queryTmp   = 'UPDATE `' . $table . '` SET '
                                 . substr($queryT, 0, -1) . ' ' . $whereT;
                 }
 
-                $this->_db->exec($queryTmp);
+                $tmpModif = $this->_db->exec($queryTmp);
+                if (!$modif && $tmpModif > 0) {
+                    $modif = true;
+                }
             }
         } else {
             foreach ($this->_versionsIds as $id_version) {
                 $queryTmp = $query . '`id_version` = ' . $id_version;
 
-                $this->_db->exec($queryTmp);
+                $tmpModif = $this->_db->exec($queryTmp);
+                if (!$modif && $tmpModif > 0) {
+                    $modif = true;
+                }
             }
-                $id_gab_page = $this->_db->lastInsertId();
+
+            $id_gab_page = $this->_db->lastInsertId();
         }
 
         $this->deleteUsedFile($id_version, $id_gab_page);
         $this->saveUsedFile($id_version, $id_gab_page, $filesUsed);
-
 
         $hook = new \Slrfw\Hook();
         $hook->setSubdirName('gabarit');
@@ -1717,7 +1775,7 @@ class gabaritManager extends manager
         $hook->page = $page;
         $hook->exec($gabarit->getName() . 'Save');
 
-        return true;
+        return $modif;
     }
 
     /**
@@ -1729,7 +1787,8 @@ class gabaritManager extends manager
      * @param array       &$donnees    données à enregistrer
      * @param boolean     $partialSave Ne sauvegarde que les champs présents
      *
-     * @return boolean
+     * @return boolean Retourne TRUE si une des lignes du bloc a été modifié,
+     * FALSE sinon.
      * @hook gabarit/ <gabaritName>Bloc A la fin de l'enregistrement
      */
     public function saveBloc(
@@ -1744,16 +1803,25 @@ class gabaritManager extends manager
         $champs = $gabarit->getChamps();
         $ordre = 1;
 
-        /** Cas des types join en mode simpleFieldset (Checkbox) */
+        $modif = false;
+
         $firstField = current($bloc->getGabarit()->getJoins());
         if (count($bloc->getGabarit()->getJoins()) == 1
             && $firstField['type'] == 'JOIN'
             && $firstField['params']['VIEW'] == 'simple'
         ) {
+            /**
+             * Cas des types join en mode simpleFieldset (Checkbox)
+             */
+
             $query  = 'DELETE FROM `' . $table . '` WHERE'
                     . ' `id_version` = ' . $id_version
                     . ' AND `id_gab_page` = ' . $id_gab_page;
-            $this->_db->query($query);
+
+            $tmpModif = $this->_db->exec($query);
+            if (!$modif && $tmpModif > 0) {
+                $modif = true;
+            }
 
             if (isset($donnees['champ' . $firstField['id']])) {
                 foreach ($donnees['champ' . $firstField['id']] as $value) {
@@ -1766,29 +1834,49 @@ class gabaritManager extends manager
                             . ' `visible` = 1,'
                             . $fieldSql;
 
-                    $this->_db->exec($query);
+                    $tmpModif = $this->_db->exec($query);
+                    if (!$modif && $tmpModif > 0) {
+                        $modif = true;
+                    }
                 }
             }
+        } else {
+            /**
+             * Cas des blocs classiques
+             */
 
-            return true;
-        }
+            if (isset($donnees['id_' . $gabarit->getTable()])) {
+                foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
+                    if ($id_bloc === 'ANNULE') {
+                        continue;
+                    }
+                    $res = $this->saveBlocLine($table, $champs, $id_bloc,
+                        $ordre, $donnees, $id_gab_page, $id_version, $partialSave);
 
-        if (isset($donnees['id_' . $gabarit->getTable()])) {
-            foreach ($donnees['id_' . $gabarit->getTable()] as $id_bloc) {
-                if ($id_bloc === 'ANNULE') {
-                    continue;
+                    if ($id_bloc) {
+                        $ids_blocs[] = $id_bloc;
+                    } else {
+                        $ids_blocs[] = $res;
+                    }
+
+                    $tmpModif = $res;
+                    if (!$modif && $tmpModif > 0) {
+                        $modif = true;
+                    }
+
+                    $ordre++;
                 }
-                $ids_blocs[] = $this->saveBlocLine($table, $champs, $id_bloc,
-                    $ordre, $donnees, $id_gab_page, $id_version, $partialSave);
-                $ordre++;
+
+                $query  = 'UPDATE `' . $table . '` SET `suppr` = NOW()'
+                        . ' WHERE `suppr` = 0'
+                        . ' AND `id_gab_page` = ' . $id_gab_page
+                        . ' AND `id` NOT IN (' . implode(',', $ids_blocs) . ')';
+                $tmpModif = $this->_db->exec($query);
+                if (!$modif && $tmpModif > 0) {
+                    $modif = true;
+                }
             }
-
-            $query  = 'UPDATE `' . $table . '` SET `suppr` = NOW()'
-                    . ' WHERE `suppr` = 0 AND `id_gab_page` = ' . $id_gab_page
-                    . ' AND `id` NOT IN (' . implode(',', $ids_blocs) . ')';
-            $this->_db->query($query);
         }
-
 
         $hook = new \Slrfw\Hook();
         $hook->setSubdirName('gabarit');
@@ -1799,22 +1887,27 @@ class gabaritManager extends manager
         $hook->tableName = $table;
         $hook->exec($gabarit->getName() . 'Bloc');
 
-
-        return true;
+        return $modif;
     }
 
     /**
      * Sauve une ligne d'un bloc dynamique
      *
-     * @param string $table
-     * @param array  $champs
-     * @param int    $id_bloc
-     * @param int    $ordre
-     * @param array  &$donnees
-     * @param int    $id_gab_page
-     * @param int    $id_version
+     * @param string  $table       table en BDD du bloc
+     * @param array   $champs      champs du bloc dynamique
+     * @param int     $id_bloc     identifiant du bloc
+     * @param int     $ordre       ordre du bloc
+     * @param array   &$donnees    données à enregistrer
+     * @param int     $id_gab_page identifiant de la page
+     * @param int     $id_version  identifiant de la version
+     * @param boolean $partialSave identifiant de la version
      *
-     * @return int identifiant de la ligne sauvée
+     * @return int|bool Retourne :
+     * <ul>
+     * <li>si le bloc est crée, l'identifiant de la ligne crée en BDD</li>
+     * <li>si le bloc existe déjà et la ligne en BDD est modifiée, TRUE</li>
+     * <li>si le bloc existe déjà mais la ligne en BDD n'est pas modifiée, FALSE</li>
+     * </ul>
      */
     protected function saveBlocLine(
         $table,
@@ -1894,12 +1987,17 @@ class gabaritManager extends manager
         }
 
 
+        $modif = false;
+
         if ($updating) {
             $queryTmp   = substr($query, 0, -1)
                         . ' WHERE `id_version` = ' . $id_version
                         . ' AND `id` = ' . $id_bloc;
 
-            $this->_db->exec($queryTmp);
+            $tmpModif = $this->_db->exec($queryTmp);
+            if (!$modif && $tmpModif > 0) {
+                $modif = true;
+            }
         } else {
             $id_bloc = 0;
             foreach ($this->_versionsIds as $id_version) {
@@ -1912,7 +2010,10 @@ class gabaritManager extends manager
                     $queryTmp  .= ', `visible` = ' . $visible;
                 }
 
-                $this->_db->exec($queryTmp);
+                $tmpModif = $this->_db->exec($queryTmp);
+                if (!$modif && $tmpModif > 0) {
+                    $modif = true;
+                }
 
                 $id_bloc = $this->_db->lastInsertId();
             }
@@ -1920,7 +2021,11 @@ class gabaritManager extends manager
 
         $this->saveUsedFile($id_version, $id_gab_page, $filesUsed);
 
-        return $id_bloc;
+        if ($updating) {
+            return $modif;
+        } else {
+            return $id_bloc;
+        }
     }
 
     /**
@@ -1929,14 +2034,17 @@ class gabaritManager extends manager
      * @param int   $id_version  identifiant de la version
      * @param int   $id_gab_page identifiant de la page
      *
-     * @return void
+     * @return boolean
      */
     protected function deleteUsedFile($id_version, $id_gab_page)
     {
         $query  = 'DELETE FROM `media_fichier_utilise`'
                 . ' WHERE id_gab_page = ' . $id_gab_page
                 . ' AND id_version = ' . $id_version;
-        $this->_db->exec($query);
+
+        $modif = $this->_db->exec($query);
+
+        return ($modif > 0);
     }
 
     /**
@@ -1946,19 +2054,27 @@ class gabaritManager extends manager
      * @param int   $id_gab_page identifiant de la page
      * @param array $filesUsed   tableau des fichiers utilisés
      *
-     * @return void
+     * @return boolean
      */
     protected function saveUsedFile($id_version, $id_gab_page, $filesUsed)
     {
+        $modif = false;
+
         foreach ($filesUsed as $file) {
             if ($file != '') {
                 $query  = 'INSERT IGNORE INTO `media_fichier_utilise` SET'
                         . ' id_gab_page = ' . $id_gab_page . ','
                         . ' rewriting = ' . $this->_db->quote($file) . ','
                         . ' id_version = ' . $id_version;
-                $this->_db->exec($query);
+
+                $tmpModif = $this->_db->exec($query);
+                if (!$modif && $tmpModif) {
+                    $modif = true;
+                }
             }
         }
+
+        return $modif;
     }
 
     /**
