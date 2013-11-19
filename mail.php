@@ -135,6 +135,25 @@ class Mail
     {
         if (!isset($this->body)) {
             $config = Registry::get('mainconfig');
+
+            $realMainPath = false;
+
+            if ($this->mainUse) {
+                /**
+                 * On cherche le fichier main
+                 */
+
+                $mainPath = $config->get('dirs', 'mail') . 'main.phtml';
+                $realMainPath = FrontController::search($mainPath, false);
+                if (empty($realMainPath)) {
+                    $realMainPath = FrontController::search($mainPath);
+
+                    if (empty($realMainPath)) {
+                        throw new Exception\Lib('Aucun fichier mail main.phtml');
+                    }
+                }
+            }
+
             $path = $config->get('dirs', 'mail') . $this->codeName . '.phtml';
             $realPath = FrontController::search($path, false);
 
@@ -147,7 +166,7 @@ class Mail
             }
 
             ob_start();
-            $this->view->displayPath($realPath, $this->mainUse);
+            $this->view->displayPath($realPath, $realMainPath);
             $this->body = ob_get_clean();
         }
 
