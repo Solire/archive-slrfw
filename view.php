@@ -223,23 +223,30 @@ class View
     /**
      * Affichage directe d'une vue
      *
-     * @param string  $strPath Chemin vers le fichier
-     * @param boolean $mainUse utilisation d'un main.phtml
+     * @param string         $strPath  Chemin vers le fichier
+     * @param boolean|string $mainPath Chamin vers le fichier main.phtml,
+     * si il est faux, aucun fichier main ne sera utilisé
      *
      * @return void
      */
-    public function displayPath($strPath, $mainUse = false)
+    public function displayPath($strPath, $mainPath = false)
     {
         $this->pathMode = true;
-        if (!$mainUse) {
+        if ($mainPath === false) {
             $path = new Path($strPath);
             include $path->get();
         } else {
+            /**
+             * Fichier de la vue
+             */
             $path = new Path($strPath);
             $this->pathModePath = $path->get();
-            $dir = pathinfo($strPath, PATHINFO_DIRNAME);
-            $pathMain = new Path($dir . DS . 'main.phtml');
-            include $pathMain->get();
+
+            /**
+             * Fichier principal
+             */
+            $path = new Path($mainPath);
+            include $path->get();
         }
     }
 
