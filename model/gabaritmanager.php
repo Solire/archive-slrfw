@@ -1300,7 +1300,7 @@ class gabaritManager extends manager
             );
         }
 
-        if (!$page) {
+        if (!$page || $page->getGabarit()->getEditable() == 0) {
             return null;
         }
 
