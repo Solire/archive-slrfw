@@ -72,7 +72,7 @@ class Controller
      *
      * @var Seo
      */
-    protected $_seo;
+    public $_seo;
 
     /**
      *
