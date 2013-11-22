@@ -100,14 +100,11 @@ class Mail
      */
     public function send()
     {
-        /** Désolé c'est brutal **/
-        $dir = pathinfo(__FILE__, PATHINFO_DIRNAME);
-        include_once $dir . '/external/Zend/Mail.php';
-        unset($dir);
+        $mail = new \Zend\Mail\Message();
 
-        $mail = new \Zend_Mail('utf-8');
 
-        $mail->setBodyHtml($this->loadBody())
+        $mail->setEncoding('utf-8')
+             ->setBodyHtml($this->loadBody())
              ->setFrom($this->from)
              ->addTo($this->to)
              ->setSubject($this->subject);
