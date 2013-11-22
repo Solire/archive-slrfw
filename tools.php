@@ -15,94 +15,19 @@ namespace Slrfw;
  * @author stephane
  */
 class Tools {
-    /* En entree :
-      (array) $php_array => le tableau PHP à traduire en JS
-      (STRING) $js_array_name => le nom du tableau JS qui sera construit
 
-      En sortie :
-      (string) => le script JS permettant la construction du tableau
-
-      En cas d'errur :
-      retourne FALSE et une erreur de type E_USER_NOTICE est generée
-     */
-
-    static function php2js($php_array, $js_array_name) {
-// contrôle des parametres d'entrée
-        if (!is_array($php_array)) {
-            trigger_error("php2js() => 'array' attendu en parametre 1, '" . gettype($array) . "' fourni !?!");
-            return false;
-        }
-        if (!is_string($js_array_name)) {
-            trigger_error("php2js() => 'string' attendu en parametre 2, '" . gettype($array) . "' fourni !?!");
-            return false;
-        }
-
-// Création du tableau en JS
-        $script_js = "var $js_array_name = new Array();\n";
-// on rempli le tableau JS à partir des valeurs de son homologue PHP
-        foreach ($php_array as $key => $value) {
-// pouf, on tombe sur une dimension supplementaire
-            if (is_array($value)) {
-// On va demander la création d'un tableau JS temporaire
-                $temp = uniqid('temp_'); // on lui choisi un nom bien barbare
-                $t = Tools::php2js($value, $temp); // et on creer le script JS
-// En cas d'erreur, remonter l'info aux récursions supérieures
-                if ($t === false)
-                    return false;
-
-// Ajout du script de création du tableau JS temporaire
-                $script_js.= $t;
-// puis on applique ce tableau temporaire à celui en cours de construction
-                $script_js.= "{$js_array_name}['{$key}'] = {$temp};\n";
-            }
-
-// Si la clef est un entier, pas de guillemets
-            elseif (is_int($key))
-                $script_js.= "{$js_array_name}[{$key}] = '{$value}';\n";
-
-// sinon avec les guillemets
-            else
-                $script_js.= "{$js_array_name}['{$key}'] = '" . addcslashes(stripslashes($value), "'") . "';\n";
-        }
-// Et retourn le script JS
-        return $script_js;
-    }
-
-// fin de la fonction php2js
-
-
-
-
-    /* En entree :
-      (STRING) $adresse => Adresse complete de la loc à laquelle on veut recup les coordonnees
-
-      En sortie :
-      (array) $donnees =>
-
-      En cas d'errur :
-      retourne FALSE et une erreur de type E_USER_NOTICE est generée
-     */
-    static function getCoordonnees($adresse, $apiKey = "DEMO") {
-        $url = "http://maps.google.com/maps/geo?q=" . urlencode($adresse) . "&output=csv&key=" . $apiKey;
-        $csv = file($url);
-        $donnees = substr($csv[0], 0, 3) != "200" ? false : explode(",", $csv[0]);
-        return $donnees;
-    }
-
-    //ENVOI DE MAIL EN UTF8
     static function mail_utf8($to, $subject = '(No subject)', $message = '', $header = '', $type = "text/plain") {
         $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: ' . $type . '; charset="UTF-8"' . "\r\n";
         mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $message, $header_ . $header);
     }
 
-    static function RelativeTimeFromDate($date) {
-        if (substr($date, 0, 10) == "0000-00-00")
-            return "";
-
-        $timestamp = strtotime($date);
-        return self::RelativeTime($timestamp);
-    }
-
+    /**
+     *
+     *
+     * @param type $valeur
+     *
+     * @return type
+     */
     static function format_taille($valeur) {
         $strTmp = "";
 
@@ -133,6 +58,20 @@ class Tools {
         return $strTmp;
     }
 
+    /**
+     * @deprecated ???
+     */
+    static function RelativeTimeFromDate($date) {
+        if (substr($date, 0, 10) == "0000-00-00")
+            return "";
+
+        $timestamp = strtotime($date);
+        return self::RelativeTime($timestamp);
+    }
+
+    /**
+     * @deprecated ???
+     */
     static function RelativeTime($timestamp) {
         $difference = time() - $timestamp;
         $periods = array("seconde", "minute", "heure", "jour", "semaine",
@@ -154,7 +93,9 @@ class Tools {
         return $text;
     }
 
-    //RENVOI UNE CHAINE DE N (=$car) CARACTERES ALEATOIREMENT
+    /**
+     * @deprecated ???
+     */
     static function random($car) {
         $string = "";
         $chaine = "abcdefghijklmnpqrstuvwxy0123456789";
@@ -165,7 +106,9 @@ class Tools {
         return $string;
     }
 
-    //GENERE TABLEAU ASSOCIATIF AVEC NOM DE COLONNE COMME INDICE (FICHIER DE CONFIG)
+    /**
+     * @deprecated ???
+     */
     static function configAssign($arrayConf, $columnName, $columnValue, $columnLang = null, $lang = null) {
         $tableConfig = array();
 
@@ -263,6 +206,8 @@ class Tools {
      * Construit une url propre à partir d'une chaine de caractere,
      * @param string $string la chaine de base à transformer.
      * @return string La chaine transfomée.
+     *
+     * @deprecated ???
      */
     static function friendlyURL($string) {
         $string = preg_replace("`\[.*\]`U", "", $string);
@@ -273,6 +218,9 @@ class Tools {
         return strtolower(trim($string, '-'));
     }
 
+    /**
+     * @deprecated ???
+     */
     static function trimUltime($chaine) {
         $chaine = trim($chaine);
         $chaine = str_replace("\t", " ", $chaine);
@@ -307,6 +255,7 @@ class Tools {
      * return files with their extension.
      * </p>
      * @return array an array with each name of directories/files
+     * @deprecated ???
      */
     static function listDir($path, $dir = true, $file = true, $recursive = true, $hierarch = false, $fullPath = true, $extension = true) {
 //        $path2 = $path . (substr($path, - 1) != "/" ? "/" : "" ) . "*";
@@ -337,6 +286,9 @@ class Tools {
         return $myVideos;
     }
 
+    /**
+     * @deprecated ???
+     */
     static function removeExtension($fileName) {
 // cherche la postion du '.'
         $position = strpos($fileName, ".");
@@ -345,15 +297,23 @@ class Tools {
         return $fileNameWithoutExtension;
     }
 
+    /**
+     * @deprecated ???
+     */
     static function get_file_extension($file_name) {
         return substr(strrchr($file_name, '.'), 1);
     }
 
     /**
      *
+     *
      * @param string $date
      * @param bool $moiscomplet
+     *
      * @return string
+     *
+     * @deprecated ??? use Slrfw\Format\DateTime::toText($date) instead
+     * @see Format\DateTime
      */
     static function formate_date_texte($date, $moiscomplet = FALSE) {
         if ($moiscomplet)
@@ -375,18 +335,34 @@ class Tools {
 
     /**
      * transforme une date au format US (format DATE de mysql) en date au format FR et inverse.
+     *
      * @param string $date date sous la forme YYYY-mm-dd resp. dd-mm-YYYY
      * @param string $glueBefore séparateur de la $dateUS
      * @param string $glueAfter séparateur de la date à retourner
+     *
      * @return string sous la forme dd-mm-YYYY resp. YYYY-mm-dd
+     *
+     * @deprecated ??? use Slrfw\Format\DateTime::sql($dateSql) instead
+     * @see Format\DateTime
      */
     static function formate_date_nombre($dateUS, $glueBefore = '-', $glueAfter = '-') {
         $heureUs = substr($dateUS, 10);
         $dateUS = substr($dateUS, 0, 10);
 
+
+
         return implode($glueAfter, array_reverse(explode($glueBefore, $dateUS))) . $heureUs;
     }
 
+    /**
+     *
+     *
+     * @param type $chaine
+     *
+     * @return type
+     *
+     * @deprecated ???
+     */
     static function regexAccents($chaine) {
         mb_internal_encoding("UTF-8");
         mb_regex_encoding('UTF-8');
@@ -405,8 +381,15 @@ class Tools {
         return $chaine;
     }
 
-    static function highlightedSearch($chaine, $keywords) {
-
+    /**
+     *
+     * @param type $chaine
+     * @param string $keywords
+     *
+     * @return type
+     */
+    static function highlightedSearch($chaine, $keywords)
+    {
         mb_internal_encoding("UTF-8");
         mb_regex_encoding('UTF-8');
         for ($Z = 0; $Z < count($keywords); $Z++) {
@@ -426,6 +409,16 @@ class Tools {
 
 }
 
+/**
+ *
+ *
+ * @param type $pattern
+ * @param type $flags
+ *
+ * @return type
+ *
+ * @deprecated ???
+ */
 function iglob($pattern, $flags = null) {
     $path = preg_split(
             '#(?<=\A|[\\\\/])((?>[^\\\\/*?]*)[*?](?>[^\\\\/]*))(?=\Z|[\\\\/])#', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
@@ -455,6 +448,18 @@ function iglob($pattern, $flags = null) {
     return $res;
 }
 
+/**
+ *
+ * @param type $path
+ * @param type $flags
+ * @param type $parent
+ * @param type $lvl
+ * @param type $res
+ *
+ * @return void
+ *
+ * @deprecated ???
+ */
 function iglob_DFS($path, $flags, $parent, $lvl, &$res) {
     $depth = count($path) - 1;
 

@@ -90,9 +90,25 @@ class Javascript
                 $path = $this->getPath($lib['src']);
 
                 if (empty($path)) {
-                    $path = $lib['src'];
-                } else {
-                    $path .= '?' . filemtime($path);
+                    /**
+                     * Le fichier n'existe pas, on ne traite pas le chemin
+                     */
+
+                    $path  = $lib['src'];
+
+                } elseif ($lib['cacheControl']) {
+                    /**
+                     * Si on veut ajouter le timestamp de la date de modif
+                     * du fichier pour contrecarer le cache du navigateur
+                     * en cas de modification
+                     */
+
+                    $fileInfo  = pathinfo($path);
+
+                    $filemtime = filemtime($path);
+
+                    $path = $fileInfo['dirname'] . '/' . $fileInfo['filename']
+                          . '.' . $filemtime . '.js';
                 }
             } else {
                 $path = $lib['src'];
@@ -109,15 +125,17 @@ class Javascript
     /**
      * Ajoute une librairie js à la page
      *
-     * @param string  $path  Chemin absolu ou relatif vers le fichier
-     * @param boolean $local Active ou non le préfixage par js/
+     * @param string  $path         Chemin absolu ou relatif vers le fichier
+     * @param boolean $cacheControl Veut-on ajouter le timestamp du fichier ou
+     * non? (bug avec le script de tinymce)
      *
      * @return void
      */
-    public function addLibrary($path)
+    public function addLibrary($path, $cacheControl = true)
     {
             $this->libraries[] = array(
-                'src' => $path
+                'src'           => $path,
+                'cacheControl'  => $cacheControl,
             );
     }
 }

@@ -447,7 +447,7 @@
         var anOpen_<?php echo $this->name ?>2 = [];
         var anOpen_<?php echo $this->name ?>2Id = [];
 
-
+        var currentAjax;
 
 
         
@@ -502,26 +502,28 @@
         var oTable_<?php echo $this->name ?>;
 
         $(document).ready(function() {
-            $.datepicker.regional['fr'] = {
-                clearText: 'Effacer', clearStatus: '',
-                closeText: 'Fermer', closeStatus: 'Fermer sans modifier',
-                prevText: '<Préc', prevStatus: 'Voir le mois précédent',
-                nextText: 'Suiv>', nextStatus: 'Voir le mois suivant',
-                currentText: 'Courant', currentStatus: 'Voir le mois courant',
-                monthNames: ['Janvier','Février','Mars','Avril','Mai','Juin',
-                    'Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
-                monthNamesShort: ['Jan','Fév','Mar','Avr','Mai','Jun',
-                    'Jul','Aoû','Sep','Oct','Nov','Déc'],
-                monthStatus: 'Voir un autre mois', yearStatus: 'Voir un autre année',
-                weekHeader: 'Sm', weekStatus: '',
-                dayNames: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
-                dayNamesShort: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
-                dayNamesMin: ['Di','Lu','Ma','Me','Je','Ve','Sa'],
-                dayStatus: 'Utiliser DD comme premier jour de la semaine', dateStatus: 'Choisir le DD, MM d',
-                dateFormat: 'dd/mm/yy', firstDay: 0,
-                initStatus: 'Choisir la date', isRTL: false
-            };
-            $.datepicker.setDefaults($.datepicker.regional['fr']);
+            if($.datepicker) {
+                $.datepicker.regional['fr'] = {
+                    clearText: 'Effacer', clearStatus: '',
+                    closeText: 'Fermer', closeStatus: 'Fermer sans modifier',
+                    prevText: '<Préc', prevStatus: 'Voir le mois précédent',
+                    nextText: 'Suiv>', nextStatus: 'Voir le mois suivant',
+                    currentText: 'Courant', currentStatus: 'Voir le mois courant',
+                    monthNames: ['Janvier','Février','Mars','Avril','Mai','Juin',
+                        'Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+                    monthNamesShort: ['Jan','Fév','Mar','Avr','Mai','Jun',
+                        'Jul','Aoû','Sep','Oct','Nov','Déc'],
+                    monthStatus: 'Voir un autre mois', yearStatus: 'Voir un autre année',
+                    weekHeader: 'Sm', weekStatus: '',
+                    dayNames: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+                    dayNamesShort: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
+                    dayNamesMin: ['Di','Lu','Ma','Me','Je','Ve','Sa'],
+                    dayStatus: 'Utiliser DD comme premier jour de la semaine', dateStatus: 'Choisir le DD, MM d',
+                    dateFormat: 'dd/mm/yy', firstDay: 0,
+                    initStatus: 'Choisir la date', isRTL: false
+                };
+                $.datepicker.setDefaults($.datepicker.regional['fr']);
+            }
 <?php
 if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"]) {
     ?>
@@ -775,6 +777,11 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
 <?php } ?>
             },
             "fnServerData": function ( sSource, aoData, fnCallback ) {
+                currentAjax = {
+                    source  :   sSource,
+                    data    :   aoData,
+                }
+                
                 $.ajax( {
                     "dataType": 'json',
                     "type": "POST",
@@ -896,7 +903,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"
     <?php
 }
 ?>
-            "sAjaxSource": "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>json&<?php echo $this->additionalParams ?>",
+            "sAjaxSource": "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>json&<?php echo $this->additionalParams ?>table=<?php echo $this->name ?>",
             "sServerMethod": "POST"
 
         }).fnSetFilteringDelay().columnFilter({
@@ -1242,4 +1249,65 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
             }
         }, oSettings );
     };
+</script>
+
+<script type="text/javascript">
+    
+    $(document).ready(function() {
+        /** Evenement sur la case à cocher selectable **/
+        $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .datatable-selectable").live("click", function() {
+            var $this = $(this);
+            var value = $this.parents("tr:first").attr("id")
+            var checked = $this.is(':checked');
+            
+            $.post('<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>dt_action=select&json&<?php echo $this->additionalParams ?>', 
+                { row_id: value, select: checked ? 1 : 0, table : $(this).parents("table:first").attr("id") }, 
+                function(data) {
+                    if (!data.status) {
+                        $this.attr('checked', !checked);
+                    } else {
+
+                    }
+                    $(".datatable-selectable-nb").html(data.number)
+                }, "json"
+            ); 
+        })
+        
+        
+        /** Evenement sur la case à cocher selectable-all **/
+        $("#tableau-<?php echo $this->name ?> > thead .datatable-selectable-all, #tableau-<?php echo $this->name ?> > tfoot .datatable-selectable-all").live("click", function() {
+            var $this = $(this);
+            var value = $this.val()
+            var checked = $this.is(':checked');
+            var data = currentAjax.data;
+            data.push({name : "select", value : checked ? 1 : 0});
+            if ($(".loading-overlay").length == 0) {
+                var $overlay = $('<div class="loading-overlay"><div class="circle"></div><div class="circle1"></div></div>').hide()
+                $("#tableau-<?php echo $this->name ?>_wrapper").prepend($overlay)
+                var marginTop = $("#tableau-<?php echo $this->name ?>_wrapper").outerHeight() / 2 - 25
+                $overlay.find(".circle").css({'margin-top' : marginTop + "px"})
+                $overlay.fadeIn(500);
+            }
+            
+            $.post(currentAjax.source + '&dt_action=selectall', 
+                data, 
+                function(data) {
+                    oTable_<?php echo $this->name ?>.fnDraw();
+                    if (!data.status) {
+                        $this.attr('checked', !checked);
+                    } else {
+                        if(checked) {
+                            $("#tableau-<?php echo $this->name ?> > thead .datatable-selectable-all, #tableau-<?php echo $this->name ?> > tfoot .datatable-selectable-all")
+                                    .attr("checked", "checked");
+                        } else {
+                            $("#tableau-<?php echo $this->name ?> > thead .datatable-selectable-all, #tableau-<?php echo $this->name ?> > tfoot .datatable-selectable-all")
+                                    .removeAttr("checked")
+                        }
+                    }
+                    $(".datatable-selectable-nb").html(data.number)
+                    
+                }, "json"
+            ); 
+        })
+    })
 </script>

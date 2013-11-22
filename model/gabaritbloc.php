@@ -165,18 +165,21 @@ class gabaritBloc
      * @param string $key
      * @return mixed
      */
-    public function getValue($i, $key = NULL)
+    public function getValue($i, $key = null)
     {
-        if ($i < 0 || $i >= count($this->_values))
-            return NULL;
+        if ($i < 0 || $i >= count($this->_values)) {
+            return null;
+        }
 
         $row = $this->_values[$i];
 
-        if ($key == NULL)
+        if ($key == null) {
             return $row;
+        }
 
-        if (!isset($row[$key]))
-            return NULL;
+        if (!isset($row[$key])) {
+            return null;
+        }
 
         return $row[$key];
     }
