@@ -102,9 +102,7 @@ class Mail
     {
         $mail = new \Zend\Mail\Message();
 
-
         $mail->setEncoding('utf-8')
-             ->setBodyHtml($this->loadBody())
              ->setFrom($this->from)
              ->addTo($this->to)
              ->setSubject($this->subject);
@@ -113,7 +111,17 @@ class Mail
             $mail->addBcc($this->bcc);
         }
 
-        $mail->send();
+        $htmlMarkup = $this->loadBody();
+        $html = new \Zend\Mime\Part($htmlMarkup);
+        $html->type = "text/html";
+
+        $body = new \Zend\Mime\Message();
+        $body->setParts(array($html));
+
+        $mail->setBody($body);
+
+        $transport = new \Zend\Mail\Transport\Sendmail();
+        $transport->send($mail);
     }
 
 
