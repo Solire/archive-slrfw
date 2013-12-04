@@ -1,0 +1,8 @@
+{
+	"require": {
+		"php": ">=5.3.0",
+        "ensepar/html2pdf": "1.0.1",
+        "zendframework/zend-mail": "2.2.5",
+        "solire/geshi-php": "dev-master"
+	}
+}

@@ -11,8 +11,6 @@
 
 namespace Slrfw;
 
-require_once 'external/geshi/geshi.php';
-
 /**
  * Marvin est une methode de rapport d'erreur
  *
