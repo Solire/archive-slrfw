@@ -306,7 +306,11 @@ class Datatable
     {
         if ($this->_configName != '') {
             include $this->_configPath . DIRECTORY_SEPARATOR . $this->_configName . '.cfg.php';
-            $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
+            
+            if(isset($_REQUEST["table"])) {
+                $this->name = $_REQUEST["table"];
+            } else
+                $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->nameConfig = str_replace(array(".", "-"), "_", $this->_configName);
             $this->config = $config;
 
@@ -401,7 +405,7 @@ class Datatable
 
         $this->_columnActionButtons = $columnActionButtons;
 
-        $this->url = self::_selfURL();
+        $this->url = self::_selfURL() . "&table=" . $this->name ;
         $this->urlRaw = self::_selfURLRaw();
 
         $this->beforeRunAction();
@@ -1021,7 +1025,7 @@ class Datatable
      * @return 	void
      */
     public function selectAction() {
-        $selectArrayName = $_POST["table"] . "_select";
+        $selectArrayName = "tableau-" . $_GET["table"] . "_select";
         $selectRows = isset($_SESSION[$selectArrayName]) ? $_SESSION[$selectArrayName] : array(); 
         if($_POST["select"] == 0) {
             unset($selectRows[$_POST["row_id"]]);
@@ -1063,6 +1067,12 @@ class Datatable
         );
         echo json_encode($r);
         exit();
+    }
+    
+    public function getSelectedRows() {
+        $selectRows = array(); 
+        $selectArrayName = "tableau-" . $_GET["table"] . "_select";
+        $_SESSION[$selectArrayName] = $selectRows;
     }
 
     // --------------------------------------------------------------------
