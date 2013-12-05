@@ -63,9 +63,9 @@ class gabarit
         $this->_parents = $parents;
     }
 
-
-
-
+    public function setView($view) {
+        $this->_data['view'] = $view;
+    }
 
     public function getId() {
         return $this->_data['id'];
