@@ -45,13 +45,25 @@ class gabaritManager extends manager
      * Nom de la classe gabaritPage utilisé par défaut
      */
     const DEFAULT_GABARIT_CLASS = '\Slrfw\Model\GabaritPage';
-
+    
+    /**
+     * Nom de la classe gabaritBloc utilisé par défaut
+     */
+    const DEFAULT_GABARIT_BLOC_CLASS = '\Slrfw\Model\GabaritBloc';
+    
     /**
      * Nom de la classe à utiliser pour charger les gabarits page
      *
      * @var string
      */
     private $gabaritClassName = self::DEFAULT_GABARIT_CLASS;
+    
+    /**
+     * Nom de la classe à utiliser pour charger les gabarits bloc
+     *
+     * @var string
+     */
+    private $gabaritBlocClassName = self::DEFAULT_GABARIT_BLOC_CLASS;
 
     /**
      * Donne l'identifiant d'une page d'après son rewriting et l'identifiant.
@@ -115,6 +127,34 @@ class gabaritManager extends manager
 
         if (!empty($classNameOff)) {
             $this->gabaritClassName = $classNameOff;
+            return true;
+        }
+
+        throw new \Slrfw\Exception\Lib('Aucune classe trouvée ' . $className);
+    }
+    
+    /**
+     * Spécifie la classe à utiliser dans le chargement des blocs
+     *
+     * @param string $className Nom de la classe avec les namespaces. Si null
+     * passé, le nom de la classe est remis à la valeur par défaut.
+     *
+     * @return boolean Vrais si la classe à été enregistrée comme class à utiliser
+     * pour le gabaritBloc
+     * @throws \Slrfw\Exception\Lib Lorsqu'aucune classe n'est trouvée
+     */
+    public function setBlocClass($className)
+    {
+        /** Enregistrement de la valeur par défaut si null **/
+        if ($className === null) {
+            $this->gabaritBlocClassName = self::DEFAULT_GABARIT_BLOC_CLASS;
+            return true;
+        }
+
+        $classNameOff = \Slrfw\FrontController::searchClass($className);
+
+        if (!empty($classNameOff)) {
+            $this->gabaritBlocClassName = $classNameOff;
             return true;
         }
 
@@ -508,13 +548,7 @@ class gabaritManager extends manager
             $gabarit_bloc->setChamps($champs);
             $gabarit_bloc->setJoins($joins);
 
-
-            if (class_exists('\Slrfw\Model\Personnalise\\' . $table)) {
-                $className = '\Slrfw\Model\Personnalise\\' . $table;
-                $bloc = new $className();
-            } else {
-                $bloc = new gabaritBloc();
-            }
+            $bloc = new $this->gabaritBlocClassName();
 
             $bloc->setGabarit($gabarit_bloc);
             $blocs[$gabarit_bloc->getName()] = $bloc;
