@@ -32,11 +32,19 @@ if (isset($this->config["style"])
 if (!isset($this->modeEdit) || $this->modeEdit == false) {
     ?>
     <script src="app/back/js/tiny_mce/tiny_mce.js" type="text/javascript"></script>
+    <?php 
+    if($this->config["extra"]["creable"]) {
+    ?>
     <a role="button" data-toggle="modal" href="#modal-<?php echo $this->name ?>" class="btn btn-small">
         <i class="icon-plus"></i> Ajouter un<?php echo $this->config["table"]["suffix_genre"] ?> <?php echo $this->config["table"]["title_item"] ?>
     </a>
-    
     <hr />
+    <?php
+    }
+    ?>
+    
+    
+    
     
     <div class="group-modal">
 
