@@ -26,6 +26,13 @@ class gabaritManager extends manager
      * @var array
      */
     protected $_versions = array();
+    
+    /**
+     * Tableau de mise en cache des gabarits.
+     *
+     * @var array
+     */
+    protected $_gabarits = array();
 
     /**
      * Tableau des identifiants des versions (utilisé lors de l'enregistrement
@@ -359,7 +366,8 @@ class gabaritManager extends manager
 
     /**
      * Retourne un objet gabarit à partir de l'identifiant du gabarit
-     *
+     *  Avec mise en cache
+     * 
      * @param int $id_gabarit identifiant du gabarit en BDD
      *
      * @return Slrfw\Model\gabarit
@@ -455,8 +463,8 @@ class gabaritManager extends manager
         }
         $gabarit->setChamps($champs);
         $gabarit->setJoins($joins);
-
-        return $gabarit;
+        $this->_gabarits[$id_gabarit] = $gabarit;
+        return $this->_gabarits[$id_gabarit];
     }
 
     /**
@@ -927,8 +935,8 @@ class gabaritManager extends manager
                     /**
                      * Recuperation des blocs
                      */
-                    $blocs = $this->getBlocs(
-                        $this->getGabarit($pageJoin->getMeta('id_gabarit')));
+                    $gabarit = $this->getGabarit($pageJoin->getMeta('id_gabarit'));
+                    $blocs = $this->getBlocs($gabarit);
                     foreach ($blocs as $blocName => $bloc) {
                         $valuesBloc = $this->getBlocValues($bloc,
                             $pageJoin->getMeta('id'), $id_version, true);
@@ -936,6 +944,7 @@ class gabaritManager extends manager
                             $bloc->setValues($valuesBloc);
                         }
                     }
+                    $pageJoin->setGabarit($gabarit);
                     $pageJoin->setBlocs($blocs);
                 }
             }
@@ -996,7 +1005,7 @@ class gabaritManager extends manager
      * @param int    $nbre       nombre de pages à récupérer
      * @param bool   $main       ???
      *
-     * @return \Slrfw\Model\gabaritPage tableau de page
+     * @return \Slrfw\Model\gabaritPage|array tableau de page
      */
     public function getList(
         $id_version,
@@ -1334,7 +1343,7 @@ class gabaritManager extends manager
             );
         }
 
-        if (!$page || ($page->getGabarit()->getEditable() == 0 && $updating)) {
+        if (!$page) {
             return null;
         }
 
