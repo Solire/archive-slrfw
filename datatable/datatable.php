@@ -733,7 +733,7 @@ class Datatable
                     }
                     $selectSqlArray[] = "CONCAT(" . implode(",", $aVal) . ") name ";
                     $column["values"] = $this->_db->query(
-                                    'SELECT ' . implode(",", $selectSqlArray) . '
+                                    'SELECT  DISTINCT ' . implode(",", $selectSqlArray) . '
                                      FROM ' . $table . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : "") . ';')->fetchAll(\PDO::FETCH_COLUMN);
                 } elseif (isset($column["sql"])) {
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["sql"] . ""
