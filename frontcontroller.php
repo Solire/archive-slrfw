@@ -577,7 +577,15 @@ class FrontController
         $apiId = $db->query($query)->fetchColumn();
 
         if (empty($apiId)) {
-            $apiId = 1;
+            /** On essaie de recuperer l'api par le domaine **/
+            $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+            $query = 'SELECT id_api '
+                   . 'FROM version '
+                   . 'WHERE domaine = ' . $db->quote($serverUrl);
+            $apiId = $db->query($query)->fetchColumn();
+            if (empty($apiId)) {
+                $apiId = 1;
+            }
         }
         if (!defined('ID_API')) {
             define('ID_API', $apiId);
