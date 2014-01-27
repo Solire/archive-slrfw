@@ -119,6 +119,10 @@ class gabarit
     public function getEditable() {
         return $this->_data['editable'];
     }
+    
+    public function getEditableMiddleOffice() {
+        return $this->_data['editable_middle_office'];
+    }
 
     public function getMeta() {
         return $this->_data['meta'];
