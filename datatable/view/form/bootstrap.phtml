@@ -132,6 +132,7 @@ if (!isset($this->modeEdit) || $this->modeEdit == false) {
             if(typeof tinyMCE == "object")
                 tinyMCE.triggerSave(true, true);
             $.post($myForm.attr("action"), $myForm.serialize(), function() {
+                $myForm[0].reset();
                 $modal.modal("hide")
                 $modal.on('hidden', function () {
                     var $modalResponse = $("#modal-response-" + $myForm.attr("data-response") + "-<?php echo $this->name ?>")
