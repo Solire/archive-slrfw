@@ -306,7 +306,7 @@ class gabaritPage extends gabaritBloc
 
     /**
      *
-     * @return type
+     * @return gabaritBloc | array
      */
     public function getBlocs($name = null)
     {
