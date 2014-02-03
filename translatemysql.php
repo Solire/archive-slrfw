@@ -85,7 +85,7 @@ class TranslateMysql
         }
 
         if (count($this->_versions) == 0) {
-            $query  = 'SELECT id FROM version';
+            $query  = 'SELECT id FROM version WHERE id_api =' . intval($this->_api);
             $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
         }
 
