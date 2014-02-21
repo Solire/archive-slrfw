@@ -392,6 +392,21 @@ class MyPDO extends \PDO
     {
         return $this->exec('DELETE FROM ' . $table . ' WHERE ' . $where);
     }
+    
+    /**
+     * 
+     * @param string $table nom de la table où il faudrait controller l'existence
+     * @param string $field nom du champ enum
+     * @return type
+     */
+    function getEnumValues($table, $field) {    
+        $query = "SHOW FIELDS FROM `{$table}` LIKE '{$field}'";
+        $result = $this->query($query);
+        $row = $result->fetch();
+        preg_match('#^enum\((.*?)\)$#ism', $row['Type'], $matches);
+        $enum = str_getcsv($matches[1], ",", "'");
+        return $enum;
+    }
 
 }
 
