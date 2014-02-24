@@ -9,15 +9,15 @@
     if ($this->value == '') {
         $style = ' display:none;';
     } else {
-        $src = $this->idGabPage . '/mini/' . $this->value;
+        $minSrc = $this->idGabPage . '/mini/' . $this->value;
         $href = $this->idGabPage . '/' . $this->value;
-        $sizes = getimagesize('upload/' . $src);
+        $sizes = getimagesize('upload/' . $href);
         $size = $sizes[0] . ' x ' . $sizes[1];
     }
 ?>
         <a class="previsu" style="cursor:pointer;<?php echo $style; ?>" href="<?php echo $href; ?>">
             <div class="fl" style="margin-left:0px;">
-                <img style="max-height:80px;width:auto;height:auto;max-width: 80px;" src="<?php echo $src; ?>" class="img-polaroid champ-image-vignette">
+                <img style="max-height:80px;width:auto;height:auto;max-width: 80px;" src="<?php echo $minSrc; ?>" class="img-polaroid champ-image-vignette">
             </div>
             <div class="fl" style="margin-left:0px;width:315px">
                 <dl class="dl-horizontal">
