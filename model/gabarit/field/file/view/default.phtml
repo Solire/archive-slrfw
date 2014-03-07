@@ -5,14 +5,21 @@
 
     <div class="champ-image" style="float:left;">
 <?php
-    $style = $src = $size = $href = '';
+    $style = $src = $minSrc = $size = $href = '';
     if ($this->value == '') {
         $style = ' display:none;';
     } else {
-        $minSrc = $this->idGabPage . '/mini/' . $this->value;
-        $href = $this->idGabPage . '/' . $this->value;
-        $sizes = getimagesize('upload/' . $href);
-        $size = $sizes[0] . ' x ' . $sizes[1];
+        $ext = pathinfo($this->value, PATHINFO_EXTENSION);
+        $href   = $this->idGabPage . '/' . $this->value;
+        $path = 'upload/' . $href;
+        if (Slrfw\Model\fileManager::isImage($path)) {
+            $minSrc = $this->idGabPage . '/mini/' . $this->value;
+            $sizes = getimagesize('upload/' . $href);
+            $size  = $sizes[0] . ' x ' . $sizes[1];
+        } else {
+            $size  = Slrfw\Format\Number::formatSize(filesize($path));
+            $minSrc = 'app/back/img/filetype/' . $ext . '.png';
+        }
     }
 ?>
         <a class="previsu" style="cursor:pointer;<?php echo $style; ?>" href="<?php echo $href; ?>">

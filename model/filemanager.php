@@ -424,7 +424,7 @@ class fileManager extends manager {
             } else {
                 $width = 0;
                 $height = 0;
-                $jsonrpc['taille'] = '';
+                $jsonrpc['taille'] = \Slrfw\Format\Number::formatSize($size);
             }
 
             /** Ajout d'informations utiles (ou pas) */
