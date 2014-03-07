@@ -394,7 +394,7 @@ class MyPDO extends \PDO
     }
     
     /**
-     * 
+     * Liste des bvaleurs d'un champ ENUM
      * @param string $table nom de la table où il faudrait controller l'existence
      * @param string $field nom du champ enum
      * @return type
@@ -407,6 +407,22 @@ class MyPDO extends \PDO
         $enum = str_getcsv($matches[1], ",", "'");
         return $enum;
     }
+    
+    /**
+     * Creation d'une table
+     * @param type $table
+     * @param type $columns
+     * @return type
+     */
+    public function createTable($table, $columns) {
+        $sql = "CREATE TABLE $table (";
+        foreach ($columns as $columnName) {
+            $sql .= "`$columnName` VARCHAR(255),";
+        }
+        $sql = substr($sql, 0, -1) . ");";
+        return $this->exec($sql);
+    }
+
 
 }
 
