@@ -2,10 +2,8 @@
 /**
  * Gestionnaire de vue
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -13,10 +11,8 @@ namespace Slrfw;
 /**
  * Gestionnaire de vue
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class View
 {
@@ -238,7 +234,7 @@ class View
      */
     public function setController($controller)
     {
-        $this->_controller = $controller;
+        $this->_controller = strtolower($controller);
     }
 
     /**
@@ -250,7 +246,7 @@ class View
      */
     public function setAction($action)
     {
-        $this->_action = $action;
+        $this->_action = strtolower($action);
     }
 
     /**

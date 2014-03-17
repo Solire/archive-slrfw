@@ -2,10 +2,8 @@
 /**
  * Front controller
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -13,10 +11,8 @@ namespace Slrfw;
 /**
  * Front controller
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class FrontController
 {
@@ -543,10 +539,11 @@ class FrontController
         $view->base = $front->getDir('base');
         $instance->$method();
 
+        $view->setController($front->controller);
+        $view->setAction($front->action);
+
         if ($view->isEnabled()) {
             $instance->shutdown();
-            $view->setController($front->controller);
-            $view->setAction($front->action);
             $view->display();
         }
 
