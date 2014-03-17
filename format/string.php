@@ -2,10 +2,8 @@
 /**
  * Formatage de chaines de caractères
  *
- * @package    Library
- * @subpackage Format
  * @author     Stéphane <smonnot@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw\Format;
@@ -13,10 +11,8 @@ namespace Slrfw\Format;
 /**
  * Formatage de chaines de caractères
  *
- * @package    Library
- * @subpackage Format
  * @author     Stéphane <smonnot@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class String
 {
@@ -28,7 +24,8 @@ class String
 
     /**
      * Tableau de translitération linguistique
-     * @var array 
+     *
+     * @var array
      */
     static protected $charMap = array(
         // Latin
@@ -161,17 +158,20 @@ class String
         for ($i = 0; $i < $strLen; $i++) {
             $string .= $chaine[rand() % strlen($chaine)];
         }
+
         return $string;
     }
-    
+
     /**
      * Construit une url propre à partir d'une chaine de caractere,
+     *
      * @param string $string la chaine de base à transformer.
      * @param string $charReplacement caractere de remplacement.
+     *
      * @return string La chaine transfomée.
-     * @deprecated since version 4.0
+     * @deprecated since version 4.1.0
      */
-    static function friendlyURL($string, $charReplacement = "-") {
+    public static function friendlyURL($string, $charReplacement = "-") {
         $string = preg_replace("`\[.*\]`U", "", $string);
         $string = preg_replace('`&(amp;)?#?[a-z0-9]+;`i', $charReplacement, $string);
         $string = htmlentities($string, ENT_COMPAT, 'utf-8');
@@ -179,42 +179,55 @@ class String
         $string = preg_replace(array("`[^a-z0-9]`i", "`[$charReplacement]+`"), $charReplacement, $string);
         return strtolower(trim($string, $charReplacement));
     }
-    
+
     /**
      * Construit une url propre à partir d'une chaine de caractere
      *
-     * @author Shinbuntu <smonnot@solire.fr>
      * @param  string $str Chaine à transformer
      * @param  string $delimiter Délimiteur
      * @param  int    $limit Nombre de caractères maximum
-     * @return type
+     *
+     * @return string
      */
-    static function urlSlug($str, $delimiter = '-', $limit = NULL) {
-        // On convertit en utf8
+    public static function urlSlug($str, $delimiter = '-', $limit = NULL) {
+        /**
+         * On convertit en utf8
+         */
         $str = mb_convert_encoding((string) $str, 'UTF-8', mb_list_encodings());
-        
-        // On transforme les caractères spéciaux en caractères simples
+
+        /**
+         * On transforme les caractères spéciaux en caractères simples
+         */
         $str = str_replace(array_keys(self::$charMap), self::$charMap, $str);
-        
-        // On remplace tous les caractères non alpha numériques par le délimiteur
+
+        /**
+         * On remplace tous les caractères non alpha numériques par le délimiteur
+         */
         $str = preg_replace('/[^\p{L}\p{Nd}]+/u', $delimiter, $str);
-        
-        // On supprime les délimiteurs en double
+
+        /**
+         * On supprime les délimiteurs en double
+         */
         $str = preg_replace('/(' . preg_quote($delimiter, '/') . '){2,}/', '$1', $str);
-        
-        // Si on a une limite, on coupe la chaine
+
+        /**
+         * Si on a une limite, on coupe la chaine
+         */
         if($limit !== NULL) {
             $str = mb_substr($str, 0, $limit, 'UTF-8');
         }
-        
-        // On supprime les délimiteurs en double
+
+        /**
+         * On supprime les délimiteurs en debut et en fin de chaîne
+         */
         $str = trim($str, $delimiter);
-        
-        // On met en minuscule la chaine de caractère
+
+        /**
+         * On met en minuscule la chaine de caractère
+         */
         $str = mb_strtolower($str, 'UTF-8');
-                
+
         return $str;
     }
-
 }
 
