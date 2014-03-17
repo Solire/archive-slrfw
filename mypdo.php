@@ -237,15 +237,16 @@ class MyPDO extends \PDO
      * @return array
      */
     function getEnumValues($table, $field) {
-        $query  = 'SHOW FIELDS FROM `' . $table . '` LIKE "' . $this->quote($field) . '"';
-        $row    = $this->query($query)->fetch();
+        $query  = 'SHOW FIELDS FROM `' . $table . '` LIKE \'' . $field . '\'';
+        $row    = $this->query($query)->fetch(\PDO::FETCH_ASSOC);
 
         $match  = array();
-        if (!preg_match('#^enum\((.*?)\)$#ism', $row['Type'], $match)) {
+        if (!preg_match('`^enum\((.*?)\)$`ism', $row['Type'], $match)) {
             return null;
         }
 
-        $enum = str_getcsv($matches[1], ',', '\'');
+        $enum = str_getcsv($match[1], ',', '\'');
+
         return $enum;
     }
 
