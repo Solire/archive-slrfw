@@ -20,12 +20,6 @@ namespace Slrfw;
  */
 class FrontController
 {
-
-    /**
-     * Identifiant de version
-     */
-    const VERSION = '2.2.0';
-
     /**
      * Configuration principale du site
      *
@@ -548,10 +542,12 @@ class FrontController
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();
-        $instance->shutdown();
 
         if ($view->isEnabled()) {
-            $view->display($front->controller, $front->action, false);
+            $instance->shutdown();
+            $view->setController($front->controller);
+            $view->setAction($front->action);
+            $view->display();
         }
 
         return true;
@@ -701,7 +697,6 @@ class FrontController
             'dir' => $name,
         );
     }
-
 
     /**
      * Renvois les valeurs par défaut propre à l'application
