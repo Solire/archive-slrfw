@@ -1,2 +1,5 @@
 composer.lock
 
+# Tests unitaires
+tests/units/coverage
+tests/units/tmp
