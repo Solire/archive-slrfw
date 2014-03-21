@@ -30,7 +30,7 @@ class MyPDO extends \PDO
     public function rewrit($string, $table = null, $name = 'rewrit', $param = '')
     {
         if (!$table) {
-            return Format\String::makeRew($string);
+            return Format\String::urlSlug($string);
         }
         /**
          * Controle de l'existence du rewrit contenu dans le champ $Name
@@ -43,7 +43,8 @@ class MyPDO extends \PDO
             } else {
                 $temp = $string;
             }
-            $rewrit = Format\String::urlSlug($rewrit, '-', 255);
+            $rewrit = Format\String::urlSlug($string, '-', 255);
+
             $query  = 'SELECT COUNT(*)'
                     . ' FROM `' . $table . '`'
                     . ' WHERE `' . $name . '` = ' . $this->quote($rewrit)
