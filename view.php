@@ -2,10 +2,8 @@
 /**
  * Gestionnaire de vue
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -13,21 +11,52 @@ namespace Slrfw;
 /**
  * Gestionnaire de vue
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class View
 {
+    /**
+     * Définit si la vue incluse automatiquement après execution de l'action
+     *
+     * @var bool
+     */
     private $_enable = true;
+
+    /**
+     * Définit l'inclusion de la vue main.phtml
+     *
+     * @var bool
+     */
     private $_main = true;
 
+    /**
+     * Format du chemin de la vue
+     *
+     * @var string
+     */
     private $_format = null;
-    private $_translate = null;
-    private $_controller;
-    private $_action;
 
+    /**
+     * Objet de traduction
+     *
+     * @var TranslateMysql
+     */
+    private $_translate = null;
+
+    /**
+     * Nom du controller
+     *
+     * @var string
+     */
+    private $_controller;
+
+    /**
+     * Nom de l'action
+     *
+     * @var string
+     */
+    private $_action;
 
     /**
      * Gestion des vues par appel direct des fichiers
@@ -171,6 +200,7 @@ class View
         } else {
             $path = $this->getpath($this->_controller, $this->_action);
         }
+
         if ($path !== false) {
             include $path;
         }
@@ -195,22 +225,38 @@ class View
         return false;
     }
 
-    // @todo Documenter à quoi sert custom
     /**
-     * Affiche la vue
+     * Définit le nom du controller (dossier contenant la vue)
      *
-     * @param string  $controller Nom du controller
-     * @param string  $action     Nom de l'action
-     * @param boolean $custom     ???
+     * @param string $controller
      *
      * @return void
      */
-    public function display($controller, $action, $custom = true)
+    public function setController($controller)
     {
         $this->_controller = strtolower($controller);
-        $this->_action = strtolower($action);
+    }
 
-        if (($this->isEnabled() || $custom) && $this->isIncludeMain()) {
+    /**
+     * Définit le nom de l'action (nom du fichier de la vue)
+     *
+     * @param string $action
+     *
+     * @return void
+     */
+    public function setAction($action)
+    {
+        $this->_action = strtolower($action);
+    }
+
+    /**
+     * Affiche la vue
+     *
+     * @return void
+     */
+    public function display()
+    {
+        if ($this->isIncludeMain()) {
             $main = $this->getpath(null, 'main');
             if ($main !== false) {
                 include $main;
