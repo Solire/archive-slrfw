@@ -76,8 +76,9 @@ class TranslateMysql
      */
     public function _($string, $aide = '')
     {
-        if (isset($this->_translate[$this->_locale][$string])) {
-            return $this->_translate[$this->_locale][$string];
+        $stringSha = hash('sha256', $string);
+        if (isset($this->_translate[$this->_locale][$stringSha])) {
+            return $this->_translate[$this->_locale][$stringSha];
         }
 
         if (!self::DEBUG) {
@@ -91,6 +92,7 @@ class TranslateMysql
 
         foreach ($this->_versions as $versionId) {
             $query  = 'INSERT INTO traduction SET'
+                    . ' `cle_sha` =  '     . $this->_db->quote($stringSha) . ','
                     . ' id_version =  ' . $versionId . ','
                     . ' id_api =  ' . intval($this->_api) . ','
                     . ' cle = ' . $this->_db->quote($string) . ','
@@ -147,7 +149,7 @@ class TranslateMysql
      */
     protected function _loadTranslationData($locale)
     {
-        $query  = 'SELECT cle, valeur'
+        $query  = 'SELECT cle_sha, valeur'
                 . ' FROM traduction'
                 . ' WHERE id_api = ' . $this->_api
                 . ' AND id_version = ' . $locale;
