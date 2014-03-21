@@ -2,39 +2,28 @@
 /**
  * Classe de contrôle des chemins de fichiers
  *
- * @package    Library
- * @subpackage Core
- * @author     Siwaÿll <sanath.labs@gmail.com>
- * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @author  Siwaÿll <sanath.labs@gmail.com>
+ * @license beerware http://wikipedia.org/wiki/Beerware
  */
 
 namespace Slrfw;
 
+use \Slrfw\Exception\Lib as Exception;
+
 /**
  * Classe de contrôle des chemins de fichiers
  *
- * @package    Library
- * @subpackage Core
- * @author     Siwaÿll <sanath.labs@gmail.com>
- * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @author  Siwaÿll <sanath.labs@gmail.com>
+ * @license beerware http://wikipedia.org/wiki/Beerware
  */
 class Path
 {
-    /**
-     * Envois d'exceptions activé ou non
-     * false par défaut
-     *
-     * @var boolean
-     * @deprecated
-     */
-    private static $_silentMode = false;
-
     /**
      * Chemin absolu vers le fichier
      *
      * @var string
      */
-    protected $_path = '';
+    protected $path = '';
 
     /**
      * Mode silencieux
@@ -54,27 +43,13 @@ class Path
      */
     public function __construct($filePath, $option = 0)
     {
-        $this->_path = $this->test($filePath);
+        $this->path = $this->test($filePath);
 
-        if ($this->_path == false) {
-            if (!self::$_silentMode && $option != self::SILENT) {
-                throw new \Exception('Fichier introuvable : ' . $filePath);
+        if ($this->path == false) {
+            if ($option != self::SILENT) {
+                throw new Exception('Fichier introuvable : ' . $filePath);
             }
         }
-    }
-
-    /**
-     * Active ou enlenve l'envois d'exceptions
-     *
-     * @param boolean $value Vrai pour mettre en silencieux
-     *
-     * @return void
-     * @uses Path::$_slientMode Edition
-     * @deprecated
-     */
-    public static function silence($value = true)
-    {
-        self::$_silentMode = $value;
     }
 
     /**
@@ -95,14 +70,14 @@ class Path
      */
     public function get()
     {
-        if (!$this->_path) {
+        if (!$this->path) {
             return false;
         }
 
-        if (is_dir($this->_path)) {
-            return $this->_path . DIRECTORY_SEPARATOR;
+        if (is_dir($this->path)) {
+            return $this->path . DIRECTORY_SEPARATOR;
         } else {
-            return $this->_path;
+            return $this->path;
         }
     }
 
@@ -114,22 +89,19 @@ class Path
      * @return boolean True si l'opération c'est bien déroulée.
      * @static
      */
-    static public function addPath($path)
+    public static function addPath($path)
     {
-        $path = realpath($path);
-        if (!$path) {
-            return false;
-        }
+        $path = new self($path);
 
         $usePaths = explode(PATH_SEPARATOR, get_include_path());
         foreach ($usePaths as $usePath) {
-            if ($usePath == $path) {
+            if ($usePath == $path->get()) {
                 return true;
             }
         }
 
-        set_include_path(get_include_path()
-            . PATH_SEPARATOR . $path
+        set_include_path(
+            get_include_path() . PATH_SEPARATOR . $path->get()
         );
 
         return true;
@@ -159,4 +131,3 @@ class Path
         return false;
     }
 }
-
