@@ -69,7 +69,7 @@
         #tableau-<?php echo $this->name ?> table a { text-decoration: underline; }
         #tableau-<?php echo $this->name ?> table tr  >  td { border: 0px;text-align: left;vertical-align: top;  }
         #tableau-<?php echo $this->name ?> table tr  >  td:first-child {  padding-left: 50px;width: 100px;  }
-        
+
         #tableau-<?php echo $this->name ?> table  >  tbody {
             border-top: 0px dotted #333333;
         }
@@ -450,7 +450,7 @@
         var currentAjax;
 
 
-        
+
         // get visible columns
         $.fn.getColumnsShown = function(dTable)
         {
@@ -781,7 +781,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
                     source  :   sSource,
                     data    :   aoData,
                 }
-                
+
                 $.ajax( {
                     "dataType": 'json',
                     "type": "POST",
@@ -803,7 +803,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
             'bProcessing': true,
             'bServerSide': true,
             'oTableTools': {
-                'sSwfPath': $("base").attr("href") + "/swf/datatable/copy_cvs_xls_pdf.swf",
+                'sSwfPath': $("base").attr("href") + 'app/back/swf/datatable/copy_cvs_xls.swf',
                 'aButtons': [
 <?php
 if (isset($this->config["extra"]) && isset($this->config["extra"]["copy"]) && $this->config["extra"]["copy"]) {
@@ -1252,16 +1252,16 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
 </script>
 
 <script type="text/javascript">
-    
+
     $(document).ready(function() {
         /** Evenement sur la case à cocher selectable **/
         $("#tableau-<?php echo $this->name ?> > tbody > tr > td > .datatable-selectable").live("click", function() {
             var $this = $(this);
             var value = $this.parents("tr:first").attr("id")
             var checked = $this.is(':checked');
-            
-            $.post('<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>dt_action=select&json&<?php echo $this->additionalParams ?>', 
-                { row_id: value, select: checked ? 1 : 0}, 
+
+            $.post('<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>dt_action=select&json&<?php echo $this->additionalParams ?>',
+                { row_id: value, select: checked ? 1 : 0},
                 function(data) {
                     if (!data.status) {
                         $this.attr('checked', !checked);
@@ -1273,10 +1273,10 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
                         $(".datatable-selectable-" + id).html(item)
                     })
                 }, "json"
-            ); 
+            );
         })
-        
-        
+
+
         /** Evenement sur la case à cocher selectable-all **/
         $("#tableau-<?php echo $this->name ?> > thead .datatable-selectable-all, #tableau-<?php echo $this->name ?> > tfoot .datatable-selectable-all").live("click", function() {
             var $this = $(this);
@@ -1291,9 +1291,9 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
                 $overlay.find(".circle").css({'margin-top' : marginTop + "px"})
                 $overlay.fadeIn(500);
             }
-            
-            $.post(currentAjax.source + '&dt_action=selectall', 
-                data, 
+
+            $.post(currentAjax.source + '&dt_action=selectall',
+                data,
                 function(data) {
                     oTable_<?php echo $this->name ?>.fnDraw();
                     if (!data.status) {
@@ -1308,13 +1308,13 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
                         }
                     }
                     $(".datatable-selectable-nb").html(data.number)
-                    
+
                     $.each(data, function(id, item) {
                         $(".datatable-selectable-" + id).html(item)
                     })
-                    
+
                 }, "json"
-            ); 
+            );
         })
     })
 </script>
