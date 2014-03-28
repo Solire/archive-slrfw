@@ -74,18 +74,16 @@ class View
 
     /**
      * Chargement d'une nouvelle vue
-     *
-     * @param TranslateMysql $translate Gestionnaire de traduction
      */
-    public function __construct($translate)
-    {
-        $this->_translate = $translate;
-    }
+    public function __construct()
+    {}
 
     /**
-     * Chanegement de la classe de traduction
+     * Chargement de la classe de traduction
      *
      * @param TranslateMysql $translate
+     *
+     * @return void
      */
     public function setTranslate($translate)
     {
@@ -96,10 +94,11 @@ class View
      * Alias à l'utilisation de translate
      *
      * @param string $string Chaine à traduire
-     * @param string $aide   ??
+     * @param string $aide   Texte permettant de situer l'emplacement de la
+     * chaine à traduire, exemple : 'Situé sur le bas de page'
      *
      * @return string
-     * @todo
+     * @uses TranslateMysql
      */
     public function _($string, $aide = '')
     {
