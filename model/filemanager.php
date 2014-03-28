@@ -9,6 +9,12 @@ namespace Slrfw\Model;
  *
  */
 class fileManager extends manager {
+    
+    /**
+     *
+     * @var Nom de la table media
+     */
+    protected $mediaTableName = 'media_fichier';
 
     /**
      *
@@ -418,7 +424,7 @@ class fileManager extends manager {
             } else {
                 $width = 0;
                 $height = 0;
-                $jsonrpc['taille'] = '';
+                $jsonrpc['taille'] = \Slrfw\Format\Number::formatSize($size);
             }
 
             /** Ajout d'informations utiles (ou pas) */
@@ -665,7 +671,7 @@ class fileManager extends manager {
         $width,
         $height
     ) {
-        $query  = 'INSERT INTO `media_fichier` SET'
+        $query  = 'INSERT INTO `' . $this->mediaTableName . '` SET'
                 . ' `rewriting` = ' . $this->_db->quote($fileName) . ','
                 . ' `id_gab_page` = ' . $id_gab_page . ','
                 . ' `id_temp` = ' . $id_temp . ','
@@ -755,5 +761,9 @@ class fileManager extends manager {
         return true;
     }
 
+    public function setMediaTableName($mediaTableName) {
+        $this->mediaTableName = $mediaTableName;
+    }
+    
 }
 

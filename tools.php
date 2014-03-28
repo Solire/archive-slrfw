@@ -20,6 +20,11 @@ class Tools {
         $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: ' . $type . '; charset="UTF-8"' . "\r\n";
         mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $message, $header_ . $header);
     }
+    
+    static function cut($text, $nbCharsMax)
+    {
+        return mb_strlen($text, 'UTF-8') > $nbCharsMax ? mb_substr($text, 0, $nbCharsMax, 'UTF-8') . '...' : $text;
+    }
 
     /**
      *

@@ -2,10 +2,8 @@
 /**
  * Front controller
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -13,19 +11,11 @@ namespace Slrfw;
 /**
  * Front controller
  *
- * @package    Library
- * @subpackage Core
  * @author     dev <dev@solire.fr>
- * @license    Solire http://www.solire.fr/
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class FrontController
 {
-
-    /**
-     * Identifiant de version
-     */
-    const VERSION = '2.2.0';
-
     /**
      * Configuration principale du site
      *
@@ -444,6 +434,7 @@ class FrontController
 
         return null;
     }
+
     /**
      * Test si le morceau d'url est une application
      *
@@ -536,22 +527,46 @@ class FrontController
             }
         }
 
+        /**
+         * Création de la classe de traduction
+         */
+        $translate = new TranslateMysql(ID_VERSION, ID_API, Registry::get('db'));
+        $translate->addTranslation();
 
+        /**
+         * Création de la vue
+         * @todo Ne créér la vue que si besoin.
+         */
+        $view = new View();
 
+        /**
+         * On créé le controller
+         */
         $instance = new $class();
 
-        /** Passage des paramètres de rewriting **/
+        /**
+         * On passe la vue et la traduction au controller
+         */
+        $instance->setView($view);
+        $view->setTranslate($translate);
+        $instance->setTranslate($translate);
+
+        /**
+         * Passage des paramètres de rewriting
+         */
         $instance->setRewriting($front->rewriting);
 
         $instance->start();
-        $view = $instance->getView();
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();
-        $instance->shutdown();
+
+        $view->setController($front->controller);
+        $view->setAction($front->action);
 
         if ($view->isEnabled()) {
-            $view->display($front->controller, $front->action, false);
+            $instance->shutdown();
+            $view->display();
         }
 
         return true;
@@ -577,7 +592,15 @@ class FrontController
         $apiId = $db->query($query)->fetchColumn();
 
         if (empty($apiId)) {
-            $apiId = 1;
+            /** On essaie de recuperer l'api par le domaine **/
+            $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+            $query = 'SELECT id_api '
+                   . 'FROM version '
+                   . 'WHERE domaine = ' . $db->quote($serverUrl);
+            $apiId = $db->query($query)->fetchColumn();
+            if (empty($apiId)) {
+                $apiId = 1;
+            }
         }
         if (!defined('ID_API')) {
             define('ID_API', $apiId);
@@ -693,7 +716,6 @@ class FrontController
             'dir' => $name,
         );
     }
-
 
     /**
      * Renvois les valeurs par défaut propre à l'application

@@ -306,12 +306,17 @@ class gabaritPage extends gabaritBloc
 
     /**
      *
-     * @return type
+     * @return gabaritBloc | array
      */
     public function getBlocs($name = null)
     {
-        if ($name == null || !isset ($this->_blocs[$name]))
+        if ($name == null) {
             return $this->_blocs;
+        }
+        
+        if(!isset ($this->_blocs[$name])) {
+            return false;
+        }
 
         return $this->_blocs[$name];
     }

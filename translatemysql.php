@@ -76,8 +76,9 @@ class TranslateMysql
      */
     public function _($string, $aide = '')
     {
-        if (isset($this->_translate[$this->_locale][$string])) {
-            return $this->_translate[$this->_locale][$string];
+        $stringSha = hash('sha256', $string);
+        if (isset($this->_translate[$this->_locale][$stringSha])) {
+            return $this->_translate[$this->_locale][$stringSha];
         }
 
         if (!self::DEBUG) {
@@ -85,12 +86,13 @@ class TranslateMysql
         }
 
         if (count($this->_versions) == 0) {
-            $query  = 'SELECT id FROM version';
+            $query  = 'SELECT id FROM version WHERE id_api =' . intval($this->_api);
             $this->_versions = $this->_db->query($query)->fetchAll(\PDO::FETCH_COLUMN);
         }
 
         foreach ($this->_versions as $versionId) {
             $query  = 'INSERT INTO traduction SET'
+                    . ' `cle_sha` =  '     . $this->_db->quote($stringSha) . ','
                     . ' id_version =  ' . $versionId . ','
                     . ' id_api =  ' . intval($this->_api) . ','
                     . ' cle = ' . $this->_db->quote($string) . ','
@@ -147,7 +149,7 @@ class TranslateMysql
      */
     protected function _loadTranslationData($locale)
     {
-        $query  = 'SELECT cle, valeur'
+        $query  = 'SELECT cle_sha, valeur'
                 . ' FROM traduction'
                 . ' WHERE id_api = ' . $this->_api
                 . ' AND id_version = ' . $locale;

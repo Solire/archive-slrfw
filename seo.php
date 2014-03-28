@@ -312,7 +312,7 @@ class Seo
      */
     public function showKeywords()
     {
-        return implode(' ', $this->_keywords);
+        return implode(', ', $this->_keywords);
 
     }//end showKeywords()
 

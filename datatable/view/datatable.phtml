@@ -284,7 +284,7 @@
             align: center;
         }
 
-        #tableau-<?php echo $this->name ?> tbody tr.even td .btn-a a, #tableau-<?php echo $this->name ?> tbody tr.odd td .btn-a a {
+        #tableau-<?php echo $this->name ?> tbody tr.even td a.btn, #tableau-<?php echo $this->name ?> tbody tr.odd td a.btn {
             color: white;
             text-decoration: none;
         }
@@ -903,7 +903,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["hide_columns"
     <?php
 }
 ?>
-            "sAjaxSource": "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>json&<?php echo $this->additionalParams ?>table=<?php echo $this->name ?>",
+            "sAjaxSource": "<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>json&<?php echo $this->additionalParams ?>",
             "sServerMethod": "POST"
 
         }).fnSetFilteringDelay().columnFilter({
@@ -1261,7 +1261,7 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
             var checked = $this.is(':checked');
             
             $.post('<?php echo $this->url; ?><?php echo strpos($this->url, "?") === false ? '?' : '&' ?>dt_action=select&json&<?php echo $this->additionalParams ?>', 
-                { row_id: value, select: checked ? 1 : 0, table : $(this).parents("table:first").attr("id") }, 
+                { row_id: value, select: checked ? 1 : 0}, 
                 function(data) {
                     if (!data.status) {
                         $this.attr('checked', !checked);
@@ -1269,6 +1269,9 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
 
                     }
                     $(".datatable-selectable-nb").html(data.number)
+                    $.each(data, function(id, item) {
+                        $(".datatable-selectable-" + id).html(item)
+                    })
                 }, "json"
             ); 
         })
@@ -1305,6 +1308,10 @@ $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallba
                         }
                     }
                     $(".datatable-selectable-nb").html(data.number)
+                    
+                    $.each(data, function(id, item) {
+                        $(".datatable-selectable-" + id).html(item)
+                    })
                     
                 }, "json"
             ); 

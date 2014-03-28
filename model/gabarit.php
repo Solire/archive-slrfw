@@ -63,9 +63,9 @@ class gabarit
         $this->_parents = $parents;
     }
 
-
-
-
+    public function setView($view) {
+        $this->_data['view'] = $view;
+    }
 
     public function getId() {
         return $this->_data['id'];
@@ -118,6 +118,10 @@ class gabarit
 
     public function getEditable() {
         return $this->_data['editable'];
+    }
+    
+    public function getEditableMiddleOffice() {
+        return $this->_data['editable_middle_office'];
     }
 
     public function getMeta() {

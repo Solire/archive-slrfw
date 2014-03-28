@@ -67,12 +67,18 @@ class Number
         return printf("%0" . $nbZero . "d", $number);
     }
 
+    /**
+     *
+     * @param type $valeur
+     * 
+     * @return type
+     */
     static function formatSize($valeur) {
         $strTmp = "";
 
         if (preg_match("#^[0-9]{1,}$#", $valeur)) {
             if ($valeur >= 1000000) {
-                // Taille supÃ©rieur Ã  1 MegaOctet
+                // Taille supérieur à 1 MegaOctet
                 $strTmp = sprintf("%01.2f", $valeur / 1000000);
                 // Suppression des "0" en fin de chaine
                 $strTmp = preg_replace("#[\.]{1}[0]{1,}$#", "", $strTmp) . " Mo";

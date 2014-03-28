@@ -26,6 +26,13 @@ class gabaritManager extends manager
      * @var array
      */
     protected $_versions = array();
+    
+    /**
+     * Tableau de mise en cache des gabarits.
+     *
+     * @var array
+     */
+    protected $_gabarits = array();
 
     /**
      * Tableau des identifiants des versions (utilisé lors de l'enregistrement
@@ -45,13 +52,25 @@ class gabaritManager extends manager
      * Nom de la classe gabaritPage utilisé par défaut
      */
     const DEFAULT_GABARIT_CLASS = '\Slrfw\Model\GabaritPage';
-
+    
+    /**
+     * Nom de la classe gabaritBloc utilisé par défaut
+     */
+    const DEFAULT_GABARIT_BLOC_CLASS = '\Slrfw\Model\GabaritBloc';
+    
     /**
      * Nom de la classe à utiliser pour charger les gabarits page
      *
      * @var string
      */
     private $gabaritClassName = self::DEFAULT_GABARIT_CLASS;
+    
+    /**
+     * Nom de la classe à utiliser pour charger les gabarits bloc
+     *
+     * @var string
+     */
+    private $gabaritBlocClassName = self::DEFAULT_GABARIT_BLOC_CLASS;
 
     /**
      * Donne l'identifiant d'une page d'après son rewriting et l'identifiant.
@@ -115,6 +134,34 @@ class gabaritManager extends manager
 
         if (!empty($classNameOff)) {
             $this->gabaritClassName = $classNameOff;
+            return true;
+        }
+
+        throw new \Slrfw\Exception\Lib('Aucune classe trouvée ' . $className);
+    }
+    
+    /**
+     * Spécifie la classe à utiliser dans le chargement des blocs
+     *
+     * @param string $className Nom de la classe avec les namespaces. Si null
+     * passé, le nom de la classe est remis à la valeur par défaut.
+     *
+     * @return boolean Vrais si la classe à été enregistrée comme class à utiliser
+     * pour le gabaritBloc
+     * @throws \Slrfw\Exception\Lib Lorsqu'aucune classe n'est trouvée
+     */
+    public function setBlocClass($className)
+    {
+        /** Enregistrement de la valeur par défaut si null **/
+        if ($className === null) {
+            $this->gabaritBlocClassName = self::DEFAULT_GABARIT_BLOC_CLASS;
+            return true;
+        }
+
+        $classNameOff = \Slrfw\FrontController::searchClass($className);
+
+        if (!empty($classNameOff)) {
+            $this->gabaritBlocClassName = $classNameOff;
             return true;
         }
 
@@ -319,7 +366,8 @@ class gabaritManager extends manager
 
     /**
      * Retourne un objet gabarit à partir de l'identifiant du gabarit
-     *
+     *  Avec mise en cache
+     * 
      * @param int $id_gabarit identifiant du gabarit en BDD
      *
      * @return Slrfw\Model\gabarit
@@ -415,8 +463,8 @@ class gabaritManager extends manager
         }
         $gabarit->setChamps($champs);
         $gabarit->setJoins($joins);
-
-        return $gabarit;
+        $this->_gabarits[$id_gabarit] = $gabarit;
+        return $this->_gabarits[$id_gabarit];
     }
 
     /**
@@ -508,13 +556,7 @@ class gabaritManager extends manager
             $gabarit_bloc->setChamps($champs);
             $gabarit_bloc->setJoins($joins);
 
-
-            if (class_exists('\Slrfw\Model\Personnalise\\' . $table)) {
-                $className = '\Slrfw\Model\Personnalise\\' . $table;
-                $bloc = new $className();
-            } else {
-                $bloc = new gabaritBloc();
-            }
+            $bloc = new $this->gabaritBlocClassName();
 
             $bloc->setGabarit($gabarit_bloc);
             $blocs[$gabarit_bloc->getName()] = $bloc;
@@ -893,8 +935,8 @@ class gabaritManager extends manager
                     /**
                      * Recuperation des blocs
                      */
-                    $blocs = $this->getBlocs(
-                        $this->getGabarit($pageJoin->getMeta('id_gabarit')));
+                    $gabarit = $this->getGabarit($pageJoin->getMeta('id_gabarit'));
+                    $blocs = $this->getBlocs($gabarit);
                     foreach ($blocs as $blocName => $bloc) {
                         $valuesBloc = $this->getBlocValues($bloc,
                             $pageJoin->getMeta('id'), $id_version, true);
@@ -902,6 +944,7 @@ class gabaritManager extends manager
                             $bloc->setValues($valuesBloc);
                         }
                     }
+                    $pageJoin->setGabarit($gabarit);
                     $pageJoin->setBlocs($blocs);
                 }
             }
@@ -962,7 +1005,7 @@ class gabaritManager extends manager
      * @param int    $nbre       nombre de pages à récupérer
      * @param bool   $main       ???
      *
-     * @return \Slrfw\Model\gabaritPage tableau de page
+     * @return \Slrfw\Model\gabaritPage|array tableau de page
      */
     public function getList(
         $id_version,
@@ -1300,7 +1343,7 @@ class gabaritManager extends manager
             );
         }
 
-        if (!$page || $page->getGabarit()->getEditable() == 0) {
+        if (!$page) {
             return null;
         }
 

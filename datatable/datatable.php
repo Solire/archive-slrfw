@@ -227,12 +227,12 @@ class Datatable
     public function __construct($get, $configPath, $db = null, $cssPath = "./datatable/", $jsPath = "./datatable/", $imgPath = "./img/datatable/", $log = null) {
         $this->_db = $db;
         $this->_get = $get;
-        
+
         $pathInfoConfig = pathinfo($configPath);
-        
+
         $this->_configPath = $pathInfoConfig["dirname"];
         $this->_configName = str_replace(".cfg", "", $pathInfoConfig["filename"]);
-        
+
         $this->_log = $log;
 
 
@@ -306,7 +306,11 @@ class Datatable
     {
         if ($this->_configName != '') {
             include $this->_configPath . DIRECTORY_SEPARATOR . $this->_configName . '.cfg.php';
-            $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
+
+            if(isset($_REQUEST["table"])) {
+                $this->name = $_REQUEST["table"];
+            } else
+                $this->name = str_replace(array(".", "-"), "_", $this->_configName) . '_' . str_replace(array(" ", "."), "", microtime());
             $this->nameConfig = str_replace(array(".", "-"), "_", $this->_configName);
             $this->config = $config;
 
@@ -384,11 +388,11 @@ class Datatable
                 <a href="#" class="btn btn-small btn-warning btn-info delete-item" title="Supprimer"><i class="icon-trash"></i></a>
                 ';
         }
-        
+
         /** On teste si l'option selectable est activé **/
         if (isset($this->config["extra"])
                 && isset($this->config["extra"]["selectable"]) && $this->config["extra"]["selectable"]) {
-            /** On ajoute une colonne checkbox **/ 
+            /** On ajoute une colonne checkbox **/
             $columnSelectable = array(
                 'width' =>  '10px',
                 'content' => '<input type="checkbox" class="datatable-selectable" />',
@@ -401,7 +405,7 @@ class Datatable
 
         $this->_columnActionButtons = $columnActionButtons;
 
-        $this->url = self::_selfURL();
+        $this->url = self::_selfURL() . "&table=" . $this->name ;
         $this->urlRaw = self::_selfURLRaw();
 
         $this->beforeRunAction();
@@ -729,7 +733,7 @@ class Datatable
                     }
                     $selectSqlArray[] = "CONCAT(" . implode(",", $aVal) . ") name ";
                     $column["values"] = $this->_db->query(
-                                    'SELECT ' . implode(",", $selectSqlArray) . '
+                                    'SELECT  DISTINCT ' . implode(",", $selectSqlArray) . '
                                      FROM ' . $table . (isset($column["filter_field_where"]) && $column["filter_field_where"] != "" ? " WHERE " . $column["filter_field_where"] : "") . ';')->fetchAll(\PDO::FETCH_COLUMN);
                 } elseif (isset($column["sql"])) {
                     $column["values"] = $this->_db->query("SELECT DISTINCT " . $column["sql"] . ""
@@ -888,8 +892,11 @@ class Datatable
                         }
                     }
                 } else {
-                    if (isset($_POST[$column["name"]]))
+                    if (isset($_POST[$column["name"]])) {
                         $values[$column["name"]] = $_POST[$column["name"]];
+                    } else {
+                        $values[$column["name"]] = '';
+                    }
                 }
             }
         }
@@ -1014,21 +1021,21 @@ class Datatable
         if ($r)
             exit(1);
     }
-    
+
     /**
      * Action qui va être appelée pour lors de la selection/ deselection d'un element
      *
      * @return 	void
      */
     public function selectAction() {
-        $selectArrayName = $_POST["table"] . "_select";
-        $selectRows = isset($_SESSION[$selectArrayName]) ? $_SESSION[$selectArrayName] : array(); 
+        $selectArrayName = "tableau-" . $_GET["table"] . "_select";
+        $selectRows = isset($_SESSION[$selectArrayName]) ? $_SESSION[$selectArrayName] : array();
         if($_POST["select"] == 0) {
             unset($selectRows[$_POST["row_id"]]);
         } else {
             $selectRows[$_POST["row_id"]] = $_POST["row_id"];
         }
-        
+
         $_SESSION[$selectArrayName] = $selectRows;
         $r = array(
             "status"    => 1,
@@ -1037,14 +1044,14 @@ class Datatable
         echo json_encode($r);
         exit();
     }
-    
+
     /**
      * Action qui va être appelée pour lors de la selection/ deselection d'un element
      *
      * @return 	void
      */
     public function selectallAction() {
-        $selectRows = array(); 
+        $selectRows = array();
         $selectArrayName = "tableau-" . $_GET["table"] . "_select";
         if($_POST["select"] == 1) {
             //Permet de supprimer le limit dans la requete
@@ -1055,7 +1062,7 @@ class Datatable
                 $selectRows[$response->aaData[$i]->DT_RowId] = $response->aaData[$i]->DT_RowId;
             }
         }
-        
+
         $_SESSION[$selectArrayName] = $selectRows;
         $r = array(
             "status"    => 1,
@@ -1063,6 +1070,12 @@ class Datatable
         );
         echo json_encode($r);
         exit();
+    }
+
+    public function getSelectedRows() {
+        $selectRows = array();
+        $selectArrayName = "tableau-" . $_GET["table"] . "_select";
+        $_SESSION[$selectArrayName] = $selectRows;
     }
 
     // --------------------------------------------------------------------
@@ -2102,7 +2115,7 @@ class Datatable
         $output['realIndexes'] = $realIndexes;
         $output['aColumnsAdvanced'] = $aColumnsAdvanced;
 //        $output['aColumnsFull']         = $aColumnsFull;
-        
+
         //Nom du tableau en session contenant les id des lignes selectionnées
         $selectArrayName = "tableau-" . $_GET["table"] . "_select";
 
@@ -2185,13 +2198,13 @@ class Datatable
             }
             $row["DT_RowId"] = substr($row["DT_RowId"], 0, -1);
             if (isset($this->config["extra"]["selectable"]) && $this->config["extra"]["selectable"]) {
-                if(isset($_SESSION[$selectArrayName]) 
+                if(isset($_SESSION[$selectArrayName])
                         && in_array($row["DT_RowId"], $_SESSION[$selectArrayName])) {
                     $row[0] = str_replace('<input ', '<input checked="checked" ', $row[0]);
                 }
             }
-            
-            
+
+
             if (isset($this->config["table"]["postDataProcessing"])) {
                 $fnNamePostDataProcessing = $this->config["table"]["postDataProcessing"];
                 $this->$fnNamePostDataProcessing($aRow, $row2, $row);

@@ -117,6 +117,14 @@ class DateTime
 
         $max = count($periodsMember);
         if ($modeDate) {
+            /**
+             * La date est nulle
+             * On retourne null
+             */
+            if($timestampOrDate == "") {
+                return null;
+            }
+            
             $time = $timestampOrDate;
             if (strlen($timestampOrDate) == 10) {
                 /**
