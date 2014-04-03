@@ -9,8 +9,6 @@
 
 namespace Slrfw\Model;
 
-use \Slrfw\Tools;
-
 /**
  * Description of gabaritmanager
  *
@@ -26,7 +24,7 @@ class gabaritManager extends manager
      * @var array
      */
     protected $_versions = array();
-    
+
     /**
      * Tableau de mise en cache des gabarits.
      *
@@ -52,19 +50,19 @@ class gabaritManager extends manager
      * Nom de la classe gabaritPage utilisé par défaut
      */
     const DEFAULT_GABARIT_CLASS = '\Slrfw\Model\GabaritPage';
-    
+
     /**
      * Nom de la classe gabaritBloc utilisé par défaut
      */
     const DEFAULT_GABARIT_BLOC_CLASS = '\Slrfw\Model\GabaritBloc';
-    
+
     /**
      * Nom de la classe à utiliser pour charger les gabarits page
      *
      * @var string
      */
     private $gabaritClassName = self::DEFAULT_GABARIT_CLASS;
-    
+
     /**
      * Nom de la classe à utiliser pour charger les gabarits bloc
      *
@@ -139,7 +137,7 @@ class gabaritManager extends manager
 
         throw new \Slrfw\Exception\Lib('Aucune classe trouvée ' . $className);
     }
-    
+
     /**
      * Spécifie la classe à utiliser dans le chargement des blocs
      *
@@ -276,9 +274,9 @@ class gabaritManager extends manager
         $hook = new \Slrfw\Hook();
         $hook->setSubdirName('gabarit');
 
-        $hook->page = $page;
+        $hook->page      = $page;
         $hook->idGabPage = $id_gab_page;
-        $hook->visible = $visible;
+        $hook->visible   = $visible;
 
         $hook->exec($gabarit->getName() . 'Page');
 
@@ -367,7 +365,7 @@ class gabaritManager extends manager
     /**
      * Retourne un objet gabarit à partir de l'identifiant du gabarit
      *  Avec mise en cache
-     * 
+     *
      * @param int $id_gabarit identifiant du gabarit en BDD
      *
      * @return Slrfw\Model\gabarit
@@ -1742,7 +1740,7 @@ class gabaritManager extends manager
                 }
 
                 if ($champ['typedonnee'] == 'DATE') {
-                    $value = Tools::formate_date_nombre($value, '/', '-');
+                    $value = \Slrfw\Format\DateTime::frToSql($value);
                 }
 
                 if ($champ['trad'] == 0 && $updating) {
@@ -2006,7 +2004,7 @@ class gabaritManager extends manager
 
 
             if ($champ['typedonnee'] == 'DATE') {
-                $value = Tools::formate_date_nombre($value, '/', '-');
+                $value = \Slrfw\Format\DateTime::frToSql($value);
             }
 
             switch ($champ['type']) {
@@ -2243,7 +2241,7 @@ class gabaritManager extends manager
                 }
 
                 if ($champ['typedonnee'] == 'DATE') {
-                    $value = Tools::formate_date_nombre($value, '/', '-');
+                    $value = \Slrfw\Format\DateTime::frToSql($value);
                 }
 
                 $values[$champ['name']] = $value;
@@ -2289,7 +2287,7 @@ class gabaritManager extends manager
                 }
 
                 if ($champ['typedonnee'] == 'DATE') {
-                    $value = Tools::formate_date_nombre($value, '/', '-');
+                   $value = \Slrfw\Format\DateTime::frToSql($value);
                 }
 
                 $values[$champ['name']] = $value;

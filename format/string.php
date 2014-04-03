@@ -180,6 +180,16 @@ class String
         return strtolower(trim($string, $charReplacement));
     }
 
+    public static function replaceAccent($str)
+    {
+        /**
+         * On transforme les caractères spéciaux en caractères simples
+         */
+        $str = str_replace(array_keys(self::$charMap), self::$charMap, $str);
+
+        return $str;
+    }
+
     /**
      * Construit une url propre à partir d'une chaine de caractere
      *
@@ -189,16 +199,8 @@ class String
      *
      * @return string
      */
-    public static function urlSlug($str, $delimiter = '-', $limit = NULL) {
-        /**
-         * On convertit en utf8
-         */
-        $str = mb_convert_encoding((string) $str, 'UTF-8', mb_list_encodings());
-
-        /**
-         * On transforme les caractères spéciaux en caractères simples
-         */
-        $str = str_replace(array_keys(self::$charMap), self::$charMap, $str);
+    public static function urlSlug($str, $delimiter = '-', $limit = null) {
+        $str = self::replaceAccent($str);
 
         /**
          * On remplace tous les caractères non alpha numériques par le délimiteur
@@ -213,7 +215,7 @@ class String
         /**
          * Si on a une limite, on coupe la chaine
          */
-        if($limit !== NULL) {
+        if ($limit !== null) {
             $str = mb_substr($str, 0, $limit, 'UTF-8');
         }
 
