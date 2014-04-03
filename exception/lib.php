@@ -1,6 +1,6 @@
 <?php
 /**
- * Exception de base
+ * Exception des Librairies
  *
  * @package    Library
  * @subpackage Error
@@ -11,14 +11,14 @@
 namespace Slrfw\Exception;
 
 /**
- * Exception de base
+ * Exception des Librairies
  *
  * @package    Library
  * @subpackage Error
  * @author     Adrien <aimbert@solire.fr>
  * @license    Solire http://www.solire.fr/
  */
-class lib extends \Exception
+class Lib extends \Exception
 {
 }
 
