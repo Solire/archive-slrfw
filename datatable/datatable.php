@@ -2007,10 +2007,10 @@ class Datatable
                   `-------------------------------------------------------- */
                 if (isset($aColumnsFull[$realIndex]["filter_field"]) && $aColumnsFull[$realIndex]["filter_field"] == "date-range") {
                     $dateRange = explode("~", $_POST['sSearch_' . $realIndex]);
-                    $dateRange[0] = Tools::formate_date_nombre($dateRange[0], "/", "-");
+                    $dateRange[0] = \Slrfw\Format\DateTime::frToSql($dateRange[0]);
                     $sWhere2 .= ($sWhere2 != '' ? " AND " : " " ) . $aColumnsAdvanced[$realIndex] . " >= " . $this->_db->quote('' . $dateRange[0] . ' 00:00:00') . "";
                     if ($dateRange[1] != "") {
-                        $dateRange[1] = Tools::formate_date_nombre($dateRange[1], "/", "-");
+                        $dateRange[1] = \Slrfw\Format\DateTime::frToSql($dateRange[1]);
                         $sWhere2 .= " AND " . $aColumnsAdvanced[$realIndex] . " <= " . $this->_db->quote('' . $dateRange[1] . ' 23:59:59') . "";
                     }
                 }
