@@ -495,9 +495,9 @@ class FrontController
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();
-        $instance->shutdown();
 
         if ($view->isEnabled()) {
+            $instance->shutdown();
             $view->display($front->controller, $front->action, false);
         }
 
