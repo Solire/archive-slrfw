@@ -35,7 +35,7 @@ class Config
      *
      * @var array
      */
-    private $config = null;
+    protected $config = null;
 
     /**
      * Tableau de paramétrage du fichier de configuration
