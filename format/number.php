@@ -21,22 +21,6 @@ namespace Slrfw\Format;
  */
 class Number
 {
-
-    /**
-     * Affichage des prix
-     *
-     * @param float  $number
-     * @param bool   $formatShow
-     * @param string $currencyChar Caractère de la devise
-     *
-     * @return string
-     * @deprecated
-     */
-    static function formatMoney($number, $formatShow = false, $currencyChar = "")
-    {
-        return self::money($number, $formatShow, $currencyChar);
-    }
-
     /**
      * Formate un prix pour un affichage
      *
@@ -70,7 +54,7 @@ class Number
     /**
      *
      * @param type $valeur
-     * 
+     *
      * @return type
      */
     static function formatSize($valeur) {
