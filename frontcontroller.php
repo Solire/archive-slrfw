@@ -434,6 +434,7 @@ class FrontController
 
         return null;
     }
+
     /**
      * Test si le morceau d'url est une application
      *
@@ -526,15 +527,36 @@ class FrontController
             }
         }
 
+        /**
+         * Création de la classe de traduction
+         */
+        $translate = new TranslateMysql(ID_VERSION, ID_API, Registry::get('db'));
+        $translate->addTranslation();
 
+        /**
+         * Création de la vue
+         * @todo Ne créér la vue que si besoin.
+         */
+        $view = new View();
 
+        /**
+         * On créé le controller
+         */
         $instance = new $class();
 
-        /** Passage des paramètres de rewriting **/
+        /**
+         * On passe la vue et la traduction au controller
+         */
+        $instance->setView($view);
+        $view->setTranslate($translate);
+        $instance->setTranslate($translate);
+
+        /**
+         * Passage des paramètres de rewriting
+         */
         $instance->setRewriting($front->rewriting);
 
         $instance->start();
-        $view = $instance->getView();
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
         $instance->$method();

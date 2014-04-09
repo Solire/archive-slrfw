@@ -113,6 +113,28 @@ class Controller
     public $acceptRew = false;
 
     /**
+     * Chargement du controller
+     */
+    public function __construct()
+    {
+        if (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)
+            && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+        ) {
+            $this->_ajax = true;
+        }
+
+        $this->_mainConfig = Registry::get('mainconfig');
+        $this->_appConfig = Registry::get('appconfig');
+        $this->_envConfig = Registry::get('envconfig');
+
+        $this->_request = $_REQUEST;
+        $this->_url = Registry::get('basehref');
+        $this->_root = Registry::get('baseroot');
+        $this->_db = Registry::get('db');
+        $this->_log = Registry::get('log');
+    }
+
+    /**
      * Fonction éxécutée avant l'execution de la fonction relative à la page en cours
      *
      * @return void
@@ -121,10 +143,8 @@ class Controller
     {
         $this->_css = new Loader\Css();
         $this->_javascript = new Loader\Javascript();
-        $this->_translate = new TranslateMysql(ID_VERSION, ID_API, $this->_db);
-        $this->_translate->addTranslation();
+
         $this->_seo = new Seo();
-        $this->_view = new View($this->_translate);
         $this->_view->mainConfig = Registry::get('mainconfig');
         $this->_view->appConfig = Registry::get('appconfig');
         $this->_view->envConfig = Registry::get('envconfig');
@@ -202,37 +222,47 @@ class Controller
     }
 
     /**
-     * Chargement du controller
+     * Définit la vue
+     *
+     * @param View $view
+     *
+     * @return void
      */
-    public function __construct()
+    public function setView($view)
     {
-
-        if (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)
-            && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
-        ) {
-            $this->_ajax = true;
-        }
-
-        $this->_mainConfig = Registry::get('mainconfig');
-        $this->_appConfig = Registry::get('appconfig');
-        $this->_envConfig = Registry::get('envconfig');
-
-        $this->_request = $_REQUEST;
-        $this->_url = Registry::get('basehref');
-        $this->_root = Registry::get('baseroot');
-        $this->_db = Registry::get('db');
-        $this->_log = Registry::get('log');
+        $this->_view = $view;
     }
-
 
     /**
      * Renvois la vue
      *
-     * @return \Slrfw\View
+     * @return View
      */
     public function getView()
     {
         return $this->_view;
+    }
+
+    /**
+     * Chargement de la classe de traduction
+     *
+     * @param TranslateMysql $translate
+     *
+     * @return void
+     */
+    public function setTranslate($translate)
+    {
+        $this->_translate = $translate;
+    }
+
+    /**
+     * Définit l'objet de traduction
+     *
+     * @return TranslateMysql
+     */
+    public function getTranslate()
+    {
+        return $this->_translate;
     }
 
 
@@ -427,9 +457,11 @@ class Controller
     }
 
     /**
-     * Traduit si possible la chaine
+     * Alias à l'utilisation de translate
      *
      * @param string $string Chaine à traduire
+     * @param string $aide   Texte permettant de situer l'emplacement de la
+     * chaine à traduire, exemple : 'Situé sur le bas de page'
      *
      * @return string
      * @uses TranslateMysql

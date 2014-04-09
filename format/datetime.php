@@ -124,7 +124,7 @@ class DateTime
             if($timestampOrDate == "") {
                 return null;
             }
-            
+
             $time = $timestampOrDate;
             if (strlen($timestampOrDate) == 10) {
                 /**
@@ -359,10 +359,36 @@ class DateTime
      * @link http://php.net/manual/en/function.date.php documentaion pour
      * paramètre $format
      */
-    static public function sql($dateSql, $format = 'd/m/Y')
+    static public function sqlTo($dateSql, $format = 'd/m/Y')
     {
         $date = new \DateTime($dateSql);
         return $date->format($format);
+    }
+
+    /**
+     *
+     * 
+     * @param string $dateFr
+     * @param string $delimiter
+     *
+     * @return string
+     * @throws \Slrfw\Exception\lib En cas d'erreur de format
+     */
+    static public function frToSql($dateFr, $delimiter = '/')
+    {
+        $sizeExpected = 8 + 2 * strlen($delimiter);
+        if (strlen($dateFr) != $sizeExpected) {
+            $format  = 'Wrong french date format %s';
+            $message = sprintf($format, $dateFr);
+            throw new \Slrfw\Exception\lib($message);
+        }
+
+        $dateArray = explode($delimiter, $dateFr);
+        $dateArray = array_reverse($dateArray);
+        $dateSql   = implode('-', $dateArray);
+        unset($dateArray);
+
+        return $dateSql;
     }
 }
 
