@@ -22,6 +22,8 @@ $db = \Slrfw\Registry::get('db');
 
 // Ajout de la colonne cle_sha dans la table traduction
 $query = 'UPDATE utilisateur SET pass = "$2y$10$VfOIubFk/IjdqxPwL60xtOrxXwlOEQqSn5Ml0Jc5z0cSkenCgH8/e";';
-
 $db->exec($query);
 
+// Suppression de la colonne certificat (inutilisée)
+$query = 'ALTER TABLE utilisateur DROP COLUMN certificat';
+$db->exec($query);

@@ -99,10 +99,6 @@ class Session
                 $query->execute();
                 $user = $query->fetch(\PDO::FETCH_ASSOC);
 
-                if (isset($user['certificat'])) {
-                    $this->certificat = $user['certificat'];
-                }
-
                 $token = $this->makeToken($user['login'], date('m-d'), $user['id']);
 
                 if ($token == $foo[0]) {
@@ -267,10 +263,6 @@ class Session
 
         if (password_verify($password, $user['pass']) !== true) {
             throw new Exception\User('Couple Courriel / Mot de passe incorrect');
-        }
-
-        if (isset($user['certificat'])) {
-            $this->certificat = $user['certificat'];
         }
 
         $token = $this->makeToken($user['login'], date('m-d'), $user['id']);
