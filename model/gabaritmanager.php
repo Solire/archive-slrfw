@@ -1716,10 +1716,11 @@ class gabaritManager extends manager
         foreach ($allchamps as $name_group => $champs) {
             foreach ($champs as $champ) {
                 if ($partialSave
-                        && !isset($donnees['champ' . $champ['id']])
+                    && !isset($donnees['champ' . $champ['id']])
                 ) {
                     continue;
                 }
+
                 if ($champ['visible'] == 0) {
                     continue;
                 }

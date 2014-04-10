@@ -559,10 +559,10 @@ class FrontController
         $instance->start();
         $view->setFormat($front->getFormat('view-file'));
         $view->base = $front->getDir('base');
-        $instance->$method();
-
         $view->setController($front->controller);
         $view->setAction($front->action);
+
+        $instance->$method();
 
         if ($view->isEnabled()) {
             $instance->shutdown();
