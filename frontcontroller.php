@@ -167,7 +167,11 @@ class FrontController
 
         /* = base de données
           ------------------------------- */
-        $db = DB::factory(self::$envConfig->get('database'));
+        try {
+            $db = DB::factory(self::$envConfig->get('database'));
+        } catch (\PDOException $exc) {
+            throw new Exception\Lib($exc->getMessage());
+        }
         Registry::set('db', $db);
 
         Registry::set('project-name', self::$mainConfig->get('project', 'name'));
