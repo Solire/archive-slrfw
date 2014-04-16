@@ -212,5 +212,49 @@ class Config
 
         return null;
     }
+
+    /**
+     * Enregistre la valeur
+     *
+     * @param mixed  $value   Valeur à mettre dans la configuration
+     * @param string $section Code de la section
+     * @param string $key     Nom de la clé de configuration
+     *
+     * @return self
+     */
+    public function set($value, $section, $key = null)
+    {
+        if (!empty($key)) {
+            $this->config[$section][$key] = $value;
+            return $this;
+        } else {
+            $this->config[$section] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Supprime un parametre de configuration
+     *
+     * @param string $section Code de la section
+     * @param string $key     Nom de la clé de configuration
+     *
+     * @return self
+     */
+    public function kill($section, $key = null)
+    {
+        if (!empty($key)) {
+            if (isset($this->config[$section][$key])) {
+                unset($this->config[$section][$key]);
+            }
+
+        } else {
+            if (isset($this->config[$section])) {
+                unset($this->config[$section]);
+            }
+        }
+        return $this;
+    }
 }
 
