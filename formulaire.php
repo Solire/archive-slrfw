@@ -250,6 +250,7 @@ class Formulaire
          * $configuration peut évoluer dans la boucle. (et que dans un foreach
          * cela n'est pas pris en compte)
           ------------------------------- */
+        reset($configuration);
         while (list($name, $regles) = each($configuration)) {
             /* = Gestion des prefix dans le formulaire
             `------------------------------------------- */
