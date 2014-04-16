@@ -59,26 +59,29 @@ class Mail
      * @param string $name Nom identifiant la vue utilisée
      *
      * @uses Registry envconfig
-     * @uses Registry db
      * @uses View
-     * @uses TranslateMysql
-     * @uses DB
      * @link http://solire-02/wiki/index.php/Mail_%28lib%29 explication & docu
      */
     public function __construct($name)
     {
         $this->codeName = $name;
-
-        $db = Registry::get('db');
-        $translate = new TranslateMysql(ID_VERSION, ID_API, $db);
-        $translate->addTranslation();
-        $this->view = new View($translate);
+        $this->view = new View();
 
         $configLoc = Registry::get('envconfig');
         $default = $configLoc->get('mail');
         foreach ($default as $key => $value) {
             $this->$key = $value;
         }
+    }
+
+    /**
+     * Renvois la vue utilisée dans le mail
+     *
+     * @return View
+     */
+    public function getView()
+    {
+        return $this->view;
     }
 
     /**
