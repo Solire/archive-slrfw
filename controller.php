@@ -226,11 +226,13 @@ class Controller
      *
      * @param View $view
      *
-     * @return void
+     * @return self
      */
-    public function setView($view)
+    final public function setView($view)
     {
         $this->_view = $view;
+
+        return $this;
     }
 
     /**
@@ -248,11 +250,13 @@ class Controller
      *
      * @param TranslateMysql $translate
      *
-     * @return void
+     * @return self
      */
-    public function setTranslate($translate)
+    final public function setTranslate($translate)
     {
         $this->_translate = $translate;
+
+        return $this;
     }
 
     /**
@@ -419,12 +423,14 @@ class Controller
      *
      * @param array $rew Rewriting contenu dans les "/"
      *
-     * @return void
+     * @return self
      *
      */
     final public function setRewriting(array $rew)
     {
         $this->rew = $rew;
+
+        return $this;
     }
 
     /**
