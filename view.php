@@ -2,17 +2,19 @@
 /**
  * Gestionnaire de vue
  *
- * @author     dev <dev@solire.fr>
- * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @author  dev <dev@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
 
+use \Slrfw\Exception\Lib as Exception;
+
 /**
  * Gestionnaire de vue
  *
- * @author     dev <dev@solire.fr>
- * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @author  dev <dev@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class View
 {
@@ -44,23 +46,42 @@ class View
      */
     private $mainPath = false;
 
+    /**
+     * Préfix du chemin pour trouver les fichiers des vues
+     *
+     * @var string
+     */
+    private $prefixPath = '';
+
+    /**
+     * Template du chemin pour trouver les fichiers des vues
+     *
+     * @var string
+     */
+    private $formatPath = '%s';
+
 
     /**
      * Chargement d'une nouvelle vue
      */
     public function __construct()
-    {}
+    {
+    }
 
+    // TRADUCTION
+    
     /**
      * Chargement de la classe de traduction
      *
-     * @param TranslateMysql $translate
+     * @param TranslateMysql $translate Classe de traduction
      *
-     * @return void
+     * @return self
      */
     public function setTranslate($translate)
     {
         $this->translate = $translate;
+
+        return $this;
     }
 
     /**
@@ -111,7 +132,11 @@ class View
      */
     public function content()
     {
-        include $this->contentPath->get();
+        if ($this->contentPath === false) {
+            throw Exception('Aucun fichier de vue', 500);
+        }
+
+        include $this->contentPath;
     }
 
     /**
@@ -122,7 +147,7 @@ class View
     public function display()
     {
         if ($this->mainPath !== false) {
-            include $this->mainPath->get();
+            include $this->mainPath;
         } else {
             $this->content();
         }
@@ -138,7 +163,7 @@ class View
      */
     public function setViewPath($strPath)
     {
-        $this->contentPath = new Path($strPath);
+        $this->contentPath = $this->searchFile($strPath);
 
         return $this;
     }
@@ -153,7 +178,35 @@ class View
      */
     public function setMainPath($strPath)
     {
-        $this->mainPath = new Path($strPath);
+        $this->mainPath = $this->searchFile($strPath);
+
+        return $this;
+    }
+
+    /**
+     * Paramètre le préfix des chemins pour les vues
+     *
+     * @param string $prefix préfix des chemins
+     *
+     * @return \Slrfw\View
+     */
+    public function setPathPrefix($prefix)
+    {
+        $this->prefixPath = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * Paramètre le prefix des chemins pour les vues
+     *
+     * @param string $format préfix du chemin
+     *
+     * @return \Slrfw\View
+     */
+    public function setPathFormat($format)
+    {
+        $this->formatPath = (string) $format;
 
         return $this;
     }
@@ -161,7 +214,7 @@ class View
     /**
      * Annule l'utilisation du fichier "main"
      *
-     *  @return self
+     * @return self
      */
     public function unsetMain()
     {
@@ -171,18 +224,39 @@ class View
     }
 
     /**
+     * Localise le fichier de vue demandé
+     *
+     * @param string $path nom du fichier de vue
+     *
+     * @return string
+     * @throws Exception si aucun fichier n'est trouvé
+     */
+    protected function searchFile($path)
+    {
+        $path = $this->prefixPath . sprintf($this->formatPath, $path);
+        $file = FrontController::search($path);
+        if ($file === false) {
+            $file = FrontController::search($path, false);
+        }
+
+        if ($file === false) {
+            throw new Exception('La vue ' . (string) $path . ' ne peut être trouvée', 300);
+        }
+
+        return $file;
+    }
+
+    /**
      * Ajoute un fichier
      *
-     * @param string $fileName Nom du fichier avec l'extension
+     * @param string $filePath Nom du fichier avec l'extension
      *
-     * @return void
+     * @return self
      */
     public function add($filePath)
     {
-        $dir = FrontController::$mainConfig->get('dirs', 'views');
-        $file = FrontController::search($dir . $filePath);
-        if ($file !== false) {
-            include $file;
-        }
+        include $this->searchFile($filePath);
+
+        return $this;
     }
 }
