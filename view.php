@@ -21,56 +21,29 @@ class View
      *
      * @var bool
      */
-    private $_enable = true;
-
-    /**
-     * Définit l'inclusion de la vue main.phtml
-     *
-     * @var bool
-     */
-    private $_main = true;
-
-    /**
-     * Format du chemin de la vue
-     *
-     * @var string
-     */
-    private $_format = null;
+    private $enable = true;
 
     /**
      * Objet de traduction
      *
      * @var TranslateMysql
      */
-    private $_translate = null;
+    private $translate = false;
 
     /**
-     * Nom du controller
+     * Chemin vers la vue pour le contenu
      *
-     * @var string
+     * @var boolean|Path
      */
-    private $_controller;
+    private $contentPath = false;
 
     /**
-     * Nom de l'action
+     * Chemin vers la vue "main"
      *
-     * @var string
+     * @var boolean|Path
      */
-    private $_action;
+    private $mainPath = false;
 
-    /**
-     * Gestion des vues par appel direct des fichiers
-     *
-     * @var boolean
-     */
-    private $pathMode = false;
-
-    /**
-     * Chemin absolu vers le fichier de contenu
-     *
-     * @var string
-     */
-    private $pathModePath;
 
     /**
      * Chargement d'une nouvelle vue
@@ -87,7 +60,7 @@ class View
      */
     public function setTranslate($translate)
     {
-        $this->_translate = $translate;
+        $this->translate = $translate;
     }
 
     /**
@@ -102,7 +75,11 @@ class View
      */
     public function _($string, $aide = '')
     {
-        return $this->_translate->_($string, $aide);
+        if ($this->translate !== false) {
+            return $this->translate->_($string, $aide);
+        }
+
+        return $string;
     }
 
     /**
@@ -114,19 +91,7 @@ class View
      */
     public function enable($enable)
     {
-        $this->_enable = $enable;
-    }
-
-    /**
-     * Activer ou désactiver l'utilisation du main
-     *
-     * @param boolean $enable Vrai pour activer
-     *
-     * @return void
-     */
-    public function main($enable)
-    {
-        $this->_main = $enable;
+        $this->enable = (boolean) $enable;
     }
 
     /**
@@ -136,55 +101,7 @@ class View
      */
     public function isEnabled()
     {
-        return $this->_enable;
-    }
-
-    /**
-     * Test si le main est actif
-     *
-     * @return boolean
-     */
-    public function isIncludeMain()
-    {
-        return $this->_main;
-    }
-
-    /**
-     * Renvois le chemin vers le fichier de vue
-     *
-     * @param string  $controller Nom du controller (peut être null, pour tester
-     * les fichiers à la racine du dossier de vue, comme main.phtml par exemple)
-     * @param string  $action     Nom de l'action
-     * @param boolean $format     Appliquer le formatage de l'action
-     *
-     * @return string|boolean
-     */
-    private function getpath($controller, $action, $format = true)
-    {
-        if ($format === true) {
-            $action = sprintf($this->_format, $action);
-        }
-
-        if (!empty($controller)) {
-            $filePath = $controller . DS . $action;
-        } else {
-            $filePath = $action;
-        }
-
-        $dir = FrontController::$mainConfig->get('dirs', 'views');
-        return FrontController::search($dir . $filePath);
-    }
-
-    /**
-     * Enregistre le template de format des actions
-     *
-     * @param string $format format des actions
-     *
-     * @return void
-     */
-    public function setFormat($format)
-    {
-        $this->_format = $format;
+        return $this->enable;
     }
 
     /**
@@ -194,58 +111,7 @@ class View
      */
     public function content()
     {
-        if ($this->pathMode === true) {
-            $path = $this->pathModePath;
-        } else {
-            $path = $this->getpath($this->_controller, $this->_action);
-        }
-
-        if ($path !== false) {
-            include $path;
-        }
-    }
-
-    /**
-     * Test si la vue existe pour la combinaison controller / action
-     *
-     * @param string $controller Nom du controller
-     * @param string $action     Nom de l'action
-     *
-     * @return boolean
-     */
-    public function exists($controller, $action)
-    {
-        $controller = strtolower($controller);
-        $action = strtolower($action);
-        $path = $this->getpath($controller, $action);
-        if ($path !== false) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Définit le nom du controller (dossier contenant la vue)
-     *
-     * @param string $controller
-     *
-     * @return void
-     */
-    public function setController($controller)
-    {
-        $this->_controller = strtolower($controller);
-    }
-
-    /**
-     * Définit le nom de l'action (nom du fichier de la vue)
-     *
-     * @param string $action
-     *
-     * @return void
-     */
-    public function setAction($action)
-    {
-        $this->_action = strtolower($action);
+        include $this->contentPath->get();
     }
 
     /**
@@ -255,44 +121,53 @@ class View
      */
     public function display()
     {
-        if ($this->isIncludeMain()) {
-            $main = $this->getpath(null, 'main');
-            if ($main !== false) {
-                include $main;
-            }
+        if ($this->mainPath !== false) {
+            include $this->mainPath->get();
         } else {
             $this->content();
         }
     }
 
     /**
-     * Affichage directe d'une vue
+     * Enregistre le fichier "main"
      *
-     * @param string         $strPath  Chemin vers le fichier
-     * @param boolean|string $mainPath Chamin vers le fichier main.phtml,
-     * si il est faux, aucun fichier main ne sera utilisé
+     * @param string $strPath chemin vers le fichier de vue
      *
-     * @return void
+     * @return self
+     * @uses Path pour contrôler le chemin
      */
-    public function displayPath($strPath, $mainPath = false)
+    public function setViewPath($strPath)
     {
-        $this->pathMode = true;
-        if ($mainPath === false) {
-            $path = new Path($strPath);
-            include $path->get();
-        } else {
-            /**
-             * Fichier de la vue
-             */
-            $path = new Path($strPath);
-            $this->pathModePath = $path->get();
+        $this->contentPath = new Path($strPath);
 
-            /**
-             * Fichier principal
-             */
-            $path = new Path($mainPath);
-            include $path->get();
-        }
+        return $this;
+    }
+
+    /**
+     * Enregistre le fichier de vue pour le contenu
+     *
+     * @param string $strPath chemin vers le fichier de vue
+     *
+     * @return self
+     * @uses Path pour contrôler le chemin
+     */
+    public function setMainPath($strPath)
+    {
+        $this->mainPath = new Path($strPath);
+
+        return $this;
+    }
+
+    /**
+     * Annule l'utilisation du fichier "main"
+     *
+     *  @return self
+     */
+    public function unsetMain()
+    {
+        $this->mainPath = false;
+
+        return $this;
     }
 
     /**
@@ -302,24 +177,10 @@ class View
      *
      * @return void
      */
-    public function add($fileName)
+    public function add($filePath)
     {
-        $file = $this->getpath(null, $fileName, false);
-        if ($file !== false) {
-            include $file;
-        }
-    }
-
-    /**
-     * Inclut un fichier phtml du dossier template.
-     *
-     * @param string $file Nom du fichier template à inclure
-     *
-     * @return void
-     */
-    public function template($file)
-    {
-        $file = $this->getpath('template', $file);
+        $dir = FrontController::$mainConfig->get('dirs', 'views');
+        $file = FrontController::search($dir . $filePath);
         if ($file !== false) {
             include $file;
         }

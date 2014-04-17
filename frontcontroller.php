@@ -560,11 +560,17 @@ class FrontController
          */
         $instance->setRewriting($front->rewriting);
 
+        $defaultViewPath = self::$mainConfig->get('dirs', 'views')
+                         . strtolower($front->controller) . DS
+                         . sprintf($front->getFormat('view-file'), $front->action);
+        $mainViewPath = self::$mainConfig->get('dirs', 'views')
+                      . sprintf($front->getFormat('view-file'), 'main');
+
+        $view
+            ->setViewPath(self::search($defaultViewPath))
+            ->setMainPath(self::search($mainViewPath))
+        ;
         $instance->start();
-        $view->setFormat($front->getFormat('view-file'));
-        $view->base = $front->getDir('base');
-        $view->setController($front->controller);
-        $view->setAction($front->action);
 
         $instance->$method();
 
