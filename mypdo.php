@@ -43,7 +43,7 @@ class MyPDO extends \PDO
             } else {
                 $temp = $string;
             }
-            $rewrit = Format\String::urlSlug($string, '-', 255);
+            $rewrit = Format\String::urlSlug($temp, '-', 255);
 
             $query  = 'SELECT COUNT(*)'
                     . ' FROM `' . $table . '`'
