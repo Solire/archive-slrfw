@@ -141,9 +141,12 @@ class Config
             /**
              * on test si dans la section il y a une variable
              * ça permet de passer à la suivante sans avoir à tout tester
-             **/
+             */
             $testString = '';
             foreach ($section as $value) {
+                if (is_array($value)) {
+                    $value = implode(' ', $value);
+                }
                 $testString .= $value;
             }
             if (!preg_match(self::VAR_FORMAT, $testString)) {
@@ -151,28 +154,50 @@ class Config
             }
 
             foreach ($section as $key => $value) {
+                /**
+                 * On prend en compte la possibilite de mettre un tableau dans
+                 * un attribut
+                 * @example
+                 * [section]
+                 * item[] = "a"
+                 * item[] = "b"
+                 */
+                if (!is_array($value)) {
+                    $type = 'string';
+                    $value = array($value);
+                } else {
+                    $type = 'array';
+                }
 
-                if (preg_match_all(self::VAR_FORMAT, $value, $matches)) {
+                foreach ($value as $index => $valueLine) {
+                    if (preg_match_all(self::VAR_FORMAT, $valueLine, $matches)) {
+                        for ($i = 0; $i < count($matches[0]); $i++) {
+                            $id = $matches[1][$i];
+                            /**
+                             * Si il y a un : dans le nom de la variable c'est
+                             * qu'elle pointe sur un autre bloc
+                             * sinon on prend le bloc en cours
+                             */
+                            if (strpos($id, ':') !== false) {
+                                $opt = explode(':', $id);
+                                $val = $this->get($opt[0], $opt[1]);
+                            } else {
+                                $val = $this->get($divName, $id);
+                            }
 
-                    for ($i = 0; $i < count($matches[0]); $i++) {
-                        $id = $matches[1][$i];
-                        /* = Si il y a un : dans le nom de la variable c'est
-                        | qu'elle pointe sur un autre bloc
-                        | sinon on prend le bloc en cours
-                        `------------------------------------------------- */
-                        if (strpos($id, ':') !== false) {
-                            $opt = explode(':', $id);
-                            $val = $this->get($opt[0], $opt[1]);
-                        } else {
-                            $val = $this->get($divName, $id);
+                            /**
+                             * On replace la valeur de la variable dans le champ
+                             */
+                            $v = str_replace(
+                                $matches[0][$i], $val, $valueLine
+                            );
+
+                            if ($type == 'string') {
+                                $this->config[$divName][$key] = $valueLine;
+                            } else {
+                                $this->config[$divName][$key][$index] = $valueLine;
+                            }
                         }
-                        /* = On replace la valeur de la variable dans le champ
-                        `------------------------------------------------- */
-                        $value = str_replace(
-                            $matches[0][$i], $val, $value
-                        );
-
-                        $this->config[$divName][$key] = $value;
                     }
                 }
             }
