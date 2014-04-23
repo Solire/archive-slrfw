@@ -133,12 +133,11 @@ class Config
      */
     private function parseVar()
     {
-        /* =
-        `------------------------------------------------- */
-        /** Parcour des options de configurations **/
+        /*
+         * Parcour des options de configurations
+         */
         foreach ($this->config as $divName => $section) {
-
-            /**
+            /*
              * on test si dans la section il y a une variable
              * ça permet de passer à la suivante sans avoir à tout tester
              */
@@ -154,7 +153,7 @@ class Config
             }
 
             foreach ($section as $key => $value) {
-                /**
+                /*
                  * On prend en compte la possibilite de mettre un tableau dans
                  * un attribut
                  * @example
@@ -175,8 +174,8 @@ class Config
                             $id = $matches[1][$i];
                             /**
                              * Si il y a un : dans le nom de la variable c'est
-                             * qu'elle pointe sur un autre bloc
-                             * sinon on prend le bloc en cours
+                             * qu'elle pointe sur un autre bloc sinon on prend
+                             * le bloc en cours
                              */
                             if (strpos($id, ':') !== false) {
                                 $opt = explode(':', $id);
@@ -188,7 +187,7 @@ class Config
                             /**
                              * On replace la valeur de la variable dans le champ
                              */
-                            $v = str_replace(
+                            $valueLine = str_replace(
                                 $matches[0][$i], $val, $valueLine
                             );
 
