@@ -86,7 +86,7 @@
 <?php
                             foreach ($column["creable_field"]["options"] as $option) {
 ?>
-                    <option value="<?php echo $option["value"]; ?>"><?php echo $option["text"]; ?></option>
+                    <option value="<?php echo $option["value"]; ?>" <?php echo $value == $option["value"] ? 'selected="selected"' : ''; ?>><?php echo $option["text"]; ?></option>
 <?php
                             }
 ?>
