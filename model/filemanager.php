@@ -98,24 +98,24 @@ class fileManager extends manager {
         $orderby = null,
         $sens = null
     ) {
-        $query = 'SELECT media_fichier.*, IF(id_version IS NULL, 0, 1) utilise '
-                . 'FROM `media_fichier` '
+        $query = 'SELECT `' . $this->mediaTableName . '`.*, IF(id_version IS NULL, 0, 1) utilise '
+                . 'FROM `' . $this->mediaTableName . '` '
                 . 'LEFT JOIN media_fichier_utilise '
-                . 'ON `media_fichier`.rewriting = media_fichier_utilise.rewriting '
+                . 'ON `' . $this->mediaTableName . '`.rewriting = media_fichier_utilise.rewriting '
                 . 'WHERE `suppr` = 0 ';
 
         if ($id_gab_page)
-            $query .= ' AND `media_fichier`.`id_gab_page` = ' . $id_gab_page;
+            $query .= ' AND `' . $this->mediaTableName . '`.`id_gab_page` = ' . $id_gab_page;
 
         if ($id_temp)
             $query .= ' AND `id_temp` = ' . $id_temp;
 
         if ($search) {
             $search = '%' . $search . '%';
-            $query .= ' AND `media_fichier`.`rewriting` LIKE ' . $this->_db->quote($search);
+            $query .= ' AND `' . $this->mediaTableName . '`.`rewriting` LIKE ' . $this->_db->quote($search);
         }
 
-        $query .= ' GROUP BY `media_fichier`.rewriting';
+        $query .= ' GROUP BY `' . $this->mediaTableName . '`.rewriting';
 
         if ($orderby) {
             $query .= ' ORDER BY `' . $orderby . '` ';
@@ -146,22 +146,22 @@ class fileManager extends manager {
         $id_temp = 0,
         $extensions = false
     ) {
-        $query = 'SELECT media_fichier.*, IF(id_version IS NULL, 0, 1) utilise '
-                . 'FROM `media_fichier` '
+        $query = 'SELECT `' . $this->mediaTableName . '`.*, IF(id_version IS NULL, 0, 1) utilise '
+                . 'FROM `' . $this->mediaTableName . '` '
                 . 'LEFT JOIN media_fichier_utilise '
-                . 'ON `media_fichier`.rewriting = media_fichier_utilise.rewriting '
+                . 'ON `' . $this->mediaTableName . '`.rewriting = media_fichier_utilise.rewriting '
                 . 'WHERE `suppr` = 0';
 
         if ($id_gab_page) {
-            $query .= ' AND `media_fichier`.`id_gab_page` = ' . $id_gab_page;
+            $query .= ' AND `' . $this->mediaTableName . '`.`id_gab_page` = ' . $id_gab_page;
         }
 
         if ($id_temp) {
-            $query .= ' AND `media_fichier`.`id_temp` = ' . $id_temp;
+            $query .= ' AND `' . $this->mediaTableName . '`.`id_temp` = ' . $id_temp;
         }
 
         $term = '%' . $term . '%';
-        $query .= ' AND `media_fichier`.`rewriting` LIKE ' . $this->_db->quote($term);
+        $query .= ' AND `' . $this->mediaTableName . '`.`rewriting` LIKE ' . $this->_db->quote($term);
 
         $files = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
