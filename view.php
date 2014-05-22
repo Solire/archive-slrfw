@@ -69,7 +69,7 @@ class View
     }
 
     // TRADUCTION
-    
+
     /**
      * Chargement de la classe de traduction
      *
@@ -133,7 +133,7 @@ class View
     public function content()
     {
         if ($this->contentPath === false) {
-            throw Exception('Aucun fichier de vue', 500);
+            throw new Exception('Aucun fichier de vue', 500);
         }
 
         include $this->contentPath;
