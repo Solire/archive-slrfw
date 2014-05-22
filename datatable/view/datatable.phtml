@@ -866,6 +866,7 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["pdf"]) && $th
 }
 
 if (isset($this->config["extra"]) && isset($this->config["extra"]["csv"]) && $this->config["extra"]["csv"]) {
+    $exportFileName = $this->nameConfig . '-' . date('Y-m-d_h-m');
     ?>
                             {
                                 "sExtends":    "collection",
@@ -875,13 +876,15 @@ if (isset($this->config["extra"]) && isset($this->config["extra"]["csv"]) && $th
                                         "sExtends": "csv",
                                         "sButtonText": "Colonnes visibles",
                                         "sCharSet": "utf8",
-                                        "mColumns": "visible"
+                                        "mColumns": "visible",
+                                        "sFileName": "<?php echo $exportFileName ?>.csv"
                                     },
                                     {
                                         "sExtends": "csv",
                                         "sButtonText": "Toutes colonnes",
                                         "sCharSet": "utf8",
-                                        "mColumns": "all"
+                                        "mColumns": "all",
+                                        "sFileName": "<?php echo $exportFileName ?>.csv"
                                     }
                                 ]
                             },
