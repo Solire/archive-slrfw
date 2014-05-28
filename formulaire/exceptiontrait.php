@@ -20,13 +20,13 @@ trait ExceptionTrait
     /**
      * Enregistre le nom de l'input qui contien une erreur
      *
-     * @param string $inputName nom de l'input fautif
+     * @param string|array $inputName nom de l'input fautif
      *
      * @return self
      */
     public function setErrorInputName($inputName)
     {
-        $this->targetInput = (string) $inputName;
+        $this->targetInput = $inputName;
 
         return $this;
     }
