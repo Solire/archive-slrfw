@@ -4,17 +4,11 @@
   "description": "",
   "keywords": [""],
   "license": "CC by-nc",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/solire/geshi-php/"
-    }
-  ],
   "require": {
     "php": ">=5.5.0",
     "ensepar/html2pdf": "1.0.1",
     "zendframework/zend-mail": "2.2.5",
-    "solire/geshi-php": "dev-master"
+    "easybook/geshi": "dev-master"
   },
   "autoload": {
     "psr-4": { "Slrfw\\": "" }
