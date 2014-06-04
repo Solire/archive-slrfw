@@ -1,15 +1,9 @@
 {
-  "name": "solire/slrfw",
+  "name": "sowork/slrfw",
   "type": "library",
   "description": "",
   "keywords": [""],
   "license": "CC by-nc",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/Solire/geshi-php"
-    }
-  ],
   "require": {
     "php": ">=5.5.0",
     "ensepar/html2pdf": "1.0.1",
