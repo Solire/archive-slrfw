@@ -116,7 +116,7 @@ class Mail
 
         $htmlMarkup = $this->loadBody();
         $html = new \Zend\Mime\Part($htmlMarkup);
-        $html->type = "text/html";
+        $html->type = 'text/html; charset="utf-8"';
 
         $body = new \Zend\Mime\Message();
         $body->setParts(array($html));
