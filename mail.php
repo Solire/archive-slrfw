@@ -177,6 +177,18 @@ class Mail
         return $this->body;
     }
 
+    /**
+     * Supprime le cache du body du mail
+     *
+     * @return self
+     */
+    public function resetBody()
+    {
+        $this->body = null;
+
+        return $this;
+    }
+
 
     /**
      * Enregistrement des variables pour le mail
