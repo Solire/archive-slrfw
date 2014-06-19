@@ -38,4 +38,20 @@ trait InstanceTrait
 
         return $form;
     }
+
+    /**
+     * Charge un fichier de config formulaire
+     *
+     * @param string $name Nom du fichier de configuration du formulaire
+     *
+     * @return \Slrfw\Config
+     */
+    protected function chargeFormConfig($name)
+    {
+        $name = 'config/form/' . $name;
+        $path = \Slrfw\FrontController::search($name, false);
+        $conf = new \Slrfw\Config($path);
+
+        return $conf;
+    }
 }
