@@ -97,6 +97,18 @@ class Mail
     }
 
     /**
+     * Désactive l'utilisation du main.phtml
+     *
+     * @return self
+     */
+    public function disableMainUse()
+    {
+        $this->mainUse = false;
+
+        return $this;
+    }
+
+    /**
      * Envois du mail
      *
      * @return void
