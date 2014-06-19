@@ -6,7 +6,7 @@
   <base href="<?php echo $this->baseHref; ?>" />
   <meta name="robots" content="noindex, nofollow, all" />
   <meta name="googlebot" content="noindex, nofollow, all" />
-  <?php if (!empty($this->auto)) { ?>
+  <?php if ($this->auto !== null) { ?>
   <meta http-equiv="refresh" content="<?php echo $this->auto; ?>;url=<?php echo $this->url; ?>" />
   <?php } ?>
   <style>
