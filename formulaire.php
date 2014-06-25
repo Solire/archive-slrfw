@@ -2,28 +2,33 @@
 /**
  * Module de gestion de formulaires
  *
- * @package    Library
- * @subpackage Formulaire
- * @author     Siwaÿll <sanath.labs@gmail.com>
- * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @author  Adrien <aimbert@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
 
+use Slrfw\Exception\Lib as Exception;
+use Slrfw\Exception\Internal;
+use \Slrfw\Formulaire\Champ;
+
 /**
  * Contrôle des formulaires
  *
- * @package    Library
- * @subpackage Formulaire
- * @author     Siwaÿll <sanath.labs@gmail.com>
- * @license    GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @author  Adrien <aimbert@solire.fr>
+ * @license GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 class Formulaire
 {
     /**
+     * Nom de la section pour la configuration globale
+     */
+    const CONFIG = '__global';
+
+    /**
      * Force le retour de run() sous forme d'une liste
      */
-    const FORMAT_LIST = 2;
+    const FORMAT_LIST = 1;
 
     /**
      * Ordre dans lesquels les tableaux sont mergés
@@ -34,7 +39,7 @@ class Formulaire
      *
      * @var string
      */
-    protected $_ordre = 'cgp';
+    protected $defaultOrder = 'cgp';
 
     /**
      * Liste des plugins
@@ -62,7 +67,7 @@ class Formulaire
      *
      * @var array
      */
-    protected $_data;
+    protected $data;
 
     /**
      * toutes les données
@@ -154,30 +159,30 @@ class Formulaire
      *
      * @config main [dirs] "formulaire" Chemin du dossier des .ini d'architecture
      */
-    public function __construct($iniPath, $complete = false)
+    public function __construct($config)
     {
-        $config = Registry::get('mainconfig');
-        if (!is_array($iniPath)) {
-            if (!$complete) {
-                $iniPath = $config->get('dirs', 'formulaire') . $iniPath;
-            }
-            $iniPath = new Path($iniPath);
-            $architecture = new Config($iniPath->get());
-            $this->_architecture = $architecture->getAll();
-            $this->_config = $architecture->getConfig();
-            unset($architecture);
-        } else {
-            $this->_architecture = $iniPath;
+        if (!is_object($config) || !in_array('Slrfw\ConfigInterface', class_implements($config))) {
+            throw new Exception('Configuration non valide');
         }
 
-        $this->parseArchi();
+        $this->config = $config;
+    }
+
+    /**
+     * Renvois la configuration du formulaire
+     *
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     /**
      * Parcour l'architecture pour y trouver la configuration générale
      * et sortir le cas d'exemple
      *
-     * @return boolean
+     * @return self
      */
     protected function parseArchi()
     {
@@ -201,7 +206,7 @@ class Formulaire
             unset($this->_architecture['_exemple']);
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -243,6 +248,52 @@ class Formulaire
     }
 
     /**
+     *
+     * @param string      $name  Nom du champ
+     * @param array|Champ $rules Données du champ
+     *
+     * @return \Slrfw\Formulaire\Champ
+     */
+    protected function loadChamp($name, $rules)
+    {
+        if (is_object($rules) && $rules instanceof Champ) {
+            return $rules;
+        }
+
+        $champ = new \Slrfw\Formulaire\Champ($name);
+
+        if (!is_array($rules)) {
+            $rules = explode('|', $rules);
+        }
+
+        foreach ($rules as $key => $value) {
+            $champ->setRule($key, $value);
+        }
+
+        return $champ;
+    }
+
+    /**
+     * Renvois le nom du champ à récupérer dans les variables http
+     *
+     * @param Champ $field Champ en cours de traitement
+     *
+     * @return string
+     */
+    protected function getFieldName(Champ $field)
+    {
+        $target = $field->getTargetName();
+
+        if ($this->config->get(self::CONFIG, 'prefix') !== null) {
+            $target = $this->config->get(self::CONFIG, 'prefix') . $target;
+        }
+
+        $this->inputNames[] = $target;
+
+        return $target;
+    }
+
+    /**
      * Traite le formulaire pour en renvoyer les données vérifiées
      *
      * @return array tableau des données du formulaire
@@ -255,8 +306,10 @@ class Formulaire
      */
     public function run()
     {
-        $this->_fullData = $this->catchData();
-        $configuration = $this->_architecture;
+        $this->fullData = $this->catchData();
+        $configuration = $this->config->getAll();
+
+        unset($configuration[self::CONFIG]);
 
         /* = On utilise cette formulation plutot que foreach parce que
          * $configuration peut évoluer dans la boucle. (et que dans un foreach
@@ -264,86 +317,60 @@ class Formulaire
           ------------------------------- */
         reset($configuration);
         while (list($name, $regles) = each($configuration)) {
-            /* = Gestion des prefix dans le formulaire
-            `------------------------------------------- */
-            $this->target = $name;
-            if (isset($regles['designe'])) {
-                $this->target = $regles['designe'];
-            }
+            $champ = $this->loadChamp($name, $regles);
 
-
-            if (isset($this->_config['prefix'])) {
-                $this->target = $this->_config['prefix'] . $target;
-            }
-
-            $this->inputNames[] = $this->target;
-            $temp = $this->get($this->target);
-
-            /* = Si la variable n'est pas présente
-            `------------------------------------ */
-            if ($temp == null) {
-                if ($regles['obligatoire'] == true) {
-                    $this->throwError($regles);
-                }
-
+            try {
+                $temp = $this->extractFromHttpVars($champ);
+            } catch (Internal $exc) {
                 continue;
             }
 
-            $options = explode('|', $regles['test']);
-
-            /* = Test si le fichier de configuration est au bon format
-            `--------------------------------------------------------- */
-            if (!is_array($options)) {
-                throw new Exception\Lib("Config : Opt n'est pas un tableau");
-            }
+            $controls = $champ->getTests();
 
             /* = Si la variable ne passe pas les testes
             | on retourne un message d'erreur si celle-ci est
             | obligatoire, sinon, on l'ignore simplement.
             `---------------------------------------- */
-            if (!$temp->tests($options)) {
-                if ($regles['obligatoire'] == true) {
-                    $this->throwError($regles);
+            if (!$temp->tests($controls)) {
+                if ($champ->isRequired() === true) {
+                    $this->throwError($champ);
                 }
 
                 continue;
             }
 
-            if (isset($regles['renomme'])) {
-                $name = $regles['renomme'];
-            }
-
-            $this->_data[$name] = $temp->get();
+            $name = $champ->getFinalName();
+            $this->data[$name] = $temp->get();
             unset($temp);
 
-            /* = Passage en obligatoire des champs liés
-              ------------------------------- */
-            if (isset($regles['force'])) {
-                $champs = explode('|', $regles['force']);
-                foreach ($champs as $champ) {
-                    $configuration[$champ]['obligatoire'] = true;
-                }
-                unset($champs, $champ);
-            }
-
-            /* = Contrôle d'egalité du champ
-              ------------------------------- */
-            if (isset($regles['egal'])) {
-                if ($this->_data[$name] != $this->_data[$regles['egal']]) {
-                    $this->throwError($regles);
-                }
-            }
+//            /* = Passage en obligatoire des champs liés
+//              ------------------------------- */
+//            if (isset($regles['force'])) {
+//                $champs = explode('|', $regles['force']);
+//                foreach ($champs as $champ) {
+//                    $configuration[$champ]['obligatoire'] = true;
+//                }
+//                unset($champs, $champ);
+//            }
+//
+//            /* = Contrôle d'egalité du champ
+//              ------------------------------- */
+//            if (isset($regles['egal'])) {
+//                if ($this->_data[$name] != $this->_data[$regles['egal']]) {
+//                    $this->throwError($regles);
+//                }
+//            }
         }
 
-        if (!empty($this->plugins)) {
-            foreach ($this->plugins as $plugin) {
-                if (in_array('Slrfw\Formulaire\PluginInterface', class_implements($plugin))) {
-                    $plugin::form($this->_data);
-                } else {
-                    $this->throwError(array('erreur' => 'plugin incompatible'));
-                }
-            }
-        }
+//        if (!empty($this->plugins)) {
+//            foreach ($this->plugins as $plugin) {
+//                if (in_array('Slrfw\Formulaire\PluginInterface', class_implements($plugin))) {
+//                    $plugin::form($this->_data);
+//                } else {
+//                    $this->throwError(array('erreur' => 'plugin incompatible'));
+//                }
+//            }
+//        }
 
         $options = func_get_args();
         if (!empty($options)) {
@@ -352,7 +379,7 @@ class Formulaire
             }
         }
 
-        return $this->_data;
+        return $this->data;
     }
 
     /**
@@ -363,44 +390,11 @@ class Formulaire
     public function getList()
     {
         $list = array();
-        foreach ($this->_data as $value) {
+        foreach ($this->data as $value) {
             $list[] = $value;
         }
 
         return $list;
-    }
-
-    /**
-     * Génère une requête SQL pour que le contenu du formulaire puisse être inséré en base
-     *
-     * la table est à préciser pendant l'appel de la fonction ou dans le fichier
-     * de configuration
-     *
-     * @param \PDO   $db    Connection à la bdd
-     * @param string $table Nom de la table dans lequel faire l'insertion
-     *
-     * @return string
-     *
-     * @deprecated
-     */
-    public function makeQuery(\PDO $db, $table = null)
-    {
-        if (empty($table) && isset($this->_config['table'])) {
-            $table = $this->_config['table'];
-        }
-        $query = 'DESC ' . $table;
-        $archi = $db->query($query)->fetchAll(\PDO::FETCH_COLUMN, 0);
-
-        $values = array();
-        foreach ($archi as $col) {
-            if (isset($this->_data[$col])) {
-                $values[] = $col . ' = ' . $db->quote($this->_data[$col]);
-            }
-        }
-
-        $query = 'INSERT INTO ' . $table . ' SET ' . implode(', ', $values);
-
-        return $query;
     }
 
     /**
@@ -418,43 +412,34 @@ class Formulaire
      *
      * @todo faire un tutorial expliquant le paramétrage des champs d'un formulaire
      */
-    protected function throwError($regles)
+    protected function throwError(Champ $field)
     {
-        $error = null;
+        $message = $field->getErrorMessage();
 
-        if (!isset($regles['erreur'])) {
-            $regles['erreur'] = '';
-        }
-
-        if (isset($regles['exception'])) {
-            /* = Exception personnalisée au niveau du champ
-            ------------------------------- */
-            $error = new $regles['exception']($regles['erreur']);
-        } elseif (isset($this->_config['exception'])) {
-            /* = Exception personnalisée au niveau du formulaire
-            ------------------------------- */
-            $error = new $this->_config['exception']($regles['erreur']);
+        if ($field->hasPersonalException() === true) {
+            // Exception personnalisée au niveau du champ
+            $className = $field->getPersonalException();
+            $error = new $className($message);
+        } elseif ($this->config->get(self::CONFIG, 'exception') !== null) {
+            // Exception personnalisée au niveau du formulaire
+            $className = $this->config->get(self::CONFIG, 'exception');
+            $error = new $className($message);
         } else {
-            $error = new Exception\User($regles['erreur']);
-
-            /* = Par défaut on redirige vers la page précédente
-              ------------------------------- */
-            if (isset($_SERVER['HTTP_REFERER'])) {
-                $error->link($_SERVER['HTTP_REFERER'], 1);
-            }
+            $className = 'Exception';
+            $error = new Exception($message);
         }
 
         if (method_exists($error, 'setErrorInputName')) {
             $error->setErrorInputName($this->target);
         }
 
-        if (isset($this->_config['appelFonction'])) {
-            if (is_callable($this->_config['appelFonction'])) {
-                $error = call_user_func(
-                    $this->_config['appelFonction'], $this, $error
-                );
-            }
-        }
+//        if (isset($this->_config['appelFonction'])) {
+//            if (is_callable($this->_config['appelFonction'])) {
+//                $error = call_user_func(
+//                    $this->_config['appelFonction'], $this, $error
+//                );
+//            }
+//        }
         throw $error;
     }
 
@@ -462,21 +447,25 @@ class Formulaire
      * Récupère les données GET POST COOKIE
      *
      * @return array
-     * @uses Formulaire::$_ordre
      */
     protected function catchData()
     {
-        $datas = array(
+        $datas = [
             'g' => $_GET,
             'p' => $_POST,
             'c' => $_COOKIE,
-        );
+        ];
 
-        $result = array();
-        for ($i = 0; $i < strlen($this->_ordre); $i++) {
-            $lettre = $this->_ordre[$i];
-            if (isset($datas[$lettre]) && !empty($datas[$lettre])) {
-                $result = array_merge($result, $datas[$lettre]);
+        $order = $this->defaultOrder;
+        if ($this->config->get(self::CONFIG, 'ordre') !== null) {
+            $order = $this->config->get(self::CONFIG, 'ordre');
+        }
+
+        $result = [];
+        for ($i = 0; $i < strlen($order); $i++) {
+            $httpVar = $order[$i];
+            if (isset($datas[$httpVar]) && !empty($datas[$httpVar])) {
+                $result = array_merge($result, $datas[$httpVar]);
             }
         }
         return $result;
@@ -499,15 +488,25 @@ class Formulaire
      *
      * @return Param|null
      */
-    protected function get($key)
+    protected function extractFromHttpVars(Champ $field)
     {
-        if (isset($this->_fullData[$key])) {
-            return new Param($this->_fullData[$key]);
-        } else {
-            return null;
+        $key = $this->getFieldName($field);
+
+        if (isset($this->fullData[$key])) {
+            return new Param($this->fullData[$key]);
         }
+
+        $this->markError($field);
     }
 
+    protected function markError(Champ $field)
+    {
+        if ($field->isRequired() === true) {
+            $this->throwError($field);
+        }
+
+        throw new Internal('Ignore field');
+    }
 
     /**
      * Renvois les données collectées par le formulaire sous la forme
@@ -517,7 +516,7 @@ class Formulaire
      */
     public function getArray()
     {
-        return $this->_data;
+        return $this->data;
     }
 
 
@@ -533,8 +532,8 @@ class Formulaire
      */
     public function __get($name)
     {
-        if (isset($this->_data[$name])) {
-            return $this->_data[$name];
+        if (isset($this->data[$name])) {
+            return $this->data[$name];
         }
 
         return null;
@@ -552,7 +551,7 @@ class Formulaire
      */
     public function __isset($name)
     {
-        if (isset($this->_data[$name])) {
+        if (isset($this->data[$name])) {
             return true;
         }
 
