@@ -2,10 +2,8 @@
 /**
  * Gestionnaire des fichiers de configurations
  *
- * @package    Slrfw
- * @subpackage Core
- * @author     Adrien <aimbert@solire.fr>
- * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @author  Adrien <aimbert@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -13,12 +11,10 @@ namespace Slrfw;
 /**
  * Gestionnaire des fichiers de configurations
  *
- * @package    Slrfw
- * @subpackage Core
- * @author     Adrien <aimbert@solire.fr>
- * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @author  Adrien <aimbert@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
-class Config
+class Config implements ConfigInterface
 {
     /**
      * Nom de la section de configuration du .ini
