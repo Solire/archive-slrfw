@@ -58,7 +58,7 @@ class Param
             return $name;
         }
 
-        return 'Slrfw\Param\\' . ucfirst($name);
+        return 'Slrfw\Formulaire\Validate\\' . ucfirst($name);
     }
 
     /**
@@ -80,7 +80,7 @@ class Param
 
         $className = $this->getClassName($option);
 
-        return $className::test($this->foo, $param);
+        return $className::validate($this->foo, $param);
     }
 
     /**
