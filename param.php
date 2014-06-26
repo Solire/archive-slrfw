@@ -62,6 +62,28 @@ class Param
     }
 
     /**
+     * Execute un test sur la variable
+     *
+     * @param string $option Nom du test à effectuer
+     *
+     * @return boolean
+     */
+    public function validate($option)
+    {
+        $param = null;
+        if (strpos($option, ':') !== false) {
+            $foo = explode(':', $option);
+            $option = $foo[0];
+            $param = $foo[1];
+            unset($foo);
+        }
+
+        $className = $this->getClassName($option);
+
+        return $className::test($this->foo, $param);
+    }
+
+    /**
      * Permet d'effectuer differents tests sur la variable
      *
      * @param array $options Tableau de tests à effectuer
@@ -75,19 +97,10 @@ class Param
         }
 
         foreach ($options as $option) {
-            $param = null;
-            if (strpos($option, ':') !== false) {
-                $foo = explode(':', $option);
-                $option = $foo[0];
-                $param = $foo[1];
-                unset($foo);
+            if ($this->validate($option) === true) {
+                continue;
             }
-
-            $className = $this->getClassName($option);
-
-            if ($className::test($this->foo, $param) !== true) {
-                return false;
-            }
+            return false;
         }
 
         return true;
