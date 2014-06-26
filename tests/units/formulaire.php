@@ -35,7 +35,7 @@ class Formulaire extends atoum
                 ->setRule('erreur', 'Erreur interne')
             ->create('nom')
                 ->setRule('obligatoire', true)
-                ->setRule('test', ['notEmpty', 'isString'])
+                ->setRule('test', ['isString', 'length:>=2'])
                 ->setRule('erreur', 'Erreur saisie')
         ;
 
