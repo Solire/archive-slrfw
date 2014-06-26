@@ -14,7 +14,7 @@ use Slrfw\Exception\Lib as Exception;
  * Contrôle des formulaires
  *
  * @author  Adrien <aimbert@solire.fr>
- * @license GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class Champ
 {

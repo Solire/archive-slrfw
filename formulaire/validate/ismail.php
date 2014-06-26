@@ -6,7 +6,7 @@
  * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
-namespace Slrfw\Param;
+namespace Slrfw\Formulaire\Validate;
 
 /**
  * Contrôle de variables

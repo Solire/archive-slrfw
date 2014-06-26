@@ -6,7 +6,7 @@
  * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
-namespace Slrfw\Param;
+namespace Slrfw\Formulaire\Validate;
 
 /**
  * Contrôle de variables
@@ -25,10 +25,9 @@ class IsBoolean
      */
     public static function test($data)
     {
-        if (filter_var($data, FILTER_VALIDATE_BOOLEAN) === false) {
-            return false;
+        if ($data == 0 || $data == 1) {
+            return true;
         }
-
-        return true;
+        return false;
     }
 }

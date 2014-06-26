@@ -6,10 +6,10 @@
  * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
-namespace tests\unit\Slrfw\Param;
+namespace tests\unit\Slrfw\Formulaire\Validate;
 
 use atoum;
-use Slrfw\Param\IsInt as TestClass;
+use Slrfw\Formulaire\Validate\IsInt as TestClass;
 
 /**
  * Test class for IsInt.

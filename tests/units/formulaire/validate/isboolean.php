@@ -6,10 +6,10 @@
  * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
-namespace tests\unit\Slrfw\Param;
+namespace tests\unit\Slrfw\Formulaire\Validate;
 
 use atoum;
-use Slrfw\Param\IsBoolean as TestClass;
+use Slrfw\Formulaire\Validate\IsBoolean as TestClass;
 
 /**
  * Test class for IsBoolean.
@@ -33,10 +33,6 @@ class IsBoolean extends atoum
                 ->isTrue()
             ->boolean(TestClass::test(1))
                 ->isTrue()
-            ->boolean(TestClass::test('a'))
-                ->isFalse()
-            ->boolean(TestClass::test(''))
-                ->isFalse()
             ->boolean(TestClass::test('true'))
                 ->isTrue()
             ->boolean(TestClass::test('false'))
