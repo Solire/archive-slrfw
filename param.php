@@ -92,19 +92,4 @@ class Param
 
         return true;
     }
-
-    /**
-     * Test si le parametre ne contient que des chiffres
-     *
-     * @return boolean
-     */
-    public function testOnlyNumber()
-    {
-        $char = preg_replace('#([0-9]+)#', '', $this->_foo);
-        if (!empty($char)) {
-            return false;
-        }
-
-        return true;
-    }
 }
