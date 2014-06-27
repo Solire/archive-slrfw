@@ -14,7 +14,7 @@ namespace Slrfw\Formulaire\Validate;
  * @author  Adrien <aimbert@solire.fr>
  * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
-class Not
+class Not implements ParamInterface
 {
     /**
      * Test si le parametre n'est pas vide.
@@ -24,7 +24,7 @@ class Not
      *
      * @return boolean
      */
-    public static function test($data, $param)
+    public static function validate($data, $param)
     {
         if ($data == $param) {
             return false;

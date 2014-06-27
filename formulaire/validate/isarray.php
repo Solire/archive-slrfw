@@ -14,7 +14,7 @@ namespace Slrfw\Formulaire\Validate;
  * @author  Adrien <aimbert@solire.fr>
  * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
-class IsArray
+class IsArray implements ParamInterface
 {
     /**
      * Test si le parametre est un tableau
@@ -23,7 +23,7 @@ class IsArray
      *
      * @return boolean
      */
-    public static function test($data)
+    public static function validate($data, $param)
     {
         if (is_array($data)) {
             return true;
