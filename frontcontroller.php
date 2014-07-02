@@ -759,6 +759,33 @@ class FrontController
         }
         return '';
     }
+    
+    /**
+     * Renvoi l'url complète de la page courante
+     * 
+     * @return string
+     */
+    public static function getCurrentURL()
+    {
+        // On ajoute selon le cas http ou https
+        if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == 'on') {
+            $currentURL = 'https://';
+        } else {
+            $currentURL = 'http://';
+        }
+        
+        // On ajoute le nom d'hote de l'url
+        $currentURL .= $_SERVER["SERVER_NAME"];
+
+        // Si le port est différent de 80 ou 443, on l'ajoute à l'url
+        if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
+            $currentURL .= ":" . $_SERVER["SERVER_PORT"];
+        }
+        
+        // On ajoute enfin la fin de l'url
+        $currentURL .= $_SERVER["REQUEST_URI"];
+        return $currentURL;
+    }
 
     /**
      * Marque une erreur
