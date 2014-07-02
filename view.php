@@ -176,8 +176,13 @@ class View
      * @return self
      * @uses Path pour contrôler le chemin
      */
-    public function setMainPath($strPath)
+    public function setMainPath($strPath, $noSearch = false)
     {
+        if ($noSearch === true) {
+            $this->mainPath = $strPath;
+            return $this;
+        }
+
         $this->mainPath = $this->searchFile($strPath);
 
         return $this;

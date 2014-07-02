@@ -35,6 +35,13 @@ class Message
     public $etat = 'success';
 
     /**
+     * Temps avant la redirection html
+     *
+     * @var int
+     */
+    public $auto = null;
+
+    /**
      * Valeurs possible pour l'etat
      *
      * @var array

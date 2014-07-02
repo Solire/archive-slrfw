@@ -25,6 +25,8 @@ namespace Slrfw\Exception;
  */
 class User extends \Exception
 {
+    use \Slrfw\Formulaire\ExceptionTrait;
+
     /**
      * Lien vers la page qui suit le message
      * @var string

@@ -491,8 +491,7 @@ class FrontController
     public static function run($controller = null, $action = null)
     {
         $front = self::getInstance();
-
-        if (empty($application) && empty($controller) && empty($action)) {
+        if (empty($controller) && empty($action)) {
             $front->parseUrl();
         } else {
             /** Chargement du controller **/
@@ -501,6 +500,12 @@ class FrontController
 
             /** Chargement de l'action **/
             $front->action = $action;
+
+            if (isset($front->view) && !empty($front->view)) {
+                $defaultViewPath = strtolower($front->controller) . DS . $front->action;
+                $front->view->setViewPath($defaultViewPath);
+                unset($defaultViewPath);
+            }
 
             self::loadAppConfig();
         }
@@ -585,7 +590,6 @@ class FrontController
         $this->view = new View();
 
         $defaultViewPath = strtolower($this->controller) . DS . $this->action;
-
         $mainViewPath = sprintf($this->getFormat('view-file'), 'main');
 
         try {

@@ -71,7 +71,19 @@ class Formulaire
      */
     protected $_fullData;
 
+    /**
+     * Nom du champ en cours d'annalyse
+     *
+     * @var string
+     */
+    protected $target = '';
 
+    /**
+     * Liste des noms des champs du formulaire
+     *
+     * @var array
+     */
+    protected $inputNames = [];
 
     /**
      * Charge un nouveau formulaire
@@ -254,17 +266,18 @@ class Formulaire
         while (list($name, $regles) = each($configuration)) {
             /* = Gestion des prefix dans le formulaire
             `------------------------------------------- */
-            $target = $name;
+            $this->target = $name;
             if (isset($regles['designe'])) {
-                $target = $regles['designe'];
+                $this->target = $regles['designe'];
             }
 
 
             if (isset($this->_config['prefix'])) {
-                $target = $this->_config['prefix'] . $target;
+                $this->target = $this->_config['prefix'] . $target;
             }
 
-            $temp = $this->get($target);
+            $this->inputNames[] = $this->target;
+            $temp = $this->get($this->target);
 
             /* = Si la variable n'est pas présente
             `------------------------------------ */
@@ -431,6 +444,9 @@ class Formulaire
             }
         }
 
+        if (method_exists($error, 'setErrorInputName')) {
+            $error->setErrorInputName($this->target);
+        }
 
         if (isset($this->_config['appelFonction'])) {
             if (is_callable($this->_config['appelFonction'])) {
@@ -464,6 +480,16 @@ class Formulaire
             }
         }
         return $result;
+    }
+
+    /**
+     * Renvois la liste des champs input du formulaire
+     *
+     * @return array
+     */
+    public function getInputNamesList()
+    {
+        return $this->inputNames;
     }
 
     /**

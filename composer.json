@@ -8,7 +8,7 @@
     "php": ">=5.5.0",
     "ensepar/html2pdf": "1.0.1",
     "zendframework/zend-mail": "2.2.5",
-    "solire/geshi-php": "dev-master"
+    "easybook/geshi": "1.0.8.12"
   },
   "autoload": {
     "psr-4": { "Slrfw\\": "" }

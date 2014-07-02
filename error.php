@@ -124,6 +124,9 @@ final class Error
         $message->setEtat('error');
         list($link, $auto) = $exc->get();
         $message->addRedirect($link, $auto);
+        if ($exc->getTargetInputName() !== '') {
+            $message->inputName = $exc->getTargetInputName();
+        }
         try {
             $message->display();
         } catch (\Exception $exc) {
