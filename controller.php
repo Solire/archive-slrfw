@@ -322,6 +322,9 @@ class Controller
         $url = preg_replace("`^/" . Registry::get('baseroot') . "`", "", $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
         $urlsToTest[] = $url;
+        
+        // On ajoute aussi l'url entière à tester
+        $urlsToTest[] = FrontController::getCurrentURL();
 
         $ajustLen = 0;
         if (substr($url, -1) == '/') {
@@ -354,9 +357,14 @@ class Controller
         }
 
         if ($redirection301 !== false) {
-            $samePart = array_slice($urlPartsReverse, 0, $keyChange);
-            $redirection301 .= implode('/', $samePart);
-            $redirection301 = $this->_url . $redirection301;
+            // Si l'url de redirection est une url absolue
+            if(substr($redirection301, 0, 7) == 'http://'
+                || substr($redirection301, 0, 8) == 'https://'
+            ) {
+                $redirection301 = $redirection301;
+            } else {
+                $redirection301 = $this->_url . $redirection301;
+            }
         }
 
         return $redirection301;
