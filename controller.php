@@ -66,7 +66,7 @@ class Controller
      *
      * @var bool
      */
-    protected $_ajax = false;
+    public $_ajax = false;
 
     /**
      *
@@ -326,7 +326,7 @@ class Controller
         $url = preg_replace("`^/" . Registry::get('baseroot') . "`", "", $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
         $urlsToTest[] = $url;
-        
+
         // On ajoute aussi l'url entière à tester
         $urlsToTest[] = FrontController::getCurrentURL();
 
