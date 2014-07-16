@@ -91,7 +91,7 @@ class TranslateMysql
         }
 
         foreach ($this->_versions as $versionId) {
-            $query  = 'INSERT INTO traduction SET'
+            $query  = 'INSERT IGNORE INTO traduction SET'
                     . ' `cle_sha` =  '     . $this->_db->quote($stringSha) . ','
                     . ' id_version =  ' . $versionId . ','
                     . ' id_api =  ' . intval($this->_api) . ','
