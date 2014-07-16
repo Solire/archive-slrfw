@@ -1739,7 +1739,7 @@ class gabaritManager extends manager
                     $filesUsed[] = $value;
                 }
 
-                if ($champ['typedonnee'] == 'DATE') {
+                if ($champ['typedonnee'] == 'DATE' && $value != '') {
                     $value = \Slrfw\Format\DateTime::frToSql($value);
                 }
 
@@ -2003,7 +2003,7 @@ class gabaritManager extends manager
             }
 
 
-            if ($champ['typedonnee'] == 'DATE') {
+            if ($champ['typedonnee'] == 'DATE' && $value != '') {
                 $value = \Slrfw\Format\DateTime::frToSql($value);
             }
 
@@ -2240,7 +2240,7 @@ class gabaritManager extends manager
                     $value = str_replace('"', '&quot;', $value);
                 }
 
-                if ($champ['typedonnee'] == 'DATE') {
+                if ($champ['typedonnee'] == 'DATE' && $value != '') {
                     $value = \Slrfw\Format\DateTime::frToSql($value);
                 }
 
@@ -2286,7 +2286,7 @@ class gabaritManager extends manager
                     $value = str_replace('"', '&quot;', $value);
                 }
 
-                if ($champ['typedonnee'] == 'DATE') {
+                if ($champ['typedonnee'] == 'DATE' && $value != '') {
                    $value = \Slrfw\Format\DateTime::frToSql($value);
                 }
 
