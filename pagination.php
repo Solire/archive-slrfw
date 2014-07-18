@@ -1,212 +1,275 @@
 <?php
-
+/**
+ * Gestionnaire de pagination
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Shinbuntu <smonnot@solire.fr>
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ */
 namespace Slrfw;
 
-/** @todo faire la présentation du code */
-
+/**
+ * Gestionnaire de pagination
+ *
+ * @package    Slrfw
+ * @subpackage Core
+ * @author     Shinbuntu <smonnot@solire.fr>
+ * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ */
 class Pagination
 {
-
-    private $_currentPage = 1;
-    private $_queryWithoutSelect;
-    private $_queryCount;
-    private $_queryGetField;
-    private $_countResults;
-    private $_results;
-    private $_nbElemsByPage;
-    private $_nbPages;
-    private $_limit;
-    private $_binds;
+    /**
+     * Numéro de la page courante
+     * @var int 
+     */
+    protected $currentPage = 1;
 
     /**
+     * Requete sans le SELECT
+     * @var string 
+     */
+    protected $queryWithoutSelect;
+
+    /**
+     * Partie SELECT de la requete
+     * @var string 
+     */
+    protected $queryGetField;
+
+    /**
+     * Nombre de résultats
+     * @var int 
+     */
+    protected $countResults;
+
+    /**
+     * Tableau contenant les résultats
+     * @var array 
+     */
+    protected $results;
+
+    /**
+     * Nombre d'éléments à afficher par page
+     * @var int
+     */
+    protected $nbElemsByPage;
+
+    /**
+     * Nombre de pages
+     * @var int
+     */
+    protected $nbPages;
+
+    /**
+     * Limites de récupération
+     * @var array 
+     */
+    protected $limit;
+
+    /**
+     * Accès base de données
      * @var MyPDO
      */
     private $_db = null;
 
     /**
-     *
-     * @param MyPDO $myPdo Connection MyPDO
-     * @param string $queryWithoutSelect Query without SELECT clause
-     * @param string $queryGetField
-     * @param int $nbElemsByPage number of elements by page
-     * @param int $currentPage number of current page
-     * @param array $binds binds for prepareQuery
+     * Constructeur de Pagination
+     * 
+     * @param MyPDO  $myPdo              Connection MyPDO
+     * @param string $queryWithoutSelect Requete sans la clause SELECT
+     * @param string $queryGetField      Clause SELECT sans 'SELECT'
+     * @param int    $nbElemsByPage      Nombres d'éléments par page
+     * @param int    $currentPage        Numéro de la page courante
      */
-    public function __construct(MyPDO $myPdo, $queryWithoutSelect, $queryGetField, $nbElemsByPage, $currentPage, $binds = null, $queryCount = null)
-    {
-        $this->_db = $myPdo;
-        $this->_queryWithoutSelect = $queryWithoutSelect;
-        $this->_queryCount = $queryCount;
-        $this->_queryGetField = $queryGetField;
-        $this->_nbElemsByPage = intval($nbElemsByPage);
-        $this->_binds = $binds;
-        $this->_executeCountQuery();
-        if ($this->_countResults == 0)
+    public function __construct(
+        MyPDO $myPdo,
+        $queryWithoutSelect,
+        $queryGetField,
+        $nbElemsByPage,
+        $currentPage
+    ) {
+        $this->db = $myPdo;
+        $this->queryWithoutSelect = $queryWithoutSelect;
+        $this->queryGetField = $queryGetField;
+        $this->nbElemsByPage = intval($nbElemsByPage);
+        $this->executeCountQuery();
+        if ($this->countResults == 0) {
             return;
-        $this->_calculNbPages();
+        }
+
+        $this->calculNbPages();
         $currentPage = $this->setCurrentPage($currentPage);
-        $this->_calculLimit();
-        $this->_executeQuery();
-//        $this->_debug();
+        $this->calculLimit();
+        $this->executeQuery();
     }
 
+    /**
+     * Renvoie le numéro de la page courante
+     * 
+     * @return int
+     */
     public function getCurrentPage()
     {
-        return $this->_currentPage;
+        return $this->currentPage;
     }
 
+    /**
+     * Renvoie le nombre d'éléments par page
+     * 
+     * @return int
+     */
     public function getNbPage()
     {
-        return $this->_nbPages;
+        return $this->nbPages;
     }
 
+    /**
+     * Définit le numéro de la page courante
+     * 
+     * @param int $currentPage Numéro de la page courante
+     * 
+     * @return void
+     */
     public function setCurrentPage($currentPage)
     {
-
-        $currentPage = intval($currentPage) == 0 ? 1 : intval($currentPage);
-        if ($currentPage > $this->_nbPages) { // Si la valeur de $pageActuelle (le numéro de la page) est plus grande que $nombreDePages...
-            $this->_currentPage = $this->_nbPages;
-        }
-        else
-            $this->_currentPage = $currentPage;
-    }
-
-    private function _cleanHref($excludeParams = null)
-    {
-        $myGetVars = parse_url($_SERVER ['REQUEST_URI']);
-        if (isset($myGetVars['query'])) {
-            $myGetVarsArray = $this->_convertUrlQuery(urldecode(parse_url($_SERVER ['REQUEST_URI'], PHP_URL_QUERY)));
+        if (intval($currentPage) == 0) {
+            $currentPage = 1;
         } else {
-            return $myGetVars["path"] . '?';
+            $currentPage = intval($currentPage);
         }
-        $offset = array_search('page', array_keys($myGetVarsArray));
 
-        if ($offset !== false)
-            array_splice($myGetVarsArray, $offset, 1);
-
-        if ($excludeParams != null)
-            foreach ($excludeParams as $excludeParam) {
-                $offset = array_search($excludeParam, array_keys($myGetVarsArray));
-                if ($offset !== false)
-                    array_splice($myGetVarsArray, $offset, 1);
-            }
-
-
-        $params = http_build_query($myGetVarsArray);
-        return $myGetVars["path"] . '?' . $params;
+        // Si la valeur de $currentPage est plus grande que le nombre de pages
+        if ($currentPage > $this->nbPages) {
+            $this->currentPage = $this->nbPages;
+        } else {
+            $this->currentPage = $currentPage;
+        }
     }
 
-    private function _convertUrlQuery($query)
+    /**
+     * Renvoie un tableau avec toutes les pages disponibles
+     * 
+     * @return array
+     */
+    public function getPaginationArray()
     {
-        $queryParts = explode('&', $query);
-        $params = array();
-        foreach ($queryParts as $param) {
-            $item = explode('=', $param);
-            if (!isset($item[1]))
-                continue;
-            $params[$item[0]] = $item[1];
-        }
-        return $params;
-    }
-
-    public function getPaginationArray($patternPagination = null, $excludeParams = null)
-    {
-        $href = $this->_cleanHref($excludeParams);
-        if ($patternPagination != null)
-            $hrefRaw = preg_replace("#$patternPagination#", "", $href);
-        else
-            $hrefRaw = $href;
-        $pageRequest = "page=";
-        if (substr($href, -1) != "?")
-            $pageRequest = "&" . $pageRequest;
-        else {
-            $hrefRaw = substr($hrefRaw, 0, -1);
-        }
-
         $pages = array();
-        for ($i = 1; $i <= $this->_nbPages; $i++) { //On fait notre boucle
-            //On va faire notre condition
-            if ($i == $this->_currentPage) { //Si il s'agit de la page actuelle...
-                $pages[] = array("num" => $i, "href" => $href . $pageRequest . $i, "current" => true);
-            } else { //Sinon...
-                $pages[] = array("num" => $i, "href_raw" => $hrefRaw, "href" => $href . $pageRequest . $i, "current" => false);
+        for ($i = 1; $i <= $this->nbPages; $i++) {
+            //Si il s'agit de la page actuelle
+            if ($i == $this->currentPage) {
+                $pages[] = array(
+                    'num' => $i,
+                    'current' => true
+                );
+            } else {
+                $pages[] = array(
+                    'num' => $i,
+                    'current' => false
+                );
             }
         }
         return $pages;
     }
 
+    /**
+     * Renvoie le tableau des résultats de la page courante
+     * 
+     * @return array
+     */
     public function getResults()
     {
-        return $this->_results;
+        return $this->results;
     }
 
-    private function _executeCountQuery()
+    /**
+     * Définit les résultats
+     * 
+     * @param array $results Tableau de résultats
+     * 
+     * @return void
+     */
+    public function setResults($results)
     {
+        $this->results = $results;
+    }
 
-        if ($this->_queryCount == null)
-            $query = "SELECT count(*) " . $this->_queryWithoutSelect;
-        else
-            $query = $this->_queryCount;
-        $prepareQuery = $this->_db->prepare($query);
-//        echo '<pre>', print_r($query, true), '</pre>';
-        if ($this->_binds != null) {
-            foreach ($this->_binds as $key => $value) {
-                $prepareQuery->bindParam(":" . $key, $value[0], $value[1]);
+    /**
+     * Execute la requete de récupération du nombre total d'éléments
+     * 
+     * @return void
+     */
+    private function executeCountQuery()
+    {
+        $query = 'SELECT count(*) ' . $this->queryWithoutSelect;
+        $prepareQuery = $this->db->prepare($query);
+        $prepareQuery->execute();
+        $this->countResults = $prepareQuery->fetch(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Execute la requete de récupération des éléments de la page courante
+     * 
+     * @return void
+     */
+    private function executeQuery()
+    {
+        $query = 'SELECT '
+                . $this->queryGetField . ' '
+                . $this->queryWithoutSelect . ' '
+                . $this->getLimit();
+        $prepareQuery = $this->db->prepare($query);
+        $prepareQuery->execute();
+        $this->results = $prepareQuery->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Calcule des limites de la requete à executer
+     * 
+     * @return void
+     */
+    private function calculLimit()
+    {
+        // On calcul la première entrée à lire
+        $this->limit[] = intval(($this->currentPage - 1) * $this->nbElemsByPage);
+        // On calcul le nombre d'entrées à lire
+        $this->limit[] = $this->nbElemsByPage;
+    }
+
+    /**
+     * Renvoie la clause LIMIT de la requete à executer
+     * 
+     * @return string
+     */
+    private function getLimit()
+    {
+        $limit = '';
+        if (is_null($this->limit) || $this->limit == '' || $this->limit[1] == 0) {
+            $limit = '';
+        } else {
+            $limit = 'LIMIT ';
+            if (is_array($this->limit)) {
+                $limit .= implode($this->limit, ',');
+            } else {
+                $limit .= $this->limit;
             }
         }
 
-
-        $prepareQuery->execute();
-//        echo  $prepareQuery->getBuiltQuery();
-        $this->_countResults = $prepareQuery->fetch(\PDO::FETCH_COLUMN);
+        return $limit;
     }
 
-    private function _executeQuery()
+    /**
+     * Calcule le nombre de page total
+     * 
+     * @return void
+     */
+    private function calculNbPages()
     {
-        $query = "SELECT "
-                . $this->_queryGetField . " "
-                . $this->_queryWithoutSelect . " "
-                . $this->_getLimit();
-        $prepareQuery = $this->_db->prepare($query);
-//        echo '<pre>', print_r($query, true), '</pre>';
-        if ($this->_binds != null) {
-            foreach ($this->_binds as $key => $value) {
-                $prepareQuery->bindParam(":" . $key, $value[0], $value[1]);
-            }
+        if (intval($this->nbElemsByPage) == 0) {
+            $this->nbPages = 1;
+        } else {
+            $this->nbPages = ceil($this->countResults / $this->nbElemsByPage);
         }
-        $prepareQuery->execute();
-//        echo  $prepareQuery->getBuiltQuery();
-        $this->_results = $prepareQuery->fetchAll(\PDO::FETCH_ASSOC);
     }
-
-    private function _calculLimit()
-    {
-        $this->_limit[] = intval(($this->_currentPage - 1) * $this->_nbElemsByPage); // On calcul la première entrée à lire
-        $this->_limit[] = $this->_nbElemsByPage; // On calcul la première entrée à lire
-    }
-
-    private function _getLimit()
-    {
-        return (is_null($this->_limit) || $this->_limit == "" || $this->_limit[1] == 0 ? "" : "LIMIT " . (is_array($this->_limit) ? implode($this->_limit, ",") : $this->_limit));
-    }
-
-    private function _calculNbPages()
-    {
-        if (intval($this->_nbElemsByPage) == 0)
-            $this->_nbPages = 1;
-        else
-            $this->_nbPages = ceil($this->_countResults / $this->_nbElemsByPage);
-    }
-
-    private function _debug()
-    {
-        echo '<pre>', print_r($this, true), '</pre>';
-        exit();
-    }
-
-    public function setBinds($binds)
-    {
-        $this->_binds = $binds;
-    }
-
 }
+
