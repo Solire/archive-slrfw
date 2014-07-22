@@ -279,14 +279,7 @@ class FrontController
                 }
 
                 /** On test l'existence du dossier app répondant au nom $ctrl **/
-                if ($this->testApp($ctrl)) {
-
-                    /** Erreur doublon */
-                    if ($this->application == $ctrl) {
-                        $this->addRewriting($ctrl);
-                        $rewritingMod = true;
-                        continue;
-                    }
+                if ($this->testApp($ctrl) !== false) {
 
                     /** Si un application est déjà définie */
                     if ($application === true) {
@@ -305,7 +298,7 @@ class FrontController
 
                     $this->application = ucfirst($ctrl);
                     self::$appName = $this->application;
-                    $this->app = $this->application;
+                    $this->app = $this->testApp($ctrl);
                     $application = true;
                     continue;
                 }
@@ -440,14 +433,15 @@ class FrontController
      *
      * @param string $ctrl Morceau d'url
      *
-     * @return boolean
+     * @return boolean|string false si ce n'est pas une application, sinon
+     * renvoi le dir App
      */
     private function testApp($ctrl)
     {
         foreach (self::$appDirs as $app) {
             $testPath = new Path($app['dir'] . DS . $ctrl, Path::SILENT);
             if ($testPath->get()) {
-                return true;
+                return ucfirst($app['dir']);
             }
         }
 
@@ -510,8 +504,7 @@ class FrontController
 
         $front->setVersion();
 
-        $class = $front->app . '\\' . $front->application
-               . '\\Controller\\' . ucfirst($front->controller);
+        $class = $front->getClassName();
         $method = sprintf($front->getFormat('controller-action'), $front->action);
         if (!class_exists($class)) {
             $front->debug(self::CONTROLLER_CLASS_NOT_EXISTS, array($class));
@@ -759,10 +752,10 @@ class FrontController
         }
         return '';
     }
-    
+
     /**
      * Renvoi l'url complète de la page courante
-     * 
+     *
      * @return string
      */
     public static function getCurrentURL()
@@ -773,7 +766,7 @@ class FrontController
         } else {
             $currentURL = 'http://';
         }
-        
+
         // On ajoute le nom d'hote de l'url
         $currentURL .= $_SERVER["SERVER_NAME"];
 
@@ -781,7 +774,7 @@ class FrontController
         if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
             $currentURL .= ":" . $_SERVER["SERVER_PORT"];
         }
-        
+
         // On ajoute enfin la fin de l'url
         $currentURL .= $_SERVER["REQUEST_URI"];
         return $currentURL;
