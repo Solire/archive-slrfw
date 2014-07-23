@@ -2,8 +2,8 @@
 /**
  * Front controller
  *
- * @author     dev <dev@solire.fr>
- * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @author  dev <dev@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 
 namespace Slrfw;
@@ -11,8 +11,8 @@ namespace Slrfw;
 /**
  * Front controller
  *
- * @author     dev <dev@solire.fr>
- * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
+ * @author  dev <dev@solire.fr>
+ * @license CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
 class FrontController
 {

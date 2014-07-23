@@ -52,13 +52,38 @@ class Param
      *
      * @return string
      */
-    protected function getClassName($name)
+    protected function getClassName($name, $tool)
     {
         if (strpos('\\', $name) !== false) {
             return $name;
         }
 
-        return 'Slrfw\Formulaire\Validate\\' . ucfirst($name);
+        return 'Slrfw\Formulaire\\' . $tool . '\\' . ucfirst($name);
+    }
+
+    protected function validatePlugin($className)
+    {
+        if (!in_array('Slrfw\Formulaire\ParamInterface', class_implements($config))) {
+            throw new Exception('_' . $className . '_ n\'implemente pas Slrfw\Formulaire\ParamInterface');
+        }
+
+        return $className;
+    }
+
+    /**
+     * Extrait les options du nom du traitement
+     *
+     * @param string $name Nom du traitement
+     *
+     * @return string[]
+     */
+    protected function extractOptions($name)
+    {
+        if (strpos($name, ':') === false) {
+            return [$name, null];
+        }
+        $foo = explode(':', $name);
+        return $foo;
     }
 
     /**
@@ -70,16 +95,22 @@ class Param
      */
     public function validate($option)
     {
-        $param = null;
-        if (strpos($option, ':') !== false) {
-            $foo = explode(':', $option);
-            $option = $foo[0];
-            $param = $foo[1];
-            unset($foo);
-        }
+        list($option, $param) = $this->extractOptions($option);
+        $className = $this->getClassName($option, 'Validate');
+        return $className::validate($this->foo, $param);
+    }
 
-        $className = $this->getClassName($option);
-
+    /**
+     * Execute un traitement sur la variable
+     *
+     * @param string $option Nom du traitement à effectuer
+     *
+     * @return boolean
+     */
+    public function sanitize($option)
+    {
+        list($option, $param) = $this->extractOptions($option);
+        $className = $this->getClassName($option, 'Sanitize');
         return $className::validate($this->foo, $param);
     }
 

@@ -29,7 +29,6 @@ class FastConfig extends atoum
         $this
             ->object(new TestClass())
                 ->isInstanceOf('\Slrfw\FastConfig')
-
         ;
     }
 
