@@ -260,7 +260,16 @@ class gabaritBloc
         }
 
         $type = strtolower($champ['type']);
-        $classNameType = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\' . $type . 'field';
+
+        $classNameType = 'Model\\Gabarit\\Field\\' . ucfirst($type) . '\\'
+                       . ucfirst($type) . 'Field';
+        $classNameType = \Slrfw\FrontController::searchClass($classNameType);
+
+        if ($classNameType === false) {
+            $classNameType  = '\Slrfw\Model\Gabarit\Field\\' . $type . '\\'
+                            . $type . 'field';
+        }
+
         $field = new $classNameType($champ, $label, $value, $id, $classes, $id_gab_page, $id_version);
         $field->start();
         $form .= $field;
