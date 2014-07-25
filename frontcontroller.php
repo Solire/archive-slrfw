@@ -105,6 +105,9 @@ class FrontController
     private $_format = null;
     private $_debug = null;
 
+    private $translate = false;
+    private $view = false;
+
     const CONTROLLER_FILE_NOT_EXISTS = 0;
     const CONTROLLER_CLASS_NOT_EXISTS = 1;
     const CONTROLLER_ACTION_NOT_EXISTS = 2;
@@ -167,7 +170,11 @@ class FrontController
 
         /* = base de données
           ------------------------------- */
-        $db = DB::factory(self::$envConfig->get('database'));
+        try {
+            $db = DB::factory(self::$envConfig->get('database'));
+        } catch (\PDOException $exc) {
+            throw new Exception\Lib($exc->getMessage());
+        }
         Registry::set('db', $db);
 
         Registry::set('project-name', self::$mainConfig->get('project', 'name'));
@@ -478,8 +485,7 @@ class FrontController
     public static function run($controller = null, $action = null)
     {
         $front = self::getInstance();
-
-        if (empty($application) && empty($controller) && empty($action)) {
+        if (empty($controller) && empty($action)) {
             $front->parseUrl();
         } else {
             /** Chargement du controller **/
@@ -488,6 +494,12 @@ class FrontController
 
             /** Chargement de l'action **/
             $front->action = $action;
+
+            if (isset($front->view) && !empty($front->view)) {
+                $defaultViewPath = strtolower($front->controller) . DS . $front->action;
+                $front->view->setViewPath($defaultViewPath);
+                unset($defaultViewPath);
+            }
 
             self::loadAppConfig();
         }
@@ -521,48 +533,73 @@ class FrontController
         }
 
         /**
-         * Création de la classe de traduction
-         */
-        $translate = new TranslateMysql(ID_VERSION, ID_API, Registry::get('db'));
-        $translate->addTranslation();
-
-        /**
-         * Création de la vue
-         * @todo Ne créér la vue que si besoin.
-         */
-        $view = new View();
-
-        /**
          * On créé le controller
          */
         $instance = new $class();
 
-        /**
-         * On passe la vue et la traduction au controller
-         */
-        $instance->setView($view);
-        $view->setTranslate($translate);
-        $instance->setTranslate($translate);
-
-        /**
-         * Passage des paramètres de rewriting
-         */
-        $instance->setRewriting($front->rewriting);
+        $instance
+            ->setView($front->loadView())
+            ->setTranslate($front->loadTranslate())
+            ->setRewriting($front->rewriting)
+        ;
 
         $instance->start();
-        $view->setFormat($front->getFormat('view-file'));
-        $view->base = $front->getDir('base');
         $instance->$method();
-
-        $view->setController($front->controller);
-        $view->setAction($front->action);
-
-        if ($view->isEnabled()) {
+        if ($front->view->isEnabled()) {
             $instance->shutdown();
-            $view->display();
+            $front->view->display();
+        }
+        return true;
+    }
+
+    /**
+     * Chargement de la classe de traduction
+     *
+     * @return \Slrfw\TranslateMysql
+     */
+    public function loadTranslate()
+    {
+        if ($this->translate !== false) {
+            return $this->translate;
         }
 
-        return true;
+        $this->translate = new TranslateMysql(ID_VERSION, ID_API, Registry::get('db'));
+        $this->translate->addTranslation();
+
+        return $this->translate;
+    }
+
+    /**
+     * Chargement de la vue
+     *
+     * @return View
+     */
+    public function loadView()
+    {
+        if ($this->view !== false) {
+            return $this->view;
+        }
+
+        $this->view = new View();
+
+        $defaultViewPath = strtolower($this->controller) . DS . $this->action;
+        $mainViewPath = sprintf($this->getFormat('view-file'), 'main');
+
+        try {
+            $this->view
+                ->setPathFormat($this->getFormat('view-file'))
+                ->setPathPrefix(self::$mainConfig->get('dirs', 'views'))
+                ->setTranslate($this->loadTranslate())
+                ->setMainPath('main')
+                ->setViewPath($defaultViewPath)
+            ;
+        } catch (Exception\Lib $exc) {
+            if ($exc->getCode() === 0 || $exc->getCode() > 400) {
+                throw $exc;
+            }
+        }
+
+        return $this->view;
     }
 
     /**

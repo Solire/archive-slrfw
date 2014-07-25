@@ -59,26 +59,29 @@ class Mail
      * @param string $name Nom identifiant la vue utilisée
      *
      * @uses Registry envconfig
-     * @uses Registry db
      * @uses View
-     * @uses TranslateMysql
-     * @uses DB
      * @link http://solire-02/wiki/index.php/Mail_%28lib%29 explication & docu
      */
     public function __construct($name)
     {
         $this->codeName = $name;
-
-        $db = Registry::get('db');
-        $translate = new TranslateMysql(ID_VERSION, ID_API, $db);
-        $translate->addTranslation();
-        $this->view = new View($translate);
+        $this->view = new View();
 
         $configLoc = Registry::get('envconfig');
         $default = $configLoc->get('mail');
         foreach ($default as $key => $value) {
             $this->$key = $value;
         }
+    }
+
+    /**
+     * Renvois la vue utilisée dans le mail
+     *
+     * @return View
+     */
+    public function getView()
+    {
+        return $this->view;
     }
 
     /**
@@ -89,6 +92,18 @@ class Mail
     public function setMainUse()
     {
         $this->mainUse = true;
+
+        return $this;
+    }
+
+    /**
+     * Désactive l'utilisation du main.phtml
+     *
+     * @return self
+     */
+    public function disableMainUse()
+    {
+        $this->mainUse = false;
 
         return $this;
     }
@@ -141,41 +156,37 @@ class Mail
         if (!isset($this->body)) {
             $config = Registry::get('mainconfig');
 
-            $realMainPath = false;
+            $this->view->setPathPrefix($config->get('dirs', 'mail'));
 
             if ($this->mainUse) {
                 /**
                  * On cherche le fichier main
                  */
 
-                $mainPath = $config->get('dirs', 'mail') . 'main.phtml';
-                $realMainPath = FrontController::search($mainPath, false);
-                if (empty($realMainPath)) {
-                    $realMainPath = FrontController::search($mainPath);
-
-                    if (empty($realMainPath)) {
-                        throw new Exception\Lib('Aucun fichier mail main.phtml');
-                    }
-                }
-            }
-
-            $path = $config->get('dirs', 'mail') . $this->codeName . '.phtml';
-            $realPath = FrontController::search($path, false);
-
-            if (empty($realPath)) {
-                $realPath = FrontController::search($path);
-
-                if (empty($realPath)) {
-                    throw new Exception\Lib('Aucun fichier mail ' . $this->codeName);
-                }
+                $this->view->setMainPath('main.phtml');
             }
 
             ob_start();
-            $this->view->displayPath($realPath, $realMainPath);
+            $this->view
+                ->setViewPath($this->codeName . '.phtml')
+                ->display()
+            ;
             $this->body = ob_get_clean();
         }
 
         return $this->body;
+    }
+
+    /**
+     * Supprime le cache du body du mail
+     *
+     * @return self
+     */
+    public function resetBody()
+    {
+        $this->body = null;
+
+        return $this;
     }
 
 

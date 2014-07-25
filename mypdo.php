@@ -267,5 +267,47 @@ class MyPDO extends \PDO
         $sql = substr($sql, 0, -1) . ");";
         return $this->exec($sql);
     }
+
+    /**
+     * Retourne les éléments de tri (WHERE et ORDER BY) pour la requête de
+     * recherche en fonction d'un terme de recherche
+     *
+     * @param string   $term
+     * @param string[] $columns
+     *
+     * @return array
+     */
+    public function search($term, $columns)
+    {
+        /**
+         * Variable qui contient la chaine de recherche
+         */
+        $stringSearch = trim($term);
+
+        /**
+         * On divise en mots (séparé par des espace)
+         */
+        $words = preg_split('`\s+`', $stringSearch);
+
+        if (count($words) > 1) {
+            array_unshift($words, $stringSearch);
+        }
+
+        $filterWords = array();
+        $orderBy     = array();
+        foreach ($words as $word) {
+            foreach ($columns as $col) {
+                $filterWord     = $col . ' LIKE '
+                                . $this->quote('%' . $word . '%');
+                $filterWords[]  = $filterWord;
+                $orderBy[]      = 'IF(' . $filterWord . ', ' . mb_strlen($word) . ', 0)';
+            }
+        }
+
+        return array(
+            'where'  => ' (' . implode(' OR ', $filterWords) . ')',
+            'order'  => ' ' . implode(' + ', $orderBy),
+        );
+    }
 }
 

@@ -99,10 +99,6 @@ class Session
                 $query->execute();
                 $user = $query->fetch(\PDO::FETCH_ASSOC);
 
-                if (isset($user['certificat'])) {
-                    $this->certificat = $user['certificat'];
-                }
-
                 $token = $this->makeToken($user['login'], date('m-d'), $user['id']);
 
                 if ($token == $foo[0]) {
@@ -201,33 +197,7 @@ class Session
      */
     final static public function prepareMdp($mdp)
     {
-        $ordre = array(
-            '$char . $id',
-            '$id . $id',
-            '$id . $char',
-            '$char . $id . $char',
-            '$char . $char',
-        );
-
-        $key = str_split(strrev($mdp));
-        $result = '';
-        $i = ceil(count($key) / 3);
-        $iOrdre = 0;
-        foreach (str_split($mdp) as $char) {
-            if (!isset($key[$i])) {
-                $i = 0;
-            }
-
-            if (empty($ordre[$iOrdre])) {
-                $iOrdre = 0;
-            }
-            $id = ord($key[$i]);
-            $exec = '$result .= ' . $ordre[$iOrdre] . ';';
-            eval($exec);
-            $iOrdre++;
-            $i++;
-        }
-        return hash('sha256', $result);
+        return password_hash($mdp, PASSWORD_BCRYPT);
     }
 
     /**
@@ -290,14 +260,9 @@ class Session
         $query->execute();
         $user = $query->fetch(\PDO::FETCH_ASSOC);
 
-        $password = self::prepareMdp($password);
 
-        if ($user['pass'] != $password) {
+        if (password_verify($password, $user['pass']) !== true) {
             throw new Exception\User('Couple Courriel / Mot de passe incorrect');
-        }
-
-        if (isset($user['certificat'])) {
-            $this->certificat = $user['certificat'];
         }
 
         $token = $this->makeToken($user['login'], date('m-d'), $user['id']);

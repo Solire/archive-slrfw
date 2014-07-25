@@ -35,7 +35,7 @@ class Config
      *
      * @var array
      */
-    private $config = null;
+    protected $config = null;
 
     /**
      * Tableau de paramétrage du fichier de configuration
@@ -133,17 +133,19 @@ class Config
      */
     private function parseVar()
     {
-        /* =
-        `------------------------------------------------- */
-        /** Parcour des options de configurations **/
+        /*
+         * Parcour des options de configurations
+         */
         foreach ($this->config as $divName => $section) {
-
-            /**
+            /*
              * on test si dans la section il y a une variable
              * ça permet de passer à la suivante sans avoir à tout tester
-             **/
+             */
             $testString = '';
             foreach ($section as $value) {
+                if (is_array($value)) {
+                    $value = implode(' ', $value);
+                }
                 $testString .= $value;
             }
             if (!preg_match(self::VAR_FORMAT, $testString)) {
@@ -151,28 +153,50 @@ class Config
             }
 
             foreach ($section as $key => $value) {
+                /*
+                 * On prend en compte la possibilite de mettre un tableau dans
+                 * un attribut
+                 * @example
+                 * [section]
+                 * item[] = "a"
+                 * item[] = "b"
+                 */
+                if (!is_array($value)) {
+                    $type = 'string';
+                    $value = array($value);
+                } else {
+                    $type = 'array';
+                }
 
-                if (preg_match_all(self::VAR_FORMAT, $value, $matches)) {
+                foreach ($value as $index => $valueLine) {
+                    if (preg_match_all(self::VAR_FORMAT, $valueLine, $matches)) {
+                        for ($i = 0; $i < count($matches[0]); $i++) {
+                            $id = $matches[1][$i];
+                            /**
+                             * Si il y a un : dans le nom de la variable c'est
+                             * qu'elle pointe sur un autre bloc sinon on prend
+                             * le bloc en cours
+                             */
+                            if (strpos($id, ':') !== false) {
+                                $opt = explode(':', $id);
+                                $val = $this->get($opt[0], $opt[1]);
+                            } else {
+                                $val = $this->get($divName, $id);
+                            }
 
-                    for ($i = 0; $i < count($matches[0]); $i++) {
-                        $id = $matches[1][$i];
-                        /* = Si il y a un : dans le nom de la variable c'est
-                        | qu'elle pointe sur un autre bloc
-                        | sinon on prend le bloc en cours
-                        `------------------------------------------------- */
-                        if (strpos($id, ':') !== false) {
-                            $opt = explode(':', $id);
-                            $val = $this->get($opt[0], $opt[1]);
-                        } else {
-                            $val = $this->get($divName, $id);
+                            /**
+                             * On replace la valeur de la variable dans le champ
+                             */
+                            $valueLine = str_replace(
+                                $matches[0][$i], $val, $valueLine
+                            );
+
+                            if ($type == 'string') {
+                                $this->config[$divName][$key] = $valueLine;
+                            } else {
+                                $this->config[$divName][$key][$index] = $valueLine;
+                            }
                         }
-                        /* = On replace la valeur de la variable dans le champ
-                        `------------------------------------------------- */
-                        $value = str_replace(
-                            $matches[0][$i], $val, $value
-                        );
-
-                        $this->config[$divName][$key] = $value;
                     }
                 }
             }
@@ -211,6 +235,50 @@ class Config
         }
 
         return null;
+    }
+
+    /**
+     * Enregistre la valeur
+     *
+     * @param mixed  $value   Valeur à mettre dans la configuration
+     * @param string $section Code de la section
+     * @param string $key     Nom de la clé de configuration
+     *
+     * @return self
+     */
+    public function set($value, $section, $key = null)
+    {
+        if (!empty($key)) {
+            $this->config[$section][$key] = $value;
+            return $this;
+        } else {
+            $this->config[$section] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Supprime un parametre de configuration
+     *
+     * @param string $section Code de la section
+     * @param string $key     Nom de la clé de configuration
+     *
+     * @return self
+     */
+    public function kill($section, $key = null)
+    {
+        if (!empty($key)) {
+            if (isset($this->config[$section][$key])) {
+                unset($this->config[$section][$key]);
+            }
+
+        } else {
+            if (isset($this->config[$section])) {
+                unset($this->config[$section]);
+            }
+        }
+        return $this;
     }
 }
 

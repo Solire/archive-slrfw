@@ -66,7 +66,7 @@ class Controller
      *
      * @var bool
      */
-    protected $_ajax = false;
+    public $_ajax = false;
 
     /**
      *
@@ -226,11 +226,13 @@ class Controller
      *
      * @param View $view
      *
-     * @return void
+     * @return self
      */
-    public function setView($view)
+    final public function setView($view)
     {
         $this->_view = $view;
+
+        return $this;
     }
 
     /**
@@ -248,11 +250,13 @@ class Controller
      *
      * @param TranslateMysql $translate
      *
-     * @return void
+     * @return self
      */
-    public function setTranslate($translate)
+    final public function setTranslate($translate)
     {
         $this->_translate = $translate;
+
+        return $this;
     }
 
     /**
@@ -322,7 +326,7 @@ class Controller
         $url = preg_replace("`^/" . Registry::get('baseroot') . "`", "", $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
         $urlsToTest[] = $url;
-        
+
         // On ajoute aussi l'url entière à tester
         $urlsToTest[] = FrontController::getCurrentURL();
 
@@ -427,12 +431,14 @@ class Controller
      *
      * @param array $rew Rewriting contenu dans les "/"
      *
-     * @return void
+     * @return self
      *
      */
     final public function setRewriting(array $rew)
     {
         $this->rew = $rew;
+
+        return $this;
     }
 
     /**
