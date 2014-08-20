@@ -173,7 +173,7 @@ abstract class GabaritFieldSet
             }
         } elseif ($value != '') {
             if (\mb_strlen($value, 'UTF-8') > 50) {
-                $valueLabel = \mb_substr($value, 0, 50, 'UTF-8') . '&hellip;';
+                $valueLabel = \mb_substr(strip_tags($value), 0, 50, 'UTF-8') . '&hellip;';
             } else {
                 $valueLabel = $value;
             }
