@@ -296,11 +296,19 @@ class MyPDO extends \PDO
         $filterWords = array();
         $orderBy     = array();
         foreach ($words as $word) {
-            foreach ($columns as $col) {
-                $filterWord     = $col . ' LIKE '
+            foreach ($columns as $key => $value) {
+                if (is_numeric($value)) {
+                    $pond    = $value;
+                    $colName = $key;
+                } else {
+                    $pond    = 1;
+                    $colName = $value;
+                }
+
+                $filterWord     = $colName . ' LIKE '
                                 . $this->quote('%' . $word . '%');
                 $filterWords[]  = $filterWord;
-                $orderBy[]      = 'IF(' . $filterWord . ', ' . mb_strlen($word) . ', 0)';
+                $orderBy[]      = 'IF(' . $filterWord . ', ' . mb_strlen($word) * $pond . ', 0)';
             }
         }
 
