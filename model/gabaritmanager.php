@@ -1444,27 +1444,23 @@ class gabaritManager extends manager
             );
 
             $query = 'UPDATE `gab_page` SET'
-                    . ' `titre`      = ' . $this->_db->quote($donnees['titre']) . ',';
+                    . ' `titre` = ' . $this->_db->quote($donnees['titre']) . ',';
 
             if ($page->getVersion('exotique') > 0) {
                 $query .= ' `titre_rew`      = '
                         . $this->_db->quote($donnees['titre_rew']) . ',';
             }
 
-            if ($donnees['bal_title'] == '') {
-                $donnees['bal_title'] = $donnees['titre'];
-            }
-
             if (!isset($donnees['author'])) {
                 $donnees['author'] = 0;
             }
 
-            $query .= ' `bal_title`  = ' . $this->_db->quote($donnees['bal_title']) . ','
-                    . ' `bal_key`    = ' . $this->_db->quote($donnees['bal_key']) . ','
-                    . ' `author`    = ' . $this->_db->quote($donnees['author']) . ','
-                    . ' `bal_descr`	= ' . $this->_db->quote($donnees['bal_descr']) . ','
-                    . ' `importance`	= ' . $donnees['importance'] . ','
-                    . ' `date_modif`	= NOW(),';
+            $query .= ' `bal_title` = ' . $this->_db->quote($donnees['bal_title']) . ','
+                    . ' `bal_key` = ' . $this->_db->quote($donnees['bal_key']) . ','
+                    . ' `author` = ' . $this->_db->quote($donnees['author']) . ','
+                    . ' `bal_descr` = ' . $this->_db->quote($donnees['bal_descr']) . ','
+                    . ' `importance` = ' . $donnees['importance'] . ','
+                    . ' `date_modif` = NOW(),';
 
             if (isset($donnees['no_index']) && $page->getMeta('id') != 1) {
                 $query .= ' `no_index`   = ' . $donnees['no_index'] . ',';
@@ -1472,8 +1468,8 @@ class gabaritManager extends manager
                 $query .= ' `no_index`   = 0,';
             }
 
-            $query .= ' `canonical`	= ' . $this->_db->quote($donnees['canonical']) . ','
-                    . ' `rewriting`		= ' . $this->_db->quote($rewriting)
+            $query .= ' `canonical` = ' . $this->_db->quote($donnees['canonical']) . ','
+                    . ' `rewriting` = ' . $this->_db->quote($rewriting)
                     . ' WHERE `id` = ' . $page->getMeta('id')
                     . ' AND `id_version` = ' . $page->getMeta('id_version');
 
