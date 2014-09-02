@@ -536,7 +536,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
         foreach ($details as $detail) {
             list($detailName, $detailId, $style) = explode("|", $detail);
             ?>
-
+                        console.log(aData);
                                     if(aData[<?php echo $detailId; ?>] != '') {
                                         sOut += '<tr><td><?php echo $detailName; ?></td><td>';
             <?php
@@ -572,7 +572,7 @@ if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
 
 
 
-                $('#tableau-<?php echo $this->name ?> tbody td a.detail').live( 'click', function (e) {
+                $('#tableau-<?php echo $this->name ?> > tbody > tr > td > a.detail').live( 'click', function (e) {
                     e.preventDefault()
                     var nTr = $(this).parents('tr:first')[0];
                     var i = $.inArray( nTr, anOpen_<?php echo $this->name ?> );
