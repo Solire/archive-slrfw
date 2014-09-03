@@ -371,13 +371,28 @@ class FrontController
      */
     final public static function search($path, $current = true)
     {
+        $appLibDir = self::$mainConfig->get('appLibDir');
+        
+        $initialPath = $path;
         if ($current === true) {
             $path = DS . strtolower(self::$appName) . DS . $path;
         } else {
             $path = DS . $path;
         }
         foreach (self::$appDirs as $app) {
+            if ($current === true) {
+                $dir = $app['dir'] . DS . strtolower(self::$appName);
+            } else {
+                $dir = $app['dir'];
+            }
             $fooPath = $app['dir'] . $path;
+            
+            // Permet de faire correspondre des répertoires d'application
+            if ($appLibDir && isset($appLibDir[$dir])) {
+                $dir = $appLibDir[$dir];
+                $fooPath = $dir . DS . $initialPath;
+            }
+
             $testPath = new Path($fooPath, Path::SILENT);
             if ($testPath->get() !== false) {
                 return $testPath->get();
