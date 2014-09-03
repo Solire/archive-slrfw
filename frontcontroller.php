@@ -816,7 +816,7 @@ class FrontController
      *
      * @return string
      */
-    public static function getCurrentURL()
+    public static function getCurrentUrl()
     {
         // On ajoute selon le cas http ou https
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
