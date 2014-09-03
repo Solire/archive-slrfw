@@ -328,7 +328,7 @@ class Controller
         $urlsToTest[] = $url;
 
         // On ajoute aussi l'url entière à tester
-        $urlsToTest[] = FrontController::getCurrentURL();
+        $urlsToTest[] = FrontController::getCurrentUrl();
 
         $ajustLen = 0;
         if (substr($url, -1) == '/') {
