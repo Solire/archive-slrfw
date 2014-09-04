@@ -68,7 +68,7 @@
 
         #tableau-<?php echo $this->name ?> table a { text-decoration: underline; }
         #tableau-<?php echo $this->name ?> table tr  >  td { border: 0px;text-align: left;vertical-align: top;  }
-        #tableau-<?php echo $this->name ?> table tr  >  td:first-child {  padding-left: 50px;width: 100px;  }
+        /*#tableau-<?php echo $this->name ?> table tr  >  td:first-child {  padding-left: 50px;width: 100px;  }*/
 
         #tableau-<?php echo $this->name ?> table  >  tbody {
             border-top: 0px dotted #333333;
@@ -695,8 +695,15 @@ if (isset($this->config["table"]["info"]) && !$this->config["table"]["info"]) {
             'aaSorting': [
 <?php
 $numCol = 0;
+$columnsDef = array();
 foreach ($this->config["columns"] as $column) {
     if (isset($column["show"]) && $column["show"]) {
+        $columnDef = new stdClass();
+        if(isset($column['width'])) {
+            $columnDef->width = $column['width'];
+        }
+        $columnsDef[] = $columnDef;
+        
         if (isset($column["default_sorting"]) && $column["default_sorting"]) {
             ?>
                                         [ <?php echo isset($this->config["table"]["detail"]) && $this->config["table"]["detail"] ? $numCol + 1 : $numCol; ?>, "<?php echo $column["default_sorting_direction"]; ?>" ],
@@ -708,6 +715,7 @@ foreach ($this->config["columns"] as $column) {
 }
 ?>
             ],
+            "columnDefs": <?php echo json_encode($columnsDef); ?>,
             'aoColumns': [
 <?php
 if (isset($this->config["table"]["detail"]) && $this->config["table"]["detail"])
