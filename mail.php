@@ -37,6 +37,41 @@ class Mail
     protected $codeName;
 
     /**
+     * Sujet du mail
+     *
+     * @var string
+     */
+    public $subject;
+
+    /**
+     * Contenu du mail
+     *
+     * @var string
+     */
+    public $body;
+
+    /**
+     * Adresse mail de l'expediteur
+     *
+     * @var string
+     */
+    public $from;
+
+    /**
+     * Adresse mail du destinataire
+     *
+     * @var string
+     */
+    public $to;
+
+    /**
+     * Adresse mail des destinaires en copie carpone
+     *
+     * @var string
+     */
+    public $bcc;
+
+    /**
      *
      * @var View
      */
