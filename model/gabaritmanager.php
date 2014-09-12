@@ -1776,21 +1776,19 @@ class gabaritManager extends manager
                 if ($query != '') {
                     $queryTmp   = 'UPDATE `' . $table . '` SET '
                                 . substr($query, 0, -1) . ' ' . $where;
-                }
-
-                $tmpModif = $this->_db->exec($queryTmp);
-                if (!$modif && $tmpModif > 0) {
-                    $modif = true;
+                    $tmpModif = $this->_db->exec($queryTmp);
+                    if (!$modif && $tmpModif > 0) {
+                        $modif = true;
+                    }
                 }
 
                 if ($queryT != '') {
                     $queryTmp   = 'UPDATE `' . $table . '` SET '
                                 . substr($queryT, 0, -1) . ' ' . $whereT;
-                }
-
-                $tmpModif = $this->_db->exec($queryTmp);
-                if (!$modif && $tmpModif > 0) {
-                    $modif = true;
+                    $tmpModif = $this->_db->exec($queryTmp);
+                    if (!$modif && $tmpModif > 0) {
+                        $modif = true;
+                    }
                 }
             }
         } else {
