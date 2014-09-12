@@ -186,7 +186,8 @@ class Pagination
             $pages[] = array(
                 'text'    => $this->prevHtml,
                 'num'     => $this->currentPage - 1,
-                'current' => false
+                'current' => false,
+                'link'    => true
             );
         }
 
@@ -197,7 +198,8 @@ class Pagination
                 $pages[] = array(
                     'text'    => $i,
                     'num'     => $i,
-                    'current' => true
+                    'current' => true,
+                    'link'    => false
                 );
             } else {
                 /* Si première page
@@ -215,7 +217,8 @@ class Pagination
                     $pages[] = array(
                         'text'    => $i,
                         'num'     => $i,
-                        'current' => false
+                        'current' => false,
+                        'link'    => true
                     );
                 } elseif ($i < $this->currentPage
                     && ($i + $this->delta + 1) == $this->currentPage
@@ -225,7 +228,8 @@ class Pagination
                     $pages[] = array(
                         'text'    => $this->deltaHtml,
                         'num'     => $this->deltaHtml,
-                        'current' => false
+                        'current' => false,
+                        'link'    => false
                     );
                 }
             }
@@ -236,7 +240,8 @@ class Pagination
             $pages[] = array(
                 'text'    => $this->nextHtml,
                 'num'     => $this->currentPage + 1,
-                'current' => false
+                'current' => false,
+                'link'    => true
             );
         }
 
