@@ -80,6 +80,19 @@ class Pagination
     protected $nextHtml = '&rsaquo;';
 
     /**
+     * Permet de limiter l'affichage des pages à N pages avant et après la page 
+     * courante (-1 pour la liste complete des pages)
+     * @var string 
+     */
+    protected $delta = 1;
+
+    /**
+     * Html/Text à afficher lorsqu'un delta est paramétré
+     * @var string
+     */
+    protected $deltaHtml = '&#8230;';
+
+    /**
      * Accès base de données
      * @var MyPDO
      */
@@ -187,11 +200,34 @@ class Pagination
                     'current' => true
                 );
             } else {
-                $pages[] = array(
-                    'text'    => $i,
-                    'num'     => $i,
-                    'current' => false
-                );
+                /* Si première page
+                 *  ou dernière page
+                 *  ou toutes les pages à afficher
+                 */
+                if ($i == 1
+                    || $i == $this->nbPages
+                    || $this->delta < 0
+                    || $i < $this->currentPage
+                    && ($i + $this->delta) >= $this->currentPage
+                    || $i > $this->currentPage
+                    && ($i - $this->delta) <= $this->currentPage
+                ) {
+                    $pages[] = array(
+                        'text'    => $i,
+                        'num'     => $i,
+                        'current' => false
+                    );
+                } elseif ($i < $this->currentPage
+                    && ($i + $this->delta + 1) == $this->currentPage
+                    || $i > $this->currentPage
+                    && ($i - $this->delta - 1) == $this->currentPage
+                ) {
+                    $pages[] = array(
+                        'text'    => $this->deltaHtml,
+                        'num'     => $this->deltaHtml,
+                        'current' => false
+                    );
+                }
             }
         }
 
