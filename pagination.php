@@ -68,10 +68,22 @@ class Pagination
     protected $limit;
 
     /**
+     * Html/Text du lien page précédente (Vide pour desactiver)
+     * @var string 
+     */
+    protected $prevHtml = '&lsaquo;';
+
+    /**
+     * Html/Text du lien page suivante  (Vide pour desactiver)
+     * @var string 
+     */
+    protected $nextHtml = '&rsaquo;';
+
+    /**
      * Accès base de données
      * @var MyPDO
      */
-    private $_db = null;
+    private $db = null;
 
     /**
      * Constructeur de Pagination
@@ -155,20 +167,43 @@ class Pagination
     public function getPaginationArray()
     {
         $pages = array();
+
+        /* Lien page précédente */
+        if ($this->prevHtml && $this->currentPage > 1) {
+            $pages[] = array(
+                'text'    => $this->prevHtml,
+                'num'     => $this->currentPage - 1,
+                'current' => false
+            );
+        }
+
+        /* Lien des pages numérotées */
         for ($i = 1; $i <= $this->nbPages; $i++) {
             //Si il s'agit de la page actuelle
             if ($i == $this->currentPage) {
                 $pages[] = array(
-                    'num' => $i,
+                    'text'    => $i,
+                    'num'     => $i,
                     'current' => true
                 );
             } else {
                 $pages[] = array(
-                    'num' => $i,
+                    'text'    => $i,
+                    'num'     => $i,
                     'current' => false
                 );
             }
         }
+
+        /* Lien page suivante*/
+        if ($this->nextHtml && $this->currentPage < $this->nbPages) {
+            $pages[] = array(
+                'text'    => $this->nextHtml,
+                'num'     => $this->currentPage + 1,
+                'current' => false
+            );
+        }
+
         return $pages;
     }
 
@@ -272,4 +307,3 @@ class Pagination
         }
     }
 }
-
