@@ -12,18 +12,18 @@ class ShinForm {
     const VALIDATE_FLOAT = 'number';
     const VALIDATE_INT = 'digits';
 
-    private $_config = null;
+    protected $_config = null;
 
     /**
      *
      * @var MyPDO
      */
-    private $_db = null;
-    private $_validateRules = null;
-    private $_errors = null;
-    private $_dataValidated = null;
-    private $_dataNotValidated = null;
-    private $_queries = null;
+    protected $_db = null;
+    protected $_validateRules = null;
+    protected $_errors = null;
+    protected $_dataValidated = null;
+    protected $_dataNotValidated = null;
+    protected $_queries = null;
 
     public function __construct($configName, $db, $configArray = null) {
         if ($configName != null) {
