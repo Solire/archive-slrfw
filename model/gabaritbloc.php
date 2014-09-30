@@ -252,7 +252,7 @@ class gabaritBloc
         $id = 'champ' . $champ['id'] . '_' . $idpage;
 
         if ($champ['typedonnee'] == 'DATE') {
-            if($value != '0000-00-00') {
+            if($value != '0000-00-00' && $value != '') {
                 $value = \Slrfw\Format\DateTime::sqlTo($value);
             } else {
                 $value = '';
