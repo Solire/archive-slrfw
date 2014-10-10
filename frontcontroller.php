@@ -431,7 +431,7 @@ class FrontController
      * Charge la configuration relative à l'application
      *
      * @param string $test ?
-     * 
+     *
      * @return \Slrfw\Config|null
      */
     final public static function loadAppConfig($test = null)
