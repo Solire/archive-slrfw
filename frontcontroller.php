@@ -2,11 +2,6 @@
 /**
  * Front controller
  *
-<<<<<<< Updated upstream
-=======
- * @package    Library
- * @subpackage Core
->>>>>>> Stashed changes
  * @author     dev <dev@solire.fr>
  * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
@@ -16,11 +11,6 @@ namespace Slrfw;
 /**
  * Front controller
  *
-<<<<<<< Updated upstream
-=======
- * @package    Library
- * @subpackage Core
->>>>>>> Stashed changes
  * @author     dev <dev@solire.fr>
  * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
@@ -425,11 +415,8 @@ class FrontController
     /**
      * Charge la configuration relative à l'application
      *
-<<<<<<< Updated upstream
-=======
      * @param string $test ?
      *
->>>>>>> Stashed changes
      * @return \Slrfw\Config|null
      */
     final public static function loadAppConfig($test = null)
