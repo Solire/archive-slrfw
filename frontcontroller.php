@@ -2,6 +2,11 @@
 /**
  * Front controller
  *
+<<<<<<< Updated upstream
+=======
+ * @package    Library
+ * @subpackage Core
+>>>>>>> Stashed changes
  * @author     dev <dev@solire.fr>
  * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
@@ -11,6 +16,11 @@ namespace Slrfw;
 /**
  * Front controller
  *
+<<<<<<< Updated upstream
+=======
+ * @package    Library
+ * @subpackage Core
+>>>>>>> Stashed changes
  * @author     dev <dev@solire.fr>
  * @license    CC by-nc http://creativecommons.org/licenses/by-nc/3.0/fr/
  */
@@ -167,6 +177,7 @@ class FrontController
         Registry::set('mainconfig', self::$mainConfig);
         Registry::set('envconfig', self::$envConfig);
 
+        Registry::set('baseroot', self::$envConfig->get('base', 'root'));
 
         /* = base de données
           ------------------------------- */
@@ -414,6 +425,11 @@ class FrontController
     /**
      * Charge la configuration relative à l'application
      *
+<<<<<<< Updated upstream
+=======
+     * @param string $test ?
+     *
+>>>>>>> Stashed changes
      * @return \Slrfw\Config|null
      */
     final public static function loadAppConfig($test = null)
@@ -623,7 +639,7 @@ class FrontController
 
         if (empty($apiId)) {
             /** On essaie de recuperer l'api par le domaine **/
-            $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+            $serverUrl = $_SERVER['SERVER_NAME'];
             $query = 'SELECT id_api '
                    . 'FROM version '
                    . 'WHERE domaine = ' . $db->quote($serverUrl);
@@ -679,7 +695,7 @@ class FrontController
          * On verifie en base si le nom de domaine courant correspond
          *  à une langue
          **/
-        $serverUrl = str_replace('www.', '', $_SERVER['SERVER_NAME']);
+        $serverUrl = $_SERVER['SERVER_NAME'];
 
         $query = 'SELECT * '
                . 'FROM `version` '
@@ -714,10 +730,9 @@ class FrontController
             $serverUrl = self::$envConfig->get('base', 'url');
             Registry::set('url', $serverUrl);
             Registry::set('basehref', $serverUrl);
-
         } else {
-            Registry::set('url', 'http://www.' . $serverUrl . '/');
-            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
+            Registry::set('url', 'http://' . $serverUrl . '/' . Registry::get('baseroot'));
+            Registry::set('basehref', 'http://' . $serverUrl . '/' . Registry::get('baseroot'));
         }
 
 

@@ -1092,13 +1092,12 @@ class gabaritManager extends manager
     public function getMain($id_version, $id_api)
     {
         $query = 'SELECT `g`.`name`, `p`.*'
-                . ' FROM `gab_page` `p` LEFT JOIN `gab_page` `e`'
-                . ' ON `e`.`id_parent` = `p`.`id` AND `e`.`suppr` = 0'
-                . ' AND `e`.`id_version` = ' . $id_version
+                . ' FROM `gab_page` `p` '
                 . ' INNER JOIN `gab_gabarit` `g` ON `p`.`id_gabarit` = `g`.`id`'
                 . ' AND `g`.`main` = 1 AND  `g`.`id_api` = ' . $id_api
                 . ' WHERE `p`.`suppr` = 0 AND `p`.`id_version` = ' . $id_version
                 . ' ORDER BY `p`.`ordre` ASC';
+
         $metas = $this->_db->query($query)->fetchAll(
             \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
