@@ -323,11 +323,19 @@ class Controller
      */
     public function check301()
     {
-        $appUrl = \Slrfw\FrontController::$appUrl . '/';
+        $appUrl = \Slrfw\FrontController::$appUrl;
+        if (!empty($appUrl)) {
+            $appUrl .= '/';
+        }
 
         $urlsToTest = array();
 
-        $url = preg_replace('`^/' . \Slrfw\FrontController::$envConfig->get('base', 'root') . $appUrl . '`', '', $_SERVER['REQUEST_URI']);
+        $mask = '`'
+              . '^/'
+              . \Slrfw\FrontController::$envConfig->get('base', 'root')
+              . $appUrl
+              . '`';
+        $url = preg_replace($mask, '', $_SERVER['REQUEST_URI']);
         $urlParts = explode('/', $url);
 
         if (substr($url, -1) == '/') {
@@ -339,11 +347,12 @@ class Controller
         do {
             $urlPart = array_shift($urlParts);
 
-            $url .= $urlPart . '/';
+            $url .= $urlPart;
 
             $urlFollowing = '';
             if (!empty($urlParts)) {
                 $urlFollowing = implode('/', $urlParts);
+                $url .= '/';
             }
 
             $urlsToTest[] = array(
