@@ -332,6 +332,7 @@ class Controller
 
         if (substr($url, -1) == '/') {
             unset($urlParts[count($urlParts) - 1]);
+            $urlParts[count($urlParts) - 1] .= '/';
         }
 
         $url = '';
@@ -342,7 +343,7 @@ class Controller
 
             $urlFollowing = '';
             if (!empty($urlParts)) {
-                $urlFollowing = implode('/', $urlParts) . '/';
+                $urlFollowing = implode('/', $urlParts);
             }
 
             $urlsToTest[] = array(
