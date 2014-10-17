@@ -38,6 +38,13 @@ class FrontController
     public static $appName;
 
     /**
+     * Préfix url pour l'application
+     *
+     * @var string
+     */
+    public static $appUrl = '';
+
+    /**
      * Id api utilisé par page du front
      * @var int
      */
@@ -288,7 +295,6 @@ class FrontController
 
                 /** On test l'existence du dossier app répondant au nom $ctrl **/
                 if ($this->testApp($ctrl) !== false) {
-
                     /** Si un application est déjà définie */
                     if ($application === true) {
                         $this->addRewriting($ctrl);
@@ -300,12 +306,14 @@ class FrontController
                     $idApi = $conf->get('fx', 'idApi');
                     if (!empty($idApi)) {
                         self::$idApiRew = $idApi;
+                        self::$appUrl = $ctrl;
                         unset($idApi, $conf);
                         continue;
                     }
 
                     $this->application = ucfirst($ctrl);
                     self::$appName = $this->application;
+
                     $this->app = $this->testApp($ctrl);
                     $application = true;
                     continue;
