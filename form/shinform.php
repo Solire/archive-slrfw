@@ -12,18 +12,18 @@ class ShinForm {
     const VALIDATE_FLOAT = 'number';
     const VALIDATE_INT = 'digits';
 
-    private $_config = null;
+    protected $_config = null;
 
     /**
      *
      * @var MyPDO
      */
-    private $_db = null;
-    private $_validateRules = null;
-    private $_errors = null;
-    private $_dataValidated = null;
-    private $_dataNotValidated = null;
-    private $_queries = null;
+    protected $_db = null;
+    protected $_validateRules = null;
+    protected $_errors = null;
+    protected $_dataValidated = null;
+    protected $_dataNotValidated = null;
+    protected $_queries = null;
 
     public function __construct($configName, $db, $configArray = null) {
         if ($configName != null) {
@@ -751,7 +751,7 @@ class ShinForm {
         return $this->_validate($stringToValidate, $validateType);
     }
 
-    private function _buildValidate() {
+    protected function _buildValidate() {
         foreach ($this->_config["form"] as $formName => $form) {
             foreach ($form["fields"] as $field) {
                 uksort($field["validate"]["rules"], array($this, "_sortRules"));
@@ -763,7 +763,7 @@ class ShinForm {
         }
     }
 
-    private function _validate($stringToValidate, $validateType, $file = null) {
+    protected function _validate($stringToValidate, $validateType, $file = null) {
 
         if (is_array(current($validateType))) {
             foreach (current($validateType) as $keyRuleParam => $ruleParam) {
@@ -848,11 +848,11 @@ class ShinForm {
         return $stringToValidate;
     }
 
-    private function _validateFile() {
+    protected function _validateFile() {
 
     }
 
-    private function _validateType($stringToValidate, $secureType, $params = null) {
+    protected function _validateType($stringToValidate, $secureType, $params = null) {
         switch ($secureType) {
             case "digits":
                 $stringToValidate = str_replace(CHR(32), "", $stringToValidate);
@@ -908,7 +908,7 @@ class ShinForm {
         return $filteredString;
     }
 
-    private function _validateUnique($stringToValidate, $params) {
+    protected function _validateUnique($stringToValidate, $params) {
 
         $stringToValidate2 = $this->_db->quote($stringToValidate);
         $query = "SELECT count(`" . $params["column"] . "`) FROM `" . $params["table"] . "` WHERE `" . $params["column"] . "` = $stringToValidate2";
@@ -916,18 +916,18 @@ class ShinForm {
         return $stringToValidate;
     }
 
-    private function _validateRestricted($stringToValidate, $params) {
+    protected function _validateRestricted($stringToValidate, $params) {
         $filteredString = in_array($stringToValidate, $params["value"]) ? $stringToValidate : false;
         return $filteredString;
     }
 
-    private function _validateRequired($stringToValidate) {
+    protected function _validateRequired($stringToValidate) {
         $filteredString = !isset($stringToValidate) || $stringToValidate == "" || $stringToValidate === 0 ? false : $stringToValidate;
 
         return $filteredString;
     }
 
-    private function _validateMaxLength($stringToValidate, $len) {
+    protected function _validateMaxLength($stringToValidate, $len) {
         if (strlen($stringToValidate) > $len)
             $filteredString = false;
         else
@@ -935,7 +935,7 @@ class ShinForm {
         return $filteredString;
     }
 
-    private function _validateMinLength($stringToValidate, $len) {
+    protected function _validateMinLength($stringToValidate, $len) {
         if (strlen($stringToValidate) != 0 && strlen($stringToValidate) < $len)
             $filteredString = false;
         else
@@ -943,7 +943,7 @@ class ShinForm {
         return $filteredString;
     }
 
-    private function _validateFileSize($stringToValidate, $sizeMax, $sizeToValidate) {
+    protected function _validateFileSize($stringToValidate, $sizeMax, $sizeToValidate) {
         $sizeMax = $sizeMax * 1024;
         if ($sizeToValidate > $sizeMax) {
             return false;
@@ -951,7 +951,7 @@ class ShinForm {
         return $stringToValidate;
     }
 
-    private function _validateFileExtension($fileName, $fileExtensionAllow) {
+    protected function _validateFileExtension($fileName, $fileExtensionAllow) {
         $extension = strrchr($fileName, '.');
         if ($fileName != "" && $fileExtensionAllow != null && in_array(substr($extension, 1), $fileExtensionAllow) === false) { //Si l'extension n'est pas dans le tableau
             return false;
@@ -959,7 +959,7 @@ class ShinForm {
         return $fileName;
     }
 
-    private function _sortRules($a, $b) {
+    protected function _sortRules($a, $b) {
         $priority = array('depends' => 0, 'required' => 1, 'minlength' => 2, 'maxlength' => 3);
         // company logic dictates a week begins on a Tuesday.
         if ((isset($priority[$a]) && !isset($priority[$b])) || (isset($priority[$b]) && isset($priority[$a]) && $priority[$a] < $priority[$b])) {
@@ -969,7 +969,7 @@ class ShinForm {
         }
     }
 
-    private function _sortRulesJs($a, $b) {
+    protected function _sortRulesJs($a, $b) {
         $priority = array('depends' => 0, 'required' => 1, 'minlength' => 2, 'maxlength' => 3);
         // company logic dictates a week begins on a Tuesday.
         if ((isset($priority[$a]) && !isset($priority[$b])) || (isset($priority[$b]) && isset($priority[$a]) && $priority[$a] < $priority[$b])) {
@@ -979,7 +979,7 @@ class ShinForm {
         }
     }
 
-    private function _removeHtml($string) {
+    protected function _removeHtml($string) {
         return strip_tags($string);
     }
 

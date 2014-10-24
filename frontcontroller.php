@@ -380,13 +380,28 @@ class FrontController
      */
     final public static function search($path, $current = true)
     {
+        $appLibDir = self::$mainConfig->get('appLibDir');
+
+        $initialPath = $path;
         if ($current === true) {
             $path = DS . strtolower(self::$appName) . DS . $path;
         } else {
             $path = DS . $path;
         }
         foreach (self::$appDirs as $app) {
+            if ($current === true) {
+                $dir = $app['dir'] . DS . strtolower(self::$appName);
+            } else {
+                $dir = $app['dir'];
+            }
             $fooPath = $app['dir'] . $path;
+
+            // Permet de faire correspondre des répertoires d'application
+            if ($appLibDir && isset($appLibDir[$dir])) {
+                $dir = $appLibDir[$dir];
+                $fooPath = $dir . DS . $initialPath;
+            }
+
             $testPath = new Path($fooPath, Path::SILENT);
             if ($testPath->get() !== false) {
                 return $testPath->get();
@@ -399,7 +414,7 @@ class FrontController
     /**
      * Cherche une classe
      *
-     * @param string  $className nom de la classe, avec les namespace, qui sera
+     * @param string $className nom de la classe, avec les namespace, qui sera
      * préfixé par le nom de l'app
      *
      * @return string|boolean
@@ -805,25 +820,25 @@ class FrontController
      *
      * @return string
      */
-    public static function getCurrentURL()
+    public static function getCurrentUrl()
     {
         // On ajoute selon le cas http ou https
-        if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == 'on') {
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $currentURL = 'https://';
         } else {
             $currentURL = 'http://';
         }
 
         // On ajoute le nom d'hote de l'url
-        $currentURL .= $_SERVER["SERVER_NAME"];
+        $currentURL .= $_SERVER['SERVER_NAME'];
 
         // Si le port est différent de 80 ou 443, on l'ajoute à l'url
-        if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
-            $currentURL .= ":" . $_SERVER["SERVER_PORT"];
+        if ($_SERVER['SERVER_PORT'] != '80' && $_SERVER['SERVER_PORT'] != '443') {
+            $currentURL .= ':' . $_SERVER['SERVER_PORT'];
         }
 
         // On ajoute enfin la fin de l'url
-        $currentURL .= $_SERVER["REQUEST_URI"];
+        $currentURL .= $_SERVER['REQUEST_URI'];
         return $currentURL;
     }
 

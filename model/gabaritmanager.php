@@ -368,7 +368,7 @@ class gabaritManager extends manager
      *
      * @param int $id_gabarit identifiant du gabarit en BDD
      *
-     * @return Slrfw\Model\gabarit
+     * @return \Slrfw\Model\gabarit
      */
     public function getGabarit($id_gabarit)
     {

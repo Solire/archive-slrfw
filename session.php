@@ -57,7 +57,7 @@ class Session
      * courante
      *
      * @return boolean
-     * @throws LibException
+     * @throws Exception\Lib
      * @config main [format] session Format du bloc session dans la config main
      * @uses Session->regen()
      */
@@ -241,8 +241,8 @@ class Session
      * @param string $password Mot de passe de la session
      *
      * @return bool
-     * @throws LibException
-     * @throws UserException
+     * @throws Exception\Lib
+     * @throws Exception\User
      */
     public function connect($login, $password)
     {
@@ -273,7 +273,7 @@ class Session
             $this->user = $user;
             $this->connected = true;
         } else {
-            throw new LibException('Impossible d\'enregistrer un cookie');
+            throw new Exception\Lib('Impossible d\'enregistrer un cookie');
         }
 
         return $this->connected;

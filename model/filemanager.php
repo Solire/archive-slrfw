@@ -718,11 +718,22 @@ class fileManager extends manager {
         $largeur_source = imagesx($source);
         $hauteur_source = imagesy($source);
 
-        if ($largeur_source > $largeurmax || $hauteur_source > $hauteurmax) {
-            $ratio = $hauteur_source / $hauteurmax;
-            if ($largeur_source / $ratio > $largeurmax) {
-                $ratio = $largeur_source / $largeurmax;
+        if ($largeurmax != '*' && $largeur_source > $largeurmax
+            || $hauteurmax != '*' && $hauteur_source > $hauteurmax
+        ) {
+            if ($largeurmax == '*') {
+                $ratioL = 1;
+            } else {
+                $ratioL = $largeur_source / $largeurmax;
             }
+            
+            if ($hauteurmax == '*') {
+                $ratioH = 1;
+            } else {
+                $ratioH = $hauteur_source / $hauteurmax;
+            }
+            
+            $ratio = max(array($ratioH, $ratioL));
 
             $largeur_destination = $largeur_source / $ratio;
             $hauteur_destination = $hauteur_source / $ratio;

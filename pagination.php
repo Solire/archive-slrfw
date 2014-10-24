@@ -68,10 +68,35 @@ class Pagination
     protected $limit;
 
     /**
+     * Html/Text du lien page précédente (Vide pour desactiver)
+     * @var string 
+     */
+    protected $prevHtml = '&lsaquo;';
+
+    /**
+     * Html/Text du lien page suivante  (Vide pour desactiver)
+     * @var string 
+     */
+    protected $nextHtml = '&rsaquo;';
+
+    /**
+     * Permet de limiter l'affichage des pages à N pages avant et après la page 
+     * courante (-1 pour la liste complete des pages)
+     * @var string 
+     */
+    protected $delta = 1;
+
+    /**
+     * Html/Text à afficher lorsqu'un delta est paramétré
+     * @var string
+     */
+    protected $deltaHtml = '&#8230;';
+
+    /**
      * Accès base de données
      * @var MyPDO
      */
-    private $_db = null;
+    private $db = null;
 
     /**
      * Constructeur de Pagination
@@ -155,20 +180,71 @@ class Pagination
     public function getPaginationArray()
     {
         $pages = array();
+
+        /* Lien page précédente */
+        if ($this->prevHtml && $this->currentPage > 1) {
+            $pages[] = array(
+                'text'    => $this->prevHtml,
+                'num'     => $this->currentPage - 1,
+                'current' => false,
+                'link'    => true
+            );
+        }
+
+        /* Lien des pages numérotées */
         for ($i = 1; $i <= $this->nbPages; $i++) {
             //Si il s'agit de la page actuelle
             if ($i == $this->currentPage) {
                 $pages[] = array(
-                    'num' => $i,
-                    'current' => true
+                    'text'    => $i,
+                    'num'     => $i,
+                    'current' => true,
+                    'link'    => false
                 );
             } else {
-                $pages[] = array(
-                    'num' => $i,
-                    'current' => false
-                );
+                /* Si première page
+                 *  ou dernière page
+                 *  ou toutes les pages à afficher
+                 */
+                if ($i == 1
+                    || $i == $this->nbPages
+                    || $this->delta < 0
+                    || $i < $this->currentPage
+                    && ($i + $this->delta) >= $this->currentPage
+                    || $i > $this->currentPage
+                    && ($i - $this->delta) <= $this->currentPage
+                ) {
+                    $pages[] = array(
+                        'text'    => $i,
+                        'num'     => $i,
+                        'current' => false,
+                        'link'    => true
+                    );
+                } elseif ($i < $this->currentPage
+                    && ($i + $this->delta + 1) == $this->currentPage
+                    || $i > $this->currentPage
+                    && ($i - $this->delta - 1) == $this->currentPage
+                ) {
+                    $pages[] = array(
+                        'text'    => $this->deltaHtml,
+                        'num'     => $this->deltaHtml,
+                        'current' => false,
+                        'link'    => false
+                    );
+                }
             }
         }
+
+        /* Lien page suivante*/
+        if ($this->nextHtml && $this->currentPage < $this->nbPages) {
+            $pages[] = array(
+                'text'    => $this->nextHtml,
+                'num'     => $this->currentPage + 1,
+                'current' => false,
+                'link'    => true
+            );
+        }
+
         return $pages;
     }
 
@@ -272,4 +348,3 @@ class Pagination
         }
     }
 }
-
