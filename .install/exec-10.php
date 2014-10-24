@@ -1,7 +1,7 @@
 <?php
 /**
  * Ajout d'un paramètre pour les champs de type fichier
- * afin de paramétrer des créations de miniatures pour 
+ * afin de paramétrer des créations de miniatures pour
  * les images uploadées
  *
  * @package    Slrfw
@@ -31,10 +31,10 @@ $query = '
       `code_champ_type`
     )
     VALUES (
-      'MINIATURE', 
-      'Miniature (200x100;*x50;50x*)', 
-      '', 
-      'FILE'
+      "MINIATURE",
+      "Miniature (200x100;*x50;50x*)",
+      "",
+      "FILE"
     );
 ';
 

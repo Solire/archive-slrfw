@@ -648,11 +648,11 @@ class FrontController
         $apiId = $db->query($query)->fetchColumn();
 
         if (empty($apiId)) {
-            /** On essaie de recuperer l'api par le domaine **/
+            /* On essaie de recuperer l'api par le domaine */
             $serverUrl = $_SERVER['SERVER_NAME'];
             $query = 'SELECT id_api '
-                   . 'FROM version '
-                   . 'WHERE domaine = ' . $db->quote($serverUrl);
+                   . 'FROM domaine '
+                   . 'WHERE hote = ' . $db->quote($serverUrl);
             $apiId = $db->query($query)->fetchColumn();
             if (empty($apiId)) {
                 $apiId = 1;
@@ -684,13 +684,14 @@ class FrontController
      */
     public function setVersion()
     {
-        $db = Registry::get('db');
+        $db = DB::get('base');
 
         /* = Permet de forcer une version (utile en dev ou recette)
           ------------------------------- */
         if (isset($_GET['version-force'])) {
             $_SESSION['version-force'] = $_GET['version-force'];
         }
+
         if (isset($_SESSION['version-force'])) {
             $sufVersion = $_SESSION['version-force'];
         } else {
@@ -707,20 +708,21 @@ class FrontController
          **/
         $serverUrl = $_SERVER['SERVER_NAME'];
 
-        $query = 'SELECT * '
-               . 'FROM `version` '
-               . 'WHERE  id_api = ' . intval(ID_API) . ' AND `domaine` = "' . $serverUrl . '"';
-        $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+        $query = 'SELECT `id_version` '
+               . 'FROM `domaine` '
+               . 'WHERE  `id_api` = ' . ID_API . ' '
+               . 'AND `hote` = ' . $db->quote($serverUrl);
+        $versionId = $db->query($query)->fetch(\PDO::FETCH_COLUMN);
 
         /**
          * Si aucune langue ne correspond
          *  on prend la version FR
          **/
-        if (!isset($version['id'])) {
+        if ($versionId === false) {
             $query = 'SELECT * '
                    . 'FROM `version` '
-                   . 'WHERE id_api = ' . intval(ID_API)
-                   . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+                   . 'WHERE id_api = ' . ID_API . ' '
+                   . 'AND `suf` LIKE ' . $db->quote($sufVersion);
             $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
             /**
@@ -728,12 +730,12 @@ class FrontController
              *  Si la langue en SESSION n'existe pas dans l'api
              *  On récupère la version FR DE la nouvelle api
              */
-            if (!isset($version['id'])) {
+            if ($version === false) {
                 $sufVersion = 'FR';
                 $query = 'SELECT * '
-                   . 'FROM `version` '
-                   . 'WHERE id_api = ' . intval(ID_API)
-                   . ' AND `suf` LIKE ' . $db->quote($sufVersion);
+                       . 'FROM `version` '
+                       . 'WHERE id_api = ' . ID_API . ' '
+                       . 'AND `suf` LIKE ' . $db->quote($sufVersion);
                 $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
             }
 
@@ -741,6 +743,12 @@ class FrontController
             Registry::set('url', $serverUrl);
             Registry::set('basehref', $serverUrl);
         } else {
+            $query = 'SELECT * '
+                   . 'FROM `version` '
+                   . 'WHERE `id_api` = ' . ID_API . ' '
+                   . 'AND `id` = ' . $versionId;
+            $version = $db->query($query)->fetch(\PDO::FETCH_ASSOC);
+
             Registry::set('url', 'http://' . $serverUrl . '/' . Registry::get('baseroot'));
             Registry::set('basehref', 'http://' . $serverUrl . '/' . Registry::get('baseroot'));
         }
