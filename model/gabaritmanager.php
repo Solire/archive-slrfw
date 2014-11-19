@@ -1470,6 +1470,7 @@ class gabaritManager extends manager
             $query .= ' `canonical` = ' . $this->_db->quote($donnees['canonical']) . ','
                     . ' `rewriting` = ' . $this->_db->quote($rewriting)
                     . ' WHERE `id` = ' . $page->getMeta('id')
+                    . ' AND `id_api` = ' . $page->getMeta('id_api')
                     . ' AND `id_version` = ' . $page->getMeta('id_version');
 
             $modfiTmp = $this->_db->exec($query);
