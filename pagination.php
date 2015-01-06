@@ -112,13 +112,14 @@ class Pagination
         $queryWithoutSelect,
         $queryGetField,
         $nbElemsByPage,
-        $currentPage
+        $currentPage,
+        $queryCount = null
     ) {
         $this->db = $myPdo;
         $this->queryWithoutSelect = $queryWithoutSelect;
         $this->queryGetField = $queryGetField;
         $this->nbElemsByPage = intval($nbElemsByPage);
-        $this->executeCountQuery();
+        $this->executeCountQuery($queryCount);
         if ($this->countResults == 0) {
             return;
         }
@@ -275,9 +276,13 @@ class Pagination
      * 
      * @return void
      */
-    private function executeCountQuery()
+    private function executeCountQuery($queryCount = null)
     {
-        $query = 'SELECT count(*) ' . $this->queryWithoutSelect;
+        if ($queryCount == null) {
+            $query = 'SELECT count(*) ' . $this->queryWithoutSelect;
+        } else {
+            $query = $queryCount;
+        }
         $prepareQuery = $this->db->prepare($query);
         $prepareQuery->execute();
         $this->countResults = $prepareQuery->fetch(\PDO::FETCH_COLUMN);
