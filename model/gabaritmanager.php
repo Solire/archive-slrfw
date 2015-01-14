@@ -1920,6 +1920,11 @@ class gabaritManager extends manager
         $hook->setSubdirName('gabarit');
 
         $hook->data = $donnees;
+        if (isset($ids_blocs)) {
+            $hook->ids_blocs = $ids_blocs;
+        } else {
+            $hook->ids_blocs = array();
+        }
         $hook->idGabPage = $id_gab_page;
         $hook->idVersion = $id_version;
         $hook->tableName = $table;
