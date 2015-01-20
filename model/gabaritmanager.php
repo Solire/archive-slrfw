@@ -1470,6 +1470,7 @@ class gabaritManager extends manager
             $query .= ' `canonical` = ' . $this->_db->quote($donnees['canonical']) . ','
                     . ' `rewriting` = ' . $this->_db->quote($rewriting)
                     . ' WHERE `id` = ' . $page->getMeta('id')
+                    . ' AND `id_api` = ' . $page->getMeta('id_api')
                     . ' AND `id_version` = ' . $page->getMeta('id_version');
 
             $modfiTmp = $this->_db->exec($query);
@@ -1919,6 +1920,11 @@ class gabaritManager extends manager
         $hook->setSubdirName('gabarit');
 
         $hook->data = $donnees;
+        if (isset($ids_blocs)) {
+            $hook->ids_blocs = $ids_blocs;
+        } else {
+            $hook->ids_blocs = array();
+        }
         $hook->idGabPage = $id_gab_page;
         $hook->idVersion = $id_version;
         $hook->tableName = $table;
