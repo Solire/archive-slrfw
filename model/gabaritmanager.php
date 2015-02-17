@@ -34,6 +34,15 @@ class gabaritManager extends manager
      */
     protected $gabaritBlocsDataCache = array();
 
+    /**
+     * Cache for optimization (champtypeparam)
+     */
+    protected $gabChampTypeParams = null;
+
+    /**
+     * Cache for optimization (champtypeparamdefault)
+     */
+    protected $gabChampTypeParamsDefault = null;
 
     /**
      * Tableau de mise en cache des versions.
@@ -496,7 +505,7 @@ class gabaritManager extends manager
     public function getBlocs($gabarit)
     {
         $gabaritMD5 = md5(serialize($gabarit));
-        if (!isset($this->gabaritBlocsDataCache[$gabaritMD5]) || !$this->cacheEnabled) {
+        if (!isset($this->gabaritBlocsDataCache[$gabaritMD5]) || !$this->cacheEnabled || 1) {
             $query  = 'SELECT *'
                     . ' FROM `gab_bloc`'
                     . ' WHERE `id_gabarit` = ' . $gabarit->getId();
@@ -507,21 +516,29 @@ class gabaritManager extends manager
              * a optimiser (1 requete pour champ dyn et champ normaux,
              * filtrer par id champ + type, voir faire des jointure sur gab_champ)
              */
-            $query  = 'SELECT `gc`.`id`, `gcpv`.*'
-                    . ' FROM `gab_champ` `gc`'
-                    . ' INNER JOIN `gab_champ_param_value` `gcpv`'
-                    . ' ON `gcpv`.`id_champ` = `gc`.`id`'
-                    . ' ORDER BY `id_group`, `ordre`';
-            $gabChampTypeParams = $this->_db->query($query)->fetchAll(
-                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+            if ($this->gabChampTypeParams == null) {
+                $query  = 'SELECT `gc`.`id`, `gcpv`.*'
+                        . ' FROM `gab_champ` `gc`'
+                        . ' INNER JOIN `gab_champ_param_value` `gcpv`'
+                        . ' ON `gcpv`.`id_champ` = `gc`.`id`'
+                        . ' ORDER BY `id_group`, `ordre`';
+                    $gabChampTypeParams = $this->_db->query($query)->fetchAll(
+                        \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
-            $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
-                    . ' FROM `gab_champ_type` `gct`'
-                    . ' INNER JOIN `gab_champ_param` `gcp`'
-                    . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
-                    . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
-            $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
-                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+                    $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
+                            . ' FROM `gab_champ_type` `gct`'
+                            . ' INNER JOIN `gab_champ_param` `gcp`'
+                            . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
+                            . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
+                    $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
+                        \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+
+                    $this->gabChampTypeParams = $gabChampTypeParams;
+                    $this->gabChampTypeParamsDefault = $gabChampTypeParamsDefault;
+            } else {
+                $gabChampTypeParams = $this->gabChampTypeParams;
+                $gabChampTypeParamsDefault = $this->gabChampTypeParamsDefault;
+            }
 
             foreach ($gabChampTypeParamsDefault as $type => $params) {
                 $paramsDefault[$type] = array();
