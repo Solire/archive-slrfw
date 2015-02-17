@@ -19,9 +19,21 @@ namespace Slrfw\Model;
 class gabaritManager extends manager
 {
     /**
+     * Enable / Disable Cache for optimization
+     */
+    public $cacheEnabled = false;
+
+    /**
      * Cache for optimization
      */
     protected $gabaritDataCache = array();
+
+    
+    /**
+     * Cache for optimization (gab_bloc)
+     */
+    protected $gabaritBlocsDataCache = array();
+
 
     /**
      * Tableau de mise en cache des versions.
@@ -377,7 +389,7 @@ class gabaritManager extends manager
      */
     public function getGabarit($id_gabarit)
     {
-        if (!isset($this->gabaritDataCache[$id_gabarit])) {
+        if (!isset($this->gabaritDataCache[$id_gabarit]) || !$this->cacheEnabled) {
             $query = 'SELECT * FROM `gab_gabarit` WHERE `id` = ' . $id_gabarit;
             $row = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
@@ -483,92 +495,96 @@ class gabaritManager extends manager
      */
     public function getBlocs($gabarit)
     {
-        $query  = 'SELECT *'
-                . ' FROM `gab_bloc`'
-                . ' WHERE `id_gabarit` = ' . $gabarit->getId();
-        $rows   = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
-
-        /**
-         * TODO
-         * a optimiser (1 requete pour champ dyn et champ normaux,
-         * filtrer par id champ + type, voir faire des jointure sur gab_champ)
-         */
-        $query  = 'SELECT `gc`.`id`, `gcpv`.*'
-                . ' FROM `gab_champ` `gc`'
-                . ' INNER JOIN `gab_champ_param_value` `gcpv`'
-                . ' ON `gcpv`.`id_champ` = `gc`.`id`'
-                . ' ORDER BY `id_group`, `ordre`';
-        $gabChampTypeParams = $this->_db->query($query)->fetchAll(
-            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
-
-        $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
-                . ' FROM `gab_champ_type` `gct`'
-                . ' INNER JOIN `gab_champ_param` `gcp`'
-                . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
-                . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
-        $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
-            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
-
-        foreach ($gabChampTypeParamsDefault as $type => $params) {
-            $paramsDefault[$type] = array();
-            foreach ($params as $param) {
-                $paramsDefault[$type][$param['code']] = $param['value'];
-            }
-        }
-
-        $blocs = array();
-        foreach ($rows as $row) {
-            $gabarit_bloc = new gabarit($row);
-
-            $table = $gabarit->getTable() . '_' . $row['name'];
-            $gabarit_bloc->setTable($table);
-
-            $joins = array();
-
+        $gabaritMD5 = md5(serialize($gabarit));
+        if (!isset($this->gabaritBlocsDataCache[$gabaritMD5]) || !$this->cacheEnabled) {
             $query  = 'SELECT *'
-                    . ' FROM `gab_champ`'
-                    . ' WHERE `id_parent` = ' . $row['id']
-                    . ' AND `type_parent` = "bloc"'
-                    . ' ORDER BY `ordre`';
-            $champs = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+                    . ' FROM `gab_bloc`'
+                    . ' WHERE `id_gabarit` = ' . $gabarit->getId();
+            $rows   = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
 
-            /** Paramètres */
-            foreach ($gabChampTypeParams as $idField => $params) {
-                $params2 = array();
+            /**
+             * TODO
+             * a optimiser (1 requete pour champ dyn et champ normaux,
+             * filtrer par id champ + type, voir faire des jointure sur gab_champ)
+             */
+            $query  = 'SELECT `gc`.`id`, `gcpv`.*'
+                    . ' FROM `gab_champ` `gc`'
+                    . ' INNER JOIN `gab_champ_param_value` `gcpv`'
+                    . ' ON `gcpv`.`id_champ` = `gc`.`id`'
+                    . ' ORDER BY `id_group`, `ordre`';
+            $gabChampTypeParams = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
+            $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
+                    . ' FROM `gab_champ_type` `gct`'
+                    . ' INNER JOIN `gab_champ_param` `gcp`'
+                    . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
+                    . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
+            $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+
+            foreach ($gabChampTypeParamsDefault as $type => $params) {
+                $paramsDefault[$type] = array();
                 foreach ($params as $param) {
-                    $params2[$param['code_champ_param']] = $param['value'];
+                    $paramsDefault[$type][$param['code']] = $param['value'];
                 }
-                foreach ($champs as &$champ) {
-                    if (!isset($champ['params'])) {
-                        if (isset($paramsDefault[$champ['type']])) {
-                            $champ['params'] = $paramsDefault[$champ['type']];
-                        } else {
-                            $champ['params'] = array();
+            }
+
+            $blocs = array();
+            foreach ($rows as $row) {
+                $gabarit_bloc = new gabarit($row);
+
+                $table = $gabarit->getTable() . '_' . $row['name'];
+                $gabarit_bloc->setTable($table);
+
+                $joins = array();
+
+                $query  = 'SELECT *'
+                        . ' FROM `gab_champ`'
+                        . ' WHERE `id_parent` = ' . $row['id']
+                        . ' AND `type_parent` = "bloc"'
+                        . ' ORDER BY `ordre`';
+                $champs = $this->_db->query($query)->fetchAll(\PDO::FETCH_ASSOC);
+
+                /** Paramètres */
+                foreach ($gabChampTypeParams as $idField => $params) {
+                    $params2 = array();
+
+                    foreach ($params as $param) {
+                        $params2[$param['code_champ_param']] = $param['value'];
+                    }
+                    foreach ($champs as &$champ) {
+                        if (!isset($champ['params'])) {
+                            if (isset($paramsDefault[$champ['type']])) {
+                                $champ['params'] = $paramsDefault[$champ['type']];
+                            } else {
+                                $champ['params'] = array();
+                            }
+                        }
+
+                        if ($champ['id'] == $idField) {
+                            $champ['params'] = array_merge($champ['params'], $params2);
+                        }
+
+                        if ($champ['type'] == 'JOIN') {
+                            $joins[$champ['id']] = $champ;
+                            unset($champ);
                         }
                     }
-
-                    if ($champ['id'] == $idField) {
-                        $champ['params'] = array_merge($champ['params'], $params2);
-                    }
-
-                    if ($champ['type'] == 'JOIN') {
-                        $joins[$champ['id']] = $champ;
-                        unset($champ);
-                    }
                 }
+
+                $gabarit_bloc->setChamps($champs);
+                $gabarit_bloc->setJoins($joins);
+
+                $bloc = new $this->gabaritBlocClassName();
+
+                $bloc->setGabarit($gabarit_bloc);
+                $blocs[$gabarit_bloc->getName()] = $bloc;
             }
-
-            $gabarit_bloc->setChamps($champs);
-            $gabarit_bloc->setJoins($joins);
-
-            $bloc = new $this->gabaritBlocClassName();
-
-            $bloc->setGabarit($gabarit_bloc);
-            $blocs[$gabarit_bloc->getName()] = $bloc;
+            $this->gabaritBlocsDataCache[$gabaritMD5] = $blocs;
         }
 
-        return $blocs;
+        return $this->gabaritBlocsDataCache[$gabaritMD5];
     }
 
     /**
