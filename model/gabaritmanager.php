@@ -19,6 +19,11 @@ namespace Slrfw\Model;
 class gabaritManager extends manager
 {
     /**
+     * Cache for optimization
+     */
+    protected $gabaritDataCache = array();
+
+    /**
      * Tableau de mise en cache des versions.
      *
      * @var array
@@ -372,97 +377,100 @@ class gabaritManager extends manager
      */
     public function getGabarit($id_gabarit)
     {
-        $query = 'SELECT * FROM `gab_gabarit` WHERE `id` = ' . $id_gabarit;
-        $row = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
+        if (!isset($this->gabaritDataCache[$id_gabarit])) {
+            $query = 'SELECT * FROM `gab_gabarit` WHERE `id` = ' . $id_gabarit;
+            $row = $this->_db->query($query)->fetch(\PDO::FETCH_ASSOC);
 
-        $gabarit = new gabarit($row);
+            $gabarit = new gabarit($row);
 
-        if ($row['id_api'] > 0) {
-            $query  = 'SELECT *'
-                    . ' FROM `gab_api`'
-                    . ' WHERE `id` = ' . $row['id_api'];
-            $api = $this->_db->query($query)->fetch();
-            $gabarit->setApi($api);
-            $table = $api['name'] . '_' . $row['name'];
-        } else {
-            $table = $row['name'];
-        }
-        $gabarit->setTable($table);
-
-        /**
-         * Récupération des champs
-         */
-        $query  = 'SELECT IF (`g`.`label` IS NULL, "general", `g`.`label`), `c`.*'
-                . ' FROM `gab_champ` `c`'
-                . ' LEFT JOIN `gab_champ_group` `g` ON `g`.`id` = `c`.`id_group`'
-                . ' WHERE `id_parent` = ' . $id_gabarit
-                . ' AND `type_parent` = "gabarit"'
-                . ' ORDER BY `g`.`ordre`, `c`.`ordre`';
-        $champs = $this->_db->query($query)->fetchAll(
-            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
-
-        /**
-         * TODO
-         * a optimiser (1 requete pour champ dyn et champ normaux,
-         * filtrer par id champ + type, voir faire des jointure sur gab_champ)
-         */
-        $query  = 'SELECT `gc`.`id`, `gcpv`.*'
-                . ' FROM `gab_champ` `gc`'
-                . ' INNER JOIN `gab_champ_param_value` `gcpv`'
-                . ' ON `gcpv`.`id_champ` = `gc`.`id`'
-                . ' ORDER BY `id_group`, `ordre`';
-        $gabChampTypeParams = $this->_db->query($query)->fetchAll(
-            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
-
-        $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
-                . ' FROM `gab_champ_type` `gct`'
-                . ' INNER JOIN `gab_champ_param` `gcp`'
-                . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
-                . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
-        $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
-            \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
-
-        foreach ($gabChampTypeParamsDefault as $type => $params) {
-            $paramsDefault[$type] = array();
-
-            foreach ($params as $param) {
-                $paramsDefault[$type][$param['code']] = $param['value'];
+            if ($row['id_api'] > 0) {
+                $query  = 'SELECT *'
+                        . ' FROM `gab_api`'
+                        . ' WHERE `id` = ' . $row['id_api'];
+                $api = $this->_db->query($query)->fetch();
+                $gabarit->setApi($api);
+                $table = $api['name'] . '_' . $row['name'];
+            } else {
+                $table = $row['name'];
             }
-        }
+            $gabarit->setTable($table);
 
-        $joins = array();
-        foreach ($gabChampTypeParams as $idField => $params) {
-            $params2 = array();
+            /**
+             * Récupération des champs
+             */
+            $query  = 'SELECT IF (`g`.`label` IS NULL, "general", `g`.`label`), `c`.*'
+                    . ' FROM `gab_champ` `c`'
+                    . ' LEFT JOIN `gab_champ_group` `g` ON `g`.`id` = `c`.`id_group`'
+                    . ' WHERE `id_parent` = ' . $id_gabarit
+                    . ' AND `type_parent` = "gabarit"'
+                    . ' ORDER BY `g`.`ordre`, `c`.`ordre`';
+            $champs = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
 
-            foreach ($params as $param) {
-                $params2[$param['code_champ_param']] = $param['value'];
+            /**
+             * TODO
+             * a optimiser (1 requete pour champ dyn et champ normaux,
+             * filtrer par id champ + type, voir faire des jointure sur gab_champ)
+             */
+            $query  = 'SELECT `gc`.`id`, `gcpv`.*'
+                    . ' FROM `gab_champ` `gc`'
+                    . ' INNER JOIN `gab_champ_param_value` `gcpv`'
+                    . ' ON `gcpv`.`id_champ` = `gc`.`id`'
+                    . ' ORDER BY `id_group`, `ordre`';
+            $gabChampTypeParams = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+
+            $query  = 'SELECT `gct`.`code`, `gcp`.*, `gcp`.`default_value` `value`'
+                    . ' FROM `gab_champ_type` `gct`'
+                    . ' INNER JOIN `gab_champ_param` `gcp`'
+                    . ' ON `gct`.`code` = `gcp`.`code_champ_type`'
+                    . ' ORDER BY  `gct`.`ordre`, `gct`.`code`';
+            $gabChampTypeParamsDefault = $this->_db->query($query)->fetchAll(
+                \PDO::FETCH_GROUP | \PDO::FETCH_ASSOC);
+
+            foreach ($gabChampTypeParamsDefault as $type => $params) {
+                $paramsDefault[$type] = array();
+
+                foreach ($params as $param) {
+                    $paramsDefault[$type][$param['code']] = $param['value'];
+                }
             }
-            foreach ($champs as &$group) {
 
-                foreach ($group as &$champ) {
-                    if (!isset($champ['params'])) {
-                        if (isset($paramsDefault[$champ['type']])) {
-                            $champ['params'] = $paramsDefault[$champ['type']];
-                        } else {
-                            $champ['params'] = array();
+            $joins = array();
+            foreach ($gabChampTypeParams as $idField => $params) {
+                $params2 = array();
+
+                foreach ($params as $param) {
+                    $params2[$param['code_champ_param']] = $param['value'];
+                }
+                foreach ($champs as &$group) {
+
+                    foreach ($group as &$champ) {
+                        if (!isset($champ['params'])) {
+                            if (isset($paramsDefault[$champ['type']])) {
+                                $champ['params'] = $paramsDefault[$champ['type']];
+                            } else {
+                                $champ['params'] = array();
+                            }
                         }
-                    }
 
-                    if ($champ['id'] == $idField) {
-                        $champ['params'] = array_merge($champ['params'], $params2);
-                    }
+                        if ($champ['id'] == $idField) {
+                            $champ['params'] = array_merge($champ['params'], $params2);
+                        }
 
-                    if ($champ['type'] == 'JOIN') {
-                        $joins[$champ['id']] = $champ;
-                        unset($champ);
+                        if ($champ['type'] == 'JOIN') {
+                            $joins[$champ['id']] = $champ;
+                            unset($champ);
+                        }
                     }
                 }
             }
+            $gabarit->setChamps($champs);
+            $gabarit->setJoins($joins);
+            $this->gabaritDataCache[$id_gabarit] = $gabarit;
         }
-        $gabarit->setChamps($champs);
-        $gabarit->setJoins($joins);
-        $this->_gabarits[$id_gabarit] = $gabarit;
-        return $this->_gabarits[$id_gabarit];
+        return $this->gabaritDataCache[$id_gabarit];
+        
     }
 
     /**
@@ -1776,21 +1784,19 @@ class gabaritManager extends manager
                 if ($query != '') {
                     $queryTmp   = 'UPDATE `' . $table . '` SET '
                                 . substr($query, 0, -1) . ' ' . $where;
-                }
-
-                $tmpModif = $this->_db->exec($queryTmp);
-                if (!$modif && $tmpModif > 0) {
-                    $modif = true;
+                    $tmpModif = $this->_db->exec($queryTmp);
+                    if (!$modif && $tmpModif > 0) {
+                        $modif = true;
+                    }
                 }
 
                 if ($queryT != '') {
                     $queryTmp   = 'UPDATE `' . $table . '` SET '
                                 . substr($queryT, 0, -1) . ' ' . $whereT;
-                }
-
-                $tmpModif = $this->_db->exec($queryTmp);
-                if (!$modif && $tmpModif > 0) {
-                    $modif = true;
+                    $tmpModif = $this->_db->exec($queryTmp);
+                    if (!$modif && $tmpModif > 0) {
+                        $modif = true;
+                    }
                 }
             }
         } else {
