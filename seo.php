@@ -3,74 +3,72 @@
 namespace Slrfw;
 
 /**
- * Manage SEO
+ * Manage SEO.
  */
 class Seo
 {
+    /**
+     * @var string Marker title
+     */
+    private $title;
 
     /**
-     *
-     * @var string  Marker title
+     * @var array keywords of the page
      */
-    private $_title;
+    private $keywords = [];
 
     /**
-     *
-     * @var array  keywords of the page
+     * @var string description of the page
      */
-    private $_keywords = array();
+    private $description = '';
 
     /**
-     *
-     * @var string  description of the page
+     * @var string url canonical of the page
      */
-    private $_description = '';
+    private $urlCanonical = '';
 
     /**
-     *
-     * @var string  url canonical of the page
+     * @var string url pagination précédente
      */
-    private $_urlCanonical = '';
-    
-    /**
-     *
-     * @var string  Author of page
-     */
-    private $_author;
-    
-    /**
-     *
-     * @var string  Authorname of page
-     */
-    private $_authorName;
+    private $prev = null;
 
     /**
-     *
-     * @var bool  indexation of the page
+     * @var string url pagination suivante
      */
-    private $_index = true;
+    private $next = null;
 
     /**
-     *
-     * @var bool  follow of the page
+     * @var string Author of page
      */
-    private $_follow = true;
-
+    private $author;
 
     /**
-     * Get Marker title
+     * @var string Authorname of page
+     */
+    private $authorName;
+
+    /**
+     * @var bool indexation of the page
+     */
+    private $index = true;
+
+    /**
+     * @var bool follow of the page
+     */
+    private $follow = true;
+
+    /**
+     * Get Marker title.
      *
      * @return string
      */
     public function getTitle()
     {
-        return $this->_title;
-
-    }//end getTitle()
-
+        return $this->title;
+    }
 
     /**
-     * Set Marker title
+     * Set Marker title.
      *
      * @param string $_title Marker title
      *
@@ -78,105 +76,89 @@ class Seo
      */
     public function setTitle($_title)
     {
-        $this->_title = $_title;
-
-    }//end setTitle()
-
+        $this->title = $_title;
+    }
 
     /**
-     * Get Prefix index
+     * Get Prefix index.
      *
      * @return string
      */
     public function getIndex()
     {
-        if ($this->_index === true) {
+        if ($this->index === true) {
             return '';
         } else {
             return 'no';
         }
-
-    }//end getIndex()
-
+    }
 
     /**
-     * Get Prefix follow
+     * Get Prefix follow.
      *
      * @return string
      */
     public function getFollow()
     {
-        if ($this->_follow === true) {
+        if ($this->follow === true) {
             return '';
         } else {
             return 'no';
         }
-
-    }//end getFollow()
-
+    }
 
     /**
-     * Enable indexation of the page
+     * Enable indexation of the page.
      *
      * @return void
      */
     public function enableIndex()
     {
-        $this->_index = true;
-
-    }//end enableIndex()
-
+        $this->index = true;
+    }
 
     /**
-     * Enable follow of the page
+     * Enable follow of the page.
      *
      * @return void
      */
     public function enableFollow()
     {
-        $this->_follow = true;
-
-    }//end enableFollow()
-
+        $this->follow = true;
+    }
 
     /**
-     * Disable indexation of the page
+     * Disable indexation of the page.
      *
      * @return void
      */
     public function disableIndex()
     {
-        $this->_index = false;
-
-    }//end disableIndex()
-
+        $this->index = false;
+    }
 
     /**
-     * Disable follow of the page
+     * Disable follow of the page.
      *
      * @return void
      */
     public function disableFollow()
     {
-        $this->_follow = false;
-
-    }//end disableFollow()
-
+        $this->follow = false;
+    }
 
     /**
-     * Get the array of keywords of the page
+     * Get the array of keywords of the page.
      *
      * @return array
      */
     public function getKeywords()
     {
-        return $this->_keywords;
-
-    }//end getKeywords()
-
+        return $this->keywords;
+    }
 
     /**
-     * Set the array of keywords of the page
+     * Set the array of keywords of the page.
      *
      * @param array $_keywords array of keywords
      *
@@ -184,60 +166,71 @@ class Seo
      */
     public function setKeywords($_keywords)
     {
-        $this->_keywords = $_keywords;
-
-    }//end setKeywords()
-
+        $this->keywords = $_keywords;
+    }
 
     /**
-     * Get description of the page
+     * Get description of the page.
      *
      * @return string
      */
     public function getDescription()
     {
-        return $this->_description;
-
-    }//end getDescription()
-
+        return $this->description;
+    }
 
     /**
-     * Get url canonical of the page
+     * Get url canonical of the page.
      *
      * @return string
      */
     public function getUrlCanonical()
     {
-        return $this->_urlCanonical;
+        return $this->urlCanonical;
+    }
 
-    }//end getDescription()
-    
-    
     /**
-     * Get author of the page
+     * Get url previous page.
+     *
+     * @return string
+     */
+    public function getPrev()
+    {
+        return $this->prev;
+    }
+
+    /**
+     * Get url next page.
+     *
+     * @return string
+     */
+    public function getNext()
+    {
+        return $this->next;
+    }
+
+    /**
+     * Get author of the page.
      *
      * @return string
      */
     public function getAuthor()
     {
-        return $this->_author;
+        return $this->author;
+    }
 
-    }//end getAuthor()
-    
     /**
-     * Get authorName of the page
+     * Get authorName of the page.
      *
      * @return string
      */
     public function getAuthorName()
     {
-        return $this->_authorName;
-
+        return $this->authorName;
     }
 
-
     /**
-     * Set description of the page
+     * Set description of the page.
      *
      * @param string $_description description of the page
      *
@@ -245,13 +238,11 @@ class Seo
      */
     public function setDescription($_description)
     {
-        $this->_description = $_description;
-
-    }//end setDescription()
-
+        $this->description = $_description;
+    }
 
     /**
-     * Set url canonical of the page
+     * Set url canonical of the page.
      *
      * @param string $_urlCanonical url canonical of the page
      *
@@ -259,13 +250,31 @@ class Seo
      */
     public function setUrlCanonical($_urlCanonical)
     {
-        $this->_urlCanonical = $_urlCanonical;
+        $this->urlCanonical = $_urlCanonical;
+    }
 
-    }//end setUrlCanonical()
-    
-    
     /**
-     * Set author of the page
+     * Get url previous page.
+     *
+     * @return string
+     */
+    public function setPrev($prev)
+    {
+        $this->prev = $prev;
+    }
+
+    /**
+     * Get url next page.
+     *
+     * @return string
+     */
+    public function setNext($next)
+    {
+        $this->next = $next;
+    }
+
+    /**
+     * Set author of the page.
      *
      * @param string $_author author of the page
      *
@@ -273,12 +282,11 @@ class Seo
      */
     public function setAuthor($_author)
     {
-        $this->_author = $_author;
+        $this->author = $_author;
+    }
 
-    }//end setAuthor()
-    
     /**
-     * Set authorName of the page
+     * Set authorName of the page.
      *
      * @param string $_authorName authorName of the page
      *
@@ -286,13 +294,11 @@ class Seo
      */
     public function setAuthorName($_authorName)
     {
-        $this->_authorName = $_authorName;
-
+        $this->authorName = $_authorName;
     }
 
-
     /**
-     * Add a keywords
+     * Add a keywords.
      *
      * @param string $_keyword a keyword
      *
@@ -300,22 +306,16 @@ class Seo
      */
     public function addKeyword($_keyword)
     {
-        $this->_keywords[] = $_keyword;
-
-    }//end addKeyword()
-
+        $this->keywords[] = $_keyword;
+    }
 
     /**
-     * Get keywords in string
+     * Get keywords in string.
      *
      * @return string
      */
     public function showKeywords()
     {
-        return implode(', ', $this->_keywords);
-
-    }//end showKeywords()
-
-
-}//end class
-
+        return implode(', ', $this->keywords);
+    }
+}
