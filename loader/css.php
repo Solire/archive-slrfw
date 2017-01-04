@@ -1,39 +1,34 @@
 <?php
-/**
- * Gestionnaire des fichiers css
- *
- * @package    Slrfw
- * @subpackage Core
- * @author     Dev <dave@solire.fr>
- * @license    Solire http://www.solire.fr/
- */
 
 namespace Slrfw\Loader;
 
+use Slrfw\FrontController;
+use Slrfw\Path;
+
 /**
- * Gestionnaire des fichiers css
+ * Gestionnaire des fichiers css.
  *
- * @package    Slrfw
- * @subpackage Core
  * @author     Dev <dave@solire.fr>
  * @license    Solire http://www.solire.fr/
  */
 class Css
 {
     /**
-     * Liste des librairies css à intégrer
+     * Liste des librairies css à intégrer.
+     *
      * @var array
      */
-    private $libraries = array();
+    private $libraries = [];
 
     /**
-     * Chargement du gestionnaire de css
+     * Chargement du gestionnaire de css.
      */
     public function __construct()
-    {}
+    {
+    }
 
     /**
-     * Renvois la liste des librairies css
+     * Renvois la liste des librairies css.
      *
      * @return array
      */
@@ -43,9 +38,10 @@ class Css
     }
 
     /**
-     * Renvois les clé de la liste des librairies
+     * Renvois les clé de la liste des librairies.
      *
      * @return array
+     *
      * @deprecated ???
      */
     public function loadedLibraries()
@@ -54,32 +50,28 @@ class Css
     }
 
     /**
-     * Renvois le chemin absolu vers la librairie en fonction des AppDirs
+     * Ajoute une librarie css.
      *
-     * @param string $filePath Chemin relatif de la librairie
+     * @param string $path  chemin absolu ou relatif du fichier
+     * @param string $media media de la librarie
+     * @param bool   $local Active ou non le préfixage par css/
      *
-     * @return string
+     * @return void
      */
-    protected function getPath($filePath)
+    public function addLibrary($path, $media = 'screen')
     {
-        $dirs = \Slrfw\FrontController::getAppDirs();
-
-        foreach ($dirs as $dir) {
-            $path = new \Slrfw\Path($dir['dir'] . DS . $filePath, \Slrfw\Path::SILENT);
-            if ($path->get()) {
-                return $dir['dir'] . DS . $filePath;
-            }
-        }
-
-        return null;
+        $this->libraries[] = [
+            'src' => $path,
+            'media' => $media,
+        ];
     }
 
     /**
-     * Affiche le code html pour l'intégration des librairies css
+     * Affiche le code html pour l'intégration des librairies css.
      *
      * @return string
      */
-    public function __toString()
+    public function html($space = 8)
     {
         $css = '';
         foreach ($this->libraries as $lib) {
@@ -88,9 +80,9 @@ class Css
             ) {
                 $path = $this->getPath($lib['src']);
                 if (empty($path)) {
-                    $path  = $lib['src'];
+                    $path = $lib['src'];
                 } else {
-                    $fileInfo  = pathinfo($path);
+                    $fileInfo = pathinfo($path);
 
                     $filemtime = filemtime($path);
 
@@ -101,30 +93,41 @@ class Css
                 $path = $lib['src'];
             }
 
-            $css   .= '        <link rel="stylesheet" href="' . $path
-                    . '" type="text/css" media="' . $lib['media']
-                    . '" />' . "\n";
+            $css .= str_pad('', $space)
+                  . '<link '
+                  . 'rel="stylesheet" '
+                  . 'href="' . $path. '" '
+                  . 'type="text/css" media="' . $lib['media'] . '">'
+                  . PHP_EOL
+            ;
         }
 
         return $css;
+    }
 
+    public function __toString()
+    {
+        return $this->html();
     }
 
     /**
-     * Ajoute une librarie css
+     * Renvois le chemin absolu vers la librairie en fonction des AppDirs.
      *
-     * @param string  $path  chemin absolu ou relatif du fichier
-     * @param string  $media media de la librarie
-     * @param boolean $local Active ou non le préfixage par css/
+     * @param string $filePath Chemin relatif de la librairie
      *
-     * @return void
+     * @return string
      */
-    public function addLibrary($path, $media = 'screen')
+    protected function getPath($filePath)
     {
-        $this->libraries[] = array(
-            'src' => $path,
-            'media' => $media,
-        );
+        $dirs = FrontController::getAppDirs();
+
+        foreach ($dirs as $dir) {
+            $path = new Path($dir['dir'] . DS . $filePath, Path::SILENT);
+            if ($path->get()) {
+                return $dir['dir'] . DS . $filePath;
+            }
+        }
+
+        return null;
     }
 }
-
