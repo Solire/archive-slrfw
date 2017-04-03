@@ -610,8 +610,13 @@ class FrontController
             Registry::set('basehref', $serverUrl);
 
         } else {
-            Registry::set('url', 'http://www.' . $serverUrl . '/');
-            Registry::set('basehref', 'http://www.' . $serverUrl . '/');
+            $protocol = 'http';
+            if (isset($_SERVER['HTTPS'])) {
+                $protocol .= 's';
+            }
+
+            Registry::set('url', $protocol . '://www.' . $serverUrl . '/');
+            Registry::set('basehref', $protocol . '://www.' . $serverUrl . '/');
         }
 
 
